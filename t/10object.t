@@ -43,5 +43,5 @@ use IWL::Object;
 	ok(!$object->existsAttribute('bar'), 'Exists attribute "bar"');
 
 	$object->deleteAttribute('foo');
-	ok(!$object->existsAttribute('foo'), 'Successfully deleted attribute "foo"');
+	ok(!$object->existsAttribute('foo'), 'Delete attribute "foo"');
 }
