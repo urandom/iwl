@@ -1,0 +1,63 @@
+#widgets_tree_body td {
+    cursor: pointer;
+}
+#content {
+    display: none;
+    padding: 5px;
+    overflow: auto;
+}
+#buttons_container *, #entries_container *, #images_container *, #labels_container * {
+    margin: 2px;
+}
+#contentbox_container {
+    width: 600px;
+    height: 600px;
+}
+#contentbox {
+    width: 300px;
+    margin: 0;
+}
+#file_container {
+    height: 4em;
+}
+#main_notebook {
+    margin-left: 10px;
+}
+.demo, .demo_label, div.demo span.button_label_default, .demo * {
+    color: #4546d0;
+}
+
+span.c_comment {
+    color: #0066dd;
+}
+span.c_label {
+    color: #447722;
+}
+span.c_string {
+    color: #009faf;
+}
+span.c_subroutine {
+    color: #000000;
+}
+span.c_variable {
+    color: #1133bb;
+}
+span.c_keyword {
+    color: #992f88;
+}
+span.c_misc {
+    color: #bf6c33;
+}
+#menus_container {
+    height: 150px;
+    width: 200px;
+}
+#menus_container div.button {
+    margin: 40px auto;
+    float: none;
+}
+#rpc_button, #rpc_combo {
+    margin: 1em auto;
+    float: none;
+    display: block;
+}

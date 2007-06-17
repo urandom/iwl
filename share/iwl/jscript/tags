@@ -1,0 +1,97 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+CanvasGradient_	dist/excanvas.js	/^  function CanvasGradient_(aType) {$/;"	f
+CanvasPattern_	dist/excanvas.js	/^  function CanvasPattern_() {}$/;"	f
+CanvasRenderingContext2D_	dist/excanvas.js	/^   function CanvasRenderingContext2D_(surfaceElement) {$/;"	f
+activate_widgets	demo.js	/^function activate_widgets (row) {$/;"	f
+activate_widgets_response	demo.js	/^function activate_widgets_response(or) {$/;"	f
+addEvent	firebug/firebug.js	/^    function addEvent(object, name, handler)$/;"	f
+appendFloat	firebug/firebug.js	/^    function appendFloat(object, html)$/;"	f
+appendFunction	firebug/firebug.js	/^    function appendFunction(object, html)$/;"	f
+appendInteger	firebug/firebug.js	/^    function appendInteger(object, html)$/;"	f
+appendNode	firebug/firebug.js	/^    function appendNode(node, html)$/;"	f
+appendNull	firebug/firebug.js	/^    function appendNull(object, html)$/;"	f
+appendObject	firebug/firebug.js	/^    function appendObject(object, html)$/;"	f
+appendObjectFormatted	firebug/firebug.js	/^    function appendObjectFormatted(object, html)$/;"	f
+appendRow	firebug/firebug.js	/^    function appendRow(row)$/;"	f
+appendSelector	firebug/firebug.js	/^    function appendSelector(object, html)$/;"	f
+appendString	firebug/firebug.js	/^    function appendString(object, html)$/;"	f
+appendText	firebug/firebug.js	/^    function appendText(object, html)$/;"	f
+cancelEvent	firebug/firebug.js	/^    function cancelEvent(event)$/;"	f
+checkElementValue	base.js	/^function checkElementValue(el, options) {$/;"	f
+checkForExistingScript	base.js	/^function checkForExistingScript(src) {$/;"	f
+codeForEvent	dist/effects.js	/^    function codeForEvent(options,eventName){$/;"	f
+contentbox_chooser_change	demo.js	/^function contentbox_chooser_change(chooser) {$/;"	f
+convertVersionString	dist/scriptaculous.js	/^    function convertVersionString(versionString){$/;"	f
+copy	dist/prototype.js	/^  function copy(methods, destination, onlyIfAbsent) {$/;"	f
+copyState	dist/excanvas.js	/^  function copyState(o1, o2) {$/;"	f
+createFrame	firebug/firebug.js	/^    function createFrame()$/;"	f
+createHtmlElement	base.js	/^function createHtmlElement(obj, paren, before_el) {$/;"	f
+createMatrixIdentity	dist/excanvas.js	/^  function createMatrixIdentity() {$/;"	f
+debug	debug.js	/^function debug (obj) {$/;"	f
+debugobj	debug.js	/^function debugobj (obj) {$/;"	f
+demo_init	demo.js	/^function demo_init () {$/;"	f
+disableView	base.js	/^function disableView() {$/;"	f
+displayStatus	base.js	/^function displayStatus(text) {$/;"	f
+displayStatusRemove	base.js	/^function displayStatusRemove() {$/;"	f
+enableView	base.js	/^function enableView() {$/;"	f
+escapeHTML	firebug/firebug.js	/^    function escapeHTML(value)$/;"	f
+evalCommandLine	firebug/firebug.js	/^    function evalCommandLine()$/;"	f
+exceptionHandler	base.js	/^function exceptionHandler () {$/;"	f
+extend	dist/prototype.js	/^  function extend(tagName) {$/;"	f
+findDOMClass	dist/prototype.js	/^  function findDOMClass(tagName) {$/;"	f
+fixPosition	dist/calendar.js	/^	function fixPosition(box) {$/;"	f
+flush	firebug/firebug.js	/^    function flush()$/;"	f
+focusCommandLine	firebug/firebug.js	/^    function focusCommandLine()$/;"	f
+getFirebugURL	firebug/firebug.js	/^    function getFirebugURL()$/;"	f
+getKeyCode	base.js	/^function getKeyCode(event) {$/;"	f
+getVisib	dist/calendar.js	/^	function getVisib(obj){$/;"	f
+iwl_calendar_on_select	calendar-create.js	/^function iwl_calendar_on_select (cal) {$/;"	f
+iwl_calendar_popup	calendar-create.js	/^function iwl_calendar_popup (params) {$/;"	f
+iwl_gmap_format	gmap.js	/^function iwl_gmap_format (map, format) {$/;"	f
+iwl_gmap_update_container	gmap.js	/^function iwl_gmap_update_container (map, id, format) {$/;"	f
+iwl_gmap_update_input	gmap.js	/^function iwl_gmap_update_input (map, id, format) {$/;"	f
+iwl_validate_degrees	gmap.js	/^function iwl_validate_degrees (value, max) {$/;"	f
+iwl_validate_latitude	gmap.js	/^function iwl_validate_latitude (value) {$/;"	f
+iwl_validate_longitude	gmap.js	/^function iwl_validate_longitude (value) {$/;"	f
+keyLogEvent	base.js	/^function keyLogEvent(callback) {$/;"	f
+layout	firebug/firebug.js	/^    function layout()$/;"	f
+logFormatted	firebug/firebug.js	/^    function logFormatted(objects, className)$/;"	f
+logRow	firebug/firebug.js	/^    function logRow(message, className, handler)$/;"	f
+loseFocus	base.js	/^function loseFocus(e) {$/;"	f
+makeTimePart	dist/calendar.js	/^			function makeTimePart(className, init, range_start, range_end) {$/;"	f
+matrixMultiply	dist/excanvas.js	/^  function matrixMultiply(m1, m2) {$/;"	f
+nextMonth	dist/calendar.js	/^			function nextMonth() {$/;"	f
+objectToString	firebug/firebug.js	/^    function objectToString(object)$/;"	f
+onCommandLineKeyDown	firebug/firebug.js	/^    function onCommandLineKeyDown(event)$/;"	f
+onError	firebug/firebug.js	/^    function onError(msg, href, lineNo)$/;"	f
+onKeyDown	firebug/firebug.js	/^    function onKeyDown(event)$/;"	f
+onSplitterMouseDown	firebug/firebug.js	/^    function onSplitterMouseDown(event)$/;"	f
+onSplitterMouseMove	firebug/firebug.js	/^    function onSplitterMouseMove(event)$/;"	f
+onSplitterMouseUp	firebug/firebug.js	/^    function onSplitterMouseUp(event)$/;"	f
+pageDimensions	prototype_extensions.js	/^function pageDimensions() {$/;"	f
+param_default	calendar-create.js	/^	function param_default(pname, def) { $/;"	f
+parseColor	dist/effects.js	/^    function parseColor(color){$/;"	f
+parseFormat	firebug/firebug.js	/^    function parseFormat(format)$/;"	f
+popGroup	firebug/firebug.js	/^    function popGroup()$/;"	f
+prevMonth	dist/calendar.js	/^			function prevMonth() {$/;"	f
+printfire	debug.js	/^function printfire() {$/;"	f
+processLineCap	dist/excanvas.js	/^  function processLineCap(lineCap) {$/;"	f
+processStyle	dist/excanvas.js	/^  function processStyle(styleString) {$/;"	f
+pushGroup	firebug/firebug.js	/^    function pushGroup(message, className)$/;"	f
+removeEvent	firebug/firebug.js	/^    function removeEvent(object, name, handler)$/;"	f
+removeSelectionFromNode	base.js	/^function removeSelectionFromNode(id) {$/;"	f
+replaceChars	firebug/firebug.js	/^        function replaceChars(ch)$/;"	f
+setMonth	dist/calendar.js	/^		function setMonth(m) {$/;"	f
+setVars	dist/calendar.js	/^			function setVars() {$/;"	f
+show_the_code	demo.js	/^function show_the_code() {$/;"	f
+sortTheMoney	demo.js	/^function sortTheMoney(col_index) {$/;"	f
+toggleConsole	firebug/firebug.js	/^    function toggleConsole(forceOpen)$/;"	f
+tryEval	base.js	/^function tryEval(text, total) {$/;"	f
+waitForBody	firebug/firebug.js	/^    function waitForBody()$/;"	f
+writeMessage	firebug/firebug.js	/^    function writeMessage(message, className, handler)$/;"	f
+writeRow	firebug/firebug.js	/^    function writeRow(message, className)$/;"	f

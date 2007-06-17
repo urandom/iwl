@@ -1,0 +1,70 @@
+/*******************************************************************************
+   Fixes for IE 6
+   Author: Marina Popova
+*******************************************************************************/
+
+div.shadowbox .contentbox_bottom {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/bl_shadow_alt0.gif') no-repeat 0px 0px;
+}
+div.shadowbox .contentbox_bottomr {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/br1100_shadow_alt0.gif') no-repeat right 0px; /* */
+}
+div.shadowbox .contentbox_bottom_alt2 {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/bl_shadow1.gif') no-repeat 0px 0px;
+}
+div.shadowbox .contentbox_bottomr_alt2 {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/br1100_shadow1.gif') no-repeat right 0px; /* */
+}
+div.shadowbox .contentbox_top {
+    height: 8px;
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/tl_shadow1.gif') no-repeat 0px 0px;
+}
+div.shadowbox .contentbox_topr {
+    height: 8px;
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/tr1100_shadow1.gif') no-repeat right 0px;
+}
+div.shadowbox .contentbox_titler,
+div.shadowbox .contentbox_footerr {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/title_r1.gif') repeat-y right 0px;
+    height:10px;
+}
+div.shadowbox .contentbox_middler,
+div.shadowbox .contentbox_footerr_alt2 {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/mr1100_shadow1.gif') repeat-y right 0px;
+}
+div.shadowbox .contentbox_header {
+    background: transparent url('/imperia/iwl/skin/default/images/contentbox/header1100_shadow1.gif') repeat-y right 0px;
+}
+
+div.shadowbox div.contentbox_bottom_alt2 {
+    padding-left: 8px;
+}
+div.shadowbox div.contentbox_top,
+div.shadowbox div.contentbox_topr {
+    height: 8px;
+}
+
+ul.menu {
+    width: 1%;
+}
+li.menu_item {   
+    height: 20px;
+}
+span.menubar_label {
+    padding: 3px 2px 2px 2px;
+}
+
+iframe.qframe {
+    z-index: 2;
+    border: 0px;
+    background-color: #ffffff;
+    position: absolute;
+    filter: progid:DXImageTransform.Microsoft.alpha(style=0,opacity=0);
+}
+
+iframe.completion {
+    z-index: 49;
+}
+ul.completion {
+    z-index: 50;
+}

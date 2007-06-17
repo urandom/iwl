@@ -1,0 +1,20 @@
+#list thead.tree_header th, #list thead.tree_header td { 
+    padding: 0 0 2px 5px;
+}
+li.menu_separator {
+    height: auto;
+}
+span.menubar_label {
+    padding: 2px 2px 3px 2px;
+}
+
+li.menubar_item_selected {
+    padding: 0 5px 0 5px;
+}
+div.slider_handle {
+    border-top: 1px #fff solid; 
+}    
+div.notebook_content {   
+    width: 99.7%;
+    margin-top: 0;
+}
