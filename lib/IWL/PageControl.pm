@@ -7,7 +7,7 @@ use strict;
 
 use base 'IWL::Container';
 
-use Locale::TextDomain qw (org.imperia.iwl);
+use Locale::TextDomain qw (iwl);
 use IWL::String qw(randomize);
 use JSON;
 

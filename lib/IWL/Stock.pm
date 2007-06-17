@@ -8,7 +8,7 @@ use strict;
 use base 'IWL::Object';
 
 use IWL::Config qw(%IWLConfig);
-use Locale::TextDomain qw (org.imperia.iwl);
+use Locale::TextDomain qw (iwl);
 
 =head1 NAME
 

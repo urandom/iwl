@@ -11,7 +11,7 @@ use IWL::Config qw(%IWLConfig);
 use IWL::Script;
 use IWL::Style;
 
-use Locale::TextDomain qw (org.imperia.iwl);
+use Locale::TextDomain qw (iwl);
 
 # Ouch ... this has to be package global.
 my $style;

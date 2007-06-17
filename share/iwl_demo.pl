@@ -1,11 +1,5 @@
 #! /usr/local/bin/perl
-#! /usr/local/bin/perl -d:ptkdb
-# $Id: iwl_demo.pl,v 1.24.2.22 2007/06/15 13:15:21 viktor Exp $
 # vim: set autoindent shiftwidth=4 tabstop=8:
-
-# Imperia AG is the sole owner and producer of its software "Imperia". For
-# our software license and copyright information please refer to: License.txt
-# Copyright (C) 1995-2006 Imperia AG.  All rights reserved.
 
 use strict;
 

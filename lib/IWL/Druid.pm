@@ -11,7 +11,7 @@ use IWL::Label;
 use IWL::String qw(randomize);
 
 use JSON;
-use Locale::TextDomain qw (imperia);
+use Locale::TextDomain qw (iwl);
 
 =head1 NAME
 

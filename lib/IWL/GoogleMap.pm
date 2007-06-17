@@ -9,7 +9,7 @@ use base qw (IWL::Widget);
 
 use IWL;
 
-use Locale::TextDomain qw (org.imperia.iwl);
+use Locale::TextDomain qw (iwl);
 
 sub new {
     my ($proto, %args) = @_;
