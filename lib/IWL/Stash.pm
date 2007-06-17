@@ -7,7 +7,7 @@ use strict;
 
 use base qw (IWL::Object);
 
-use Locale::TextDomain qw (org.imperia.iwl);
+use Locale::TextDomain qw (iwl);
 use IWL::String qw(encodeURI);
 
 # Forward declarations.

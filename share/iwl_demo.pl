@@ -359,7 +359,7 @@ sub generate_iconbox {
     foreach (1 .. 10) {
         my $icon = IWL::Iconbox::Icon->new;
         $iconbox->appendIcon($icon);
-        $icon->setImage('/imperia/skin/menuicons/drawer.png');
+        $icon->setImage($IWLConfig{SKIN_DIR} . '/images/demo/moon.png');
         $icon->setText($_ x 10);
 	if ($_ == 5) {
 	    $icon->setText('Irregular icon title');

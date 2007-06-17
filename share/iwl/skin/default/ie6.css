@@ -4,36 +4,36 @@
 *******************************************************************************/
 
 div.shadowbox .contentbox_bottom {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/bl_shadow_alt0.gif') no-repeat 0px 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/bl_shadow_alt0.gif') no-repeat 0px 0px;
 }
 div.shadowbox .contentbox_bottomr {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/br1100_shadow_alt0.gif') no-repeat right 0px; /* */
+    background: transparent url('/iwl/skin/default/images/contentbox/br1100_shadow_alt0.gif') no-repeat right 0px; /* */
 }
 div.shadowbox .contentbox_bottom_alt2 {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/bl_shadow1.gif') no-repeat 0px 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/bl_shadow1.gif') no-repeat 0px 0px;
 }
 div.shadowbox .contentbox_bottomr_alt2 {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/br1100_shadow1.gif') no-repeat right 0px; /* */
+    background: transparent url('/iwl/skin/default/images/contentbox/br1100_shadow1.gif') no-repeat right 0px; /* */
 }
 div.shadowbox .contentbox_top {
     height: 8px;
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/tl_shadow1.gif') no-repeat 0px 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/tl_shadow1.gif') no-repeat 0px 0px;
 }
 div.shadowbox .contentbox_topr {
     height: 8px;
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/tr1100_shadow1.gif') no-repeat right 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/tr1100_shadow1.gif') no-repeat right 0px;
 }
 div.shadowbox .contentbox_titler,
 div.shadowbox .contentbox_footerr {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/title_r1.gif') repeat-y right 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/title_r1.gif') repeat-y right 0px;
     height:10px;
 }
 div.shadowbox .contentbox_middler,
 div.shadowbox .contentbox_footerr_alt2 {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/mr1100_shadow1.gif') repeat-y right 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/mr1100_shadow1.gif') repeat-y right 0px;
 }
 div.shadowbox .contentbox_header {
-    background: transparent url('/imperia/iwl/skin/default/images/contentbox/header1100_shadow1.gif') repeat-y right 0px;
+    background: transparent url('/iwl/skin/default/images/contentbox/header1100_shadow1.gif') repeat-y right 0px;
 }
 
 div.shadowbox div.contentbox_bottom_alt2 {
