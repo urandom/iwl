@@ -20,7 +20,6 @@ lib/IWL/Frame.pm
 lib/IWL/GoogleMap.pm
 lib/IWL/HBox.pm
 lib/IWL/Hidden.pm
-lib/IWL/IWL.pod
 lib/IWL/Iconbox.pm
 lib/IWL/Image.pm
 lib/IWL/Input.pm
@@ -177,7 +176,6 @@ share/iwl/skin/default/calendar/win2k-cold-1/theme.css
 share/iwl/skin/default/calendar/win2k-cold-2/menuarrow.gif
 share/iwl/skin/default/calendar/win2k-cold-2/menuarrow2.gif
 share/iwl/skin/default/calendar/win2k-cold-2/theme.css
-share/iwl/skin/default/base.css
 share/iwl/skin/default/demo.css
 share/iwl/skin/default/ie.css
 share/iwl/skin/default/ie6.css
@@ -240,6 +238,7 @@ share/iwl/skin/default/images/contentbox/tr1000.gif
 share/iwl/skin/default/images/contentbox/tr1100_shadow1.gif
 share/iwl/skin/default/images/contentbox/tr1100_shadow1.png
 share/iwl/skin/default/images/contentbox/tr3000.gif
+share/iwl/skin/default/images/demo/moon.gif
 share/iwl/skin/default/images/entry/entry_bg.gif
 share/iwl/skin/default/images/icons/apply.gif
 share/iwl/skin/default/images/icons/add.gif
