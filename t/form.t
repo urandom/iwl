@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 2;
 
 use IWL;
 

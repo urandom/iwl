@@ -15,7 +15,6 @@ use IWL::String qw(encodeURI escapeHTML);
 
 # A hash to keep track of initialized js.
 my %initialized_js;
-my %initialized_json_js;
 
 =head1 NAME
 
@@ -59,6 +58,9 @@ sub new {
 
     # True if the object is realized
     $self->{_realized} = 0;
+
+    # Object tag
+    $self->{_tag} = '';
 
     return $self;
 }
@@ -487,6 +489,7 @@ Parameter:
 sub setAttribute {
     my ($self, $attr, $value, $escaping) = @_;
 
+    return unless $attr;
     return if $attr eq 'style';
 
     unless ($attr =~ /^[a-zA-Z_:][-.a-zA-Z0-9_:]*$/) {
@@ -542,6 +545,7 @@ Parameters: B<ATTR> - the attribute name to be returned, B<UNESCAPED> - optional
 sub getAttribute {
     my ($self, $attr, $unescaped) = @_;
 
+    return unless $attr;
     my $value = $self->{_attributes}{$attr};
     return unless defined $value;
 
@@ -566,6 +570,7 @@ Returns true if attribute B<ATTR> exists, false otherwise.
 sub existsAttribute {
     my ($self, $attr) = @_;
 
+    return unless $attr;
     return if $attr eq 'style';
 
     return exists $self->{_attributes}->{$attr};
@@ -582,6 +587,7 @@ Parameters: ATTR - the attribute name to be deleted
 sub deleteAttribute {
     my ($self, $attr) = @_;
 
+    return unless $attr;
     delete $self->{_attributes}{$attr};
     delete $self->{_escapings}{$attr};
 
@@ -692,7 +698,7 @@ in order to call it.
 =cut
 
 sub cleanStateful {
-    %initialized_js = %initialized_json_js = ();
+    %initialized_js = ();
 }
 
 # These are more or less copied from the Imperia ErrorSaver module.
