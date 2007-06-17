@@ -67,7 +67,7 @@ lib/IWL/Notebook/Tab.pm
 lib/IWL/PageControl.pm
 Makefile.PL
 README
-t/IWL.t
+t/01use.t
 Changes
 MANIFEST
 inc/Module/Install.pm

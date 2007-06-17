@@ -13,4 +13,6 @@ recommends		'Syntax::Highlight::Perl' => 1.00;
 
 install_share;
 
+auto_install;
+
 WriteAll;
