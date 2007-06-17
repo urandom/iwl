@@ -68,6 +68,7 @@ lib/IWL/PageControl.pm
 Makefile.PL
 README
 t/01use.t
+t/02string.t
 t/10object.t
 t/form.t
 t/stash.t
