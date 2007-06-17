@@ -5,9 +5,7 @@ package IWL::Stash;
 
 use strict;
 
-use base qw (IWL::Object);
-
-use Locale::TextDomain qw (iwl);
+use Locale::TextDomain qw(iwl);
 use IWL::String qw(encodeURI);
 
 # Forward declarations.
@@ -627,10 +625,6 @@ need the length of the list of keys.
 Sets the internal "__state" variable to the reference passed as a parameter of the function.
 
 =back
-
-=head1 INHERITANCE
-
-IWL::Object
 
 =head1 SEE ALSO
 
