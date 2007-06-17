@@ -70,6 +70,9 @@ README
 t/01use.t
 t/02string.t
 t/10object.t
+t/20text.t
+t/21script.t
+t/22widget.t
 t/form.t
 t/stash.t
 Changes

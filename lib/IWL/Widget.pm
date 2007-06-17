@@ -7,6 +7,7 @@ use strict;
 
 use base qw(IWL::Object IWL::RPC::Request);
 use IWL::Config qw(%IWLConfig);
+use IWL::Script;
 use JSON;
 
 =head1 NAME
@@ -139,7 +140,10 @@ sub signalDisconnect {
 
     my $callbacks = $self->getAttribute("on$signal", 'none');
 
-    $callbacks =~ s{$callback\s*;?}{};
+    my $index = index $callbacks, $callback;
+    return if $index == -1;
+
+    substr $callbacks, $index, length $callback, '';
     $self->setAttribute("on$signal" => $callbacks, 'none');
 
     return $self;
@@ -381,17 +385,19 @@ sub _realize {
 	my $id = $self->getId;
 	my $parent = $self->__findTopParent || $self;
 
-        foreach my $signal (keys %{$self->{_customSignals}}) {
-            my $expr = '';
-	    $expr .= ($_ || '') . ';' foreach (@{$self->{_customSignals}{$signal}});
-            if ($expr) {
-                $parent->{_customSignalScript} = IWL::Script->new
-                  unless $parent->{_customSignalScript};
-		$parent->{_customSignalScript}->appendScript(<<EOF);
+	if ($id) {
+	    foreach my $signal (keys %{$self->{_customSignals}}) {
+		my $expr = '';
+		$expr .= ($_ || '') . ';' foreach (@{$self->{_customSignals}{$signal}});
+		if ($expr) {
+		    $parent->{_customSignalScript} = IWL::Script->new
+		      unless $parent->{_customSignalScript};
+		    $parent->{_customSignalScript}->appendScript(<<EOF);
 \$('$id').signalConnect('$signal', function() { $expr });
 EOF
-            }
-        }
+		}
+	    }
+	}
 	if ($parent->{_customSignalScript} && !$parent->{_customSignalScript}{_added}) {
 	    $parent->_appendAfter($parent->{_customSignalScript}) if $parent->{_customSignalScript};
 	    $parent->{_customSignalScript}{_added} = 1;
