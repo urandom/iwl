@@ -68,6 +68,8 @@ lib/IWL/PageControl.pm
 Makefile.PL
 README
 t/01use.t
+t/form.t
+t/stash.t
 Changes
 MANIFEST
 inc/Module/Install.pm
