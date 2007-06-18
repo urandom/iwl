@@ -1,3 +1,4 @@
+bin/iwl-install
 lib/IWL.pm
 lib/IWL/Anchor.pm
 lib/IWL/Ajax.pm

@@ -61,7 +61,7 @@ use IWL::Upload;
 
 use vars qw($VERSION);
 
-$VERSION = '0.4.5';
+$VERSION = '0.45';
 
 1;
 
@@ -71,13 +71,11 @@ IWL - A widget library for the web
 
 =head1 VERSION
 
-This documentation refers to <IWL> version 0.4.5
+This documentation refers to B<IWL> version 0.45
 
 =head1 SYNOPSIS
 
     use IWL;
-    # Brief but working code example(s) here showing the most 
-    # common usage(s)
     
     # create the main container, and a few widgets
     my $page = IWL::Page->new;

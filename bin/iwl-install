@@ -1,0 +1,10 @@
+#! /usr/bin/perl
+
+eval {
+	require File::Copy::Recursive;
+	require File::ShareDir;
+};
+
+die "Could not load File::ShareDir or File::Copy::Recursive: $@" if $@;
+
+import File::Copy::Recursive 'rcopy';
