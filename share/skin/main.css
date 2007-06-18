@@ -209,7 +209,7 @@ button.button, input.inputbutton {
 
 span.entry {
     border: 1px solid #7F9DB9;
-    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    background-image:url('<IMAGE_PREFIX>/entry/entry_bg.gif');
     font-size: 16px;
     line-height: 16px;
 }
@@ -316,7 +316,7 @@ div.button_tl {
     left: 0px;
     width: 6px;
     height: 6px;
-    background: url(/iwl/skin/default/images/button/default_tl.gif) no-repeat bottom left;
+    background: url(<IMAGE_PREFIX>/button/default_tl.gif) no-repeat bottom left;
     font-size: 2px;
 }
 div.button_top {
@@ -324,7 +324,7 @@ div.button_top {
     top: 0px;
     left: 6px;
     height: 6px;
-    background: url(/iwl/skin/default/images/button/default_top.gif) repeat-x #f0ebe6 top;
+    background: url(<IMAGE_PREFIX>/button/default_top.gif) repeat-x #f0ebe6 top;
     font-size: 2px;
 }
 div.button_tr {
@@ -332,7 +332,7 @@ div.button_tr {
     top: 0px;
     width: 6px;
     height: 6px;
-    background: url(/iwl/skin/default/images/button/default_tr.gif) no-repeat bottom right;
+    background: url(<IMAGE_PREFIX>/button/default_tr.gif) no-repeat bottom right;
     font-size: 2px;
 }
 div.button_l {
@@ -341,7 +341,7 @@ div.button_l {
     left: 0px;
     width: 6px;
     height: 15px;
-    background: url(/iwl/skin/default/images/button/default_l.gif) repeat-y;
+    background: url(<IMAGE_PREFIX>/button/default_l.gif) repeat-y;
     font-size: 2px;
 }
 div.button_content {
@@ -349,7 +349,7 @@ div.button_content {
     top: 6px;
     left: 6px;
     white-space: nowrap;
-    background: url(/iwl/skin/default/images/button/default_content.gif) repeat;
+    background: url(<IMAGE_PREFIX>/button/default_content.gif) repeat;
     font-size: 2px;
     padding: 0 2px;
 }
@@ -359,7 +359,7 @@ div.button_r {
     top: 6px;
     width: 6px;
     height: 15px;
-    background: url(/iwl/skin/default/images/button/default_r.gif) repeat-y right;
+    background: url(<IMAGE_PREFIX>/button/default_r.gif) repeat-y right;
     font-size: 2px;
 }
 div.button_bl {
@@ -367,21 +367,21 @@ div.button_bl {
     left: 0px;
     width: 6px;
     height: 6px;
-    background: url(/iwl/skin/default/images/button/default_bl.gif) no-repeat top left;
+    background: url(<IMAGE_PREFIX>/button/default_bl.gif) no-repeat top left;
     font-size: 2px;
 }
 div.button_bottom {
     position: absolute;
     left: 6px;
     height: 6px;
-    background: url(/iwl/skin/default/images/button/default_bottom.gif) repeat-x #f0ebe6 bottom;
+    background: url(<IMAGE_PREFIX>/button/default_bottom.gif) repeat-x #f0ebe6 bottom;
     font-size: 2px;
 }
 div.button_br {
     position: absolute;
     width: 6px;
     height: 6px;
-    background: url(/iwl/skin/default/images/button/default_br.gif) no-repeat top right;
+    background: url(<IMAGE_PREFIX>/button/default_br.gif) no-repeat top right;
     font-size: 2px;
 }
 img.button_image {
@@ -443,18 +443,18 @@ div.contentbox_bottom {
 /*    position: relative;*/
 }
 div.contentbox_top {
-    background: transparent url('/iwl/skin/default/images/contentbox/tl.gif') no-repeat 0px 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/tl.gif') no-repeat 0px 0px;
 }
 div.contentbox_topr {
-    background: transparent url('/iwl/skin/default/images/contentbox/tr3000.gif') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/tr3000.gif') no-repeat right 0px;
 }
 div.contentbox_middle {
-/*    background: transparent url('/iwl/skin/default/images/contentbox/ml3000.gif') repeat-y 0px 0px;*/
+/*    background: transparent url('<IMAGE_PREFIX>/contentbox/ml3000.gif') repeat-y 0px 0px;*/
     background-color: white;
 /*    position: relative;*/
 }
 div.contentbox_middler {
-/*    background: transparent url('/iwl/skin/default/images/contentbox/mr.gif') repeat-y right 0px;*/
+/*    background: transparent url('<IMAGE_PREFIX>/contentbox/mr.gif') repeat-y right 0px;*/
     background-color: white;
     padding: 0 5px;
 /*    position: relative;*/
@@ -489,7 +489,7 @@ div.contentbox_titler {
     padding-bottom: 4px;
 }
 div.contentbox_title {
-    background: transparent url('/iwl/skin/default/images/contentbox/bg_t.gif') repeat-x bottom left;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bg_t.gif') repeat-x bottom left;
     font-weight : bold;
     color : #535c64;
 }
@@ -507,37 +507,37 @@ div.contentbox_footerr {
  * alt2 - white
  */
 div.contentbox_footer {
-    background: transparent url('/iwl/skin/default/images/contentbox/bg_ft_alt0.gif') repeat-x top left;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bg_ft_alt0.gif') repeat-x top left;
     padding-left: 5px;
     min-height: 15px;
 /*    position: relative;*/
 }
 div.contentbox_footer_alt1 {
-    background: transparent url('/iwl/skin/default/images/contentbox/bg_ft_alt1.gif') repeat-x top left;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bg_ft_alt1.gif') repeat-x top left;
 }
 
 div.contentbox_footer_alt2 {
-    background: transparent url('/iwl/skin/default/images/contentbox/bg_ft_alt2.gif') repeat-x top left;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bg_ft_alt2.gif') repeat-x top left;
 }
 div.contentbox_bottom {
-    background: transparent url('/iwl/skin/default/images/contentbox/bl_alt0.gif') no-repeat 0px 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bl_alt0.gif') no-repeat 0px 0px;
 /*    position: relative;*/
 }
 div.contentbox_bottom_alt1 {
-    background: transparent url('/iwl/skin/default/images/contentbox/bl_alt1.gif') no-repeat 0px 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bl_alt1.gif') no-repeat 0px 0px;
 }
 div.contentbox_bottom_alt2 {
-    background: transparent url('/iwl/skin/default/images/contentbox/bl_alt2.gif') no-repeat 0px 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bl_alt2.gif') no-repeat 0px 0px;
 }
 div.contentbox_bottomr {
-    background: transparent url('/iwl/skin/default/images/contentbox/br3000_alt0.gif') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/br3000_alt0.gif') no-repeat right 0px;
 /*    position: relative;*/
 }
 div.contentbox_bottomr_alt1 {
-    background: transparent url('/iwl/skin/default/images/contentbox/br3000_alt1.gif') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/br3000_alt1.gif') no-repeat right 0px;
 }
 div.contentbox_bottomr_alt2 {
-    background: transparent url('/iwl/skin/default/images/contentbox/br3000_alt2.gif') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/br3000_alt2.gif') no-repeat right 0px;
 }
 
 
@@ -549,7 +549,7 @@ div.contentbox_buttons {
 }
 div.contentbox_close {
     cursor: pointer;
-    background: transparent url('/iwl/skin/default/images/icons/close15x15.gif') no-repeat;
+    background: transparent url('<ICON_PREFIX>/close15x15.gif') no-repeat;
     width: 15px;
     height: 15px;
     margin-top: 2px;
@@ -557,7 +557,7 @@ div.contentbox_close {
 
 div.contentbox_resize {
     cursor: se-resize;
-    background: transparent url('/iwl/skin/default/images/icons/resize.gif') no-repeat bottom left;
+    background: transparent url('<ICON_PREFIX>/resize.gif') no-repeat bottom left;
     padding-right: 15px;
     min-height: 15px;
     display: inline;
@@ -588,7 +588,7 @@ div.shadowbox div.contentbox_header {
     text-align: left;
 }
 div.shadowbox div.contentbox_title {
-     background: transparent url('/iwl/skin/default/images/contentbox/title_l1.png') repeat-y left top;
+     background: transparent url('<IMAGE_PREFIX>/contentbox/title_l1.png') repeat-y left top;
      padding-left: 6px;
 }
 div.shadowbox div.contentbox_titler {
@@ -611,7 +611,7 @@ div.shadowbox img.contentbox_title_image {
 }
 
 div.shadowbox div.contentbox_middle {
-    background:transparent url('/iwl/skin/default/images/contentbox/middle_l1.png') repeat-y left 0px;
+    background:transparent url('<IMAGE_PREFIX>/contentbox/middle_l1.png') repeat-y left 0px;
 /*    position: relative;*/
     min-height: 30px;
     padding-left:6px;
@@ -628,12 +628,12 @@ div.shadowbox div.contentbox_content {
     overflow: auto;
 }
 div.shadowbox div.contentbox_footer {
-    background:transparent url('/iwl/skin/default/images/contentbox/title_l1.png') repeat-y left 0px;
+    background:transparent url('<IMAGE_PREFIX>/contentbox/title_l1.png') repeat-y left 0px;
 /*    position: relative;*/
     padding-left: 6px;
 }
 div.shadowbox div.contentbox_footer_alt2 {
-    background:transparent url('/iwl/skin/default/images/contentbox/middle_l1.png') repeat-y left 0px;
+    background:transparent url('<IMAGE_PREFIX>/contentbox/middle_l1.png') repeat-y left 0px;
 }
 div.shadowbox div.contentbox_footerr {
     padding-right: 12px;
@@ -654,34 +654,34 @@ div.shadowbox div.contentbox_bottomr {
 }
 
 html>body div.shadowbox div.contentbox_bottom {
-    background: transparent url('/iwl/skin/default/images/contentbox/bl_shadow_alt0.png') no-repeat 0px 0px; 
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bl_shadow_alt0.png') no-repeat 0px 0px; 
 } 
 html>body div.shadowbox div.contentbox_bottomr {
-    background: transparent url('/iwl/skin/default/images/contentbox/br1100_shadow_alt0.png') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/br1100_shadow_alt0.png') no-repeat right 0px;
 }
 html>body div.shadowbox div.contentbox_bottomr_alt2{
-    background: transparent url('/iwl/skin/default/images/contentbox/br1100_shadow1.png') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/br1100_shadow1.png') no-repeat right 0px;
 }
 html>body div.shadowbox div.contentbox_bottom_alt2 {
-    background: transparent url('/iwl/skin/default/images/contentbox/bl_shadow1.png') no-repeat 0px 0px; 
+    background: transparent url('<IMAGE_PREFIX>/contentbox/bl_shadow1.png') no-repeat 0px 0px; 
 }  
 html>body div.shadowbox div.contentbox_top {
-    background: transparent url('/iwl/skin/default/images/contentbox/tl_shadow1.png') no-repeat 0px 0px;  
+    background: transparent url('<IMAGE_PREFIX>/contentbox/tl_shadow1.png') no-repeat 0px 0px;  
 }
 html>body div.shadowbox div.contentbox_topr {
-    background: transparent url('/iwl/skin/default/images/contentbox/tr1100_shadow1.png') no-repeat right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/tr1100_shadow1.png') no-repeat right 0px;
 } 
 html>body div.shadowbox div.contentbox_titler,
 html>body div.shadowbox div.contentbox_footerr {
-    background: transparent url('/iwl/skin/default/images/contentbox/title_r1.png') repeat-y right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/title_r1.png') repeat-y right 0px;
 } 
 html>body div.shadowbox div.contentbox_middler,
 html>body div.shadowbox div.contentbox_footerr_alt2 {
-    background: transparent url('/iwl/skin/default/images/contentbox/mr1100_shadow1.png') repeat-y right 0px;
+    background: transparent url('<IMAGE_PREFIX>/contentbox/mr1100_shadow1.png') repeat-y right 0px;
     /* overflow: auto; */
 }
 html>body div.shadowbox div.contentbox_header {
-    background: transparent url('/iwl/skin/default/images/contentbox/header1100_shadow1.png') repeat-y right 0px;  
+    background: transparent url('<IMAGE_PREFIX>/contentbox/header1100_shadow1.png') repeat-y right 0px;  
 }       
 
 div.modal_view {
@@ -770,18 +770,18 @@ ul.notebook_mainnav {
 ul.notebook_mainnav li {
     display: inline;
     float: left;
-    background: url(/iwl/skin/default/images/notebook/offl.png) no-repeat top left;
+    background: url(<IMAGE_PREFIX>/notebook/offl.png) no-repeat top left;
     margin-right: 0.4em;
 }
 
 ul.notebook_mainnav li.notebook_tab_selected {
-    background: url(/iwl/skin/default/images/notebook/activel.gif) no-repeat top left;
+    background: url(<IMAGE_PREFIX>/notebook/activel.gif) no-repeat top left;
     border-bottom: 1px solid #fff;
 }
 
 ul.notebook_mainnav a {
     float: left;
-    background: url(/iwl/skin/default/images/notebook/offr.png) no-repeat top right;
+    background: url(<IMAGE_PREFIX>/notebook/offr.png) no-repeat top right;
     padding: 0.3em 0.6em 0.2em 0.6em;
     font-size: 10px;
     font-weight: bold;
@@ -793,7 +793,7 @@ ul.notebook_mainnav a {
 
 ul.notebook_mainnav li.notebook_tab_selected a {
     color: #666;
-    background: url(/iwl/skin/default/images/notebook/activer.gif) no-repeat top right;
+    background: url(<IMAGE_PREFIX>/notebook/activer.gif) no-repeat top right;
 }
 
 div.notebook_navborder {
@@ -834,7 +834,7 @@ div.disabled_view {
     border: 1px solid #454545;
 }
 div.disabled_view_rail {
-    background: transparent url(/iwl/skin/default/images/loader/loader.gif) no-repeat top left;
+    background: transparent url(<IMAGE_PREFIX>/loader/loader.gif) no-repeat top left;
     position: absolute;
     width: 32px;
     height: 32px;
@@ -944,10 +944,10 @@ li.menu_item {
     padding-right: 4px;
 }
 li.menu_radio_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_bullet20x20.gif) no-repeat top left;
+    background: url(<IMAGE_PREFIX>/menu/menu_bullet20x20.gif) no-repeat top left;
 }
 li.menu_check_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_tick20x20.gif) no-repeat top left;
+    background: url(<IMAGE_PREFIX>/menu/menu_tick20x20.gif) no-repeat top left;
 }
 
 li.menu_item_selected, li.menubar_item_selected {
@@ -970,7 +970,7 @@ span.menu_label, span.menu_label_parent {
     font-size: 9pt;
 }
 span.menu_label_parent {
-    background: url(/iwl/skin/default/images/menu/menu_next.gif) no-repeat right;
+    background: url(<IMAGE_PREFIX>/menu/menu_next.gif) no-repeat right;
     cursor: default;
     margin-right: 5px;
     padding-right: 10px;
@@ -1009,7 +1009,7 @@ div.slider_handle {
     margin: 0;
     top: 1px;
     left: 0px;
-    background: url(/iwl/skin/default/images/slider/handle.gif) no-repeat;
+    background: url(<IMAGE_PREFIX>/slider/handle.gif) no-repeat;
     cursor: move;
 }
 
@@ -1028,7 +1028,7 @@ div.vertical_slider div.slider_handle {
     width: 19px;
     left: 0px;
     top: 0px;
-    background: url(/iwl/skin/default/images/slider/vertical_handle.gif) no-repeat;
+    background: url(<IMAGE_PREFIX>/slider/vertical_handle.gif) no-repeat;
 }
 
 /* Page control */

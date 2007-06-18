@@ -30,7 +30,7 @@ use IWL::Widget;
 	$widget->setStyle(display => 'none');
 
 	is($widget->getStyle('width'), '80px');
-	is($widget->getContent, '< style="width: 80px; display: none; "></>' . "\n");
+	like($widget->getContent, qr/< style="(?:[\w-]+:\s*[\w-]+;\s*){2}"><\/>/);
 
 	is($widget->deleteStyle('width'), $widget);
 	is($widget->getContent, '< style="display: none; "></>' . "\n");
@@ -50,7 +50,7 @@ use IWL::Widget;
 	ok(!$widget->hasClass('baz'));
 	is($widget->removeClass('foo'), $widget);
 	ok(!$widget->hasClass('foo'));
-	is($widget->getContent, '< class="alpha bar" id="foo"></>' . "\n");
+	like($widget->getContent, qr/< (?:(?:class="alpha bar"|id="foo")\s*){2}><\/>/);
 }
 
 {
@@ -58,5 +58,5 @@ use IWL::Widget;
 
 	is($widget->setName('My name'), $widget);
 	is($widget->setTitle('My title'), $widget);
-	is($widget->getContent, '< name="My name" title="My title"></>' . "\n");
+	like($widget->getContent, qr/< (?:(?:name="My name"|title="My title")\s*){2}><\/>/);
 }

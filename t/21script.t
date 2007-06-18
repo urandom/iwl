@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More tests => 5;
 
 use IWL::Script;
 
@@ -6,7 +6,9 @@ use IWL::Script;
 	my $script = IWL::Script->new;
 
 	$script->setSrc('/foo/bar.js');
-	is($script->getContent, '<script src="/foo/bar.js" type="text/javascript"></script>' . "\n");
+    is($script->getAttribute('src'), '/foo/bar.js');
+    is($script->getAttribute('type'), 'text/javascript');
+    like($script->getContent, qr/<script (?:\w+=".*?(?<!\\)"){1}><\/script>/);
 }
 
 {

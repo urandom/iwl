@@ -68,6 +68,39 @@ mirror $shareskin                , $full_skindir;
 mirror $shareimages              , $full_imagedir;
 mirror $shareicons               , $full_icondir;
 
+prefix_replace(
+    $full_skindir . '/main.css',
+    $full_skindir . '/ie6.css'
+);
+
+#######################################################################
+# PREFIX replace subroutine {{{
+#######################################################################
+sub prefix_replace {
+    my $image = $skindir . '/default' . $imagedir;
+    my $icon  = $skindir . '/default' . $icondir;
+
+    foreach my $file (@_) {
+        next unless -f $file && -r $file && -w $file;
+        local *FILE;
+        my $content = '';
+        open FILE, $file;
+        while (<FILE>) {
+            $_ =~ s/<IMAGE_PREFIX>/$image/;
+            $_ =~ s/<ICON_PREFIX>/$icon/;
+            $content .= $_;
+        }
+        close FILE;
+
+        open FILE, "> $file";
+        print FILE $content;
+        close FILE;
+    }
+}
+#######################################################################
+# PREFIX replace subroutine }}}
+#######################################################################
+
 #######################################################################
 # Conf creation subroutine {{{
 #######################################################################
