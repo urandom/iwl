@@ -1,10 +1,139 @@
 #! /usr/bin/perl
 
+use strict;
+use Getopt::Long;
+
 eval {
-	require File::Copy::Recursive;
+	require File::Mirror;
 	require File::ShareDir;
 };
 
-die "Could not load File::ShareDir or File::Copy::Recursive: $@" if $@;
+die "Could not load File::ShareDir or File::Mirror $@" if $@;
 
 import File::Copy::Recursive 'rcopy';
+
+Getopt::Long::Configure ('no_ignore_case');
+
+my ($opt_docroot, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_help, $opt_jsdir, $opt_cgibin);
+
+GetOptions (
+	'docroot=s'  => \$opt_docroot,
+	'skindir=s'  => \$opt_skindir,
+	'imagedir=s' => \$opt_imagedir,
+	'icondir=s'  => \$opt_icondir,
+	'jsdir=s'    => \$opt_jsdir,
+    'cgibin=s'   => \$opt_cgibin,
+	'help'       => \$opt_help,
+) or exit 1;
+
+display_help() if $opt_help;
+
+usage_error("The option '--docroot' is mandatory.") unless $opt_docroot;
+
+my $docroot = $opt_docroot;
+die "$docroot: $!" unless -d $docroot;
+
+my $cgibin = $docroot . ($opt_cgibin || '/cgi-bin');
+
+my $jsdir    = $opt_jsdir || '/iwl/jscript';
+my $skindir  = $opt_skindir || '/iwl/skin';
+my $imagedir = $opt_imagedir || '/images';
+my $icondir  = $opt_icondir || '/images/icons';
+
+my $full_jsdir    = $docroot . $jsdir;
+my $full_skindir  = $docroot . $skindir . '/default';
+my $full_imagedir = $full_skindir . ($opt_imagedir || '/images');
+my $full_icondir  = $full_skindir . ($opt_icondir || '/images/icons');
+
+die "$cgibin: $!" unless -d $cgibin;
+
+create_conf_file();
+
+my $sharedir = File::ShareDir::dist_dir('IWL');
+
+#######################################################################
+# Conf creation subroutine {{{
+#######################################################################
+sub create_conf_file {
+    my $content = <<EOF;
+# The skin name to use
+# 
+#SKIN = "default"
+
+# The directory, containing the skins. It is relative to the server document
+# root
+#
+SKIN_DIR = "$skindir"
+
+# The directory, containing the images. It is relative to the skin directory
+#
+IMAGE_DIR = "$imagedir"
+
+# The directory, containing the icons. It is relative to the skin directory
+#
+ICON_DIR = "$icondir"
+
+# The icon extension
+#
+#ICON_EXT = "gif"
+
+# The directory, containing all javascript files. It is relative to the server
+# document root
+#
+JS_DIR = "$jsdir"
+
+# The level of strictness. If greater than 1, attribute names will be checked,
+# and an exception will be thrown in case the name is illegal
+#
+#STRICT_LEVEL = "1"
+EOF
+    my $conf_name = $cgibin . '/iwl.conf';
+    $conf_name .= '.new' if -s $conf_name;
+    local *CONF;
+
+    open (CONF, "> $conf_name") or die "Couldn't open $conf_name: $!\n";  
+    print CONF $content;
+    close CONF;
+}
+#######################################################################
+# Conf creation subroutine }}}
+#######################################################################
+
+#######################################################################
+# Info subroutines {{{
+#######################################################################
+sub display_help {
+	die <<EOF;
+Usage: $0 [OPTIONS]
+    -d, --docroot=DIR       the server document root
+    -h, --help              print this help message
+
+    Optional:
+        -j, --jsdir=DIR     the javascript dir, relative to the document root
+        -s, --skindir=DIR   the skins dir, relative to the document root
+        --imagedir=DIR      the image dir, relative to the default skin dir
+        --icondir=DIR       the icon dir, relative to the default icon dir
+
+        -c, --cgibin=DIR    the cgi-bin directory, relative to the document root
+                            /cgi-bin is assumed if none is specified
+
+EOF
+	exit 0;
+}
+
+sub usage_error {
+	my $message = shift;
+	if ($message) {
+		$message =~ s/\s+$//;
+		$message = "$message\n\n";
+	} else {
+		$message = '';
+	}
+	die <<EOF;
+${message}usage: $0 [OPTIONS]
+try '$0 --help' for more information!
+EOF
+}
+#######################################################################
+# Info subroutines }}}
+#######################################################################

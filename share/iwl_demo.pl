@@ -367,7 +367,7 @@ sub generate_iconbox {
 		  "displayStatus('This callback was activated when icon $_ was selected')");
 	    $icon->setClass('demo');
 	}
-        $icon->setDimensions('64px', '64px');
+        $icon->setDimensions('80px', '80px');
 	$icon->setSelected(1) if $_ == 1;
     }
 
@@ -830,3 +830,16 @@ sub show_the_code_for {
 
     return $paragraph->getContent;
 }
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perldoc perlartistic.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
