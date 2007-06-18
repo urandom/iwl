@@ -183,6 +183,7 @@ t/10stash.t
 t/20text.t
 t/21script.t
 t/22widget.t
+t/30anchor.t
 t/30form.t
 t/iwl.conf
 lib/IWL/Table/Row.pm

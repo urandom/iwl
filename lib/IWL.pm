@@ -177,6 +177,8 @@ The following widgets have so far been written. They have extensive documentatio
 
 Configuration is done by editing the I<iwl.conf> file. It can be placed in the directory of the scripts that use IWL, or it's full path and name can be fiven in the I<IWL_CONFIG_FILE> environment variable. A default configuration is provided inside IWL::Config(3pm). See IWL::Config(3pm) for more details
 
+In order to actually use the library, the javascript and css files will also have to be installed in the server's document root. To do that, the 'iwl-install' script is provided. It is usually located in '/usr/bin'. The script also creates a I<iwl.conf> file from the user input.
+
 
 =head1 DEPENDENCIES
 
@@ -191,7 +193,6 @@ Configuration is done by editing the I<iwl.conf> file. It can be placed in the d
 =head2 General
 
  - Write more testcases
- - Write an installer
 
 =head2 Perl
 

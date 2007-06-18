@@ -19,6 +19,10 @@ To install this module type the following:
    make test
    make install
 
+In order to actually use the library, the javascript and css files will also
+have to be installed in the server's document root. To do that, the
+'iwl-install' script is provided. It is usually located in '/usr/bin'
+
 DEPENDENCIES
 
 This module requires these other modules and libraries:
