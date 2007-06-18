@@ -218,6 +218,7 @@ sub deleteStyle {
     my ($self, $attr) = @_;
 
     delete $self->{_style}{$attr};
+    return $self;
 }
 
 =item B<setId> (B<ID>)
