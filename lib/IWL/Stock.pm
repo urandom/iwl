@@ -5,8 +5,6 @@ package IWL::Stock;
 
 use strict;
 
-use base 'IWL::Object';
-
 use IWL::Config qw(%IWLConfig);
 use Locale::TextDomain qw (iwl);
 
