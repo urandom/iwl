@@ -41,13 +41,13 @@ die "$docroot: $!" unless -d $docroot;
 
 my $cgibin = $docroot . ($opt_cgibin || '/cgi-bin');
 
-my $jsdir    = $opt_jsdir || '/iwl/jscript';
-my $skindir  = $opt_skindir || '/iwl/skin';
+my $jsdir    = $opt_jsdir    || '/iwl/jscript';
+my $skindir  = $opt_skindir  || '/iwl/skin';
 my $imagedir = $opt_imagedir || '/images';
-my $icondir  = $opt_icondir || '/images/icons';
+my $icondir  = $opt_icondir  || '/images/icons';
 
-my $full_jsdir    = $docroot . $jsdir;
-my $full_skindir  = $docroot . $skindir . '/default';
+my $full_jsdir    = $docroot      . $jsdir;
+my $full_skindir  = $docroot      . $skindir . '/default';
 my $full_imagedir = $full_skindir . $imagedir;
 my $full_icondir  = $full_skindir . $icondir;
 
@@ -55,7 +55,8 @@ die "$cgibin: $!" unless -d $cgibin;
 
 create_conf_file();
 
-my $sharedir    = File::ShareDir::dist_dir('IWL');
+require IWL;
+my $sharedir    = File::ShareDir::module_dir('IWL');
 my $sharejs     = $sharedir . '/jscript';
 my $shareskin   = $sharedir . '/skin';
 my $shareimages = $sharedir . '/images';
@@ -175,7 +176,20 @@ sub recursive(&@) {
 }
 
 sub mirror {
+    mkdir_p($_[1]);
     recursive { -d $_[0] ? do { mkdir($_[1]) unless -d $_[1] } : copy(@_) } @_;
+}
+
+sub mkdir_p {
+    my $path = shift;
+    my @path = File::Spec->splitdir($path);
+    my $partial = $path[0];
+    return if -f $partial;
+    mkdir $partial unless -d $partial;
+    foreach (@path[1 .. $#path]) {
+        $partial = File::Spec->catfile($partial, $_);
+        mkdir $partial unless -d $partial;
+    }
 }
 #######################################################################
 # File::Mirror }}}
