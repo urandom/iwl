@@ -10,7 +10,6 @@ requires		'HTML::Parser' => 2.25;
 
 build_requires	'Test::Weaken' => 0.99;
 recommends		'Syntax::Highlight::Perl' => 1.00;
-recommends		'File::Mirror' => 0.10;
 recommends		'File::ShareDir' => 0.05;
 
 install_script	'bin/iwl-install';
