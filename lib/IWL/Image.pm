@@ -123,9 +123,17 @@ Returns the URL of the image
 =cut
 
 sub getSrc {
-    my $self = shift;
+    shift->getAttribute('src');
+}
 
-    return $self->getAttribute('src');
+=item B<getAlt>
+
+Returns the alternative text of the image
+
+=cut
+
+sub getAlt {
+    shift->getAttribute('alt');
 }
 
 1;
