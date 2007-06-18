@@ -75,7 +75,7 @@ sub create_conf_file {
     my $content = <<EOF;
 # The skin name to use
 # 
-#SKIN = "default"
+# SKIN = "default"
 
 # The directory, containing the skins. It is relative to the server document
 # root
@@ -92,7 +92,7 @@ ICON_DIR = "$icondir"
 
 # The icon extension
 #
-#ICON_EXT = "gif"
+# ICON_EXT = "gif"
 
 # The directory, containing all javascript files. It is relative to the server
 # document root
@@ -102,7 +102,7 @@ JS_DIR = "$jsdir"
 # The level of strictness. If greater than 1, attribute names will be checked,
 # and an exception will be thrown in case the name is illegal
 #
-#STRICT_LEVEL = "1"
+# STRICT_LEVEL = "1"
 EOF
     my $conf_name = $cgibin . '/iwl.conf';
     $conf_name .= '.new' if -s $conf_name;
