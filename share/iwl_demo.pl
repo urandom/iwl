@@ -75,7 +75,7 @@ if (my $file = $form{upload_file}) {
     my $notebook = IWL::Notebook->new(id => 'main_notebook');
     my $container = IWL::Container->new(id => 'content');
     my $style = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/demo.css');
-    my @scripts = (qw(demo.js firebug/firebug.js));
+    my @scripts = (qw(demo.js));
 #    my @scripts = (qw(demo.js button.js iconbox.js tree.js contentbox.js druid.js notebook.js upload.js popup.js firebug/firebug.js));
 
     $page->appendChild($hbox);
