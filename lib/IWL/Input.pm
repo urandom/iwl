@@ -51,10 +51,10 @@ sub new {
 }
 
 sub newMultipleFromHash {
-    my ($proto, %args) = @_;
+    my ($proto, @args) = @_;
     my @inputs;
-    foreach my $name (keys %args) {
-	my $input = $proto->new(name => $name, value => $args{$name});
+    while (my $name = shift @args) {
+	my $input = $proto->new(name => $name, value => shift @args);
 	push @inputs, $input;
     }
     return @inputs;
@@ -100,6 +100,16 @@ sub setValue {
     my ($self, $value) = @_;
 
     return $self->setAttribute(value => $value);
+}
+
+=item B<getValue>
+
+Gets the value of the input
+
+=cut
+
+sub getValue {
+    shift->getAttribute('value');
 }
 
 =item B<setDisabled> (B<BOOL>)
