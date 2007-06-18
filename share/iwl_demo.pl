@@ -3,11 +3,6 @@
 
 use strict;
 
-BEGIN {
-    push @INC, $1 if $0 =~ m#(.*)[\\\/]#;
-    require site_lowlevel;
-}
-
 # use CGI qw/:standard/;
 use IWL;
 use IWL::Config qw(%IWLConfig);
@@ -97,12 +92,6 @@ if (content)
 EOF
 	    update => "source_page",
     });
-
-    my $cal_scripts = IWL::Calendar->getRequiredScripts;
-    my $cal_styles = IWL::Calendar->getRequiredStyles;
-    foreach my $link (@$cal_scripts, @$cal_styles) {
-	$page->appendHeader ($link);
-    }
 
     build_tree($tree);
     $page->setTitle('Widget Library');
@@ -212,19 +201,11 @@ sub build_containers {
 sub build_misc {
     my $row       = shift;
     my $file      = IWL::Tree::Row->new(id => 'file_row');
-    my $flat_cal  = IWL::Tree::Row->new(id => 'flat_calendar_row');
-    my $popup_cal = IWL::Tree::Row->new(id => 'popup_calendar_row');
 
     $file->appendTextCell('File Upload');
     $row->appendRow($file);
 
-    $flat_cal->appendTextCell('Calendar');
-    $row->appendRow($flat_cal);
-
-    $popup_cal->appendTextCell('Popup calendar');
-    $row->appendRow($popup_cal);
-
-    register_row_event($file, $flat_cal, $popup_cal);
+    register_row_event($file);
 }
 
 sub generate_buttons {
@@ -598,99 +579,6 @@ sub generate_file {
     return $container->getObject;
 }
 
-sub __generate_feedback_form {
-    my $calendar = shift;
-
-    my $table = IWL::Table->new(cellspacing => 2, cellpadding => 2);
-    my $feedbacks = [
-		     {
-			 name => 'Day of the week',
-			 format => '%A',
-			},
-			{
-			    name => 'Day of the month',
-			    format => '%e',
-			},
-			{
-			    name => 'Month',
-			    format => '%B',
-			},
-			{
-			    name => 'Year',
-			    format => '%Y',
-			},
-			{
-			    name => 'Hour',
-			    format => '%H',
-			},
-			{
-			    name => 'Minute',
-			    format => '%M',
-			},
-			{
-			    name => 'Seconds',
-			    format => '%S',
-			},
-			];
-
-    my $headline = IWL::Table::Row->new;
-    $headline->appendTextHeaderCell('Description');
-    $headline->appendTextHeaderCell('Format');
-    $headline->appendTextHeaderCell('Value');
-    $table->appendHeader($headline);
-
-    foreach my $entry(@$feedbacks) {
-        my $row = IWL::Table::Row->new;
-        $row->appendTextCell($entry->{name});
-        $row->appendTextCell($entry->{format});
-        my $input = IWL::Input->new;
-        my $input_id = "$input";
-        $input_id =~ s/.*0x([0-9a-fA_F]+)\)$/fb_$1/;
-        $input->setId($input_id);
-        $row->appendCell($input);
-        $table->appendBody($row);
-        $calendar->connectInputField($input, $entry->{format});
-    }
-
-    return $table;
-}
-
-sub generate_flat_calendar {
-    my $container = IWL::Container->new(id => 'flat_calendar_container');
-    my $calendar = IWL::Calendar->new;
-
-    my $hbox = IWL::HBox->new;
-    $hbox->packStart(__generate_feedback_form($calendar));
-
-    my $inner_container = IWL::Container->new(id => 'flat_calendar_inner');
-    $inner_container->appendChild($calendar);
-    $hbox->packStart($inner_container);
-    $container->appendChild($hbox);
-
-    return $container->getObject;
-}
-
-sub generate_popup_calendar {
-    my $container = IWL::Container->new(id => 'popup_calendar_container');
-    my $calendar = IWL::Calendar->new;
-    $calendar->setPopupMode(1);
-    my $trigger = IWL::Image->newFromStock('IWL_STOCK_CALENDAR');
-    $trigger->setId('popup_calendar_trigger');
-    $calendar->connectToTrigger($trigger, 'click');
-
-    my $hbox = IWL::HBox->new;
-    $hbox->packStart(__generate_feedback_form($calendar));
-
-    my $inner_container = IWL::Container->new(id => 'popup_calendar_inner');
-    $inner_container->appendChild($trigger);
-    $inner_container->appendChild(IWL::Label->new->setText("Click image"));
-    $inner_container->appendChild($calendar);
-    $hbox->packStart($inner_container);
-    $container->appendChild($hbox);
-
-    return $container->getObject;
-}
-
 sub generate_rpc_events {
     my $container = IWL::Container->new(id => 'rpc_events_container');
     my $button = IWL::Button->new(id => 'rpc_button')->setLabel('Click me!');
@@ -817,10 +705,6 @@ sub show_the_code_for {
 	$paragraph->appendTextType(read_code("generate_tooltips", 22), 'pre');
     } elsif ($code_for eq 'file_container') {
 	$paragraph->appendTextType(read_code("generate_file", 13), 'pre');
-    } elsif ($code_for eq 'flat_calendar_container') {
-	$paragraph->appendTextType(read_code("generate_feedback_form", 71), 'pre');
-    } elsif ($code_for eq 'popup_calendar_container') {
-	$paragraph->appendTextType(read_code("generate_popup_calendar", 20), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {
 	$paragraph->appendTextType(read_code("generate_rpc_events", 14), 'pre');
 	$paragraph->appendTextType(read_code("Event row handlers", 15), 'pre');
