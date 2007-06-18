@@ -185,6 +185,8 @@ t/21script.t
 t/22widget.t
 t/30anchor.t
 t/30break.t
+t/30container.t
+t/30image.t
 t/30input.t
 t/30form.t
 t/iwl.conf
