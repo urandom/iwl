@@ -189,6 +189,7 @@ t/30container.t
 t/30image.t
 t/30input.t
 t/30form.t
+t/31button.t
 t/iwl.conf
 lib/IWL/Table/Row.pm
 lib/IWL/Table/Cell.pm
