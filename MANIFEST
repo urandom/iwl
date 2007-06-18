@@ -265,5 +265,4 @@ MANIFEST
 Makefile.PL
 Changes
 README
-MANIFEST2
 bin/iwl-install
