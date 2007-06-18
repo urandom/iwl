@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use_ok('IWL');
 use_ok('IWL::String');
