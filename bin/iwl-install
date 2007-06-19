@@ -217,11 +217,12 @@ sub mkdir_p {
     my $path = shift;
     my @path = File::Spec->splitdir($path);
     my $partial = $path[0];
-    return if -f $partial;
-    mkdir $partial unless -d $partial;
+    mkdir $partial or die "$partial: $!\n"
+      unless -d $partial;
     foreach (@path[1 .. $#path]) {
-        $partial = File::Spec->catfile($partial, $_);
-        mkdir $partial unless -d $partial;
+        $partial = File::Spec->catdir($partial, $_);
+        mkdir $partial or die "$partial: $!\n"
+          unless -d $partial;
     }
 }
 #######################################################################

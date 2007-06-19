@@ -235,6 +235,16 @@ sub setId {
     return $self->setAttribute(id => $id);
 }
 
+=item B<getId>
+
+Returns the id of the current widget
+
+=cut
+
+sub getId {
+    return shift->getAttribute('id');
+}
+
 =item B<setClass> (B<CLASS>)
 
 setClass sets the given class for the current widget. It overwrites any previous class set for the widget.
@@ -327,6 +337,16 @@ sub removeClass {
     $self->setAttribute(class => $new_list);
 }
 
+=item B<getClass>
+
+Returns the class of the current widget
+
+=cut
+
+sub getClass {
+    return shift->getAttribute('class');
+}
+
 =item B<setName> (B<NAME>)
 
 Sets the name of the current widget to the given name.
@@ -339,6 +359,16 @@ sub setName {
     my ($self, $name) = @_;
 
     return $self->setAttribute(name => $name);
+}
+
+=item B<getName>
+
+Gets the name of the current widget
+
+=cut
+
+sub getName {
+    return shift->getAttribute('name');
 }
 
 =item B<setTitle> (B<TITLE>)
@@ -355,26 +385,14 @@ sub setTitle {
     return $self->setAttribute(title => $title);
 }
 
-=item B<getId>
+=item B<getTitle>
 
-Returns the id of the current widget
-
-=cut
-
-sub getId {
-    my $self = shift;
-    return $self->getAttribute('id');
-}
-
-=item B<getClass>
-
-Returns the class of the current widget
+Gets the title of the current widget.
 
 =cut
 
-sub getClass {
-    my $self = shift;
-    return $self->getAttribute('class');
+sub getTitle {
+    return shift->getAttribute('title');
 }
 
 # Protected

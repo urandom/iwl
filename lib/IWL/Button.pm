@@ -105,14 +105,14 @@ sub setImage {
         $image->setFromStock($src);
         if ($alt) {
             $image->setAlt($alt);
-            $image->setAttribute(title => $alt);
+            $self->setTitle($alt);
         }
         return $self;
     }
     $image->set($src);
     if ($alt) {
-        $image->setAttribute(title => $alt);
         $image->setAlt($alt);
+        $self->setTitle($alt);
     }
     return $self;
 }
@@ -195,12 +195,27 @@ sub setStyle {
     return $self;
 }
 
+sub getStyle {
+    my ($self, $attr) = @_;
+    return $self->{__button}->getStyle($attr);
+}
+
+sub deleteStyle {
+    my ($self, $attr) = @_;
+    $self->{__button}->deleteStyle($attr);
+    return $self;
+}
+
 sub setId {
     my ($self, $id) = @_;
     $self->SUPER::setId($id . '_noscript');
     $self->{__button}->setId($id);
     $self->{__button}{image}->setId($id . '_image');
     return $self;
+}
+
+sub getId {
+    return shift->{__button}->getId;
 }
 
 sub setClass {
@@ -238,13 +253,6 @@ sub removeClass {
     return $self;
 }
 
-sub setAlt {
-    my ($self, $alt) = @_;
-
-    $self->{__button}{image}->setAlt($alt);
-    return $self;
-}
-
 sub signalConnect {
     my ($self, $signal, $handler) = @_;
 
@@ -252,9 +260,17 @@ sub signalConnect {
     return $self;
 }
 
-sub getId {
-    my $self = shift;
-    $self->{__button}->getId;
+sub signalDisconnect {
+    my ($self, $signal, $handler) = @_;
+
+    $self->{__button}->signalDisconnect($signal, $handler);
+    return $self;
+}
+
+sub signalDisconnectAll {
+    my ($self, $signal) = @_;
+
+    $self->{__button}->signalDisconnectAll($signal);
     return $self;
 }
 
@@ -263,6 +279,42 @@ sub setTitle {
 
     $self->{__button}->setTitle($title);
     return $self;
+}
+
+sub getTitle {
+    return shift->{__button}->getTitle;
+}
+
+sub setName {
+    my ($self, $name) = @_;
+    $self->{__button}->setName($name);
+    return $self;
+}
+
+sub getName {
+    return shift->{__button}->getName;
+}
+
+sub setAlt {
+    my ($self, $alt) = @_;
+
+    $self->{__button}{image}->setAlt($alt);
+    return $self;
+}
+
+sub getAlt {
+    return shift->{__button}{image}->getAlt;
+}
+
+sub set {
+    my ($self, $src) = @_;
+
+    $self->{__button}{image}->set($src);
+    return $self;
+}
+
+sub getSrc {
+    return shift->{__button}{image}->getSrc;
 }
 
 # Protected
