@@ -268,7 +268,7 @@ sub generate_images {
     $frame->appendChild($stock_image1);
     $frame->appendChild($stock_image2);
     $frame->setLabel('Stock images');
-    $normal_image->set($IWLConfig{SKIN_DIR} . '/images/icons/close15x15.gif');
+    $normal_image->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
 
     return $container->getObject;
 }

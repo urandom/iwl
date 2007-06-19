@@ -52,12 +52,23 @@ Parameter: B<TEXT> - the text for the label
 
 sub setLabel {
     my ($self, $text) = @_;
-    my $legend   = IWL::Widget->new;
+    if (!$self->{__legend}) {
+        $self->{__legend} = IWL::Widget->new;
+        $self->{__legend}->{_tag}  = "legend";
+    }
     my $text_obj = IWL::Text->new($text);
 
-    $legend->{_tag}  = "legend";
-    $legend->setChild($text_obj);
-    return $self->appendChild($legend);
+    $self->{__legend}->setChild($text_obj);
+    return $self;
+}
+
+# Protected
+#
+sub _realize {
+    my $self = shift;
+
+    $self->SUPER::_realize;
+    $self->prependChild($self->{__legend});
 }
 
 1;
