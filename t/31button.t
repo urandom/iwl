@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use IWL::Button;
 
@@ -19,4 +19,6 @@ use IWL::Button;
     is($button->getLabel, 'FooBar');
     is($button->getClass, 'bar');
     is($button->getId, 'foo');
+    is($button->setHref('iwl_demo.pl'), $button);
+    is($button->getHref, 'iwl_demo.pl');
 }

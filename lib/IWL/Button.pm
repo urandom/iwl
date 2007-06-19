@@ -331,6 +331,10 @@ sub getSrc {
     return shift->{__button}{image}->getSrc;
 }
 
+sub getHref {
+    return shift->{__nsAnchor}->getHref;
+}
+
 # Protected
 #
 sub _realize {
