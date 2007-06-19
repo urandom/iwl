@@ -500,7 +500,7 @@ sub _registerEvent {
 	$handlers->{evalScripts} = 'true' if $params->{evalScripts};
     }
 
-    return $handlers if $self->signalConnect($signal => "this.prepareEvents(); this.emitEvent('$event', {value: this.value})");
+    return $handlers if $self->signalConnect($signal => "if (!this.prepareEvents) return; this.prepareEvents(); this.emitEvent('$event', {value: this.value})");
 }
 
 # Internal
