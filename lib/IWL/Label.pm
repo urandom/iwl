@@ -7,6 +7,8 @@ use strict;
 
 use base qw(IWL::Widget);
 
+use IWL::Break;
+use IWL::Container;
 use IWL::String qw(randomize);
 
 use constant JUSTIFY => {
