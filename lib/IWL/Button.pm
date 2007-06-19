@@ -88,6 +88,16 @@ sub setLabel {
     return $self;
 }
 
+=item B<getLabel>
+
+Gets the text of the button label
+
+=cut
+
+sub getLabel {
+    return shift->{__button}{label};
+}
+
 =item B<setImage> (B<SRC>, [B<ALT>])
 
 Sets the given url as the source of the image
@@ -253,6 +263,10 @@ sub removeClass {
     return $self;
 }
 
+sub getClass {
+    return shift->{__button}->getClass;
+}
+
 sub signalConnect {
     my ($self, $signal, $handler) = @_;
 
@@ -365,9 +379,8 @@ sub __init {
     my $anchor = IWL::Anchor->new;
     my $image  = IWL::Image->new;
     my $id     = $args{id};
-    delete @args{qw(id)};
 
-    $self->{_defaultClass} = 'button';
+    $self->{_defaultClass}     = 'button';
     $image->{_ignore}          = 1;
     $hidden->{_ignore}         = 1;
 
@@ -387,8 +400,8 @@ sub __init {
     $self->{_options}{size} = $args{size} || 'default';
     $self->{_options}{submit} = 0;
 
-    delete @args{qw(size)};
-    $self->_constructorArguments(%args);
+    delete @args{qw(size id)};
+    $self->{__button}->_constructorArguments(%args);
     $self->requiredJs('base.js', 'button.js');
 
     # Callbacks

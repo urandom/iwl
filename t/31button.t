@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 10;
 
 use IWL::Button;
 
@@ -11,4 +11,12 @@ use IWL::Button;
     is($button->getTitle, 'Save');
     is($button->setTitle("Don't save!"), $button);
     is($button->getTitle, "Don't save!");
+}
+
+{
+    my $button = IWL::Button->new(id => 'foo', class => 'bar');
+    is($button->setLabel('FooBar'), $button);
+    is($button->getLabel, 'FooBar');
+    is($button->getClass, 'bar');
+    is($button->getId, 'foo');
 }
