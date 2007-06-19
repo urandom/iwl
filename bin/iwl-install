@@ -68,6 +68,8 @@ mirror $shareskin                , $full_skindir;
 mirror $shareimages              , $full_imagedir;
 mirror $shareicons               , $full_icondir;
 
+chmod 0755, $cgibin . '/iwl_demo.pl';
+
 prefix_replace(
     $full_skindir . '/main.css',
     $full_skindir . '/ie6.css'
