@@ -12,7 +12,7 @@ use IWL::String qw(randomize);
 
 =head1 NAME
 
-IWL::Checkbox - a check button
+IWL::Checkbox - a checkbox
 
 =head1 INHERITANCE
 
@@ -20,15 +20,15 @@ IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Checkbox
 
 =head1 DESCRIPTION
 
-The check button provides a check button most commonly used in forms.
+The checkbox provides a checkbox most commonly used in forms.
 
 =head1 CONSTRUCTOR
 
 IWL::Checkbox->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  checked: set to true if the check button should be checked on default
-  label: set the label of the checkbutton
+  checked: set to true if the checkbox should be checked on default
+  label: set the label of the checkbox
 
 =cut
 
@@ -49,7 +49,7 @@ sub new {
 
 =item B<setLabel> (B<TEXT>)
 
-Sets the text of the label for the check button
+Sets the text of the checkbox label
 
 Parameter: B<TEXT> - the text.
 
@@ -63,9 +63,19 @@ sub setLabel {
     return $self;
 }
 
+=item B<getLabel>
+
+Gets the text of the checkbox label
+
+=cut
+
+sub getLabel {
+    return shift->{_label}->getText;
+}
+
 =item B<setChecked> (B<BOOL>)
 
-Sets whether the check button is checked or not
+Sets whether the checkbox is checked or not
 
 Parameter: B<BOOL> - a boolean value.
 
@@ -100,7 +110,7 @@ sub getChecked {
 
 =item B<extractState> (B<STATE>)
 
-Update the IWL::Stash(3pm) B<STATE> according to the check button state.
+Update the IWL::Stash(3pm) B<STATE> according to the checkbox state.
 
 =cut
 

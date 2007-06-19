@@ -8,7 +8,7 @@ use IWL::Script;
 	$script->setSrc('/foo/bar.js');
     is($script->getAttribute('src'), '/foo/bar.js');
     is($script->getAttribute('type'), 'text/javascript');
-    like($script->getContent, qr/<script (?:\w+=".*?(?<!\\)"){1}><\/script>/);
+    like($script->getContent, qr(<script (?:\w+=".*?(?<!\\)"\s*){2}></script>));
 }
 
 {

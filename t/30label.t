@@ -1,4 +1,4 @@
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use IWL::Label;
 
@@ -20,9 +20,10 @@ use IWL::Label;
     my $label = IWL::Label->new;
 
     $label->appendText("Foo\nBar");
-    like($label->getContent, qr(<span id="label_\d+">Foo<br />\n</span>));
+    is($label->getText, "Foo\nBar");
+    like($label->getContent, qr(<span id="label_\d+">Foo<br />\nBar</span>\n));
     is($label->appendTextType('Alpha', 'strong'), $label);
-    like($label->getContent, qr(<span id="label_\d+">Foo<br />\n<strong>Alpha</strong>\n</span>));
+    like($label->getContent, qr(<span id="label_\d+">Foo<br />\nBar<strong>Alpha</strong>\n</span>));
 }
 
 {

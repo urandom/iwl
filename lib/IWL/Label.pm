@@ -182,7 +182,11 @@ sub getText {
     my ($self) = @_;
     my $text_label = '';
     foreach (@{$self->{childNodes}}) {
-        $text_label .= $_->getContent;
+        if ($_->isa('IWL::Break')) {
+            $text_label .= "\n";
+        } else {
+            $text_label .= $_->getContent;
+        }
     }
 
     return $text_label;
@@ -211,7 +215,6 @@ sub __convert_newline {
     my ($self, $text) = @_;
 
     my @elements;
-    my $newline = 0;
     while ($text =~ s/(?=(?:.|\n))(.*)(\n)?//) {
 	my $string = $1;
 	if (defined $string) {
@@ -222,10 +225,8 @@ sub __convert_newline {
 	if ($2) {
 	    my $obj = IWL::Break->new;
 	    push @elements, $obj;
-	    $newline = 1;
 	}
     }
-    pop @elements if $newline && !$self->{__expand};
 
     return @elements;
 }
