@@ -89,11 +89,9 @@ Returns true if the option is selected, false otherwise.
 sub getSelected {
     my ($self) = @_;
 
-    my $selected = $self->getAttribute('selected');
+    my $selected = $self->getAttribute('selected', 1);
 
-    return unless $selected;
-
-    return $selected;
+    return !!$selected;
 }
 
 =item B<setValue>
@@ -115,7 +113,7 @@ Gets the value attribute of the option.
 =cut
 
 sub getValue {
-    shift->getAttribute('value');
+    shift->getAttribute('value', 1);
 }
 
 1;

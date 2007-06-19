@@ -63,6 +63,16 @@ sub setHref {
     return $self->setAttribute(href => $url, 'uri');
 }
 
+=item B<getHref>
+
+Gets the href attribute for the anchor
+
+=cut
+
+sub getHref {
+    return shift->getAttribute('href', 1);
+}
+
 =item B<setTarget> (B<TARGET>)
 
 Sets the target attribute for the anchor
@@ -75,6 +85,16 @@ sub setTarget {
     my ($self, $target) = @_;
 
     return $self->setAttribute(target => $target);
+}
+
+=item B<getTarget>
+
+Gets the target attribute for the anchor
+
+=cut
+
+sub getTarget {
+    return shift->getAttribute('target', 1);
 }
 
 =item B<setText> (B<TEXT>)

@@ -104,7 +104,7 @@ sub extractState {
     my $first_value;
     foreach my $child (@$children) {
 	if ($child->isa ('IWL::Combo::Option')) {
-	    my $value = $child->getAttribute('value');
+	    my $value = $child->getAttribute('value', 1);
 	    $value = '' unless defined $value;
 
 	    $first_value = $value unless defined $first_value;
@@ -130,7 +130,7 @@ sub applyState {
     
     foreach my $child (@$children) {
 	if ($child->isa('IWL::Combo::Option')) {
-	    my $value = $child->getAttribute('value');
+	    my $value = $child->getAttribute('value', 1);
 	    
 	    if (defined $value && exists $values{$value}) {
 		$child->setSelected(1);

@@ -138,7 +138,7 @@ img.sort_column_image {
 
 /*List*/
 table.list thead.tree_header {
-    background: transparent url(images/tree/list_header_bg.png) repeat-x top left;
+    background: transparent url(<IMAGE_PREFIX>/tree/list_header_bg.png) repeat-x top left;
 }
 
 table.list thead.tree_header th, table.list thead.tree_header td { 
@@ -894,7 +894,7 @@ ul.menubar {
     border-top: 1px solid #dedee0;
     border-bottom: 3px solid #f3f4f5;
     background: #d3d6dd;*/
-    background: url(images/menu/bg_menu7x24.png) repeat-x top left;
+    background: url(<IMAGE_PREFIX>/menu/bg_menu7x24.png) repeat-x top left;
     height:24px;
     color: black;
 }

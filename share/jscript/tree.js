@@ -289,18 +289,18 @@ Object.extend(Object.extend(Tree, Widget), {
 		col_num = i;
 	}
 	this._bodySort(dir, col_num);
-	var icon = dir ? '/images/icons/arrows_down.gif' : '/images/icons/arrows_up.gif';
+	var icon = dir ? '/arrows_down.gif' : '/arrows_up.gif';
 	if (cell.lastChild.className != 'sort_column_image') {
 	    if (this.sortImage)
 		this.sortImage.parentNode.removeChild
 		    (this.sortImage);
 	    this.sortImage = Builder.node('img', {
 		className: 'sort_column_image',
-		src: window.IWLConfig.SKIN_DIR + icon
+		src: window.IWLConfig.ICON_DIR + icon
 	    });
 	    cell.insertBefore(this.sortImage, cell.firstChild);
 	} else {
-	    cell.lastChild.src = window.IWLConfig.SKIN_DIR + icon;
+	    cell.lastChild.src = window.IWLConfig.ICON_DIR + icon;
 	}
 	cell.setAttribute("iwl:treeCellDescSort", dir);
 	return this;

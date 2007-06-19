@@ -123,7 +123,7 @@ Returns the URL of the image
 =cut
 
 sub getSrc {
-    shift->getAttribute('src');
+    shift->getAttribute('src', 1);
 }
 
 =item B<getAlt>
@@ -133,7 +133,7 @@ Returns the alternative text of the image
 =cut
 
 sub getAlt {
-    shift->getAttribute('alt');
+    shift->getAttribute('alt', 1);
 }
 
 1;

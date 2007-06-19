@@ -110,7 +110,7 @@ sub extractState {
     my $name = $self->getName;
 
     if ($self->getChecked) {
-	my $value = $self->getAttribute('value');
+	my $value = $self->getAttribute('value', 1);
 	$value = 'on' unless defined $value;
 	$state->pushValues($name, $value);
     }

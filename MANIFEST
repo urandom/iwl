@@ -234,7 +234,6 @@ lib/IWL/Form.pm
 lib/IWL/Menu.pm
 lib/IWL/Config.pm
 lib/IWL/Druid.pm
-lib/IWL/Calendar.pm
 lib/IWL/NavBar.pm
 lib/IWL/GoogleMap.pm
 lib/IWL/Anchor.pm

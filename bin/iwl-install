@@ -39,6 +39,8 @@ usage_error("The option '--docroot' is mandatory.") unless $opt_docroot;
 my $docroot = $opt_docroot;
 die "$docroot: $!" unless -d $docroot;
 
+sanitize($opt_cgibin, $opt_jsdir, $opt_skindir, $opt_imagedir, $opt_icondir);
+
 my $cgibin = $docroot . ($opt_cgibin || '/cgi-bin');
 
 my $jsdir    = $opt_jsdir    || '/iwl/jscript';
@@ -214,7 +216,13 @@ sub mirror {
     mkdir_p($_[1]);
     recursive { -d $_[0] ? do { mkdir($_[1]) unless -d $_[1] } : copy(@_) } @_;
 }
+#######################################################################
+# File::Mirror }}}
+#######################################################################
 
+#######################################################################
+# File subroutines {{{
+#######################################################################
 sub mkdir_p {
     my $path = shift;
     my @path = File::Spec->splitdir($path);
@@ -227,6 +235,13 @@ sub mkdir_p {
           unless -d $partial;
     }
 }
+
+sub sanitize {
+    foreach (@_) {
+        $_ = '/' . $_ if $_ && index $_, '/';
+    }
+}
+
 #######################################################################
-# File::Mirror }}}
+# File subroutines }}}
 #######################################################################

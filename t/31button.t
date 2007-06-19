@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 use IWL::Button;
 
@@ -9,4 +9,6 @@ use IWL::Button;
 
     is($button->getSrc, '/my/skin/darkness/tiny/save.gif');
     is($button->getTitle, 'Save');
+    is($button->setTitle("Don't save!"), $button);
+    is($button->getTitle, "Don't save!");
 }

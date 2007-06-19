@@ -253,7 +253,7 @@ Object.extend(Object.extend(Button, Widget), {
     },
     __buttonChangeBgImage: function(part, stat) {
 	if (!part) return;
-	var url = window.IWLConfig.SKIN_DIR + "/images/button/" + stat + part.id.substr(part.id.lastIndexOf("_"))
+	var url = window.IWLConfig.IMAGE_DIR + "/button/" + stat + part.id.substr(part.id.lastIndexOf("_"))
 	    + ".gif";
 	part.style.backgroundImage = "url(" + url + ")";
     },

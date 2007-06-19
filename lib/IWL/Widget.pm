@@ -105,7 +105,7 @@ sub signalConnect {
     }
     return if !exists $self->{_signals}{$signal};
 
-    my $callbacks = $self->getAttribute("on$signal", 'none');
+    my $callbacks = $self->getAttribute("on$signal", 1);
 
     if (!$callbacks) {
 	$callbacks = $callback;
@@ -138,7 +138,7 @@ sub signalDisconnect {
     }
     return if !exists $self->{_signals}{$signal};
 
-    my $callbacks = $self->getAttribute("on$signal", 'none');
+    my $callbacks = $self->getAttribute("on$signal", 1);
 
     my $index = index $callbacks, $callback;
     return if $index == -1;
@@ -242,7 +242,7 @@ Returns the id of the current widget
 =cut
 
 sub getId {
-    return shift->getAttribute('id');
+    return shift->getAttribute('id', 1);
 }
 
 =item B<setClass> (B<CLASS>)
@@ -270,7 +270,7 @@ Parameters: B<CLASS> - the given class
 sub appendClass {
     my ($self, $class) = @_;
 
-    my $class_list = $self->getAttribute('class');
+    my $class_list = $self->getClass;
     if (!$class_list) {
 	return $self->setAttribute(class => $class);
     } else {
@@ -289,7 +289,7 @@ Parameters: B<CLASS> - the given class
 sub prependClass {
     my ($self, $class) = @_;
 
-    my $class_list = $self->getAttribute('class');
+    my $class_list = $self->getClass;
     if (!$class_list) {
 	return $self->setAttribute(class => $class);
     } else {
@@ -307,7 +307,7 @@ Parameters: B<CLASS> - the class to be checked
 
 sub hasClass {
     my ($self, $class) = @_;
-    my $class_list = $self->getAttribute('class');
+    my $class_list = $self->getClass;
     foreach (split / /, $class_list) {
 	return 1 if $_ eq $class;
     }
@@ -324,7 +324,7 @@ Parameters: B<CLASS> - the class to remove
 
 sub removeClass {
     my ($self, $class) = @_;
-    my $class_list = $self->getAttribute('class');
+    my $class_list = $self->getClass;
     my $new_list;
     return unless $class_list;
     foreach (split / /, $class_list) {
@@ -344,7 +344,7 @@ Returns the class of the current widget
 =cut
 
 sub getClass {
-    return shift->getAttribute('class');
+    return shift->getAttribute('class', 1);
 }
 
 =item B<setName> (B<NAME>)
@@ -368,7 +368,7 @@ Gets the name of the current widget
 =cut
 
 sub getName {
-    return shift->getAttribute('name');
+    return shift->getAttribute('name', 1);
 }
 
 =item B<setTitle> (B<TITLE>)
@@ -392,7 +392,7 @@ Gets the title of the current widget.
 =cut
 
 sub getTitle {
-    return shift->getAttribute('title');
+    return shift->getAttribute('title', 1);
 }
 
 # Protected

@@ -322,7 +322,7 @@ sub signalConnect {
 #
 sub _setupDefaultClass {
     my $self = shift;
-    my $password = $self->{__entry}->getAttribute('type');
+    my $password = $self->{__entry}->getAttribute('type', 1);
 
     $self->prependClass('password') if $password eq 'password';
     $self->prependClass($self->{_defaultClass});

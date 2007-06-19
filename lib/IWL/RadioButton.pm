@@ -124,7 +124,7 @@ sub extractState {
     my $name = $self->getName;
 
     if ($self->getChecked) {
-	my $value = $self->getAttribute('value');
+	my $value = $self->getAttribute('value', 1);
 	$value = 'on' unless defined $value;
 	$state->pushValues($name, $value);
     }
@@ -147,7 +147,7 @@ sub applyState {
     my $name = $self->getName;
 
     if ($state->existsKey($name)) {
-	my $my_value = $self->getAttribute('value');
+	my $my_value = $self->getAttribute('value', 1);
 	my $set_value = $state->getValues($name);
 
 	if (defined $my_value && defined $set_value 

@@ -85,7 +85,7 @@ Gets the name (attribute) of the input element.
 =cut
 
 sub getName {
-    shift->getAttribute ('name');
+    shift->getAttribute ('name', 1);
 }
 
 =item B<setValue> (B<VALUE>)
@@ -109,7 +109,7 @@ Gets the value of the input
 =cut
 
 sub getValue {
-    shift->getAttribute('value');
+    shift->getAttribute('value', 1);
 }
 
 =item B<setDisabled> (B<BOOL>)
@@ -139,13 +139,13 @@ Update the IWL::Stash(3pm) B<STATE> according to the input state.
 sub extractState {
     my ($self, $state) = @_;
 
-    my $type = $self->getAttribute('type');
+    my $type = $self->getAttribute('type', 1);
     return if $type && 'submit' eq lc $type;
     return if $type && 'image' eq lc $type;
 
     my $name = $self->getName;
 
-    my $value = $self->getAttribute('value');
+    my $value = $self->getAttribute('value', 1);
     $value = '' unless defined $value;
 
     $state->pushValues($name, $value);
@@ -165,7 +165,7 @@ state.
 sub applyState {
     my ($self, $state) = @_;
 
-    my $type = $self->getAttribute('type');
+    my $type = $self->getAttribute('type', 1);
     return if $type && 'submit' eq lc $type;
     return if $type && 'image' eq lc $type;
 
