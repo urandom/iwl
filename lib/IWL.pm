@@ -8,7 +8,6 @@ use strict;
 use IWL::Anchor;
 use IWL::Break;
 use IWL::Button;
-use IWL::Calendar;
 use IWL::Canvas;
 use IWL::Checkbox;
 use IWL::Combo::Option;
@@ -121,7 +120,6 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::Anchor - An anchor widget ("<a>")
  IWL::Break - A break widget ("<br>")
  IWL::Button - A graphic button widget
- IWL::Calendar - A calendar widget
  IWL::Canvas - The html5 canvas element ("<canvas>")
  IWL::Checkbox - A checkbox widget (checkbox + text)
  IWL::Combo - A combobox widget ("<select>")
