@@ -278,3 +278,16 @@ Makefile.PL
 Changes
 README
 bin/iwl-install
+po/Makefile
+po/bg.mo
+po/bg.po
+po/de.mo
+po/de.po
+po/fr.mo
+po/fr.po
+po/POTFILES.in
+po/PACKAGE
+po/org.bloka.iwl.pot
+lib/LocaleData/bg/LC_MESSAGES/org.bloka.iwl.mo
+lib/LocaleData/de/LC_MESSAGES/org.bloka.iwl.mo
+lib/LocaleData/fr/LC_MESSAGES/org.bloka.iwl.mo

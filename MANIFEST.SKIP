@@ -1,6 +1,7 @@
 ~$
 .swp$
 x-.*$
+^.svn$
 ^MANIFEST\.
 ^Makefile$
 ^blib/
