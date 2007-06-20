@@ -2,13 +2,16 @@ use Test::More tests => 12;
 
 use IWL::Button;
 
+use Locale::TextDomain qw(org.bloka.iwl);
+
+
 {
 	my $button = IWL::Button->newFromStock('IWL_STOCK_SAVE', id => 'foo');
     is($button->getId, 'foo');
-    is($button->getAlt, 'Save');
+	is($button->getAlt, __('Save'));
 
     is($button->getSrc, '/my/skin/darkness/tiny/save.gif');
-    is($button->getTitle, 'Save');
+	is($button->getTitle, __('Save'));
     is($button->setTitle("Don't save!"), $button);
     is($button->getTitle, "Don't save!");
 }
