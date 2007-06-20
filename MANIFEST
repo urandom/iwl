@@ -178,6 +178,7 @@ share/iwl_demo.pl
 t/01use.t
 t/02config.t
 t/02string.t
+t/03stock.t
 t/10object.t
 t/10stash.t
 t/20comment.t
@@ -277,6 +278,8 @@ MANIFEST
 Makefile.PL
 Changes
 README
+README-NLS
+TRANSLATIONS
 bin/iwl-install
 po/Makefile
 po/bg.mo

@@ -1,7 +1,7 @@
 ~$
 .swp$
 x-.*$
-^.svn$
+.svn
 ^MANIFEST\.
 ^Makefile$
 ^blib/
@@ -10,5 +10,6 @@ x-.*$
 ^\.#
 \.tar.gz$
 \.bak$
+IWL-\d.\d+
 ^Build$
 ^_build/
