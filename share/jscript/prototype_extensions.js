@@ -121,7 +121,8 @@ Object.extend(Event, {
 
     element.signals[name].observers.push(observer);
     element.signals[name].callbacks.push(callback || observer);
-    Event.observe.call(Event, element, real || name, callback || observer);
+    if ((real || name) != 'activate')
+      Event.observe.call(Event, element, real || name, callback || observer);
     return Event;
   },
   signalDisconnect: function(element, name, observer) {
