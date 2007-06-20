@@ -155,7 +155,7 @@ sub connectDisplayContainer {
     my ($self, $container, $format) = @_;
 
     my $container_id = $container->getId;
-    return $self->_pushError (__"container has no id")
+    return $self->_pushError (__"Container has no id")
 	unless defined $container_id && length $container_id;
 
     $format = "%c" unless defined $format && length $format;

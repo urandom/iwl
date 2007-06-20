@@ -141,7 +141,7 @@ sub __init {
     $self->{_defaultClass} = 'pagecontrol';
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
 
-    # TRANSLATORS: 
+    # TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
     my $info = __x("{PAGEENTRY} of {PAGECOUNT}", 
 		    PAGEENTRY => 'PAGEENTRY', PAGECOUNT => 'PAGECOUNT');
     my ($pre, $post) = $info =~ m{^(.*)PAGEENTRY(.*)$};
