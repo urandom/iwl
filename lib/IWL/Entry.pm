@@ -199,19 +199,21 @@ Parameters: B<SRC> - the source of the image, B<ALT> - the alternate text of the
 sub setIcon {
     my ($self, $src, $alt, $position, $clickable) = @_;
 
-    if ($position eq 'right') {
-        $self->{image2}{_ignore} = 0;
-        $self->{image2}->set($src);
-        $self->{image2}->setAlt($alt);
-	return $self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-    } elsif ($position eq 'left' || !$position) {
+    if (!$position || $position eq 'left') {
         $self->{image1}{_ignore} = 0;
         $self->{image1}->set($src);
         $self->{image1}->setAlt($alt);
-	return $self->{image1}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image1}->{_defaultClass} = $self->{_defaultClass} . '_image1';
+	return $self->{image1};
+    } elsif ($position eq 'right') {
+        $self->{image2}{_ignore} = 0;
+        $self->{image2}->set($src);
+        $self->{image2}->setAlt($alt);
+	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image2}->{_defaultClass} = $self->{_defaultClass} . '_image2';
+	return $self->{image2};
     }
-
-    return $self;
 }
 
 =item B<setIconFromStock> (B<STOCK_ID>, [B<POSITION>, B<CLICKABLE>])
@@ -228,11 +230,15 @@ sub setIconFromStock {
     if ($position && $position eq 'right') {
         $self->{image2}->setFromStock($stock_id) or return;
         $self->{image2}{_ignore} = 0;
-	return $self->{image2}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image2}->{_defaultClass} = $self->{_defaultClass} . '_image2';
+	return $self->{image2};
     } elsif (!$position || $position eq 'left') {
         $self->{image1}->setFromStock($stock_id) or return;
         $self->{image1}{_ignore} = 0;
-	return $self->{image1}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
+	$self->{image1}->{_defaultClass} = $self->{_defaultClass} . '_image1';
+	return $self->{image1};
     }
 }
 
@@ -247,7 +253,10 @@ sub addClearButton {
 
     $self->setIconFromStock(IWL_STOCK_CLEAR => 'right', 1);
     $self->__set_clear_callback;
-    return $self->{__clearButton} = 1;
+    $self->{__clearButton} = 1;
+    $self->{image2}->setAttribute(id => $self->getId . '_image2');
+    $self->{image2}->{_defaultClass} = $self->{_defaultClass} . '_image2';
+    return $self;
 }
 
 =item B<setAutoComplete> (B<URL>, [B<%OPTIONS>])
@@ -336,8 +345,6 @@ sub _setupDefaultClass {
 	$self->{__entry}->prependClass($self->{_defaultClass} . '_text_default');
     }
     $self->{__entry}->prependClass($self->{_defaultClass} . '_text');
-
-    return $self->__set_clear_callback if $self->{__clearButton};
 }
 
 # Internal
@@ -382,9 +389,7 @@ sub __init {
 
 sub __set_clear_callback {
     my $self  = shift;
-    my $class = $self->{__entry}->getClass;
 
-    $class =~ s/_default// if $self->{__setDefault};
     $self->{image2}->signalConnect(
         click => qq|
 	  var clearButton = \$(this).up().cleanWhitespace().down();

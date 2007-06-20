@@ -16,5 +16,5 @@ use Locale::TextDomain qw(org.bloka.iwl);
 	$image->setAlt('Broken image');
 	is($image->getSrc, '/foo/bar.jpg');
 	is($image->getAlt, 'Broken image');
-	like($image->getContent, qr/<img (?:(?:src="\/foo\/bar.jpg"|alt="Broken image")\s*){2}\/>/);
+	like($image->getContent, qr(<img (?:(?:src="/foo/bar.jpg"|alt="Broken image")\s*){2}/>));
 }
