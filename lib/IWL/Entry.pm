@@ -7,6 +7,9 @@ use strict;
 
 use base 'IWL::Input';
 
+use IWL::Image;
+use IWL::Script;
+use IWL::Container;
 use IWL::String qw(randomize);
 
 =head1 NAME
