@@ -16,15 +16,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../lib/IWL/GoogleMap.pm:158
-#, fuzzy
 msgid "Container has no id"
-msgstr "Документи"
+msgstr "Контейнерът няма ИД"
 
 #: ../lib/IWL/GoogleMap.pm:270
 msgid ""
 "No key provided.  Please follow this link in order to obtain a key from "
 "Google."
-msgstr "Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ от Google."
+msgstr ""
+"Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ от "
+"Google."
 
 #: ../lib/IWL/Druid.pm:161
 msgid "Finish"
@@ -126,42 +127,39 @@ msgstr "Следваща страница"
 
 #: ../lib/IWL/Stock.pm:120
 msgid "OK"
-msgstr ""
+msgstr "Добре"
 
 #: ../lib/IWL/Stock.pm:124
-#, fuzzy
 msgid "Preferences"
-msgstr "покажи промените"
+msgstr "Предпочитания"
 
 #: ../lib/IWL/Stock.pm:128
 msgid "Preview"
-msgstr ""
+msgstr "Преглед"
 
 #: ../lib/IWL/Stock.pm:132
-#, fuzzy
 msgid "Refresh"
-msgstr "покажи промените"
+msgstr "Обновяване"
 
 #: ../lib/IWL/Stock.pm:136
 msgid "Remove"
-msgstr ""
+msgstr "Премахване"
 
 #: ../lib/IWL/Stock.pm:140
 msgid "Save"
-msgstr ""
+msgstr "Запазване"
 
 #: ../lib/IWL/Stock.pm:144
 msgid "Save and close"
-msgstr ""
+msgstr "Запазване и излизане"
 
 #: ../lib/IWL/Stock.pm:148
-#, fuzzy
 msgid "Upload"
 msgstr "Качване"
 
 #: ../lib/IWL/Stock.pm:153
 msgid "Add Filter"
-msgstr ""
+msgstr "Добавяне на филтър"
 
 #: ../lib/IWL/Stock.pm:157
 msgid "Directory"
@@ -169,10 +167,9 @@ msgstr "Директория"
 
 #: ../lib/IWL/Stock.pm:161
 msgid "Delete directory"
-msgstr ""
+msgstr "Изтриване на директория"
 
 #: ../lib/IWL/Stock.pm:165
-#, fuzzy
 msgid "Edit directory"
 msgstr "Редактиране на директория"
 
@@ -185,37 +182,33 @@ msgid "Bottom"
 msgstr ""
 
 #: ../lib/IWL/Stock.pm:178 ../lib/IWL/Stock.pm:190
-#, fuzzy
 msgid "Main menu"
 msgstr "Главно меню"
 
 #: ../lib/IWL/Stock.pm:182
 msgid "Info"
-msgstr ""
+msgstr "Инфо"
 
 #: ../lib/IWL/Stock.pm:186
-#, fuzzy
 msgid "Mail"
-msgstr "Заглавие"
+msgstr "Поща"
 
 #: ../lib/IWL/Stock.pm:194
 msgid "Quit"
-msgstr ""
+msgstr "Изход"
 
 #: ../lib/IWL/Stock.pm:198
-#, fuzzy
 msgid "Available roles"
-msgstr "Роли"
+msgstr "Подръчни роли"
 
 #: ../lib/IWL/Stock.pm:202
 msgid "Top"
 msgstr ""
 
 #: ../lib/IWL/Stock.pm:207
-#, fuzzy
 msgid "Calendar"
-msgstr "Изчисти"
+msgstr "Календар"
 
 #: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
 msgid "Generic Text"
-msgstr ""
+msgstr "Общ текст"
