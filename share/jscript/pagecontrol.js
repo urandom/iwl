@@ -151,7 +151,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	this.__toggleButtons();
     },
     __onEventComplete: function(json, params) {
-            var options = json.user_extras;
+        var options = json.user_extras;
 	if (options) {
 	    if (options.page)
 		this.currentPage = options.page;

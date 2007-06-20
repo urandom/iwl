@@ -55,7 +55,7 @@ Parameter: B<CONTENT> - the text to be appended
 sub appendContent {
     my ($self, $content) = @_;
 
-    $self->{__content} .= $content;
+    $self->{__content} .= ' ' . $content;
 
     return $self;
 }
@@ -71,7 +71,7 @@ Parameter: B<CONTENT> - the text to be prepended
 sub prependContent {
     my ($self, $content) = @_;
 
-    $self->{__content} = $content . $self->{__content};
+    $self->{__content} = $content . ' ' . $self->{__content};
 }
 
 =item B<setContent> (B<CONTENT>)
@@ -132,7 +132,7 @@ sub getContent {
 	}
 	return $content .= "<![endif]-->\n";
     }
-    return '<!--' . $self->{__content} . '-->';
+    return '<!-- ' . $self->{__content} . ' -->';
 }
 
 sub getObject {

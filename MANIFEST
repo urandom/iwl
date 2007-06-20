@@ -180,6 +180,7 @@ t/02config.t
 t/02string.t
 t/10object.t
 t/10stash.t
+t/20comment.t
 t/20text.t
 t/21script.t
 t/22widget.t
