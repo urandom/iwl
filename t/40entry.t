@@ -1,4 +1,4 @@
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 use IWL::Entry;
 
@@ -45,4 +45,11 @@ my $entry = IWL::Entry->new;
 	is($entry->addClearButton, $entry);
 	my $clear = __("Clear");
 	like($entry->{image2}->getContent, qr(<img (?:(?:alt="$clear"|src="/my/skin/darkness/tiny/clear.gif"|class="entry_image2"|onclick=".*?"|class="entry_image2"|id="entry_\d+_image2"|style="cursor: pointer; ")\s*){6}/>\n)s);
+}
+
+{
+	my $entry = IWL::Entry->new(id => 'foo');
+
+	$entry->setAutoComplete('iwl_demo.pl');
+	like($entry->getContent, qr(.*prototype\.js.*effects\.js.*controls\.js.*scriptaculous_extensions\.js.*<span (?:(?:class="entry"|id="foo")\s*){2}><input (?:(?:class="entry_text"|id="foo_text"|type="text")\s*){3}/>\n<div (?:(?:class="entry_receiver"|id="foo_receiver")\s*){2}></div>\n<script .*Ajax\.Autocompleter.'foo_text', 'foo_receiver', 'iwl_demo.pl'.*</script>\n</span>\n)s);
 }
