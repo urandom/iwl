@@ -288,6 +288,8 @@ Object.extend(Object.extend(Tree, Widget), {
 	    if (row.cells[i] == cell)
 		col_num = i;
 	}
+
+        if (!arguments[2])
 	this._bodySort(dir, col_num);
 	var icon = dir ? '/arrows_down.gif' : '/arrows_up.gif';
 	if (cell.lastChild.className != 'sort_column_image') {

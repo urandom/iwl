@@ -132,12 +132,21 @@ Object.extend(Object.extend(PageControl, Widget), {
     },
     __refresh: function() {
 	if (!this.loaded) return;
-	if (!this.options.bound || this.options.pageCount <= 1)
-	    this.setStyle({visibility: 'hidden'});
+	if (!this.options.bound || this.options.pageCount <= 1) {
+	    var hidden = {visibility: 'hidden'};
+	    this.setStyle(hidden);
+	    this.firstButton.setStyle(hidden);
+	    this.prevButton.setStyle(hidden);
+	    this.nextButton.setStyle(hidden);
+	    this.lastButton.setStyle(hidden);
+	}
 	else {
 	    var dims = this.getDimensions();
 	    this.setStyle({width: dims.width + 'px', height: dims.height + 'px', visibility: 'visible'});
+	    this.__toggleButtons();
+	    this.input.value = this.currentPage;
 	}
+
 	this.input.value = this.currentPage;
 	this.__toggleButtons();
     },
