@@ -63,6 +63,16 @@ sub setLabel {
     return $self;
 }
 
+=item B<getLabel>
+
+Gets the text of the checkbox label
+
+=cut
+
+sub getLabel {
+    return shift->{_label}->getText;
+}
+
 =item B<setChecked> (B<BOOL>)
 
 Sets whether the radio button is checked or not
@@ -75,7 +85,7 @@ sub setChecked {
     my ($self, $bool) = @_;
 
     if ($bool) {
-        return $self->setAttribute(checked => 'true');
+        return $self->setAttribute(checked => 'checked');
     } else {
         return $self->deleteAttribute('checked');
     }
@@ -184,8 +194,8 @@ sub setClass {
 sub setTitle {
     my ($self, $title) = @_;
 
-    $self->SUPER::setTitle($title);
-    return $self->{_label}->setTitle($title);
+    $self->{_label}->setTitle($title);
+    return $self->SUPER::setTitle($title);
 }
 
 # Protected
@@ -205,7 +215,7 @@ sub __init {
 
     $self->{_label} = $label;
     $self->_appendAfter($label);
-    $self->{_defaultClass} = 'checkbox';
+    $self->{_defaultClass} = 'radiobutton';
 
     my $id = $args{id} || randomize($self->{_defaultClass});
     $self->setId($id);

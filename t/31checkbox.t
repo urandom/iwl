@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 15;
 
 use IWL::Checkbox;
 use IWL::Stash;
@@ -8,11 +8,13 @@ use IWL::Stash;
 
     is($check->setLabel('My label'), $check);
     is($check->getLabel, 'My label');
+	is($check->setTitle('My title'), $check);
+	is($check->getTitle, 'My title');
 
     is($check->setChecked(1), $check);
     ok($check->getChecked);
 
-    like($check->getContent, qr(^<input (?:(?:checked="checked"|name="checkbox_\d+"|class="checkbox"|type="checkbox"|id="checkbox_\d+")\s*){5}/>\n<label.*?>My label</label>\n$));
+    like($check->getContent, qr(^<input (?:(?:checked="checked"|name="checkbox_\d+"|class="checkbox"|type="checkbox"|id="checkbox_\d+"|title="My title")\s*){6}/>\n<label.*My title.*?>My label</label>\n$));
 }
 
 {

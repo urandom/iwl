@@ -170,6 +170,13 @@ sub setClass {
     return $self->{_label}->setClass($class . '_label');
 }
 
+sub setTitle {
+    my ($self, $title) = @_;
+
+    $self->{_label}->setTitle($title);
+    return $self->SUPER::setTitle($title);
+}
+
 # Protected
 #
 sub _setupDefaultClass {
