@@ -110,7 +110,7 @@ sub getChecked {
 
 =item B<extractState> (B<STATE>)
 
-Update the IWL::Stash(3pm) B<STATE> according to the checkbox state.
+Update the IWL::Stash(3pm) B<STATE> according to the input state.
 
 =cut
 
@@ -156,8 +156,8 @@ sub applyState {
 sub setId {
     my ($self, $id, $control_id) = @_;
 
-    $self->SUPER::setId($id) or return;
-    $self->{_label}->setId($id . '_label');
+    $self->SUPER::setId($id)               or return;
+    $self->{_label}->setId($id . '_label') or return;
 
     $self->{_label}->setAttribute(for => $id);
     return $self->setName($id);
@@ -166,8 +166,8 @@ sub setId {
 sub setClass {
     my ($self, $class) = @_;
 
-    $self->SUPER::setClass($class) or return;
-    return $self->{_label}->setClass($class . '_label');
+    $self->{_label}->setClass($class . '_label');
+    return $self->SUPER::setClass($class) or return;
 }
 
 sub setTitle {
@@ -190,7 +190,7 @@ sub _setupDefaultClass {
 # FIXME create an IWL::InputLabel, so that the necessary signals are inherited from IWL::Input
 sub __init {
     my ($self, %args) = @_;
-    my $label    = IWL::Label->new(expand => 0);
+    my $label = IWL::Label->new(expand => 0);
 
     $self->{_label} = $label;
     $self->_appendAfter($label);
@@ -198,19 +198,15 @@ sub __init {
 
     my $id = $args{id} || randomize($self->{_defaultClass});
     $self->setId($id);
-    delete @args{qw(id)};
 
-    $label->{_ignore}      = 1;
+    $label->{_ignore} = 1;
     $label->{_tag} = 'label';
-    if ($args{checked}) {
-        $self->setChecked(1);
-        delete $args{checked};
-    }
+    $self->setChecked(1) if $args{checked};
     if ($args{label}) {
         $label->{_ignore} = 0;
         $label->setText($args{label});
-        delete $args{label};
     }
+    delete @args{qw(id label checked)};
 
     $self->setAttribute(type => 'checkbox');
     $self->_constructorArguments(%args);

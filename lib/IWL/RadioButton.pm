@@ -5,7 +5,7 @@ package IWL::RadioButton;
 
 use strict;
 
-use base 'IWL::Input';
+use base 'IWL::Checkbox';
 
 use IWL::Label;
 use IWL::String qw(randomize);
@@ -16,7 +16,7 @@ IWL::RadioButton - a radio button
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::RadioButton
+IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Checkbox -> IWL::RadioButton
 
 =head1 DESCRIPTION
 
@@ -36,9 +36,14 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new(%args);
 
-    $self->__init(%args);
+    $self->setAttribute(type => 'radio');
+    $self->{_defaultClass} = 'radiobutton';
+
+    my $id = $args{id} || randomize($self->{_defaultClass});
+    $self->setId($id);
+    $self->setName($args{name}) if $args{name};
 
     return $self;
 }
@@ -46,64 +51,6 @@ sub new {
 =head1 METHODS
 
 =over 4
-
-=item B<setLabel> (B<TEXT>)
-
-Sets the text of the label for the check button
-
-Parameter: B<TEXT> - the text.
-
-=cut
-
-sub setLabel {
-    my ($self, $text) = @_;
-
-    $self->{_label}{_ignore} = 0;
-    $self->{_label}->setText($text);
-    return $self;
-}
-
-=item B<getLabel>
-
-Gets the text of the checkbox label
-
-=cut
-
-sub getLabel {
-    return shift->{_label}->getText;
-}
-
-=item B<setChecked> (B<BOOL>)
-
-Sets whether the radio button is checked or not
-
-Parameter: B<BOOL> - a boolean value.
-
-=cut
-
-sub setChecked {
-    my ($self, $bool) = @_;
-
-    if ($bool) {
-        return $self->setAttribute(checked => 'checked');
-    } else {
-        return $self->deleteAttribute('checked');
-    }
-}
-
-=item B<getChecked>
-
-Returns true if the checkbox is checked, false otherwise.
-
-=cut
-
-sub getChecked {
-    my ($self) = @_;
-
-    return unless $self->hasAttribute ('checked');
-
-    return $self;
-}
 
 =item B<setGroup> (B<NAME>)
 
@@ -121,27 +68,6 @@ sub setGroup {
 
 # Overrides
 #
-
-=item B<extractState> (B<STATE>)
-
-Update the IWL::Stash(3pm) B<STATE> according to the radio button state.
-
-=cut
-
-sub extractState {
-    my ($self, $state) = @_;
-
-    my $name = $self->getName;
-
-    if ($self->getChecked) {
-	my $value = $self->getAttribute('value', 1);
-	$value = 'on' unless defined $value;
-	$state->pushValues($name, $value);
-    }
-
-    return 1;
-}
-
 =item B<applyState> (B<STATE>)
 
 Update the input element according to the IWL::Stash(3pm) B<STATE>
@@ -172,71 +98,6 @@ sub applyState {
     }
 
     return 1;
-}
-
-sub setId {
-    my ($self, $id, $control_id) = @_;
-
-    $self->SUPER::setId($id)               or return;
-    $self->{_label}->setId($id . '_label') or return;
-
-    $self->{_label}->setAttribute(for => $id);
-    return $self->setName($id);
-}
-
-sub setClass {
-    my ($self, $class) = @_;
-
-    $self->SUPER::setClass($class);
-    return $self->{_label}->setClass($class . '_label');
-}
-
-sub setTitle {
-    my ($self, $title) = @_;
-
-    $self->{_label}->setTitle($title);
-    return $self->SUPER::setTitle($title);
-}
-
-# Protected
-#
-sub _setupDefaultClass {
-    my $self = shift;
-    $self->prependClass($self->{_defaultClass});
-    return $self->{_label}->prependClass($self->{_defaultClass} . '_label');
-}
-
-# Internal
-#
-# FIXME create an IWL::InputLabel, so that the necessary signals are inherited from IWL::Input
-sub __init {
-    my ($self, %args) = @_;
-    my $label = IWL::Label->new(expand => 0);
-
-    $self->{_label} = $label;
-    $self->_appendAfter($label);
-    $self->{_defaultClass} = 'radiobutton';
-
-    my $id = $args{id} || randomize($self->{_defaultClass});
-    $self->setId($id);
-    delete @args{qw(id)};
-
-    $label->{_ignore} = 1;
-    $label->{_tag} = 'label';
-    if ($args{checked}) {
-        $self->setAttribute(checked => 'true');
-        delete $args{checked};
-    }
-    if ($args{label}) {
-        $label->{_ignore} = 0;
-        $label->setText($args{label});
-        delete $args{label};
-    }
-
-    $self->setAttribute(type => 'radio');
-    $self->_constructorArguments(%args);
-
-    return $self;
 }
 
 1;
