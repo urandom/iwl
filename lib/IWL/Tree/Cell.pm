@@ -9,7 +9,7 @@ use base 'IWL::Table::Cell';
 
 use IWL::Config qw(%IWLConfig);
 use IWL::Image;
-use Locale::TextDomain qw (iwl);
+use Locale::TextDomain qw(org.bloka.iwl);
 
 use constant IMAGES => {
     row_expand_T   => $IWLConfig{IMAGE_DIR} . '/tree/expander_t.gif',

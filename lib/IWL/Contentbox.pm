@@ -10,7 +10,7 @@ use base 'IWL::Container';
 use IWL::Config qw(%IWLConfig);
 use IWL::String qw(randomize);
 
-use Locale::TextDomain qw (iwl);
+use Locale::TextDomain qw(org.bloka.iwl);
 use JSON;
 
 use constant TYPE => {

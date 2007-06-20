@@ -7,7 +7,7 @@ use strict;
 
 use base 'IWL::Container';
 
-use Locale::TextDomain qw (iwl);
+use Locale::TextDomain qw(org.bloka.iwl);
 use IWL::String qw(randomize);
 use JSON;
 
@@ -142,7 +142,7 @@ sub __init {
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
 
     # TRANSLATORS: 
-    my $info = __x ("{PAGEENTRY} of {PAGECOUNT}", 
+    my $info = __x("{PAGEENTRY} of {PAGECOUNT}", 
 		    PAGEENTRY => 'PAGEENTRY', PAGECOUNT => 'PAGECOUNT');
     my ($pre, $post) = $info =~ m{^(.*)PAGEENTRY(.*)$};
     if ($pre =~ m{^(.*)PAGECOUNT(.*)$}) {

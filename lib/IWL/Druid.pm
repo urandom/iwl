@@ -11,7 +11,7 @@ use IWL::Label;
 use IWL::String qw(randomize);
 
 use JSON;
-use Locale::TextDomain qw (iwl);
+use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 

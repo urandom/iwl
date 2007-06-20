@@ -5,7 +5,7 @@ package IWL::Stash;
 
 use strict;
 
-use Locale::TextDomain qw(iwl);
+use Locale::TextDomain qw(org.bloka.iwl);
 use IWL::String qw(encodeURI);
 
 # Forward declarations.
