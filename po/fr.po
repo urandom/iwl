@@ -1,0 +1,226 @@
+# French Translations for Imperia.
+# Copyright (C) 2002-2005 Imperia AG.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Imperia 8.0\n"
+"Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
+"POT-Creation-Date: 2007-06-20 18:48+0300\n"
+"PO-Revision-Date: 2006-11-15 17:14+0100\n"
+"Last-Translator: Walter International <service@walter-international.de>\n"
+"Language-Team: French <guido@imperia.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ../lib/IWL/GoogleMap.pm:158
+#, fuzzy
+msgid "container has no id"
+msgstr "Le document ne contient pas de données"
+
+#: ../lib/IWL/GoogleMap.pm:270
+msgid ""
+"No key provided.  Please follow this link in order to obtain a key from "
+"Google."
+msgstr ""
+
+#: ../lib/IWL/Druid.pm:161
+#, fuzzy
+msgid "Finish"
+msgstr "Terminé"
+
+#. TRANSLATORS: 
+#: ../lib/IWL/PageControl.pm:145
+#, perl-brace-format
+msgid "{PAGEENTRY} of {PAGECOUNT}"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:32
+msgid "Add"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:36
+msgid "Apply"
+msgstr "Appliquer"
+
+#: ../lib/IWL/Stock.pm:40
+msgid "Back"
+msgstr "Retour"
+
+#: ../lib/IWL/Stock.pm:44
+msgid "Cancel"
+msgstr "Annuler"
+
+#: ../lib/IWL/Stock.pm:48
+msgid "Clear"
+msgstr "Effacer"
+
+#: ../lib/IWL/Stock.pm:52
+msgid "Close"
+msgstr "Fermer"
+
+#: ../lib/IWL/Stock.pm:56
+msgid "Delete"
+msgstr "Effacer"
+
+#: ../lib/IWL/Stock.pm:60
+msgid "Download"
+msgstr "Télécharger"
+
+#: ../lib/IWL/Stock.pm:64
+msgid "Edit"
+msgstr "Éditer"
+
+#: ../lib/IWL/Stock.pm:68
+msgid "Export"
+msgstr "Exporter"
+
+#: ../lib/IWL/Stock.pm:72
+msgid "Fullscreen"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:76
+msgid "Go"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:80
+msgid "Go back"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:84
+msgid "Go forward"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:88
+#, fuzzy
+msgid "Go to first"
+msgstr "Aller au thème"
+
+#: ../lib/IWL/Stock.pm:92
+#, fuzzy
+msgid "Go to last"
+msgstr "Aller au thème"
+
+#: ../lib/IWL/Stock.pm:96
+msgid "Help"
+msgstr "Aide"
+
+#: ../lib/IWL/Stock.pm:100
+#, fuzzy
+msgid "Information"
+msgstr "Méta-informations"
+
+#: ../lib/IWL/Stock.pm:104
+#, fuzzy
+msgid "Lock"
+msgstr "Blocages"
+
+#: ../lib/IWL/Stock.pm:108
+#, fuzzy
+msgid "Minimize"
+msgstr "Menu principal"
+
+#: ../lib/IWL/Stock.pm:112
+msgid "New"
+msgstr "Nouveau"
+
+#: ../lib/IWL/Stock.pm:116
+msgid "Next"
+msgstr "Prochain"
+
+#: ../lib/IWL/Stock.pm:120
+msgid "OK"
+msgstr "OK"
+
+#: ../lib/IWL/Stock.pm:124
+#, fuzzy
+msgid "Preferences"
+msgstr "Différences"
+
+#: ../lib/IWL/Stock.pm:128
+msgid "Preview"
+msgstr "Aperçu avant impression"
+
+#: ../lib/IWL/Stock.pm:132
+#, fuzzy
+msgid "Refresh"
+msgstr "Références"
+
+#: ../lib/IWL/Stock.pm:136
+msgid "Remove"
+msgstr "Supprimer"
+
+#: ../lib/IWL/Stock.pm:140
+msgid "Save"
+msgstr "Enregistrer"
+
+#: ../lib/IWL/Stock.pm:144
+#, fuzzy
+msgid "Save and close"
+msgstr "Enregistrer sous"
+
+#: ../lib/IWL/Stock.pm:148
+msgid "Upload"
+msgstr "Charger"
+
+#: ../lib/IWL/Stock.pm:153
+msgid "Add Filter"
+msgstr "Ajouter un filtre"
+
+#: ../lib/IWL/Stock.pm:157
+msgid "Directory"
+msgstr "Répertoire"
+
+#: ../lib/IWL/Stock.pm:161
+msgid "Delete directory"
+msgstr "Supprimer un répertoire"
+
+#: ../lib/IWL/Stock.pm:165
+#, fuzzy
+msgid "Edit directory"
+msgstr "Éditer le répertoire"
+
+#: ../lib/IWL/Stock.pm:169
+msgid "Create directory"
+msgstr "Créer un répertoire"
+
+#: ../lib/IWL/Stock.pm:174
+msgid "Bottom"
+msgstr "Bas"
+
+#: ../lib/IWL/Stock.pm:178 ../lib/IWL/Stock.pm:190
+#, fuzzy
+msgid "Main menu"
+msgstr "Menu principal"
+
+#: ../lib/IWL/Stock.pm:182
+msgid "Info"
+msgstr "Info"
+
+#: ../lib/IWL/Stock.pm:186
+#, fuzzy
+msgid "Mail"
+msgstr "Mails"
+
+#: ../lib/IWL/Stock.pm:194
+msgid "Quit"
+msgstr "Quitter"
+
+#: ../lib/IWL/Stock.pm:198
+#, fuzzy
+msgid "Available roles"
+msgstr "Rôles disponibles"
+
+#: ../lib/IWL/Stock.pm:202
+msgid "Top"
+msgstr "Haut"
+
+#: ../lib/IWL/Stock.pm:207
+#, fuzzy
+msgid "Calendar"
+msgstr "Effacer"
+
+#: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
+msgid "Generic Text"
+msgstr ""

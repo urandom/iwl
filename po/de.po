@@ -1,0 +1,214 @@
+# German translations for Imperia CMS.
+# Copyright (C) 2002, 2003 Imperia AG, Norma Karl <Norma.Karl@imperia.net>.
+# This file is distributed under the same license as Imperia itself.
+msgid ""
+msgstr ""
+"Project-Id-Version: Imperia 8.5\n"
+"Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
+"POT-Creation-Date: 2007-06-20 18:48+0300\n"
+"PO-Revision-Date: 2007-06-08 12:31+0300\n"
+"Last-Translator: Guido Flohr <guido@imperia.net>\n"
+"Language-Team:  <guido@imperia.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.10.2\n"
+
+#: ../lib/IWL/GoogleMap.pm:158
+msgid "container has no id"
+msgstr "Container hat kein id-Attribut"
+
+#: ../lib/IWL/GoogleMap.pm:270
+msgid ""
+"No key provided.  Please follow this link in order to obtain a key from "
+"Google."
+msgstr ""
+"Kein Schlüssel angegeben. Bitte diesem Link folgen, um einen Schlüssel von "
+"Google zu bekommen."
+
+#: ../lib/IWL/Druid.pm:161
+msgid "Finish"
+msgstr "Beenden"
+
+#. TRANSLATORS: 
+#: ../lib/IWL/PageControl.pm:145
+#, perl-brace-format
+msgid "{PAGEENTRY} of {PAGECOUNT}"
+msgstr "{PAGEENTRY} of {PAGECOUNT}"
+
+#: ../lib/IWL/Stock.pm:32
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: ../lib/IWL/Stock.pm:36
+msgid "Apply"
+msgstr "Aktivieren"
+
+#: ../lib/IWL/Stock.pm:40
+msgid "Back"
+msgstr "Zurück"
+
+#: ../lib/IWL/Stock.pm:44
+msgid "Cancel"
+msgstr "Abbruch"
+
+#: ../lib/IWL/Stock.pm:48
+msgid "Clear"
+msgstr "Leeren"
+
+#: ../lib/IWL/Stock.pm:52
+msgid "Close"
+msgstr "Schließen"
+
+#: ../lib/IWL/Stock.pm:56
+msgid "Delete"
+msgstr "Löschen"
+
+#: ../lib/IWL/Stock.pm:60
+msgid "Download"
+msgstr "Herunterladen"
+
+#: ../lib/IWL/Stock.pm:64
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: ../lib/IWL/Stock.pm:68
+msgid "Export"
+msgstr "Exportieren"
+
+#: ../lib/IWL/Stock.pm:72
+msgid "Fullscreen"
+msgstr "Vollbild"
+
+#: ../lib/IWL/Stock.pm:76
+msgid "Go"
+msgstr "Gehe"
+
+#: ../lib/IWL/Stock.pm:80
+msgid "Go back"
+msgstr "Zurück"
+
+#: ../lib/IWL/Stock.pm:84
+msgid "Go forward"
+msgstr "Vor"
+
+#: ../lib/IWL/Stock.pm:88
+msgid "Go to first"
+msgstr "Zum Anfang"
+
+#: ../lib/IWL/Stock.pm:92
+msgid "Go to last"
+msgstr "Zum Ende"
+
+#: ../lib/IWL/Stock.pm:96
+msgid "Help"
+msgstr "Hilfe"
+
+#: ../lib/IWL/Stock.pm:100
+msgid "Information"
+msgstr "Informationen"
+
+#: ../lib/IWL/Stock.pm:104
+msgid "Lock"
+msgstr "Sperren"
+
+#: ../lib/IWL/Stock.pm:108
+msgid "Minimize"
+msgstr "Minimieren"
+
+#: ../lib/IWL/Stock.pm:112
+msgid "New"
+msgstr "Neu"
+
+#: ../lib/IWL/Stock.pm:116
+msgid "Next"
+msgstr "Weiter"
+
+#: ../lib/IWL/Stock.pm:120
+msgid "OK"
+msgstr "Ok"
+
+#: ../lib/IWL/Stock.pm:124
+msgid "Preferences"
+msgstr "Voreinstellungen"
+
+#: ../lib/IWL/Stock.pm:128
+msgid "Preview"
+msgstr "Vorschau"
+
+#: ../lib/IWL/Stock.pm:132
+msgid "Refresh"
+msgstr "Aufrischen"
+
+#: ../lib/IWL/Stock.pm:136
+msgid "Remove"
+msgstr "Entfernen"
+
+#: ../lib/IWL/Stock.pm:140
+msgid "Save"
+msgstr "Speichern"
+
+#: ../lib/IWL/Stock.pm:144
+msgid "Save and close"
+msgstr "Speichern und schließen"
+
+#: ../lib/IWL/Stock.pm:148
+msgid "Upload"
+msgstr "Hochladen"
+
+#: ../lib/IWL/Stock.pm:153
+msgid "Add Filter"
+msgstr "Filter hinzufügen"
+
+#: ../lib/IWL/Stock.pm:157
+msgid "Directory"
+msgstr "Verzeichnis"
+
+#: ../lib/IWL/Stock.pm:161
+msgid "Delete directory"
+msgstr "Verzeichnis löschen"
+
+#: ../lib/IWL/Stock.pm:165
+msgid "Edit directory"
+msgstr "Verzeichnis bearbeiten"
+
+#: ../lib/IWL/Stock.pm:169
+msgid "Create directory"
+msgstr "Verzeichnis erstellen"
+
+#: ../lib/IWL/Stock.pm:174
+msgid "Bottom"
+msgstr "Nach unten"
+
+#: ../lib/IWL/Stock.pm:178 ../lib/IWL/Stock.pm:190
+msgid "Main menu"
+msgstr "Hauptmenü"
+
+#: ../lib/IWL/Stock.pm:182
+msgid "Info"
+msgstr "Info"
+
+#: ../lib/IWL/Stock.pm:186
+msgid "Mail"
+msgstr "Mail"
+
+#: ../lib/IWL/Stock.pm:194
+msgid "Quit"
+msgstr "Beenden"
+
+#: ../lib/IWL/Stock.pm:198
+msgid "Available roles"
+msgstr "Verfügbare Rollen"
+
+#: ../lib/IWL/Stock.pm:202
+msgid "Top"
+msgstr "Nach oben"
+
+#: ../lib/IWL/Stock.pm:207
+msgid "Calendar"
+msgstr "Kalender"
+
+#: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
+msgid "Generic Text"
+msgstr "Generischer Text"

@@ -1,0 +1,13 @@
+~$
+.swp$
+x-.*$
+^MANIFEST\.
+^Makefile$
+^blib/
+\.old$
+^#.*#$
+^\.#
+\.tar.gz$
+\.bak$
+^Build$
+^_build/

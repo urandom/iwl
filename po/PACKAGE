@@ -1,0 +1,19 @@
+# Makefile snippet that holds all package-dependent information.  You
+# can override all variables of the default Makefile here.
+
+# Add more languages here!
+LINGUAS = bg de fr 
+
+# Textdomain for our package.
+TEXTDOMAIN = org.bloka.iwl
+
+# Initial copyright holder added to pot and po files.
+COPYRIGHT_HOLDER = Viktor Kojouharov
+
+# Where to send msgid bugs?  
+MSGID_BUGS_ADDRESS = Viktor Kojouharov <viktork@cpan.org>
+
+# Where should the compiled message catalogs be installed?  This
+# directory must be in the include path (@INC) of your Perl
+# interpreter.
+libdir = ../lib

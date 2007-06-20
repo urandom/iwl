@@ -1,0 +1,228 @@
+# Bulgarian translations for Imperia CMS.
+# Copyright (C) 1995-2004 Imperia AG.
+# This file is distributed under the same license as Imperia itself.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Imperia 7.5\n"
+"Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
+"POT-Creation-Date: 2007-06-20 18:48+0300\n"
+"PO-Revision-Date: 2007-02-09 11:45+0200\n"
+"Last-Translator: mmm\n"
+"Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../lib/IWL/GoogleMap.pm:158
+#, fuzzy
+msgid "container has no id"
+msgstr "Документи"
+
+#: ../lib/IWL/GoogleMap.pm:270
+msgid ""
+"No key provided.  Please follow this link in order to obtain a key from "
+"Google."
+msgstr ""
+
+#: ../lib/IWL/Druid.pm:161
+msgid "Finish"
+msgstr ""
+
+#. TRANSLATORS: 
+#: ../lib/IWL/PageControl.pm:145
+#, perl-brace-format
+msgid "{PAGEENTRY} of {PAGECOUNT}"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:32
+msgid "Add"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:36
+msgid "Apply"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:40
+msgid "Back"
+msgstr "Обратно"
+
+#: ../lib/IWL/Stock.pm:44
+msgid "Cancel"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:48
+msgid "Clear"
+msgstr "Изчисти"
+
+#: ../lib/IWL/Stock.pm:52
+msgid "Close"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:56
+msgid "Delete"
+msgstr "Изтриване"
+
+#: ../lib/IWL/Stock.pm:60
+#, fuzzy
+msgid "Download"
+msgstr "Сваляне"
+
+#: ../lib/IWL/Stock.pm:64
+msgid "Edit"
+msgstr "Редактиране"
+
+#: ../lib/IWL/Stock.pm:68
+msgid "Export"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:72
+msgid "Fullscreen"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:76
+msgid "Go"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:80
+msgid "Go back"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:84
+msgid "Go forward"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:88
+#, fuzzy
+msgid "Go to first"
+msgstr "понеделник"
+
+#: ../lib/IWL/Stock.pm:92
+#, fuzzy
+msgid "Go to last"
+msgstr "понеделник"
+
+#: ../lib/IWL/Stock.pm:96
+msgid "Help"
+msgstr "Помощ"
+
+#: ../lib/IWL/Stock.pm:100
+#, fuzzy
+msgid "Information"
+msgstr "Мета информация"
+
+#: ../lib/IWL/Stock.pm:104
+#, fuzzy
+msgid "Lock"
+msgstr "Заключване"
+
+#: ../lib/IWL/Stock.pm:108
+#, fuzzy
+msgid "Minimize"
+msgstr "Главно меню"
+
+#: ../lib/IWL/Stock.pm:112
+msgid "New"
+msgstr "Нова"
+
+#: ../lib/IWL/Stock.pm:116
+#, fuzzy
+msgid "Next"
+msgstr "Следваща страница"
+
+#: ../lib/IWL/Stock.pm:120
+msgid "OK"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:124
+#, fuzzy
+msgid "Preferences"
+msgstr "покажи промените"
+
+#: ../lib/IWL/Stock.pm:128
+msgid "Preview"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:132
+#, fuzzy
+msgid "Refresh"
+msgstr "покажи промените"
+
+#: ../lib/IWL/Stock.pm:136
+msgid "Remove"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:140
+msgid "Save"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:144
+msgid "Save and close"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:148
+#, fuzzy
+msgid "Upload"
+msgstr "Качване"
+
+#: ../lib/IWL/Stock.pm:153
+msgid "Add Filter"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:157
+msgid "Directory"
+msgstr "Директория"
+
+#: ../lib/IWL/Stock.pm:161
+msgid "Delete directory"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:165
+#, fuzzy
+msgid "Edit directory"
+msgstr "Редактиране на директория"
+
+#: ../lib/IWL/Stock.pm:169
+msgid "Create directory"
+msgstr "Създаване на директория"
+
+#: ../lib/IWL/Stock.pm:174
+msgid "Bottom"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:178 ../lib/IWL/Stock.pm:190
+#, fuzzy
+msgid "Main menu"
+msgstr "Главно меню"
+
+#: ../lib/IWL/Stock.pm:182
+msgid "Info"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:186
+#, fuzzy
+msgid "Mail"
+msgstr "Заглавие"
+
+#: ../lib/IWL/Stock.pm:194
+msgid "Quit"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:198
+#, fuzzy
+msgid "Available roles"
+msgstr "Роли"
+
+#: ../lib/IWL/Stock.pm:202
+msgid "Top"
+msgstr ""
+
+#: ../lib/IWL/Stock.pm:207
+#, fuzzy
+msgid "Calendar"
+msgstr "Изчисти"
+
+#: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
+msgid "Generic Text"
+msgstr ""
