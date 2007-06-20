@@ -39,9 +39,9 @@ use IWL::Object;
 
 	is($object->getContent,
 		'< one="two%20three" alpha="&lt;beta&gt;" tango="фокс <трот>" foo="bar"></>' . "\n");
-	ok($object->existsAttribute('foo'), 'Exists attribute "foo"');
-	ok(!$object->existsAttribute('bar'), 'Exists attribute "bar"');
+	ok($object->hasAttribute('foo'), 'Exists attribute "foo"');
+	ok(!$object->hasAttribute('bar'), 'Exists attribute "bar"');
 
 	$object->deleteAttribute('foo');
-	ok(!$object->existsAttribute('foo'), 'Delete attribute "foo"');
+	ok(!$object->hasAttribute('foo'), 'Delete attribute "foo"');
 }

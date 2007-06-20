@@ -62,7 +62,8 @@ sub appendOption {
     $option->setValue($value);
     $option->setText($text);
 
-    return $self->appendChild($option);
+    $self->appendChild($option);
+    return $option;
 }
 
 =item B<setMultiple> (B<BOOL>)

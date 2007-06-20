@@ -561,13 +561,13 @@ sub getAttribute {
     }
 }
 
-=item B<existsAttribute> (B<ATTR>)
+=item B<hasAttribute> (B<ATTR>)
 
 Returns true if attribute B<ATTR> exists, false otherwise.
 
 =cut
 
-sub existsAttribute {
+sub hasAttribute {
     my ($self, $attr) = @_;
 
     return unless $attr;

@@ -100,7 +100,7 @@ Returns true if the checkbox is checked, false otherwise.
 sub getChecked {
     my ($self) = @_;
 
-    return unless $self->existsAttribute ('checked');
+    return unless $self->hasAttribute('checked');
 
     return $self;
 }
