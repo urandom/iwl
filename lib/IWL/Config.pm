@@ -124,13 +124,13 @@ if (!exists $IWLConfig{JS_DIR}) {
 
 	parse_conf($conf) if (-s $conf);
     }
-    $IWLConfig{SKIN_DIR} .= '/' . $IWLConfig{SKIN};
-    $IWLConfig{IMAGE_DIR} = $IWLConfig{SKIN_DIR} . $IWLConfig{IMAGE_DIR};
-    $IWLConfig{ICON_DIR} = $IWLConfig{SKIN_DIR} . $IWLConfig{ICON_DIR};
+    $IWLConfig{SKIN_DIR}  .= '/' . $IWLConfig{SKIN};
+    $IWLConfig{IMAGE_DIR}  = $IWLConfig{SKIN_DIR} . $IWLConfig{IMAGE_DIR};
+    $IWLConfig{ICON_DIR}   = $IWLConfig{SKIN_DIR} . $IWLConfig{ICON_DIR};
 }
 
 @EXPORT_OK = qw(%IWLConfig);
-@EXPORT = qw(%IWLConfig);
+@EXPORT    = qw(%IWLConfig);
 
 1;
 
