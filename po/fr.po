@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Imperia 8.0\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-20 18:48+0300\n"
+"POT-Creation-Date: 2007-06-20 19:27+0300\n"
 "PO-Revision-Date: 2006-11-15 17:14+0100\n"
 "Last-Translator: Walter International <service@walter-international.de>\n"
 "Language-Team: French <guido@imperia.net>\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: ../lib/IWL/GoogleMap.pm:158
 #, fuzzy
-msgid "container has no id"
+msgid "Container has no id"
 msgstr "Le document ne contient pas de données"
 
 #: ../lib/IWL/GoogleMap.pm:270
@@ -30,7 +30,7 @@ msgstr ""
 msgid "Finish"
 msgstr "Terminé"
 
-#. TRANSLATORS: 
+#. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
 #: ../lib/IWL/PageControl.pm:145
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"

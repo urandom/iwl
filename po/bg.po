@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Imperia 7.5\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-20 18:48+0300\n"
-"PO-Revision-Date: 2007-02-09 11:45+0200\n"
+"POT-Creation-Date: 2007-06-20 19:27+0300\n"
+"PO-Revision-Date: 2007-06-20 19:37+0300\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net>\n"
 "MIME-Version: 1.0\n"
@@ -17,32 +17,32 @@ msgstr ""
 
 #: ../lib/IWL/GoogleMap.pm:158
 #, fuzzy
-msgid "container has no id"
+msgid "Container has no id"
 msgstr "Документи"
 
 #: ../lib/IWL/GoogleMap.pm:270
 msgid ""
 "No key provided.  Please follow this link in order to obtain a key from "
 "Google."
-msgstr ""
+msgstr "Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ от Google."
 
 #: ../lib/IWL/Druid.pm:161
 msgid "Finish"
-msgstr ""
+msgstr "Край"
 
-#. TRANSLATORS: 
+#. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
 #: ../lib/IWL/PageControl.pm:145
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
-msgstr ""
+msgstr "{PAGEENTRY} от {PAGECOUNT}"
 
 #: ../lib/IWL/Stock.pm:32
 msgid "Add"
-msgstr ""
+msgstr "Добавяне"
 
 #: ../lib/IWL/Stock.pm:36
 msgid "Apply"
-msgstr ""
+msgstr "Прилагане"
 
 #: ../lib/IWL/Stock.pm:40
 msgid "Back"
@@ -50,22 +50,21 @@ msgstr "Обратно"
 
 #: ../lib/IWL/Stock.pm:44
 msgid "Cancel"
-msgstr ""
+msgstr "Отказване"
 
 #: ../lib/IWL/Stock.pm:48
 msgid "Clear"
-msgstr "Изчисти"
+msgstr "Изчистване"
 
 #: ../lib/IWL/Stock.pm:52
 msgid "Close"
-msgstr ""
+msgstr "Затваряне"
 
 #: ../lib/IWL/Stock.pm:56
 msgid "Delete"
 msgstr "Изтриване"
 
 #: ../lib/IWL/Stock.pm:60
-#, fuzzy
 msgid "Download"
 msgstr "Сваляне"
 
@@ -75,59 +74,53 @@ msgstr "Редактиране"
 
 #: ../lib/IWL/Stock.pm:68
 msgid "Export"
-msgstr ""
+msgstr "Износ"
 
 #: ../lib/IWL/Stock.pm:72
 msgid "Fullscreen"
-msgstr ""
+msgstr "Цял екран"
 
 #: ../lib/IWL/Stock.pm:76
 msgid "Go"
-msgstr ""
+msgstr "Отиване"
 
 #: ../lib/IWL/Stock.pm:80
 msgid "Go back"
-msgstr ""
+msgstr "Назад"
 
 #: ../lib/IWL/Stock.pm:84
 msgid "Go forward"
-msgstr ""
+msgstr "Напред"
 
 #: ../lib/IWL/Stock.pm:88
-#, fuzzy
 msgid "Go to first"
-msgstr "понеделник"
+msgstr "Отиване в началото"
 
 #: ../lib/IWL/Stock.pm:92
-#, fuzzy
 msgid "Go to last"
-msgstr "понеделник"
+msgstr "Отиване накрая"
 
 #: ../lib/IWL/Stock.pm:96
 msgid "Help"
 msgstr "Помощ"
 
 #: ../lib/IWL/Stock.pm:100
-#, fuzzy
 msgid "Information"
-msgstr "Мета информация"
+msgstr "Информация"
 
 #: ../lib/IWL/Stock.pm:104
-#, fuzzy
 msgid "Lock"
 msgstr "Заключване"
 
 #: ../lib/IWL/Stock.pm:108
-#, fuzzy
 msgid "Minimize"
-msgstr "Главно меню"
+msgstr "Намаляване"
 
 #: ../lib/IWL/Stock.pm:112
 msgid "New"
-msgstr "Нова"
+msgstr "Нов"
 
 #: ../lib/IWL/Stock.pm:116
-#, fuzzy
 msgid "Next"
 msgstr "Следваща страница"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-20 18:48+0300\n"
+"POT-Creation-Date: 2007-06-20 19:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../lib/IWL/GoogleMap.pm:158
-msgid "container has no id"
+msgid "Container has no id"
 msgstr ""
 
 #: ../lib/IWL/GoogleMap.pm:270
@@ -30,7 +30,7 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#. TRANSLATORS: 
+#. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
 #: ../lib/IWL/PageControl.pm:145
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
