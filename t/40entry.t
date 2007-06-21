@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 20;
 
 use IWL::Entry;
 
@@ -12,9 +12,18 @@ my $entry = IWL::Entry->new;
 	is($entry->setPassword(1), $entry);
 	is($entry->setReadonly(1), $entry);
 	is($entry->setText('Some text'), $entry);
+	is($entry->setDefaultText('Default text'), $entry);
 	is($entry->setMaxLength(10), $entry);
 	is($entry->setSize(3), $entry);
-	like($entry->getContent, qr(<span (?:(?:class="entry password"|id="entry_\d+")\s*){2}><input (?:(?:maxlength="10"|readonly="true"|value="Some text"|class="entry_text"|id="entry_\d+_text"|type="password"|size="3")\s*){7}/>\n</span>\n));
+
+	ok($entry->isPassword);
+	ok($entry->isReadonly);
+	is($entry->getText, 'Some text');
+	is($entry->getDefaultText, 'Default text');
+	is($entry->getMaxLength, 10);
+	is($entry->getSize, 3);
+
+	like($entry->getContent, qr(^<span (?:(?:class="entry password"|id="(entry_\d+)")\s*){2}><input (?:(?:maxlength="10"|value="Some text"| size="3"|onblur=".*?'Default text'.*?"|readonly="true"|onfocus=".*?'Default text'.*?"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){9}/>\n</span>\n$)s);
 }
 
 {

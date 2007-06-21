@@ -12,7 +12,7 @@ use IWL::Stash;
 	is($check->getTitle, 'My title');
 
     is($check->setChecked(1), $check);
-    ok($check->getChecked);
+    ok($check->isChecked);
 
     like($check->getContent, qr(^<input (?:(?:checked="checked"|name="checkbox_\d+"|class="checkbox"|type="checkbox"|id="checkbox_\d+"|title="My title")\s*){6}/>\n<label.*My title.*?>My label</label>\n$));
 }

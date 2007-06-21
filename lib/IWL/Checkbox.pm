@@ -91,13 +91,13 @@ sub setChecked {
     }
 }
 
-=item B<getChecked>
+=item B<isChecked>
 
 Returns true if the checkbox is checked, false otherwise.
 
 =cut
 
-sub getChecked {
+sub isChecked {
     my ($self) = @_;
 
     return unless $self->hasAttribute('checked');
@@ -119,7 +119,7 @@ sub extractState {
 
     my $name = $self->getName;
 
-    if ($self->getChecked) {
+    if ($self->isChecked) {
 	my $value = $self->getAttribute('value', 1);
 	$value = 'on' unless defined $value;
 	$state->pushValues($name, $value);

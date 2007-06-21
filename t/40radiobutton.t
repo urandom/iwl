@@ -12,7 +12,7 @@ use IWL::Stash;
 	is($radio->getTitle, 'My title');
 
     is($radio->setChecked(1), $radio);
-    ok($radio->getChecked);
+    ok($radio->isChecked);
 
     like($radio->getContent, qr(^<input (?:(?:checked="checked"|name="radiobutton_\d+"|class="radiobutton"|type="radio"|id="radiobutton_\d+"|title="My title")\s*){6}/>\n<label.*My title.*?>My label</label>\n$));
 }
@@ -32,5 +32,5 @@ use IWL::Stash;
 
     $state->setValues('radio', 'alpha');
     ok($radio->applyState($state));
-	ok(!$radio->getChecked);
+	ok(!$radio->isChecked);
 }

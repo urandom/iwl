@@ -127,6 +127,16 @@ sub setImage {
     return $self;
 }
 
+=item B<getImage>
+
+Returns the button image
+
+=cut
+
+sub getImage {
+    return shift->{__button}{image};
+}
+
 =item B<setFromStock> (B<STOCK_ID>)
 
 Sets the button from the stock id

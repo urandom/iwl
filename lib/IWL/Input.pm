@@ -130,6 +130,16 @@ sub setDisabled {
     }
 }
 
+=item B<isDisabled>
+
+Returns true if the input is disabled
+
+=cut
+
+sub isDisabled {
+    return shift->hasAttribute('disabled');
+}
+
 =item B<extractState> (B<STATE>)
 
 Update the IWL::Stash(3pm) B<STATE> according to the input state.

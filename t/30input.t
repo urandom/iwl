@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 use IWL::Input;
 use IWL::Stash;
@@ -23,6 +23,7 @@ use IWL::Stash;
 {
 	my $input = IWL::Input->new;
 	is($input->setDisabled(1), $input);
+	ok($input->isDisabled);
 	is($input->getContent, "<input disabled />\n");
 }
 

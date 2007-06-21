@@ -92,6 +92,16 @@ sub setPassword {
     return $self;
 }
 
+=item B<isPassword>
+
+Returns true if the entry is a password type
+
+=cut
+
+sub isPassword {
+    return shift->{__entry}->getAttribute('type') eq 'password';
+}
+
 =item B<setReadonly> (B<BOOL>)
 
 Sets whether the type of the entry is read-only 
@@ -112,6 +122,16 @@ sub setReadonly {
     return $self;
 }
 
+=item B<isReadonly>
+
+Returns true if the entry is a read-only
+
+=cut
+
+sub isReadonly {
+    return shift->{__entry}->hasAttribute('readonly');
+}
+
 =item B<setText> (B<TEXT>)
 
 Sets the text of the entry
@@ -126,6 +146,16 @@ sub setText {
     $self->{__entry}->setValue($text);
 
     return $self;
+}
+
+=item B<getText>
+
+Returns the text of the entry
+
+=cut
+
+sub getText {
+    return shift->{__entry}->getValue;
 }
 
 =item B<setDefaultText> (B<TEXT>)
@@ -152,10 +182,20 @@ if (this.value == '$text') {
 }
 EOF
 
-    $self->setText($text);
-    $self->{__setDefault} = 1;
+    $self->setText($text) unless $self->getText;
+    $self->{__setDefault} = $text;
     $self->setClass($self->getClass);
     return $self;
+}
+
+=item B<getDefaultText>
+
+Returns the default text of the entry
+
+=cut
+
+sub getDefaultText {
+    return shift->{__setDefault};
 }
 
 =item B<setMaxLength> (B<NUM>)
@@ -173,6 +213,16 @@ sub setMaxLength {
     return $self;
 }
 
+=item B<getMaxLength>
+
+Returns the maximum character length of the entry
+
+=cut
+
+sub getMaxLength {
+    return shift->{__entry}->getAttribute('maxlength');
+}
+
 =item B<setSize> (B<NUM>)
 
 Sets the size of the entry field
@@ -186,6 +236,16 @@ sub setSize {
 
     $self->{__entry}->setAttribute(size => $num);
     return $self;
+}
+
+=item B<getSize>
+
+Returns the size of the entry field
+
+=cut
+
+sub getSize {
+    return shift->{__entry}->getAttribute('size');
 }
 
 =item B<setIcon> (B<SRC>, [B<ALT>, B<POSITION>, B<CLICKABLE>])
@@ -320,6 +380,16 @@ sub setAttribute {
     } else {
         $self->{__entry}->setAttribute($attr, $value);
 	return $self;
+    }
+}
+
+sub getAttribute {
+    my ($self, $attr) = @_;
+
+    if ($attr eq 'id' || $attr eq 'class') {
+        return $self->SUPER::getAttribute($attr);
+    } else {
+        return $self->{__entry}->getAttribute($attr);
     }
 }
 
