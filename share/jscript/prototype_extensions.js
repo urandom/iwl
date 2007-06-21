@@ -77,7 +77,7 @@ Object.extend(Event, {
 	element['handlers'][eventName].ajaxRequest = new Ajax.Updater(params.update, url, {
 	  onException: exceptionHandler,
 	  onComplete: onComplete,
-	  insertion: params.insertion || false,
+	  insertion: eval(params.insertion || false),
 	  evalScripts: params.evalScripts || false,
           parameters: {IWLEvent: Object.toJSON({eventName: eventName, params: cgiParams})}
 	});

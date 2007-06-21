@@ -184,6 +184,7 @@ t/10stash.t
 t/20comment.t
 t/20text.t
 t/21script.t
+t/21style.t
 t/22widget.t
 t/30anchor.t
 t/30break.t
@@ -199,6 +200,9 @@ t/40entry.t
 t/40file.t
 t/40frame.t
 t/40hbox.t
+t/40hidden.t
+t/40inputbutton.t
+t/40textarea.t
 t/50combo_option.t
 t/50radiobutton.t
 t/iwl.conf

@@ -26,7 +26,7 @@ The text area is a multi-line text entry.
 IWL::Textarea->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  readonly: set to true if the entry is read-only
+  readonly: set to true if the textarea is read-only
 
 =cut
 
@@ -38,10 +38,10 @@ sub new {
 
     $self->{_tag} = "textarea";
     $self->{_noChildren} = 0;
-    $self->setClass('textarea');
+    $self->{_defaultClass} = 'textarea';
 
     if ($args{readonly}) {
-        $self->setAttribute(readonly => 'true');
+	$self->setReadonly(1);
         delete $args{readonly};
     }
     $self->_constructorArguments(%args);
@@ -55,7 +55,7 @@ sub new {
 
 =item B<setReadonly> (B<BOOL>)
 
-Sets whether the type of the entry is read-only 
+Sets whether the type of the textarea is read-only 
 
 Parameter: B<BOOL> - a boolean value.
 
@@ -71,9 +71,19 @@ sub setReadonly {
     }
 }
 
+=item B<isReadonly>
+
+Returns true if the textarea is readonly
+
+=cut
+
+sub isReadonly {
+    return shift->hasAttribute('readonly');
+}
+
 =item B<setText> (B<TEXT>)
 
-Sets the default text of the entry
+Sets the default text of the textarea 
 
 Parameter: B<TEXT> - the text.
 
@@ -87,6 +97,17 @@ sub setText {
     return $self->setChild($text_obj);
 }
 
+=item B<getText>
+
+Returns the textarea text
+
+=cut
+
+sub getText {
+    my $child = shift->{childNodes}[0] or return '';
+    return $child->getContent;
+}
+
 =item B<extractState> (B<STATE>)
 
 Update the IWL::Stash(3pm) B<STATE> according to the input state.
@@ -96,9 +117,9 @@ Update the IWL::Stash(3pm) B<STATE> according to the input state.
 sub extractState {
     my ($self, $state) = @_;
 
-    my $name = $self->getName;
+    my $name = $self->getName or return 0;
     
-    my $child = $self->child_nodes->[0] or return 1;
+    my $child = $self->{childNodes}[0] or return 1;
     my $value = $child->getContent;
 
     $state->pushValues($name => $value);
@@ -118,7 +139,7 @@ state.
 sub applyState {
     my ($self, $state) = @_;
 
-    my $name = $self->getName;
+    my $name = $self->getName or return 0;
     my $value = $state->shiftValue($name);
     $value = '' unless defined $value;
 

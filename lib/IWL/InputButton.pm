@@ -58,6 +58,16 @@ sub setLabel {
     return $self->setValue($text);
 }
 
+=item B<getLabel>
+
+Returns the label of the button
+
+=cut
+
+sub getLabel {
+    return shift->getValue;
+}
+
 # Internal
 #
 sub __init {

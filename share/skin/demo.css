@@ -56,8 +56,11 @@ span.c_misc {
     margin: 40px auto;
     float: none;
 }
-#rpc_button, #rpc_combo {
+#rpc_button, #rpc_combo, #rpc_label {
     margin: 1em auto;
     float: none;
     display: block;
+}
+#rpc_label {
+    width: 15em;
 }

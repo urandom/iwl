@@ -41,6 +41,12 @@ $rpc->handleEvent(
 
 # Event row handlers
 $rpc->handleEvent(
+    'IWL-Anchor-click',
+    sub {
+	my $params = shift;
+
+	return "connect perl scripts via an AJAX request";
+    },
     'IWL-Button-click',
     sub {
 	my $params = shift;
@@ -581,14 +587,26 @@ sub generate_file {
 
 sub generate_rpc_events {
     my $container = IWL::Container->new(id => 'rpc_events_container');
+    my $label = IWL::Label->new(id => 'rpc_label', expand => 1);
+    my $link = IWL::Anchor->new(id => 'rpc_label_link');
     my $button = IWL::Button->new(id => 'rpc_button')->setLabel('Click me!');
     my $combo = IWL::Combo->new(id => 'rpc_combo');
 
-    $combo->appendOption('First option' => 'first')->appendOption('Second option' => 'second');
-    $combo->registerEvent('IWL-Combo-change', 'iwl_demo.pl', {onComplete => "displayStatus(arguments[0].data.text)"});
-    $button->registerEvent('IWL-Button-click', 'iwl_demo.pl', {onComplete => "displayStatus(arguments[0].data.text)", emitOnce => 1});
+    $label->setText("RPC Events are used to ... \n");
+    $link->setText('read more')->setStyle(cursor => 'pointer', color => '#053AA1');
+    $combo->appendOption('First option' => 'first');
+    $combo->appendOption('Second option' => 'second');
 
-    $container->appendChild($button, $combo);
+    $link->registerEvent('IWL-Anchor-click', 'iwl_demo.pl', {
+	    onStart => "this.remove()",
+	    update => 'rpc_label',
+	    insertion => 'bottom',
+    });
+    $button->registerEvent('IWL-Button-click', 'iwl_demo.pl', {onComplete => "displayStatus(arguments[0].data.text)", emitOnce => 1});
+    $combo->registerEvent('IWL-Combo-change', 'iwl_demo.pl', {onComplete => "displayStatus(arguments[0].data.text)"});
+
+    $label->appendChild($link);
+    $container->appendChild($label, $button, $combo);
 
     return $container->getObject;
 }
@@ -706,8 +724,8 @@ sub show_the_code_for {
     } elsif ($code_for eq 'file_container') {
 	$paragraph->appendTextType(read_code("generate_file", 13), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {
-	$paragraph->appendTextType(read_code("generate_rpc_events", 14), 'pre');
-	$paragraph->appendTextType(read_code("Event row handlers", 15), 'pre');
+	$paragraph->appendTextType(read_code("generate_rpc_events", 25), 'pre');
+	$paragraph->appendTextType(read_code("Event row handlers", 21), 'pre');
     } else {
 	$paragraph->setText('Code not available');
     }

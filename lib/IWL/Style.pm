@@ -8,7 +8,6 @@ use strict;
 use base qw(IWL::Object);
 
 use IWL::Text;
-use IWL::Page::Link;
 
 =head1 NAME
 
@@ -59,6 +58,16 @@ sub setMedia {
     my ($self, $source) = @_;
 
     return $self->setAttribute(media => $source);
+}
+
+=item B<getMedia>
+
+Returns the media type of the style
+
+=cut
+
+sub getMedia {
+    return shift->getAttribute('media');
 }
 
 =item B<appendStyleImport> (B<FILE>)
