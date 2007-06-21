@@ -61,6 +61,16 @@ sub setAction {
     return $self->setAttribute(action => $action, 'uri');
 }
 
+=item B<getAction>
+
+Returns the form action
+
+=cut
+
+sub getAction {
+    return shift->getAttribute('action', 1);
+}
+
 =item B<setMethod> (B<METHOD>)
 
 Sets the method of the form to B<METHOD>
@@ -79,6 +89,16 @@ sub setMethod {
     return $self->setAttribute(method => $method);
 }
 
+=item B<getMethod>
+
+Returns the form method
+
+=cut
+
+sub getMethod {
+    return shift->getAttribute('method', 1) || 'get';
+}
+
 =item B<setEnctype> (B<ENCTYPE>)
 
 Sets the content-type of the form to B<ENCTYPE>
@@ -93,6 +113,16 @@ sub setEnctype {
     return $self->setAttribute(enctype => $enctype);
 }
 
+=item B<getEnctype>
+
+Returns the content-type of the form
+
+=cut
+
+sub getEnctype {
+    return shift->getAttribute('enctype', 1);
+}
+
 =item B<setTarget> (B<TARGET>)
 
 Sets the target attribute for the form 
@@ -105,6 +135,16 @@ sub setTarget {
     my ($self, $target) = @_;
 
     return $self->setAttribute(target => $target);
+}
+
+=item B<getTarget>
+
+Returns the form target
+
+=cut
+
+sub getTarget {
+    return shift->getAttribute('target', 1);
 }
 
 1;

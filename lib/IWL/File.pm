@@ -65,7 +65,7 @@ Returns the accept filter
 =cut
 
 sub getAccept {
-    return shift->getAttribute('accept');
+    return shift->getAttribute('accept', 1);
 }
 
 1;

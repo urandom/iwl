@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More tests => 6;
 
 use IWL;
 
@@ -10,6 +10,10 @@ use IWL;
         week_numbers => ['on'],
         display_type => ['popup']
     );
+	is($form->getMethod, 'get');
+	is($form->getAction, 'iwl_demo.pl');
+	is($form->getTarget, '_blank');
+	is($form->getEnctype, 'image/jpeg');
 	is_deeply($expected, $state, 'get state');
 }
 
@@ -27,8 +31,10 @@ use IWL;
 
 sub __create_form {
     my $form = IWL::Form->new (name => '');
-    $form->setAction ('zzz_test.pl');
-    $form->setMethod ('GET');
+    $form->setEnctype('image/jpeg');
+    $form->setAction('iwl_demo.pl');
+	$form->setTarget('_blank');
+    $form->setMethod('get');
     
     my $button = IWL::Input->new (type => 'submit', value => 'Refresh');
     my $button_container = IWL::Container->new;
