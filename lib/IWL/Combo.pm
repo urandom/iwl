@@ -110,7 +110,7 @@ sub extractState {
 
 	    $first_value = $value unless defined $first_value;
 	    
-	    $state->pushValues($name, $value) if $child->getSelected;
+	    $state->pushValues($name, $value) if $child->isSelected;
 	}
     }
 

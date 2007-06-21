@@ -196,6 +196,7 @@ t/31button.t
 t/40checkbox.t
 t/40combo.t
 t/40entry.t
+t/40file.t
 t/50combo_option.t
 t/50radiobutton.t
 t/iwl.conf

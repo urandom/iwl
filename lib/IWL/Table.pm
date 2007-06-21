@@ -129,9 +129,9 @@ sub appendBody {
 
     $self->{_body}->appendChild($row);
 
-    if ($row->isa("IWL::Table::Row") || $row->isa("IWL::Tree::Row")) {
+    if ($row->isa("IWL::Table::Row")) {
         unless ($row->{_defaultClass}) {
-            if ($self->{_alternate}) {
+            if ($self->{__alternate}) {
                 if (@{$self->{_body}{childNodes}} % 2) {
                     $row->setClass($self->{_defaultClass} . "_body_row");
                 } else {
@@ -226,23 +226,21 @@ sub setAlternate {
     my ($self, $bool) = @_;
 
     if ($bool) {
-	$self->{_alternate} = 1;
+	$self->{__alternate} = 1;
     } else {
-	$self->{_alternate} = 0;
+	$self->{__alternate} = 0;
     }
     return $self;
 }
 
-=item B<getAlternate> 
+=item B<isAlternating>
 
-Returns whether the rows of the table atlernate
+Returns whether the rows of the table will alternate
 
 =cut
 
-sub getAlternate {
-    my ($self, $bool) = @_;
-
-    return $self->{_alternate};
+sub isAlternating {
+    return shift->{__alternate};
 }
 
 # Overrides
@@ -299,7 +297,7 @@ sub __init {
     $self->appendChild($body);
     $self->appendChild($footer);
 
-    $self->{_alternate} = 0;
+    $self->{__alternate} = 0;
 
     return $self;
 }

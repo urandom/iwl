@@ -55,11 +55,17 @@ Parameters: B<EXPR> - the expression which is used for filtering
 sub setAccept {
     my ($self, $expr) = @_;
 
-    if ($self->{_file}) {
-        return $self->{_file}->setAttribute(accept => $expr);
-    } else {
-        return $self->setAttribute(accept => $expr);
-    }
+    return $self->setAttribute(accept => $expr);
+}
+
+=item B<getAccept>
+
+Returns the accept filter
+
+=cut
+
+sub getAccept {
+    return shift->getAttribute('accept');
 }
 
 1;

@@ -80,13 +80,13 @@ sub setSelected {
     return $self;
 }
 
-=item B<getSelected>
+=item B<isSelected>
 
 Returns true if the option is selected, false otherwise.
 
 =cut
 
-sub getSelected {
+sub isSelected {
     my ($self) = @_;
 
     my $selected = $self->getAttribute('selected', 1);
