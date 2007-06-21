@@ -57,7 +57,7 @@ Object.extend(Object.extend(Notebook, Widget), {
     },
 
     _init: function (id) {
-	this.tabContainer = this.down(null, 1).cleanWhitespace();
+	this.tabContainer = this.down(null, 1);
 	this.pageContainer = this.down().next(null, 1);
 
 	this.tabs = [];

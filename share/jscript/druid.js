@@ -100,9 +100,8 @@ Object.extend(Object.extend(Druid, Widget), {
     },
 
     _init: function (id, text) {
-        var buttonContainer = this.down().next();
-        this.backButton = buttonContainer.down('div');
-        this.nextButton = this.backButton.next('div');
+	this.backButton = $(this.id + '_back_button');
+        this.nextButton = $(this.id + '_next_button');
 	if (!this.nextButton) {
 	    this.__timeout = setTimeout(this._init.apply.bind(this, arguments), 500);
 	    return;

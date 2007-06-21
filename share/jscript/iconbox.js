@@ -171,7 +171,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 
     _init: function(id) {
 	this.statusbar = $(id + '_status_label');
-	this.iconsContainer = this.cleanWhitespace().down().cleanWhitespace();
+	this.iconsContainer = this.down();
 	this.icons = new Array;
 	this.selectedIcons = new Array;
 	this.currentIcon = null;

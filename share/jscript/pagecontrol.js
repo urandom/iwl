@@ -69,13 +69,13 @@ Object.extend(Object.extend(PageControl, Widget), {
 		this.emitSignal('load');
 	    }
 	};
-	this.firstButton = this.down('div').signalConnect('load', buttonLoad.bind(this));
-	this.prevButton = this.firstButton.next('div').signalConnect('load', buttonLoad.bind(this));
-	this.labelContainer = this.prevButton.next('span');
-	this.input = this.labelContainer.down('input');
-	this.label = this.labelContainer.down('span.pagecontrol_page_count');
-	this.nextButton = this.prevButton.next('div').signalConnect('load', buttonLoad.bind(this));
-	this.lastButton = this.nextButton.next('div').signalConnect('load', buttonLoad.bind(this));
+	this.firstButton = $(this.id + '_first').signalConnect('load', buttonLoad.bind(this));
+	this.prevButton = $(this.id + '_prev').signalConnect('load', buttonLoad.bind(this));
+	this.labelContainer = $(this.id + '_label');
+	this.input = $(this.id + '_page_entry_text');
+	this.label = $(this.id + '_page_count');
+	this.nextButton = $(this.id + '_next').signalConnect('load', buttonLoad.bind(this));
+	this.lastButton = $(this.id + '_last').signalConnect('load', buttonLoad.bind(this));
 	this.currentPage = 1;
 	this.input.value = this.currentPage;
 	this.options = Object.extend({
