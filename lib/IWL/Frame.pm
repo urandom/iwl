@@ -62,6 +62,17 @@ sub setLabel {
     return $self;
 }
 
+=item B<getLabel>
+
+Returns the frame's label text
+
+=cut
+
+sub getLabel {
+    my $self = shift;
+    return $self->{__legend} ? $self->{__legend}->firstChild->getContent : '';
+}
+
 # Protected
 #
 sub _realize {

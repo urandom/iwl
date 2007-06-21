@@ -69,10 +69,31 @@ sub new {
 
 =over 4
 
+=item B<firstChild>
+
+Returns the first child of the object
+
+=cut
+
+sub firstChild {
+    return shift->{childNodes}[0];
+}
+
+=item B<lastChild>
+
+Returns the last child of the object
+
+=cut
+
+sub lastChild {
+    my $children = shift->{childNodes};
+    return $children->[$#$children];
+}
+
 =item B<nextChild> (B<CURRENT_CHILD>)
 
 Obtains the next child of the object.
-Parameter: CURRENT_CHILD - it's sibling
+Parameter: B<CURRENT_CHILD> - it's sibling
 Returns the child object, or null if there is no next child.
 
 =cut
@@ -95,7 +116,7 @@ sub nextChild {
 =item B<prevChild> (B<CURRENT_CHILD>)
 
 Obtains the previous child of the object.
-Parameter: CURRENT_CHILD - it's sibling
+Parameter: B<CURRENT_CHILD> - it's sibling
 Returns the child object, or null if there is no previous child.
 
 =cut
