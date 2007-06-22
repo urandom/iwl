@@ -46,7 +46,7 @@ $rpc->handleEvent(
     sub {
 	my $params = shift;
 
-	return "connect perl scripts via an AJAX request";
+	return "easily create AJAX requests through Perl.";
     },
     'IWL-Button-click',
     sub {
@@ -60,6 +60,35 @@ $rpc->handleEvent(
 
 	return {text => 'The combo was changed to ' . $params->{value}}, $params;
     },
+);
+
+# PageControl handlers
+$rpc->handleEvent(
+    'IWL-Container-refresh',
+    sub {
+	my $params = shift;
+
+	my $page_number = {
+	    input => $params->{value},
+	    first => 1,
+	    prev => $params->{page} - 1 || 1,
+	    next => $params->{page} + 1 > $params->{pageCount} ? $params->{pageCount} : $params->{page} + 1,
+	    last => $params->{pageCount}
+	}->{$params->{type}};
+
+	if ($page_number == 1) {
+	    return IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
+	} elsif ($page_number == 2) {
+	    return IWL::Label->new(expand => 1)->setText(<<EOF);
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+EOF
+	} elsif ($page_number == 3) {
+	    return IWL::Label->new->setText('This is the end of the road');
+	}
+    }
 );
 
 if (my $file = $form{upload_file}) {
@@ -612,6 +641,19 @@ sub generate_rpc_events {
     return $container->getObject;
 }
 
+sub generate_rpc_pagecontrol {
+    my $container = IWL::Container->new(id => 'rpc_pagecontrol_container');
+    my $content = IWL::Container->new(id => 'page_content');
+    my $pager = IWL::PageControl->new(pageCount => 3, pageSize => 10, id => 'pagecontrol')->bindToWidget(
+	  $content, 'iwl_demo.pl', {update => 'page_content', evalScripts => 1}
+    );
+
+    $content->appendChild(IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif'));
+    $container->appendChild($content, $pager);
+
+    return $container->getObject;
+}
+
 sub register_row_event {
     foreach my $row (@_) {
 	my $function = 'generate_' .$row->getId;
@@ -727,6 +769,9 @@ sub show_the_code_for {
     } elsif ($code_for eq 'rpc_events_container') {
 	$paragraph->appendTextType(read_code("generate_rpc_events", 25), 'pre');
 	$paragraph->appendTextType(read_code("Event row handlers", 21), 'pre');
+    } elsif ($code_for eq 'rpc_pagecontrol_container') {
+	$paragraph->appendTextType(read_code("generate_rpc_pagecontrol", 12), 'pre');
+	$paragraph->appendTextType(read_code("PageControl handlers", 28), 'pre');
     } else {
 	$paragraph->setText('Code not available');
     }

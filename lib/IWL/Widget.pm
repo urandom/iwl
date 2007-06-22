@@ -431,6 +431,18 @@ EOF
     }
 }
 
+sub _realizeEvents {
+    my $self = shift;
+    my $id = $self->getId;
+    return unless $self->{_handlers} && $id;
+
+    $self->SUPER::_realizeEvents;
+
+    $self->_appendAfter(IWL::Script->new->setScript(<<EOF));
+\$('$id').prepareEvents();
+EOF
+}
+
 sub _constructorArguments {
     my ($self, %args) = @_;
 
@@ -500,7 +512,8 @@ sub _registerEvent {
 	$handlers->{evalScripts} = 'true' if $params->{evalScripts};
     }
 
-    return $handlers if $self->signalConnect($signal => "if (!this.prepareEvents) return; this.prepareEvents(); this.emitEvent('$event', {value: this.value})");
+    $self->signalConnect($signal => "this.emitEvent('$event', {value: this.value})");
+    return $handlers;
 }
 
 # Internal

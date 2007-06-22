@@ -216,7 +216,11 @@ sub __defaultEvent {
 
     if ($params->{update}) {
 	IWL::Object::printHTMLHeader;
-	print $data;
+	if (UNIVERSAL::isa($data, 'IWL::Object')) {
+	    $data->print;
+	} else {
+	    print $data;
+	}
     } else {
 	IWL::Object::printJSONHeader;
 	print '{data: ' . objToJson($data) . ', user_extras: ' . (objToJson($user_extras) || 'null') . '}';

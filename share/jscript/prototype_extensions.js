@@ -69,11 +69,16 @@ Object.extend(Event, {
 	});
       } else {
 	var onComplete = params.userData.onComplete ? function(or) {
-	  var json = (or.responseText || '{}').evalJSON();
+	  if (params.onComplete && typeof params.onComplete === 'function') 
+	    params.onComplete.call(element, {}, params);
 	  var callback = eventCompletion(params.userData.onComplete);
-	  callback.call(element, json, params.userData);
+	  callback.call(element, {}, params.userData);
 	  element['handlers'][eventName].ajaxRequest = null;
-	} : function() {element['handlers'][eventName].ajaxRequest = null};
+	} : function() {
+	  if (params.onComplete && typeof params.onComplete === 'function') 
+	    params.onComplete.call(element, {}, params);
+	  element['handlers'][eventName].ajaxRequest = null
+	};
 	element['handlers'][eventName].ajaxRequest = new Ajax.Updater(params.update, url, {
 	  onException: exceptionHandler,
 	  onComplete: onComplete,

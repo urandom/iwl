@@ -139,28 +139,38 @@ Object.extend(Object.extend(PageControl, Widget), {
 	    this.prevButton.setStyle(hidden);
 	    this.nextButton.setStyle(hidden);
 	    this.lastButton.setStyle(hidden);
-	}
-	else {
+	} else {
 	    var dims = this.getDimensions();
 	    this.setStyle({width: dims.width + 'px', height: dims.height + 'px', visibility: 'visible'});
 	    this.__toggleButtons();
 	    this.input.value = this.currentPage;
 	}
-
-	this.input.value = this.currentPage;
-	this.__toggleButtons();
     },
     __onEventComplete: function(json, params) {
-        var options = json.user_extras;
+	if (params.update) {
+	    var data = params.userData;
+	    var page = {
+		update: data.value,
+		first: 1,
+		prev: data.page - 1 || 1,
+		next: data.page + 1 > data.pageCount ? data.pageCount : data.page + 1,
+		last: data.pageCount
+	    };
+	    var options = {page: page[data.type]};
+	} else {
+	    var options = json.user_extras;
+	}
 	if (options) {
 	    if (options.page)
 		this.currentPage = options.page;
 	    if (options.pageSize)
 		this.setPageSize(options.pageSize);
-	    if (options.pageCount)
+
+	    if (options.pageCount) {
 		this.setPageCount(options.pageCount);
-            else
-            this.__refresh();
+	    } else {
+		this.__refresh();
+	    }
 	} else {
 	    this.__refresh();
 	}
