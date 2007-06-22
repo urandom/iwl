@@ -740,6 +740,8 @@ Object.extend(Object.extend(Row, Widget), {
 	if (!this.tree.nav_images) return;
 	if (this.tree.isList) return;
 	var id = this.id + '_nav';
+	var indent = [];
+	var type = [];
 
 	var nav = $(this.id + '_nav_con');
 	if (!nav) {
@@ -764,6 +766,7 @@ Object.extend(Object.extend(Row, Widget), {
 		    new Insertion.Bottom(nav, this.tree.nav_images.b)
 		else
 		    new Insertion.Bottom(nav, this.tree.nav_images.i)
+		type.push(false);
 	    }
 	}
 	// Nav
@@ -771,21 +774,14 @@ Object.extend(Object.extend(Row, Widget), {
 	    if (this.isParent) {
 		if (this.collapsed) {
 		    new Insertion.Bottom(nav, this.tree.nav_images.t_e)
-		    var el = nav.cleanWhitespace().lastChild;
-		    el.id = id;
-		    Event.observe(el, "click", function (event) {
-			Event.stop(event);
-			this.expand(event.shiftKey);}.bind(this));
+		    type.push('expand');
 		} else {
 		    new Insertion.Bottom(nav, this.tree.nav_images.t_c)
-		    var el = nav.cleanWhitespace().lastChild;
-		    el.id = id;
-		    Event.observe(el, "click", function (event) {
-			Event.stop(event);
-			this.collapse();}.bind(this));
+		    type.push('collapse');
 		}
 	    } else {
 		new Insertion.Bottom(nav, this.tree.nav_images.t)
+		type.push(false);
 	    }
 	} else {
 	    var prev = this.tree._getPrevRow(this);
@@ -793,22 +789,29 @@ Object.extend(Object.extend(Row, Widget), {
 	    if (this.isParent) {
 		if (this.collapsed) {
 		    new Insertion.Bottom(nav, this.tree.nav_images.l_e)
-		    var el = nav.cleanWhitespace().lastChild;
-		    el.id = id;
-		    Event.observe(el, "click", function (event) {
-			Event.stop(event);
-			this.expand(event.shiftKey);}.bind(this));
+		    type.push('expand');
 		} else {
 		    new Insertion.Bottom(nav, this.tree.nav_images.l_c)
-		    var el = nav.cleanWhitespace().lastChild;
-		    el.id = id;
-		    Event.observe(el, "click", function (event) {
-			Event.stop(event);
-			this.collapse();}.bind(this));
+		    type.push('collapse');
 		}
 	    } else {
 		new Insertion.Bottom(nav, this.tree.nav_images.l)
+		type.push(false);
 	    }
+	}
+	new Insertion.Bottom(nav, indent.join(''));
+	nav.cleanWhitespace();
+	var children = nav.childNodes;
+	for (var i = 0, c = children[0], l = children.length; i < l; c = children[++i]) {
+	    if (!type[i]) continue;
+	    else if (type[i] == 'expand')
+		Event.observe(c, "click", function (event) {
+		    Event.stop(event);
+		    this.expand(event.shiftKey);}.bind(this));
+	    else if (type[i] == 'collapse')
+		Event.observe(c, "click", function (event) {
+		    Event.stop(event);
+		    this.collapse();}.bind(this));
 	}
     },
     _expandResponse: function(json, params) {
