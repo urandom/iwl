@@ -762,7 +762,7 @@ Object.extend(Object.extend(Row, Widget), {
 	    nav = cell.firstChild;
 	    nav.id = this.id + '_nav_con';
 	}
-	nav.update();
+	Element.update(nav);
 
 	// Indent
 	if (this.path.length > 1) {
@@ -808,7 +808,7 @@ Object.extend(Object.extend(Row, Widget), {
 	    }
 	}
 	new Insertion.Bottom(nav, indent.join(''));
-	nav.cleanWhitespace();
+	Element.cleanWhitespace(nav);
 	var children = nav.childNodes;
 	for (var i = 0, c = children[0], l = children.length; i < l; c = children[++i]) {
 	    if (!type[i]) continue;

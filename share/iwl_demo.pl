@@ -15,10 +15,11 @@ my %form = $rpc->getParams();
 $rpc->handleEvent(
     'IWL-Tree-Row-expand',
     sub {
-	my $row = IWL::Tree::Row->new(id => 'rpc_events');
-	$row->appendTextCell('RPC Events');
-	register_row_event($row);
-	return [$row];
+	my ($events, $page) = IWL::Tree::Row->newMultiple({id => 'rpc_events'}, {id => 'rpc_pagecontrol'});
+	$events->appendTextCell('RPC Events');
+	$page->appendTextCell('RPC PageControl');
+	register_row_event($events, $page);
+	return [$events, $page];
     },
     'IWL-Tree-Row-activate',
     sub {
