@@ -173,10 +173,7 @@ Object.extend(Object.extend(Tree, Widget), {
      * */
     getRowByPath: function(path) {
 	if (!path || typeof path.length !== 'number' || !path.length) return;
-	var join = path.join();
-	for (var i = 0; i < this.body.rows.length; i++) {
-	    if (this.body.rows[i].path.join() == join) return this.body.rows[i];
-	}
+	return this.pathMap[path.join()];
     },
     /**
      * Collapses the row
@@ -254,7 +251,10 @@ Object.extend(Object.extend(Tree, Widget), {
         if (this.loadComplete) {
             this._rebuildPath(parentRow);
             this._setAlternate(parentRow);
-	    new_rows.invoke('_rebuildNav');
+	    new_rows.each(function(r) {
+		    r._rebuildNav();
+		    r._addToPathMap();
+	    });
         }
 
 	return this;
@@ -464,6 +464,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    setTimeout(this.__initNavRebuild.bind(this, totals), 100);
 	    return;
 	}
+	this.__createPathMap();
 	for (var i = 0; i < this.body.rows.length; i++)
 	    this.body.rows[i]._rebuildNav();
 	return this;
@@ -508,6 +509,11 @@ Object.extend(Object.extend(Tree, Widget), {
         if (!this.sortables[col_num][0])  return this.__rowTextCompare(col_num);
        	
         return this.sortables[col_num][0](col_num);
+    },
+    __createPathMap: function() {
+	this.pathMap = {};
+	for (var i = 0, l = this.body.rows.length, r = this.body.rows[0]; i < l; r = this.body.rows[++i])
+	    this.pathMap[r.path.join()] = r;
     },
     __rowTextCompare: function(col_num) {
 	return function (a,b) {
@@ -698,6 +704,7 @@ Object.extend(Object.extend(Row, Widget), {
 	    });
 	parent_row.childList = parent_row.childList.without(this);
 	this.tree._rebuildPath(parent_row);
+	this._deleteFromPathMap();
 	if (prev) {
 	    prev._rebuildNav();
 	    var prev_children = prev.childRows();
@@ -705,6 +712,7 @@ Object.extend(Object.extend(Row, Widget), {
 		prev_children.invoke('_rebuildNav');
 	}
 	this.emitSignal('remove');
+	return this;
     },
     /**
      * Appends a row, or an array of rows, as children to this row
@@ -820,6 +828,12 @@ Object.extend(Object.extend(Row, Widget), {
 	    this.expand(params.all);
 	}
 	this._expanding = false;
+    },
+    _addToPathMap: function() {
+	this.tree.pathMap[this.path.join()] = this;
+    },
+    _deleteFromPathMap: function() {
+	delete this.tree.pathMap[this.path.join()];
     },
 
     __initEvents: function() {
