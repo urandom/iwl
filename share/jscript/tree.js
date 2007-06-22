@@ -664,7 +664,7 @@ Object.extend(Object.extend(Row, Widget), {
 	if (child_rows.length) {
 	    child_rows.each(function(child) {
 		child.show();
-		if (all) child.expand(all);
+		if (all && child.childList.length) child.expand(all);
 		else child._rebuildNav();
 	    });
 	    this.collapsed = false;
@@ -733,6 +733,7 @@ Object.extend(Object.extend(Row, Widget), {
 
     _init: function(id, tree) {
 	this.tree = tree;
+	this.childList = [];
 
 	var row_data = decodeURIComponent(this.readAttribute('iwl:treeRowData') || '{}').evalJSON();
 	if (row_data.childList)
