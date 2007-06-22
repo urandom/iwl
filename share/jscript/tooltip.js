@@ -29,7 +29,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
      * @returns The object
      * */
     setContent: function(elements) {
-	this.content.removeChildren();
+	this.content.update();
 	if (typeof elements == 'string') {
 	    this.content.update(decodeURI(elements));
 	} else if (typeof elements == 'object') {

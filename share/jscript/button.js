@@ -163,8 +163,7 @@ Object.extend(Object.extend(Button, Widget), {
 	    setTimeout(function () {this.create(id, json)}.bind(this), 500);
 	    return false;
 	}
-	var container = createHtmlElement(decodeURIComponent(
-			json.container).evalJSON(), script.parentNode, script);
+	var container = createHtmlElement(json.container, script.parentNode, script);
 	script.parentNode.removeChild(script);
 	if (!container) return;
 	this.current = $(container);
@@ -197,47 +196,31 @@ Object.extend(Object.extend(Button, Widget), {
     },
     __createElements: function(image, label) {
 	var id = this.id;
-	var klass = this.className.split(/ /)[0];
+	var className = $A(this.classNames()).first();
 
-	var tl = $(Builder.node('div', {"id": id + '_tl', "class": klass + '_tl'}));
-	var t  = $(Builder.node('div', {"id": id + '_top', "class": klass + '_top'}));
-	var tr = $(Builder.node('div', {"id": id + '_tr', "class": klass + '_tr'}));
-	var l  = $(Builder.node('div', {"id": id + '_l', "class": klass + '_l'}));
+	this.update(
+	    '<div id="' + id + '_tl" class="' + className + '_tl"></div>' +
+	    '<div id="' + id + '_top" class="' + className + '_top"></div>' +
+	    '<div id="' + id + '_tr" class="' + className + '_tr"></div>' +
+	    '<div id="' + id + '_l" class="' + className + '_l"></div>' +
+	    '<div id="' + id + '_content" class="' + className + '_content"></div>' +
+	    '<div id="' + id + '_r" class="' + className + '_r"></div>' +
+	    '<div id="' + id + '_bl" class="' + className + '_bl"></div>' +
+	    '<div id="' + id + '_bottom" class="' + className + '_bottom"></div>' +
+	    '<div id="' + id + '_br" class="' + className + '_br"></div>'
+	);
 
-	var c  = $(Builder.node('div', {"id": id + '_content', "class": klass + '_content'}));
+	this.buttonParts = this.childElements();
+	this.buttonContent = $(id + '_content');
 
-	var r  = $(Builder.node('div', {"id": id + '_r', "class": klass + '_r'}));
-	var bl = $(Builder.node('div', {"id": id + '_bl', "class": klass + '_bl'}));
-	var b  = $(Builder.node('div', {"id": id + '_bottom', "class": klass + '_bottom'}));
-	var br = $(Builder.node('div', {"id": id + '_br', "class": klass + '_br'}));
-
-	this.appendChild(tl);
-	this.appendChild(t);
-	this.appendChild(tr);
-	this.appendChild(l);
-	this.appendChild(c);
-	this.appendChild(r);
-	this.appendChild(bl);
-	this.appendChild(b);
-	this.appendChild(br);
-
-	this.buttonParts.push(tl);
-	this.buttonParts.push(t);
-	this.buttonParts.push(tr);
-	this.buttonParts.push(l);
-	this.buttonParts.push(c);
-	this.buttonParts.push(r);
-	this.buttonParts.push(bl);
-	this.buttonParts.push(b);
-	this.buttonParts.push(br);
-
-	if (image)
-	    this.buttonImage = $(createHtmlElement(decodeURIComponent(image).evalJSON(), c));
-	this.buttonLabel = $(Builder.node('span', {
-	    "id": id + '_label', "class": klass + '_label_' + this.options.size
-	}, decodeURIComponent(label)));
-	this.buttonContent = c;
-	c.appendChild(this.buttonLabel);
+	image = image ? decodeURIComponent(image) : '';
+	this.buttonContent.update(
+	    image + '<span id="' + id + '_label" class="' + className +
+		'_label_' + this.options.size + '">' +
+		decodeURIComponent(label) + '</span>'
+	);
+	this.buttonImage = $(id + '_image');
+	this.buttonLabel = $(id + '_label');
     },
     __checkComplete: function() {
 	if (!this.buttonImage) {

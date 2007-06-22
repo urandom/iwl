@@ -343,14 +343,10 @@ Object.extend(Object.extend(Tree, Widget), {
 	$A(this.body.rows).each(function($_) {
 	    Row.create($_, this);
 	}.bind(this));
-	this.nav_images = new Array;
-	for (var i in images) {
-	    this.nav_images[i] = createHtmlElement(images[i], 
-		    document.createElement("div"));
-	}
-	var span = document.createElement('span');
-	span.className = 'tree_nav_con';
-	this.nav_images['span'] = span;
+	this.nav_images = {};
+	for (var i in images)
+	    this.nav_images[i] = decodeURIComponent(images[i]);
+	this.nav_images['span'] = '<span class="tree_nav_con"></span>';
 	setTimeout(this.__initNavRebuild.bind(this, this.body.rows.length), 100);
 
 	Event.observe(this, "click", function (event) {
@@ -743,77 +739,77 @@ Object.extend(Object.extend(Row, Widget), {
     _rebuildNav: function() {
 	if (!this.tree.nav_images) return;
 	if (this.tree.isList) return;
-	var indent = new Array;
 	var id = this.id + '_nav';
+
+	var nav = $(this.id + '_nav_con');
+	if (!nav) {
+	    var cell = this.firstChild;
+	    if (!cell) {
+		new Insertion.Bottom(this, "<td>");
+		cell = this.firstChild;
+	    }
+	    new Insertion.Top(cell, this.tree.nav_images.span);
+	    nav = cell.firstChild;
+	    nav.id = this.id + '_nav_con';
+	}
+	nav.update();
+
 	// Indent
 	if (this.path.length > 1) {
 	    var path = new Array;
 	    for (var i = 0; i < this.path.length - 1; i++) {
 		path.push(this.path[i]);
 		var paren = this.tree.getRowByPath(path);
-		if (paren && !this.tree._getNextRow(paren)) 
-		    indent.push(this.tree.nav_images.b.cloneNode(false));
+		if (paren && !this.tree._getNextRow(paren))
+		    new Insertion.Bottom(nav, this.tree.nav_images.b)
 		else
-		    indent.push(this.tree.nav_images.i.cloneNode(false));
+		    new Insertion.Bottom(nav, this.tree.nav_images.i)
 	    }
 	}
 	// Nav
 	if (this.tree._getNextRow(this)) {
 	    if (this.isParent) {
 		if (this.collapsed) {
-		    var el = this.tree.nav_images.t_e.cloneNode(false);
+		    new Insertion.Bottom(nav, this.tree.nav_images.t_e)
+		    var el = nav.cleanWhitespace().lastChild;
 		    el.id = id;
 		    Event.observe(el, "click", function (event) {
 			Event.stop(event);
 			this.expand(event.shiftKey);}.bind(this));
-		    indent.push(el);
 		} else {
-		    var el = this.tree.nav_images.t_c.cloneNode(false);
+		    new Insertion.Bottom(nav, this.tree.nav_images.t_c)
+		    var el = nav.cleanWhitespace().lastChild;
 		    el.id = id;
 		    Event.observe(el, "click", function (event) {
 			Event.stop(event);
 			this.collapse();}.bind(this));
-		    indent.push(el);
 		}
 	    } else {
-		var el = this.tree.nav_images.t.cloneNode(false);
-		indent.push(el);
+		new Insertion.Bottom(nav, this.tree.nav_images.t)
 	    }
 	} else {
 	    var prev = this.tree._getPrevRow(this);
 	    if (prev) prev._rebuildNav();		// Rebuilds the previous row, in case this one was added after the initial rebuild
 	    if (this.isParent) {
 		if (this.collapsed) {
-		    var el = this.tree.nav_images.l_e.cloneNode(false);
+		    new Insertion.Bottom(nav, this.tree.nav_images.l_e)
+		    var el = nav.cleanWhitespace().lastChild;
 		    el.id = id;
 		    Event.observe(el, "click", function (event) {
 			Event.stop(event);
 			this.expand(event.shiftKey);}.bind(this));
-		    indent.push(el);
 		} else {
-		    var el = this.tree.nav_images.l_c.cloneNode(false);
+		    new Insertion.Bottom(nav, this.tree.nav_images.l_c)
+		    var el = nav.cleanWhitespace().lastChild;
 		    el.id = id;
 		    Event.observe(el, "click", function (event) {
 			Event.stop(event);
 			this.collapse();}.bind(this));
-		    indent.push(el);
 		}
 	    } else {
-		var el = this.tree.nav_images.l.cloneNode(false);
-		indent.push(el);
+		new Insertion.Bottom(nav, this.tree.nav_images.l)
 	    }
 	}
-	var nav = $(this.id + '_nav_con');
-	if (!nav) {
-	    nav = $(this.tree.nav_images.span.cloneNode(false));
-	    nav.id = this.id + '_nav_con';
-	    var cell = this.firstChild;
-	    if (!cell)
-		cell = this.appendChild(Builder.node('td'))
-	    cell.insertBefore(nav, cell.firstChild);
-	}
-	nav.removeChildren()
-	indent.each(function ($_) { nav.appendChild($_); });
     },
     _expandResponse: function(json, params) {
 	if (json.length != 0) {

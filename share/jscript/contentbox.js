@@ -209,10 +209,10 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	    var label = $(this.id + '_title_label');
 	    if (!label)
 		label = this.contentboxTitle.appendChild(Builder.node('span', {id: this.id + '_title_label', className: $A(this.classNames()).first() + '_title_label'}));
-	    label.removeChildren();
+	    label.update();
 	    label.appendChild(element);
 	} else {
-	    this.contentboxTitle.removeChildren();
+	    this.contentboxTitle.update();
 	    this.contentboxTitle.appendChild(element);
 	}
 	return this;

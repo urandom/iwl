@@ -154,8 +154,6 @@ sub setFromStock {
 
     $self->setLabel($label);
     $self->setImage($image, $label, $label);
-    $self->setId('button_' . randomize(lc $label))
-      if !$self->getId;
     return $self;
 }
 
@@ -364,11 +362,11 @@ sub _realize {
 
     $self->{__button}{image}->signalConnect(load => "\$('$id').adjust()");
     $self->{__button}{_handlers} = $self->{_handlers};
-    my $container = encodeURIComponent($self->{__button}->getJSON);
-    my $image     = encodeURIComponent($self->{__button}{image}->getJSON);
+    my $container = $self->{__button}->getJSON;
+    my $image     = encodeURIComponent($self->{__button}{image}->getContent);
     my $label     = encodeURIComponent($self->{__button}{label});
     my $json      =
-      qq|{container:"$container",image:"$image",label:"$label"}|;
+      qq|{container:$container,image:"$image",label:"$label"}|;
 
     $options = objToJson($self->{_options});
     $script->setScript("Button.create('$id', $json, $options);");

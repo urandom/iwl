@@ -181,14 +181,14 @@ sub _realize {
     my $self    = shift;
     my $cell    = IWL::Tree::Cell->new;
     my $script  = IWL::Script->new;
-    my $b       = $cell->_blank_indent->getJSON;
-    my $i       = $cell->_row_indent->getJSON;
-    my $l       = $cell->_l_junction->getJSON;
-    my $l_e     = $cell->_l_expand->getJSON;
-    my $l_c     = $cell->_l_collapse->getJSON;
-    my $t       = $cell->_t_junction->getJSON;
-    my $t_e     = $cell->_t_expand->getJSON;
-    my $t_c     = $cell->_t_collapse->getJSON;
+    my $b       = encodeURIComponent($cell->_blank_indent->getContent);
+    my $i       = encodeURIComponent($cell->_row_indent->getContent);
+    my $l       = encodeURIComponent($cell->_l_junction->getContent);
+    my $l_e     = encodeURIComponent($cell->_l_expand->getContent);
+    my $l_c     = encodeURIComponent($cell->_l_collapse->getContent);
+    my $t       = encodeURIComponent($cell->_t_junction->getContent);
+    my $t_e     = encodeURIComponent($cell->_t_expand->getContent);
+    my $t_c     = encodeURIComponent($cell->_t_collapse->getContent);
     my $id      = $self->getId;
     my $options = {};
 
@@ -204,7 +204,7 @@ sub _realize {
     $self->{_body}->prependClass($self->{_defaultClass} . '_body');
     $self->_set_alternate if $self->{_options}{alternate};
 
-    my $images = "{b:$b,i:$i,l:$l,l_e:$l_e,l_c:$l_c,t:$t,t_e:$t_e,t_c:$t_c}";
+    my $images = qq({b:"$b",i:"$i",l:"$l",l_e:"$l_e",l_c:"$l_c",t:"$t",t_e:"$t_e",t_c:"$t_c"});
     $script->prependScript("Tree.create('$id', $images, $options);");
     foreach my $sortable (@{$self->{__sortables}}) {
 	$script->appendScript("\$('$id').setCustomSortable($sortable->[0], $sortable->[1])");

@@ -182,6 +182,7 @@ t/03stock.t
 t/10object.t
 t/10stash.t
 t/20comment.t
+t/20rpc.t
 t/20text.t
 t/21script.t
 t/21style.t
