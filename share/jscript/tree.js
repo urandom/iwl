@@ -771,9 +771,9 @@ Object.extend(Object.extend(Row, Widget), {
 		path.push(this.path[i]);
 		var paren = this.tree.getRowByPath(path);
 		if (paren && !this.tree._getNextRow(paren))
-		    new Insertion.Bottom(nav, this.tree.nav_images.b)
+		    indent.push(this.tree.nav_images.b)
 		else
-		    new Insertion.Bottom(nav, this.tree.nav_images.i)
+		    indent.push(this.tree.nav_images.i)
 		type.push(false);
 	    }
 	}
@@ -781,14 +781,14 @@ Object.extend(Object.extend(Row, Widget), {
 	if (this.tree._getNextRow(this)) {
 	    if (this.isParent) {
 		if (this.collapsed) {
-		    new Insertion.Bottom(nav, this.tree.nav_images.t_e)
+		    indent.push(this.tree.nav_images.t_e)
 		    type.push('expand');
 		} else {
-		    new Insertion.Bottom(nav, this.tree.nav_images.t_c)
+		    indent.push(this.tree.nav_images.t_c)
 		    type.push('collapse');
 		}
 	    } else {
-		new Insertion.Bottom(nav, this.tree.nav_images.t)
+		indent.push(this.tree.nav_images.t)
 		type.push(false);
 	    }
 	} else {
@@ -796,14 +796,14 @@ Object.extend(Object.extend(Row, Widget), {
 	    if (prev) prev._rebuildNav();		// Rebuilds the previous row, in case this one was added after the initial rebuild
 	    if (this.isParent) {
 		if (this.collapsed) {
-		    new Insertion.Bottom(nav, this.tree.nav_images.l_e)
+		    indent.push(this.tree.nav_images.l_e)
 		    type.push('expand');
 		} else {
-		    new Insertion.Bottom(nav, this.tree.nav_images.l_c)
+		    indent.push(this.tree.nav_images.l_c)
 		    type.push('collapse');
 		}
 	    } else {
-		new Insertion.Bottom(nav, this.tree.nav_images.l)
+		indent.push(this.tree.nav_images.l)
 		type.push(false);
 	    }
 	}
