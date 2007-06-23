@@ -459,12 +459,12 @@ Object.extend(Object.extend(Tree, Widget), {
     },
 
     __initNavRebuild: function(totals) {
-	if (this.isList) return;
 	if (!this.body || this.body.rows.length != totals) {
 	    setTimeout(this.__initNavRebuild.bind(this, totals), 100);
 	    return;
 	}
 	this.__createPathMap();
+	if (this.isList) return;
 	for (var i = 0; i < this.body.rows.length; i++)
 	    this.body.rows[i]._rebuildNav();
 	return this;
