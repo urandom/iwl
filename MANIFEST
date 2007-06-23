@@ -203,6 +203,7 @@ t/40frame.t
 t/40hbox.t
 t/40hidden.t
 t/40inputbutton.t
+t/40submitimage.t
 t/40textarea.t
 t/50combo_option.t
 t/50radiobutton.t

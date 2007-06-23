@@ -8,6 +8,7 @@ use strict;
 use base 'IWL::Widget';
 
 use IWL::Stock;
+use IWL::String qw(randomize);
 
 =head1 NAME
 
@@ -44,7 +45,9 @@ sub new {
         load => 1,
     };
     $self->{_tag}  = "img";
+    $self->{_defaultClass} = 'image';
     $self->{_noChildren} = 1;
+    $self->setId(randomize($self->{_defaultClass})) unless $args{id};
 
     return $self;
 }

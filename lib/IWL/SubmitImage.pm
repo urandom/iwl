@@ -5,7 +5,7 @@ package IWL::SubmitImage;
 
 use strict;
 
-use base 'IWL::Input';
+use base qw(IWL::Image IWL::Input);
 
 =head1 NAME
 
@@ -14,6 +14,8 @@ IWL::SubmitImage - an image used as a submit button
 =head1 INHERITANCE
 
 IWL::Object -> IWL::Widget -> IWL::Input -> IWL::SubmitImage
+
+IWL::Object -> IWL::Widget -> IWL::Image -> IWL::SubmitImage
 
 =head1 DESCRIPTION
 
@@ -33,42 +35,18 @@ sub new {
 
     my $self = $class->SUPER::new(%args);
 
+    $self->{_tag} = "input";
+    $self->{_signals} = {
+        %{$self->{_signals}},
+        change => 1,
+        select => 1,
+        blur   => 1,
+        focus  => 1,
+    };
+
     $self->setAttribute(type => 'image');
-    $self->setClass('image');
 
     return $self;
-}
-
-=head1 METHODS
-
-=over 4
-
-=item B<set> (B<SRC>)
-
-Set sets the given source for the image widget.
-
-Parameters: B<SRC> - the source for the image
-
-=cut
-
-sub set {
-    my ($self, $src) = @_;
-
-    return $self->setAttribute(src => $src, 'uri');
-}
-
-=item B<setAlt> (B<TEXT>)
-
-Sets the alternative text of the image
-
-Parameters: B<TEXT> - the text to be set
-
-=cut
-
-sub setAlt {
-    my ($self, $text) = @_;
-
-    return $self->setAttribute(alt => $text);
 }
 
 1;
