@@ -184,7 +184,6 @@ EOF
 
     $self->setText($text) unless $self->getText;
     $self->{__setDefault} = $text;
-    $self->setClass($self->getClass);
     return $self;
 }
 

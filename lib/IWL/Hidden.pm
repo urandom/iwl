@@ -34,7 +34,7 @@ sub new {
     my $self = $class->SUPER::new(%args);
 
     $self->setAttribute(type => 'hidden');
-    $self->setClass('hidden');
+    $self->{_defaultClass} = 'hidden';
 
     return $self;
 }

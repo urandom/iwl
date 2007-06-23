@@ -7,6 +7,8 @@ use strict;
 
 use base 'IWL::Widget';
 
+use IWL::String qw(randomize);
+
 =head1 NAME
 
 IWL::Anchor - an anchor widget
@@ -40,6 +42,8 @@ sub new {
         focus  => 1,
         blur  => 1,
     };
+    $self->{_defaultClass} = 'anchor';
+    $self->setId(randomize($self->{_defaultClass})) unless $args{id};
 
 
     return $self;
