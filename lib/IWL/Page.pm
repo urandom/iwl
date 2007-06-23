@@ -20,24 +20,24 @@ use JSON;
 
 use constant DOCTYPES => {
     html401 => <<DECL,
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd"
 DECL
     html401strict => <<DECL,
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-    "http://www.w3.org/TR/html4/strict.dtd">
+DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd"
 DECL
     xhtml1 => <<DECL,
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
 DECL
     xhtml1strict => <<DECL,
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
 DECL
     xhtml11 => <<DECL,
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" 
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" 
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
 DECL
 };
 
@@ -170,8 +170,8 @@ sub setHTTPHeader {
 
 Sets the document type declaration. The default one is:
 
-  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
 
 For conveniece, the following strings are automatically converted to declarations:
   html401, html401strict, xhtml1, xhtml1strict, xhtml11

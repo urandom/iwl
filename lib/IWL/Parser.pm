@@ -34,9 +34,9 @@ sub new {
     my $self  = $class->SUPER::new;
 
     # The current object
-    $self->{_current} = undef;
+    $self->{__current} = undef;
     # The IWL Object that will be returned
-    $self->{_object} = undef;
+    $self->{__objects} = [];
 
     return $self;
 }
@@ -51,7 +51,7 @@ Creates an IWL Object from the given HTML file.
 
 Parameters: B<FILE> - the HTML file to be parsed
 
-Returns the IWL Object.
+Returns the parsed IWL::Object(3pm)s in list context, or the first one in scalar context
 
 =cut
 
@@ -59,7 +59,7 @@ sub createObjectFromFile {
     my ($self, $file) = @_;
 
     $self->parse_file($file);
-    return $self->{_object};
+    return wantarray ? @{$self->{__objects}} : $self->{__objects}[0];
 }
 
 =item B<createObject> (B<TEXT>)
@@ -68,7 +68,7 @@ Creates an IWL Object from the given HTML text.
 
 Parameters: B<TEXT> - the HTML text to be parsed
 
-Returns the IWL Object.
+Returns the parsed IWL::Object(3pm)s in list context, or the first one in scalar context
 
 =cut
 
@@ -76,14 +76,15 @@ sub createObject {
     my ($self, $text) = @_;
 
     $self->parse($text);
-    return $self->{_object};
+    return wantarray ? @{$self->{__objects}} : $self->{__objects}[0];
 }
 
 # HTML::Parser callbacks
 sub text {
     my ($self, $text) = @_;
+    return unless $text && $text ne "\n" && $self->{__current};
     my $obj = IWL::Text->new($text);
-    return $self->{_current}->appendChild($obj);
+    return $self->{__current}->appendChild($obj);
 }
 
 sub declaration {
@@ -96,7 +97,7 @@ sub comment {
     my $obj = IWL::Comment->new($comment);
 
     $self->commentParser(\$obj, $comment);
-    return $self->{_current}->appendChild($obj);
+    return $self->{__current}->appendChild($obj);
 }
 
 sub start {
@@ -129,23 +130,25 @@ sub start {
     if ($origtext =~ /\/>$/) {
 	$obj->{_noChildren} = 1;
     }
-    if ($self->{_current}) {
-	$self->{_current}->appendChild($obj);
-	$self->{_current} = $obj unless $obj->{_noChildren} == 1;
+    if ($self->{__current}) {
+	$self->{__current}->appendChild($obj);
+	$self->{__current} = $obj unless $obj->{_noChildren} == 1;
     } else {
-	$self->{_current} = $obj unless $obj->{_noChildren} == 1;;
+	$self->{__current} = $obj unless $obj->{_noChildren} == 1;;
+	push @{$self->{__objects}}, $obj;
     }
 
-    $self->{_object} = $obj if !$self->{_object};
     return $self;
 }
 
 sub end {
     my ($self, $tag, $origtext) = @_;
-    my $current = $self->{_current};
+    my $current = $self->{__current};
     return unless $tag eq $current->{_tag};
     if ($current->{parentNode}) {
-	$self->{_current} = $current->{parentNode};
+	$self->{__current} = $current->{parentNode};
+    } else {
+	$self->{__current} = undef;
     }
     return $self;
 }
