@@ -7,6 +7,9 @@ use strict;
 
 use base 'IWL::Container';
 
+use IWL::String qw(randomize);
+use IWL::List::Definition;
+
 =head1 NAME
 
 IWL::List - a list container
@@ -184,6 +187,7 @@ sub __init {
     }
     delete $args{type};
     $self->{_defaultClass} = 'list_' . $self->{_type};
+    $args{id} ||= randomize($self->{_defaultClass});
     $self->_constructorArguments(%args);
 }
 
