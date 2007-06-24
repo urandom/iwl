@@ -14,9 +14,9 @@ Translation Status for "simplecal"
 
 Language            | Code  | Status | Current Translator 
 --------------------+-------+---+----+---------------------------------
-Bulgarian           | bg    | O | P  | Viktor Kojouharov
+Bulgarian           | bg    | O | C  | Viktor Kojouharov
 French              | fr    | O | M  |
-German              | de    | A | C  | Guido Flohr
+German              | de    | A | M  | Guido Flohr
 
 Legend: The status is displayed in two columns.  The left column informs
 you whether somebody is already in charge of that translation, the right
