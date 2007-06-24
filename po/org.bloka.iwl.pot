@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-21 19:20+0300\n"
+"POT-Creation-Date: 2007-06-24 14:34+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -210,4 +210,10 @@ msgstr ""
 
 #: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
 msgid "Generic Text"
+msgstr ""
+
+#. TRANSLATORS: {TITLE} is a placeholder
+#: ../lib/IWL/Iconbox.pm:106
+#, perl-brace-format
+msgid "The icon {TITLE} was removed."
 msgstr ""

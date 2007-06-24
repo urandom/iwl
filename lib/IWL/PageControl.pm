@@ -142,16 +142,15 @@ sub __init {
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
 
     # TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-    my $info = __x("{PAGEENTRY} of {PAGECOUNT}", 
-		    PAGEENTRY => 'PAGEENTRY', PAGECOUNT => 'PAGECOUNT');
-    my ($pre, $post) = $info =~ m{^(.*)PAGEENTRY(.*)$};
-    if ($pre =~ m{^(.*)PAGECOUNT(.*)$}) {
+    my $info = __"{PAGEENTRY} of {PAGECOUNT}";
+    my ($pre, $post) = $info =~ m{^(.*){PAGEENTRY}(.*)$};
+    if ($pre =~ m{^(.*){PAGECOUNT}(.*)$}) {
 	$label->appendText($1)->appendChild($page_count)->appendChild($2);
     } else {
 	$label->appendText($pre);
     }
     $label->appendChild($page_entry);
-    if ($post =~ m{^(.*)PAGECOUNT(.*)$}) {
+    if ($post =~ m{^(.*){PAGECOUNT}(.*)$}) {
 	$label->appendText($1)->appendChild($page_count)->appendChild($2);
     } else {
 	$label->appendText($post);

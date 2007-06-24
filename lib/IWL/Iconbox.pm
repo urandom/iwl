@@ -7,6 +7,7 @@ use strict;
 
 use IWL::Script;
 use IWL::String qw(randomize encodeURIComponent);
+use Locale::TextDomain qw(org.bloka.iwl);
 
 use base qw(IWL::Container IWL::RPC::Request);
 
@@ -101,9 +102,12 @@ sub _realize {
     my $id      = $self->getId;
     my $options = objToJson($self->{_options});
 
+    # TRANSLATORS: {TITLE} is a placeholder
+    my $delete  = __"The icon {TITLE} was removed.";
+
     $self->SUPER::_realize;
 
-    $script->setScript("Iconbox.create('$id', $options);");
+    $script->setScript("Iconbox.create('$id', $options, {delete: '$delete'});");
     foreach my $icon (@{$self->{__icons}}) {
 	my $icon_id = $icon->getId;
         $script->appendScript("\$('$id').selectIcon('$icon_id');")

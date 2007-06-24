@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Imperia 7.5\n"
+"Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-21 19:20+0300\n"
+"POT-Creation-Date: 2007-06-24 14:34+0300\n"
 "PO-Revision-Date: 2007-06-20 19:37+0300\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net,"
@@ -213,3 +213,9 @@ msgstr "Календар"
 #: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
 msgid "Generic Text"
 msgstr "Общ текст"
+
+#. TRANSLATORS: {TITLE} is a placeholder
+#: ../lib/IWL/Iconbox.pm:106
+#, perl-brace-format
+msgid "The icon {TITLE} was removed."
+msgstr "Иконата {TITLE} е премахната."

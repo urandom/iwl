@@ -179,6 +179,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	    multipleSelect: false,
 	    clickToSelect: true
 	}, arguments[1] || {});
+	this.messages = Object.extend({}, arguments[2]);
 
 	var childElements = [];
 	this.iconsContainer.childElements().each(function(e) {
@@ -419,9 +420,9 @@ Object.extend(Object.extend(Icon, Widget), {
 	this.setSelected(false);
 	if (prev) prev.setSelected(true);
 	dom_parent.removeChild(this);
-	this.icons = this.icons.without(this);
-	// FIXME: needs to be i18n
-	this.statusbarPush("Removed icon '" + title + "'.");
+	this.iconbox.icons = this.iconbox.icons.without(this);
+	var message = this.iconbox.messages['delete'].replace(/{TITLE}/, "'" + title + "'");
+	this.iconbox.statusbarPush(message);
 	this.iconbox._alignIconsVertically();
 	this.emitSignal('remove');
 	return this;
