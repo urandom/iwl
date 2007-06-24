@@ -154,7 +154,6 @@ Object.extend(Object.extend(Iconbox, Widget), {
             }
 	    this.icons.push(Icon.create(icon, this));
 	}
-	this._alignIconsVertically();
 	return this;
     },
 
@@ -200,7 +199,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	keyLogEvent(this.__keyEventsCB.bindAsEventListener(this));
     },
     _resizeEvent: function(event) {
-	var dims = Element.getDimensions(this);
+	var dims = this.getDimensions();
 	if (!this.dimensions || 
 		dims.width != this.dimensions.width || 
 		dims.height != this.dimensions.height) {
