@@ -1,10 +1,12 @@
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 use IWL::Combo::Option;
 
 my $option = IWL::Combo::Option->new;
 
+is($option->getText, '');
 is($option->setText('Foo bar'), $option);
+is($option->getText, 'Foo bar');
 is($option->setSelected(1), $option);
 ok($option->isSelected);
 is($option->setSelected, $option);

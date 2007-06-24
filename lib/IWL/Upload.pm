@@ -60,11 +60,8 @@ Parameters: B<EXPR> - the expression which is used for filtering
 sub setAccept {
     my ($self, $expr) = @_;
 
-    if ($self->{__file}) {
-        return $self->{__file}->setAttribute(accept => $expr);
-    } else {
-        return $self->setAttribute(accept => $expr);
-    }
+    $self->{__file}->setAttribute(accept => $expr);
+    return $self;
 }
 
 =item B<setLabel> (B<TEXT>)
@@ -78,7 +75,8 @@ Parameters: B<TEXT> - the text for the label
 sub setLabel {
     my ($self, $text) = @_;
 
-    return $self->{__button}->setLabel($text);
+    $self->{__button}->setLabel($text);
+    return $self;
 }
 
 =item B<setUploadCallback> (B<CALLBACK>)

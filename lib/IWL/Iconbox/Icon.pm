@@ -76,7 +76,8 @@ Parameters: B<TEXT> - the text string
 sub setText {
     my ($self, $text) = @_;
 
-    return $self->{__label}->setText($text);
+    $self->{__label}->setText($text);
+    return $self;
 }
 
 =item B<setSelected> (B<BOOL>)

@@ -172,7 +172,8 @@ sub setId {
 
     $self->SUPER::setId($id);
     $self->{__rail}->setId($id . '_rail');
-    return $self->{__handle}->setId($id . '_handle');
+    $self->{__handle}->setId($id . '_handle');
+    return $self;
 }
 
 sub signalConnect {

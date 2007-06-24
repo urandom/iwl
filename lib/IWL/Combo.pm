@@ -7,6 +7,8 @@ use strict;
 
 use base 'IWL::Input';
 
+use IWL::Combo::Option;
+
 =head1 NAME
 
 IWL::Combo - a combo box widget
@@ -45,24 +47,33 @@ sub new {
 
 =item B<appendOption> (B<TEXT>, B<VALUE>, [B<SELECTED>])
 
-Adds an option to the combobox.
+Appends an option to the combobox.
 
-Parameter: B<TEXT> - the text to be added, B<VALUE> - the value that will be passed along, SELECTED - true if the option is selected
+Parameter: B<TEXT> - the text to be appended, B<VALUE> - the value that will be passed along, B<SELECTED> - true if the option is selected
 
 =cut
 
 sub appendOption {
-    my ($self, $text, $value, $sel) = @_;
-
-    require IWL::Combo::Option;
-    my $option = IWL::Combo::Option->new;
-
-    $option->setSelected($sel);
-    $value = $text unless defined $value;
-    $option->setValue($value);
-    $option->setText($text);
+    my $self = shift;
+    my $option = $self->__createOption(@_);
 
     $self->appendChild($option);
+    return $option;
+}
+
+=item B<prependOption> (B<TEXT>, B<VALUE>, [B<SELECTED>])
+
+Prepends an option to the combobox.
+
+Parameter: B<TEXT> - the text to be prepended, B<VALUE> - the value that will be passed along, B<SELECTED> - true if the option is selected
+
+=cut
+
+sub prependOption {
+    my $self = shift;
+    my $option = $self->__createOption(@_);
+
+    $self->prependChild($option);
     return $option;
 }
 
@@ -82,6 +93,16 @@ sub setMultiple {
     } else {
 	return $self->deleteAttribute("multiple");
     }
+}
+
+=item B<isMultiple>
+
+Returns true if the combo is set to support multiple selection
+
+=cut
+
+sub isMultiple {
+    return shift->hasAttribute('multiple');
 }
 
 =item B<extractState> (B<STATE>)
@@ -142,6 +163,16 @@ sub applyState {
     }
 
     return 1;
+}
+
+sub __createOption {
+    my ($self, $text, $value, $selected) = @_;
+    my $option = IWL::Combo::Option->new;
+
+    $option->setSelected($selected);
+    $value = $text unless defined $value;
+    $option->setValue($value);
+    return $option->setText($text);
 }
 
 1;

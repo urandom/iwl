@@ -718,19 +718,19 @@ div.navbar {
 }
 span.navbar_crumb_con {
 }
-select.navbar_nav_combo {
+select.navbar_combo {
     color: inherit;
     background: inherit;
     border: 1px inset;
 }
-select.navbar_nav_combo option {
+select.navbar_combo option {
     background: white;
     color: black;
 }
-span.nav_crumb {
+span.navbar_crumb {
     cursor: pointer;
 }
-span.nav_delim {
+span.navbar_delim {
 }
 
 /* Druid */

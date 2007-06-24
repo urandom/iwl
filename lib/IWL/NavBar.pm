@@ -7,6 +7,8 @@ use strict;
 
 use base 'IWL::Container';
 
+use IWL::Label;
+use IWL::Combo;
 use IWL::String qw(randomize);
 
 =head1 NAME
@@ -54,28 +56,52 @@ Parameters: B<TEXT> - the label of the crumb, B<CALLBACK> - the click callback
 
 sub appendPath {
     my ($self, $text, $callback) = @_;
-    my $delim = IWL::Label->new(class => 'nav_delim');
-    my $label = IWL::Label->new(class => 'nav_crumb');
+    my ($delim, $label) = $self->__createCrumb($text, $callback);
 
-    $delim->setText($self->{__delimeter});
-    $label->setText($text);
-    $label->signalConnect(click => $callback);
-    $self->{__crumbCon}->appendChild($delim);
-
-    return $self->{__crumbCon}->appendChild($label);
+    $self->{__crumbCon}->appendChild($delim, $label);
+    return $label;
 }
 
-=item B<appendCombo> (B<TEXT>, B<VALUE>)
+=item B<prependPath> (B<TEXT>, B<CALLBACK>)
 
-Appends an element to the combo of the navbar.
+Prepends a crumb to the navbar.
 
-Parameters: B<TEXT> - the label of the crumb, B<VALUE> - the data value
+Parameters: B<TEXT> - the label of the crumb, B<CALLBACK> - the click callback
 
 =cut
 
-sub appendCombo {
+sub prependPath {
+    my ($self, $text, $callback) = @_;
+    my ($delim, $label) = $self->__createCrumb($text, $callback);
+
+    $self->{__crumbCon}->prependChild($delim, $label);
+    return $label;
+}
+
+=item B<appendOption> (B<TEXT>, B<VALUE>)
+
+Appends an option to the combo of the navbar.
+
+Parameters: B<TEXT> - the label of the option, B<VALUE> - the data value
+
+=cut
+
+sub appendOption {
     my ($self, $text, $value) = @_;
     return $self->{__navCombo}->appendOption($text, $value);
+}
+
+=item B<prependOption> (B<TEXT>, B<VALUE>)
+
+Prepends an option to the combo of the navbar.
+
+Parameters: B<TEXT> - the label of the option, B<VALUE> - the data value
+
+=cut
+
+sub prependOption {
+    my ($self, $text, $value) = @_;
+    return $self->{__navCombo}->prependOption($text, $value);
 }
 
 =item B<setComboChangeCB> (B<CALLBACK>)
@@ -88,7 +114,8 @@ Parameters: B<CALLBACK> - the change callback
 
 sub setComboChangeCB {
     my ($self, $callback) = @_;
-    return $self->{__navCombo}->signalConnect(change => $callback);
+    $self->{__navCombo}->signalConnect(change => $callback);
+    return $self;
 }
 
 # Overrides
@@ -97,7 +124,8 @@ sub setId {
     my ($self, $id) = @_;
     $self->SUPER::setId($id);
     $self->{__crumbCon}->setId($id . '_crumb_con');
-    return $self->{__navCombo}->setId($id . '_nav_combo');
+    $self->{__navCombo}->setId($id . '_combo');
+    return $self;
 }
 
 # Protected
@@ -107,7 +135,8 @@ sub _setupDefaultClass {
 
     $self->SUPER::prependClass($self->{_defaultClass});
     $self->{__crumbCon}->prependClass($self->{_defaultClass} . '_crumb_con');
-    return $self->{__navCombo}->prependClass($self->{_defaultClass} . '_nav_combo');
+    $self->{__navCombo}->prependClass($self->{_defaultClass} . '_combo');
+    return $self;
 }
 
 # Internal
@@ -115,7 +144,7 @@ sub _setupDefaultClass {
 sub __init {
     my ($self, %args) = @_;
     my $crumb_con = IWL::Container->new(inline => 1);
-    my $delim     = IWL::Label->new(class => 'nav_delim');
+    my $delim     = IWL::Label->new;
     my $combo     = IWL::Combo->new;
     my $delimeter;
 
@@ -130,6 +159,7 @@ sub __init {
     $delim->setText($delimeter);
 
     $self->{_defaultClass} = 'navbar';
+    $delim->{_defaultClass} = $self->{_defaultClass} . '_delim';
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     $self->{__delimeter} = $delimeter;
     $self->{__crumbCon}  = $crumb_con;
@@ -138,6 +168,22 @@ sub __init {
     $self->appendChild($delim);
     $self->appendChild($combo);
     return $self->_constructorArguments(%args);
+}
+
+sub __createCrumb {
+    my ($self, $text, $callback) = @_;
+
+    my $delim = IWL::Label->new;
+    my $label = IWL::Label->new;
+
+    $delim->{_defaultClass} = $self->{_defaultClass} . '_delim';
+    $label->{_defaultClass} = $self->{_defaultClass} . '_crumb';
+
+    $delim->setText($self->{__delimeter});
+    $label->setText($text);
+    $label->signalConnect(click => $callback);
+
+    return $delim, $label;
 }
 
 1;

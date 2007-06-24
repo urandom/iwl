@@ -197,7 +197,7 @@ t/30label.t
 t/30parser.t
 t/31button.t
 t/40checkbox.t
-t/40combo.t
+t/40combo_option.t
 t/40entry.t
 t/40file.t
 t/40frame.t
@@ -207,7 +207,8 @@ t/40inputbutton.t
 t/40list.t
 t/40submitimage.t
 t/40textarea.t
-t/50combo_option.t
+t/41combo.t
+t/41navbar.t
 t/50radiobutton.t
 t/iwl.conf
 t/test.html

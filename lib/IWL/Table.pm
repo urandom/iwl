@@ -183,7 +183,8 @@ Parameters: B<STYLE> - the given style, in hash format
 sub setHeaderStyle {
     my ($self, %style) = @_;
 
-    return $self->{_header}->setStyle(%style);
+    $self->{_header}->setStyle(%style);
+    return $self;
 }
 
 =item B<setBodyStyle> (B<STYLE>)
@@ -197,7 +198,8 @@ Parameters: B<STYLE> - the given style, in hash format
 sub setBodyStyle {
     my ($self, %style) = @_;
 
-    return $self->{_body}->setStyle(%style);
+    $self->{_body}->setStyle(%style);
+    return $self;
 }
 
 =item B<setFooterStyle> (B<STYLE>)
@@ -211,7 +213,8 @@ Parameters: B<STYLE> - the given style, in hash format
 sub setFooterStyle {
     my ($self, %style) = @_;
 
-    return $self->{_footer}->setStyle(%style);
+    $self->{_footer}->setStyle(%style);
+    return $self;
 }
 
 =item B<setAlternate> (B<BOOL>)

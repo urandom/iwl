@@ -61,6 +61,17 @@ sub setText {
     return $self->setChild($label);
 }
 
+=item B<getText>
+
+Returns the text of the option
+
+=cut
+
+sub getText {
+    my $self = shift;
+    return $self->{childNodes}[0] ? $self->{childNodes}[0]->getContent : '';
+}
+
 =item B<setSelected> (B<BOOL>)
 
 Sets whether the option us selected.
