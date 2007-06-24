@@ -81,7 +81,7 @@ This documentation refers to B<IWL> version 0.45
     my $frame = IWL::Frame->new;
     my $iconbox = IWL::Iconbox->new
 	(width => '800px', height => '600px');
-    my $button = IWL::Imperia::Button->newFromStock
+    my $button = IWL::Button->newFromStock
 	('IWL_STOCK_CANCEL');
     my %some_icon_info = {"foo.jpg" => 'foo', "bar.png" => 'bar');
 
