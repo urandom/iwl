@@ -7,8 +7,8 @@ use strict;
 
 use base qw(IWL::Container IWL::RPC::Request);
 
-use IWL::Text;
 use IWL::Image;
+use IWL::Label;
 use IWL::String qw(randomize);
 
 use JSON;

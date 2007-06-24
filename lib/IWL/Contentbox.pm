@@ -9,6 +9,9 @@ use base 'IWL::Container';
 
 use IWL::Config qw(%IWLConfig);
 use IWL::String qw(randomize);
+use IWL::Label;
+use IWL::Image;
+use IWL::Script;
 
 use Locale::TextDomain qw(org.bloka.iwl);
 use JSON;

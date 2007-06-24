@@ -8,6 +8,8 @@ use strict;
 use base 'IWL::Container';
 
 use IWL::String qw(randomize);
+use IWL::Stock;
+use IWL::Label;
 
 =head1 NAME
 

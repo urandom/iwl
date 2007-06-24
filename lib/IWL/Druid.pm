@@ -7,8 +7,11 @@ use strict;
 
 use base 'IWL::Container';
 
-use IWL::Label;
 use IWL::String qw(randomize);
+use IWL::Label;
+use IWL::Button;
+use IWL::Script;
+use IWL::Break;
 
 use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
