@@ -182,8 +182,12 @@ t/03stock.t
 t/10object.t
 t/10stash.t
 t/20comment.t
+t/20page_link.t
+t/20page_meta.t
 t/20rpc.t
 t/20text.t
+t/21page_head.t
+t/21page_title.t
 t/21script.t
 t/21style.t
 t/22widget.t
@@ -194,8 +198,10 @@ t/30form.t
 t/30image.t
 t/30input.t
 t/30label.t
+t/30page_body.t
 t/30parser.t
 t/31button.t
+t/31page.t
 t/40checkbox.t
 t/40combo_option.t
 t/40entry.t

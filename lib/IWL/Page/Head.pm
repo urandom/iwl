@@ -5,7 +5,7 @@ package IWL::Page::Head;
 
 use strict;
 
-use base qw(IWL::Widget);
+use base qw(IWL::Object);
 
 use IWL::Page::Meta;
 
@@ -31,19 +31,16 @@ sub new {
 
     $self->{_tag} = "head";
 
-    # It sends no signals
-    $self->{_signals}      = '';
-
     return $self;
 }
 
-# Overrides
+# Protected
 #
-sub getContent {
+sub _realize {
     my $self = shift;
 
+    $self->SUPER::_realize;
     $self->appendChild($self->{_title}) if $self->{_title};
-    $self->SUPER::getContent;
 }
 
 1;

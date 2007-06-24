@@ -43,7 +43,7 @@ sub new {
     $self->{_noChildren} = 1;
     foreach (keys %args) {
 	if ($_ eq 'href') {
-	    $self->setAttribute($_ => $args{$_}, 'uri');
+	    $self->setHref($args{$_});
 	} else {
 	    $self->setAttribute($_ => $args{$_});
 	}
@@ -62,6 +62,30 @@ sub newLinkToCSS {
         media => $media || 'screen',
 	%args,
     );
+}
+
+=item B<setHref> (B<URL>)
+
+Sets the href attribute for the link 
+
+Parameters: B<URL> - the url for the link
+
+=cut
+
+sub setHref {
+    my ($self, $url) = @_;
+
+    return $self->setAttribute(href => $url, 'uri');
+}
+
+=item B<getHref>
+
+Gets the href attribute for the link
+
+=cut
+
+sub getHref {
+    return shift->getAttribute('href', 1);
 }
 
 1;

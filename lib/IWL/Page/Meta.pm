@@ -56,7 +56,18 @@ sub set {
     my ($self, $equiv, $content) = @_;
 
     $self->setAttribute("http-equiv" => $equiv);
-    return $self->setAttribute(content      => $content);
+    return $self->setAttribute(content => $content);
+}
+
+=item B<get>
+
+Returns an array of the meta object's I<http-equiv> and I<content> values
+
+=cut
+
+sub get {
+    my $self = shift;
+    return $self->getAttribute('http-equiv', 1), $self->getAttribute('content', 1);
 }
 
 1;

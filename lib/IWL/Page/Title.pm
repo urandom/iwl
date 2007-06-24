@@ -5,7 +5,7 @@ package IWL::Page::Title;
 
 use strict;
 
-use base qw(IWL::Widget);
+use base qw(IWL::Object);
 
 use IWL::Text;
 
@@ -15,7 +15,7 @@ IWL::Title - the <title> markup
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Page::Title
+IWL::Object -> IWL::Page::Title
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ sub new {
 
 =over 4
 
-=item B<setTitle> (B<TEXT>)
+=item B<setText> (B<TEXT>)
 
 Sets the title text
 
@@ -46,11 +46,22 @@ Parameters: B<TEXT> - the text
 
 =cut
 
-sub setTitle {
+sub setText {
     my ($self, $text) = @_;
 
     my $title = IWL::Text->new($text);
     return $self->setChild($title);
+}
+
+=item B<getText>
+
+Returns the title text
+
+=cut
+
+sub getText {
+    my $self = shift;
+    return $self->{childNodes}[0] ? $self->{childNodes}[0]->getContent : '';
 }
 
 1;

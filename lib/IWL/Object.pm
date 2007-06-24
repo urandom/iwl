@@ -286,7 +286,7 @@ sub getContent {
 	}
     }
 
-    $content .= $self->{_HTTPHeader} if $self->{_HTTPHeader};
+    $content .= $self->{_HTTPHeader} . "\n\n" if $self->{_HTTPHeader};
     $content .= "<!" . $self->{_declaration} . ">\n" if $self->{_declaration};
     $content .= "<" . $self->{_tag};
 

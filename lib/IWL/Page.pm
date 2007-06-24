@@ -69,8 +69,8 @@ sub new {
     my $self = $class->SUPER::new();
 
     $self->{_tag}         = "html";
-    $self->{_HTTPHeader} = "Content-type: text/html; charset=utf-8\n\n";
-    $self->{_declaration} = DOCTYPES->{'xhtml1'};
+    $self->{_HTTPHeader} = "Content-type: text/html; charset=utf-8";
+    $self->setDeclaration('xhtml1');
     $self->setAttribute(xmlns => "http://www.w3c.org/1999/xhtml");
     $self->setAttribute('xmlns:iwl' => "http://namespace.bloka.org/iwl");
 
@@ -97,7 +97,7 @@ sub appendMetaEquiv {
 
     $meta->set($equiv => $content);
     $self->{_head}->appendChild($meta);
-    return $self;
+    return $meta;
 }
 
 =item B<appendHeader> (B<OBJECT>)
@@ -142,9 +142,20 @@ sub setTitle {
     my ($self, $text) = @_;
 
     my $title = IWL::Page::Title->new;
-    $title->setTitle($text);
+    $title->setText($text);
     $self->{_head}{_title} = $title;
     return $self;
+}
+
+=item B<getTitle>
+
+Returns the title text of the page
+
+=cut
+
+sub getTitle {
+    my $self = shift;
+    return $self->{_head}{_title} ? $self->{_head}{_title}->getText : '';
 }
 
 =item B<setHTTPHeader> (B<HEADER>)
@@ -162,8 +173,18 @@ sub setHTTPHeader {
     my ($self, $header) = @_;
     return unless $header;
 
-    $self->{_HTTPHeader} = $header . "\n\n";
+    $self->{_HTTPHeader} = $header;
     return $self;
+}
+
+=item B<getHTTPHeader>
+
+Returns the HTTP header
+
+=cut
+
+sub getHTTPHeader {
+    return shift->{_HTTPHeader};
 }
 
 =item B<setDeclaration> (B<DECLARATION>)
@@ -189,7 +210,18 @@ sub setDeclaration {
     } else {
 	$self->{_declaration} = $declaration;
     }
+    chomp $self->{_declaration};
     return $self;
+}
+
+=item B<getDeclaration>
+
+Returns the document type declaration
+
+=cut
+
+sub getDeclaration {
+    return shift->{_declaration};
 }
 
 # Overrides
