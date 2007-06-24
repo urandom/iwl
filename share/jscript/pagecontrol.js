@@ -150,7 +150,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	if (params.update) {
 	    var data = params.userData;
 	    var page = {
-		update: data.value,
+		input: data.value,
 		first: 1,
 		prev: data.page - 1 || 1,
 		next: data.page + 1 > data.pageCount ? data.pageCount : data.page + 1,
