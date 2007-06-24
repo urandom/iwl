@@ -343,9 +343,8 @@ function $(element) {
       elements.push($(arguments[i]));
     return elements;
   }
-  if (typeof element == 'number')
-      element = element.toString();
-  if (typeof element == 'string')
+  var type = typeof element;
+  if (type == 'string' || type == 'number')
     element = document.getElementById(element);
   return Element.extend(element);
 }
