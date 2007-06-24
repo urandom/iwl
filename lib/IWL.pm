@@ -83,7 +83,7 @@ This documentation refers to B<IWL> version 0.45
 	(width => '800px', height => '600px');
     my $button = IWL::Button->newFromStock
 	('IWL_STOCK_CANCEL');
-    my %some_icon_info = {"foo.jpg" => 'foo', "bar.png" => 'bar');
+    my %some_icon_info = ("foo.jpg" => 'foo', "bar.png" => 'bar');
 
     # Setting up the icons and adding them to the iconbox
     foreach (keys %some_icon_info) {
