@@ -11,7 +11,7 @@ use IWL::Page::Meta;
 
 =head1 NAME
 
-IWL::Head - the <head> markup
+IWL::Page::Head - the <head> markup
 
 =head1 INHERITANCE
 

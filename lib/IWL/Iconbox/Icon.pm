@@ -15,7 +15,7 @@ use JSON;
 
 =head1 NAME
 
-IWL::Icon - an icon widget for the iconbox 
+IWL::Iconbox::Icon - an icon widget for the iconbox 
 
 =head1 INHERITANCE
 

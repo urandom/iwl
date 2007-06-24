@@ -11,7 +11,7 @@ use IWL::String qw(randomize);
 
 =head1 NAME
 
-IWL::Input - a input button
+IWL::InputButton - a input button
 
 =head1 INHERITANCE
 

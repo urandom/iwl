@@ -9,7 +9,7 @@ use base 'IWL::Object';
 
 =head1 NAME
 
-IWL::Meta - a meta object
+IWL::Page::Meta - a meta object
 
 =head1 INHERITANCE
 

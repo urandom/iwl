@@ -11,7 +11,7 @@ use IWL::Text;
 
 =head1 NAME
 
-IWL::Title - the <title> markup
+IWL::Page::Title - the <title> markup
 
 =head1 INHERITANCE
 

@@ -9,7 +9,7 @@ use base qw(IWL::Widget);
 
 =head1 NAME
 
-IWL::Body - the <body> markup
+IWL::Page::Body - the <body> markup
 
 =head1 INHERITANCE
 

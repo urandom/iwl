@@ -11,7 +11,7 @@ use IWL::Text;
 
 =head1 NAME
 
-IWL::Option - an option widget for the combobox
+IWL::Combo::Option - an option widget for the combobox
 
 =head1 INHERITANCE
 

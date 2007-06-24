@@ -9,7 +9,7 @@ use base 'IWL::Object';
 
 =head1 NAME
 
-IWL::Link - a link object
+IWL::Page::Link - a link object
 
 =head1 INHERITANCE
 
