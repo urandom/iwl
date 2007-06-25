@@ -1,1 +1,6 @@
+Release: 0.46 - 25/06/07
+	Changed the order of the parameter passing in handleEvent
+	And some minor issues
+
 Initial release: version 0.45 - 24/06/07
+
