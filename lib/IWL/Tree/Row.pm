@@ -405,7 +405,7 @@ sub _expandEvent {
     my ($params, $handler) = @_;
 
     IWL::Object::printJSONHeader;
-    my ($list, $user_extras) = $handler->($params->{path}, $params->{all}, $params->{userData})
+    my ($list, $user_extras) = $handler->($params->{userData}, $params->{all})
         if 'CODE' eq ref $handler;
     $list = [] unless ref $list eq 'ARRAY';
 

@@ -674,7 +674,7 @@ Object.extend(Object.extend(Row, Widget), {
 	} else {
 	    if (this._expanding) return;
 	    this._expanding = true;
-	    this.emitEvent('IWL-Tree-Row-expand', {path: this.path.toJSON(), all: all});
+	    this.emitEvent('IWL-Tree-Row-expand', {all: all});
 	}
     },
     /**
