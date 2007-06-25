@@ -1,4 +1,4 @@
-use Test::More tests => 19;
+use Test::More tests => 21;
 
 use IWL::Object;
 
@@ -13,10 +13,12 @@ use IWL::Object;
 	is($object->firstChild, $object->{childNodes}[0]);
 	is($object->lastChild, $object->{childNodes}[4]);
 	is(scalar @{$object->{childNodes}}, 5, '5 children');
+	is($object->getChildren, $object->{childNodes}, 'getChildren()');
 
 	is($object->{childNodes}[3], $child2_5, 'Inserting after another object');
 	is($object->{childNodes}[0], $first_child, 'Prepending objects');
 	is($object, $child2->{parentNode}, 'Parent link');
+	is($object, $child2->getParent, 'getParent()');
 	is($object->{childNodes}[4], $child3, 'Child link');
 
 	isa_ok($object->setChild(IWL::Object->new), 'IWL::Object', 'Returns itself');

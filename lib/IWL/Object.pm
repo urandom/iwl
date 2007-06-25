@@ -137,6 +137,16 @@ sub prevChild {
     return $prev;
 }
 
+=item B<getChildren>
+
+Returns a reference to the array of child objects
+
+=cut
+
+sub getChildren {
+    return shift->{childNodes};
+}
+
 =item B<nextSibling>
 
 Returns the next sibling of the current object.
@@ -159,6 +169,16 @@ sub prevSibling {
     my $self = shift;
 
     return $self->{parentNode}->prevChild($self) if $self->{parentNode};
+}
+
+=item B<getParent>
+
+Returns the parent object of the current object
+
+=cut
+
+sub getParent {
+    return shift->{parentNode};
 }
 
 =item B<appendChild> (B<OBJECT>)
