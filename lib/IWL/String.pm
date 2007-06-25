@@ -112,8 +112,13 @@ sub escape {
     foreach my $ord (@$string) {
 	if ($ord > 0xff) {
 	    $result .= sprintf "%%u%04X", $ord;
-#        } elsif () {
-#            $result .= chr $ord;
+	} elsif (
+	         ($ord >= 0x2a && $ord < 0x2c)
+	      || ($ord >= 0x2d && $ord < 0x39)
+	      || ($ord >= 0x40 && $ord < 0x5b)
+	      || ($ord >= 0x61 && $ord < 0x7b)
+	      ||  $ord == 0x5f) {
+	    $result .= chr $ord;
 	} else {
 	    $result .= sprintf "%%%02X", $ord;
 	}
