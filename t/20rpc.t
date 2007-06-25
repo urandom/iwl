@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use IWL::RPC;
 
@@ -8,6 +8,26 @@ use IWL::RPC;
 	$ENV{REQUEST_METHOD} = 'get';
 	$ENV{QUERY_STRING} = 'foo=1&bar=baz&alpha=echo%201';
 	my %params = $rpc->getParams;
+	is_deeply(\%params, {
+			foo => 1,
+			bar => 'baz',
+			alpha => 'echo 1',
+	});
+}
+
+{
+	my $rpc = IWL::RPC->new;
+	my $content = 'foo=1&bar=baz&alpha=echo%201';
+
+	$ENV{REQUEST_METHOD} = 'post';
+	$ENV{CONTENT_LENGTH} = length $content;
+
+	tie *STDIN, 'READ_TEST', $content;
+
+	my %params = $rpc->getParams;
+
+	untie *STDIN;
+
 	is_deeply(\%params, {
 			foo => 1,
 			bar => 'baz',
@@ -28,4 +48,19 @@ use IWL::RPC;
 			is_deeply($params, {jijii => 1});
 		}
 	);
+}
+
+package READ_TEST;
+
+sub TIEHANDLE {
+	my $self = {};
+	bless $self, shift;
+	$self->{_content} = shift;
+
+	return $self;
+}
+
+sub READ {
+	my $self = shift;
+	$_[0] = $self->{_content};
 }
