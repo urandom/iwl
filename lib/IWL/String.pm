@@ -9,7 +9,7 @@ use strict;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK);
-@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape escapeHTML unescapeHTML randomize);
+@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape unescape escapeHTML unescapeHTML randomize);
 
 =head1 NAME
 
@@ -70,7 +70,7 @@ Encodes the string by replacing each instance of certain characters by one, two,
 
 Parameters: B<STRING> - the string to encode
 
-NOTE: Internet explorer suffers a severe slowdown for decodeURIComponent with large strings.
+NOTE: Internet explorer suffers a severe slowdown for decodeURIComponent with large strings. escape(3pm) should be used instead.
 
 =cut
 
@@ -106,7 +106,7 @@ sub escape {
 	from => $encoding,
 	to => 'INTERNAL');
 
-    $cd->recode ($string);
+    $cd->recode($string);
 
     my $result = '';
     foreach my $ord (@$string) {
@@ -126,6 +126,22 @@ sub escape {
 
     return $result;
 
+}
+
+=item B<unescape> (B<STRING>)
+
+Unescapes a string, previously escaped using escape(3pm)
+
+Parameters: B<STRING> - the string to unescape
+
+=cut
+
+sub unescape {
+    my ($string) = @_;
+    $string =~ s/%u([0-9a-f]{4})/chr(hex($1))/eig;
+    $string =~ s/%([0-9a-f]{2})/chr(hex($1))/eig;
+
+    return $string;
 }
 
 =item B<escapeHTML> (B<STRING>)
