@@ -34,6 +34,72 @@ Returns an array of multiple widgets, one for each B<ARGS>.
 
 Parameters: B<ARGS> - a hash ref of arguments, or a integer, specifying how many widgets to create without any arguments
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<click>
+
+Fires when the pointing device button is clicked over an element. A click is defined as a mousedown and mouseup over the same screen location. The sequence of these events is:
+
+  - mousedown
+  - mouseup
+  - click
+
+=item B<dblclick>
+
+Fires when the pointing device button is double clicked over an element
+
+=item B<mousedown>
+
+Fires when the pointing device button is pressed over an element
+
+=item B<mouseup>
+
+Fires when the pointing device button is released over an element
+
+=item B<mouseover>
+
+Fires when the pointing device is moved onto an element. Note that it is also fired when the pointing device enters the element, after leaving a child element
+
+=item B<mousemove>
+
+Fires when the pointing device is moved while it is over an element
+
+=item B<mouseout>
+
+Fires when the pointing device is moved away from an element. Note that it is also fired when the mouse goes over a child of the element
+
+=item B<mouseenter>
+
+Fires when the pointing device is moved onto an element. Unlike B<mouseover>, this signal is not fired again if the pointing device enters a child of the element.
+
+=item B<mouseleave>
+
+Fires when the pointing device is moved away from an element. Unlike B<mouseout>, this signal is not fired again if the pointing device leaves a child of the element.
+
+=item B<mousewheel>
+
+Fires when the pointing device's scroll wheel has been turned
+
+=item B<keypress>
+
+Fires when a key on the keyboard is "clicked". A keypress is defined as a keydown and keyup on the same key. The sequence of these events is:
+
+  - keydown
+  - keyup
+  - keypress
+
+=item B<keydown>
+
+Fires when a key on the keyboard is pressed
+
+=item B<keyup>
+
+Fires when a key on the keyboard is released
+
+=back
+
 =cut
 
 sub new {

@@ -32,6 +32,16 @@ IWL::Image->newFromStock (B<STOCK_ID>, [B<%ARGS>])
 
 Where B<STOCK_ID> is the I<IWL::Stock> id.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the image has finished loading
+
+=back
+
 =cut
 
 sub new {

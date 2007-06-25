@@ -25,6 +25,20 @@ IWL::Form->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<form>> markup would have.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<submit>
+
+Fires when a form is submitted
+
+=item B<reset>
+
+Fires when a form is reset
+
+=back
+
 =cut
 
 sub new {

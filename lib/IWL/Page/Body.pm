@@ -19,6 +19,40 @@ IWL::Object -> IWL::Widget -> IWL::Page::Body
 
 Body is a specific object, that is only usable from Page, and should not be used otherwise.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the user agent finishes loading all content within a document, including window, frames, objects and images
+
+=item B<unload>
+
+Fires when the user agent removes all content from a window or frame
+
+=item B<beforeunload>
+
+Fires before a document is unloaded
+
+=item B<abort>
+
+Fires when the page is stopped from loading before completely loaded
+
+=item B<error>
+
+Fires when the page cannot be loaded properly
+
+=item B<resize>
+
+Fires when a document view is resized
+
+=item B<scroll>
+
+Fires when a document view is scrolled
+
+=back
+
 =cut
 
 sub new {

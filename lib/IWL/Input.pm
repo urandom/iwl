@@ -29,6 +29,28 @@ IWL::Input->newMultipleFromHash (B<NAME> => B<VALUE>, ...)
 
 Where B<NAME> => B<VALUE> is a hash of name/values for creating multiple input controls, where the keys are the names, and the values are the values. Returns an array of created inputs.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<change>
+
+Fires when the input loses the focus and its value has been modified since gaining focus
+
+=item B<select>
+
+Fires when a user selects some text in a text field, including input and textarea
+
+=item B<focus>
+
+Fires when an element receives focus either via the pointing device or by tab navigation
+
+=item B<blur>
+
+Fires when an element loses focus either via the pointing device or by tabbing navigation
+
+=back
+
 =cut
 
 sub new {

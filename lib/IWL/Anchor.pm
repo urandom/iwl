@@ -27,6 +27,19 @@ IWL::Anchor->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<a>> markup would have.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<focus>
+
+Fires when the anchor receives focus either via the pointing device or by tab navigation
+
+=item B<blur>
+
+Fires when the anchor loses focus either via the pointing device or by tabbing navigation
+
+=back
 
 =cut
 
