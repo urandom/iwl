@@ -5,18 +5,13 @@ use Getopt::Long;
 use File::Copy;
 use File::Find;
 use File::Spec;
+use File::Sharedir;
 
-
-eval {
-	require File::ShareDir;
-};
-
-die "Could not load File::ShareDir $@" if $@;
 
 import File::Copy::Recursive 'rcopy';
 
-sub recursive(&@);
 sub mirror;
+sub recursive(&@);
 
 Getopt::Long::Configure ('no_ignore_case');
 
