@@ -9,7 +9,7 @@ use strict;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK);
-@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escapeHTML unescapeHTML randomize);
+@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape escapeHTML unescapeHTML randomize);
 
 =head1 NAME
 
@@ -64,11 +64,13 @@ sub decodeURI {
     return $copy
 }
 
-=item B<encodeURIComponent> (B<STRING>tring = shift;
+=item B<encodeURIComponent> (B<STRING>)
 
 Encodes the string by replacing each instance of certain characters by one, two, or three escape sequences representing the UTF-8 encoding of the character. Can be unescaped using the decodeURIComponent javascript function
 
 Parameters: B<STRING> - the string to encode
+
+NOTE: Internet explorer suffers a severe slowdown for decodeURIComponent with large strings.
 
 =cut
 
@@ -86,15 +88,15 @@ sub encodeURIComponent {
 
 =item B<escape> (B<STRING>, [B<ENCODING>])
 
-Escapes the string with character semantics. Similar to javascript's escape();
+Escapes the string with character semantics. Similar to javascript's escape()
 
 Parameters: B<STRING> - the string to escape, B<ENCODING> - optional, the encoding of the string (defaults to 'utf-8')
 
 =cut
 
 sub escape {
-    my ($self, $string, $encoding) = @_;
-    my $encoding ||= 'utf-8';
+    my ($string, $encoding) = @_;
+    $encoding ||= 'utf-8';
 
     return '' unless defined $string;
 
