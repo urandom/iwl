@@ -64,7 +64,7 @@ sub decodeURI {
     return $copy
 }
 
-=item B<encodeURIComponent> (B<STRING>)
+=item B<encodeURIComponent> (B<STRING>tring = shift;
 
 Encodes the string by replacing each instance of certain characters by one, two, or three escape sequences representing the UTF-8 encoding of the character. Can be unescaped using the decodeURIComponent javascript function
 
@@ -82,6 +82,43 @@ sub encodeURIComponent {
     $copy =~ s/([^0-9a-zA-Z_.!~*'()\x80-\xff-])/'%'.unpack('H2', $1)/eg;
 
     return $copy
+}
+
+=item B<escape> (B<STRING>, [B<ENCODING>])
+
+Escapes the string with character semantics. Similar to javascript's escape();
+
+Parameters: B<STRING> - the string to escape, B<ENCODING> - optional, the encoding of the string (defaults to 'utf-8')
+
+=cut
+
+sub escape {
+    my ($self, $string, $encoding) = @_;
+    my $encoding ||= 'utf-8';
+
+    return '' unless defined $string;
+
+    require Locale::Recode;
+
+    my $cd = Locale::Recode->new(
+	from => $encoding,
+	to => 'INTERNAL');
+
+    $cd->recode ($string);
+
+    my $result = '';
+    foreach my $ord (@$string) {
+	if ($ord > 0xff) {
+	    $result .= sprintf "%%u%04X", $ord;
+#        } elsif () {
+#            $result .= chr $ord;
+	} else {
+	    $result .= sprintf "%%%02X", $ord;
+	}
+    }
+
+    return $result;
+
 }
 
 =item B<escapeHTML> (B<STRING>)
