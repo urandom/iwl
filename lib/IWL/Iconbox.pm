@@ -103,11 +103,11 @@ sub _realize {
     my $options = objToJson($self->{_options});
 
     # TRANSLATORS: {TITLE} is a placeholder
-    my $delete  = __"The icon {TITLE} was removed.";
+    my $delete  = __"The icon '{TITLE}' was removed.";
 
     $self->SUPER::_realize;
 
-    $script->setScript("Iconbox.create('$id', $options, {delete: '$delete'});");
+    $script->setScript("Iconbox.create('$id', $options, {delete: \"$delete\"});");
     foreach my $icon (@{$self->{__icons}}) {
 	my $icon_id = $icon->getId;
         $script->appendScript("\$('$id').selectIcon('$icon_id');")

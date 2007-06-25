@@ -5,7 +5,7 @@ use Getopt::Long;
 use File::Copy;
 use File::Find;
 use File::Spec;
-use File::Sharedir;
+use File::ShareDir;
 
 
 import File::Copy::Recursive 'rcopy';

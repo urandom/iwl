@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-24 14:34+0300\n"
+"POT-Creation-Date: 2007-06-25 16:50+0300\n"
 "PO-Revision-Date: 2007-06-08 12:31+0300\n"
 "Last-Translator: Guido Flohr <guido@imperia.net>\n"
 "Language-Team:  <guido@imperia.net>\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Kein Schlüssel angegeben. Bitte diesem Link folgen, um einen Schlüssel von "
 "Google zu bekommen."
 
-#: ../lib/IWL/Druid.pm:161
+#: ../lib/IWL/Druid.pm:164
 msgid "Finish"
 msgstr "Beenden"
 
@@ -139,7 +139,7 @@ msgstr "Vorschau"
 
 #: ../lib/IWL/Stock.pm:132
 msgid "Refresh"
-msgstr "Aufrischen"
+msgstr "Aktualisieren"
 
 #: ../lib/IWL/Stock.pm:136
 msgid "Remove"
@@ -216,5 +216,5 @@ msgstr "Generischer Text"
 #. TRANSLATORS: {TITLE} is a placeholder
 #: ../lib/IWL/Iconbox.pm:106
 #, perl-brace-format
-msgid "The icon {TITLE} was removed."
-msgstr ""
+msgid "The icon '{TITLE}' was removed."
+msgstr "Das Icon »{TITLE}« wurde entfernt."
