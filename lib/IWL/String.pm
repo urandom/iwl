@@ -68,7 +68,7 @@ Encodes the string by replacing each instance of certain characters by one, two,
 
 Parameters: B<STRING> - the string to encode
 
-NOTE: Internet explorer suffers a severe slowdown for decodeURIComponent with large strings. escape(3pm) should be used instead.
+NOTE: Internet explorer suffers a severe slowdown for decodeURIComponent with large strings. escape(3pm) should be used instead, when not dealing with encoding URI components.
 
 =cut
 

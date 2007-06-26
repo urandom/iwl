@@ -384,7 +384,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	this.contentboxTitle.style.cursor = 'move';
 	this.contentboxTitle.parentNode.style.cursor = 'move';
 	this._draggable = new Draggable(this, {
-	    handle:this.id + '_title',
+	    handle:$(this.id + '_title'),
 	    starteffect:null,
 	    endeffect:this.__endDragCallback.bind(this)});
 	this.setFocus();
