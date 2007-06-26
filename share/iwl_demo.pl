@@ -92,11 +92,7 @@ EOF
 
 if (my $file = $form{upload_file}) {
     my $name = $file->[1];
-    my $json = IWL::Text->new;
-    my $page = IWL::Page->new(simple => 1);
-    $json->setContent("{message:'$name uploaded.'}");
-    $page->appendChild($json);
-    $page->print;
+    IWL::Upload::printMessage("$name uploaded.");
     exit 0;
 } elsif (my $text = $form{text}) {
     IWL::Object::printHTMLHeader;

@@ -93,6 +93,26 @@ sub setUploadCallback {
     $self->{__uploadCallback} = $callback;
 }
 
+=item B<printMessage> (B<MESSAGE>)
+
+Prints a message, so that it can be displayed in the upload tooltip
+
+This method is a class method!  You do not need to instantiate an object
+in order to call it.
+
+=cut
+
+sub printMessage {
+    my $message = shift;
+    $message = shift if ref $message;
+
+    my $json = IWL::Text->new;
+    my $page = IWL::Page->new(simple => 1);
+    $json->setContent("{message:'$message'}");
+    $page->appendChild($json);
+    $page->print;
+}
+
 # Overrides
 #
 sub setId {
