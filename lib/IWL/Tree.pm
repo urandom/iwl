@@ -6,7 +6,7 @@ package IWL::Tree;
 use strict;
 
 use IWL::Script;
-use IWL::String qw(randomize encodeURIComponent);
+use IWL::String qw(randomize escape);
 
 use base qw(IWL::Table IWL::RPC::Request);
 
@@ -181,14 +181,14 @@ sub _realize {
     my $self    = shift;
     my $cell    = IWL::Tree::Cell->new;
     my $script  = IWL::Script->new;
-    my $b       = encodeURIComponent($cell->_blank_indent->getContent);
-    my $i       = encodeURIComponent($cell->_row_indent->getContent);
-    my $l       = encodeURIComponent($cell->_l_junction->getContent);
-    my $l_e     = encodeURIComponent($cell->_l_expand->getContent);
-    my $l_c     = encodeURIComponent($cell->_l_collapse->getContent);
-    my $t       = encodeURIComponent($cell->_t_junction->getContent);
-    my $t_e     = encodeURIComponent($cell->_t_expand->getContent);
-    my $t_c     = encodeURIComponent($cell->_t_collapse->getContent);
+    my $b       = escape($cell->_blank_indent->getContent);
+    my $i       = escape($cell->_row_indent->getContent);
+    my $l       = escape($cell->_l_junction->getContent);
+    my $l_e     = escape($cell->_l_expand->getContent);
+    my $l_c     = escape($cell->_l_collapse->getContent);
+    my $t       = escape($cell->_t_junction->getContent);
+    my $t_e     = escape($cell->_t_expand->getContent);
+    my $t_c     = escape($cell->_t_collapse->getContent);
     my $id      = $self->getId;
     my $options = {};
 
@@ -236,7 +236,7 @@ sub _refreshEvent {
     $list = [] unless ref $list eq 'ARRAY';
 
     print '{rows: ['
-           . join(',', map {'"' . encodeURIComponent($_->getContent) . '"'} @$list)
+           . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
            . '], user_extras: ' . (objToJson($user_extras) || 'null'). '}';
 }
 

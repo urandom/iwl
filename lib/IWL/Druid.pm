@@ -7,7 +7,7 @@ use strict;
 
 use base 'IWL::Container';
 
-use IWL::String qw(randomize);
+use IWL::String qw(randomize escape);
 use IWL::Label;
 use IWL::Button;
 use IWL::Script;
@@ -125,7 +125,7 @@ sub _realize {
     my $id = $self->getId;
 
     $self->SUPER::_realize;
-    $self->{__init}->setScript("Druid.create('$id', '$self->{__finishText}')");
+    $self->{__init}->setScript("Druid.create('$id', '" . escape($self->{__finishText}) . "')");
 }
 
 sub _setupDefaultClass {
@@ -191,7 +191,7 @@ sub __setup_page {
 	my $param = objToJson([$param]) if $param;
         $param ||= 'null';
         $page->setAttribute('iwl:druidCheckCallback' => "$callback", 'none');
-        $page->setAttribute('iwl:druidCheckParam' => "$param", 'uri') if $param;
+	$page->setAttribute('iwl:druidCheckParam' => $param, 'escape') if $param;
     }
     if ($reverse) {
         $index = unshift @{$self->{__pages}}, $page;

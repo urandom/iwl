@@ -143,7 +143,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	    if (!icon_data) continue;
             var icon = null;
 	    if (typeof icon_data === 'string') {
-		new Insertion.Bottom(this.iconsContainer, decodeURIComponent(icon_data));
+		new Insertion.Bottom(this.iconsContainer, unescape(icon_data));
 		icon = this.iconsContainer.childElements().last();
 		if (!icon.id)
 		    icon.id = 'iconbox_icon_' + Math.random();

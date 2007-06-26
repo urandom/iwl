@@ -53,7 +53,7 @@ sub registerEvent {
 sub _realizeEvents {
     my $self = shift;
 
-    $self->setAttribute('iwl:RPCEvents', objToJson($self->{_handlers}), 'uri')
+    $self->setAttribute('iwl:RPCEvents', objToJson($self->{_handlers}), 'escape')
         if $self->{_handlers};
 }
 

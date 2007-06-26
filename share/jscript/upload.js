@@ -59,7 +59,7 @@ Object.extend(Object.extend(Upload, Widget), {
 	    doc = this.frame.document;
 	}
 	if (doc.document) doc = doc.document;
-	var json = eval('(' + decodeURIComponent(doc.body.firstChild.nodeValue) + ')');
+	var json = eval('(' + unescape(doc.body.firstChild.nodeValue) + ')');
 
 	if (json && json.message)
 	    this.tooltip.setContent(json.message);

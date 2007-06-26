@@ -35,12 +35,11 @@ sub encodeURI {
     my $string = shift;
 
     return '' unless defined $string;
-    my $copy = $string;
 
-    turn_utf_8_off $copy;
-    $copy =~ s/([^0-9a-zA-Z_.!~*'();,\/?:@&=+#\$\x80-\xff-])/'%' . unpack ('H2', $1)/eg;
+    turn_utf_8_off $string;
+    $string =~ s/([^0-9a-zA-Z_.!~*'();,\/?:@&=+#\$\x80-\xff-])/'%' . unpack ('H2', $1)/eg;
 
-    return $copy
+    return $string
 }
 
 =item B<decodeURI> (B<STRING>)
@@ -55,13 +54,12 @@ sub decodeURI {
     my $string = shift;
 
     return '' unless defined $string;
-    my $copy = $string;
 
-    $copy =~ s/\+/ /g;
-    $copy =~ s/\%([0-9a-fA-F]{2})/pack('H2', $1)/eg;
-    turn_utf_8_on $copy;
+    $string =~ s/\+/ /g;
+    $string =~ s/\%([0-9a-fA-F]{2})/pack('H2', $1)/eg;
+    turn_utf_8_on $string;
 
-    return $copy
+    return $string
 }
 
 =item B<encodeURIComponent> (B<STRING>)
@@ -78,12 +76,11 @@ sub encodeURIComponent {
     my $string = shift;
 
     return '' unless defined $string;
-    my $copy = $string;
 
-    turn_utf_8_off $copy;
-    $copy =~ s/([^0-9a-zA-Z_.!~*'()\x80-\xff-])/'%'.unpack('H2', $1)/eg;
+    turn_utf_8_off $string;
+    $string =~ s/([^0-9a-zA-Z_.!~*'()\x80-\xff-])/'%'.unpack('H2', $1)/eg;
 
-    return $copy
+    return $string
 }
 
 =item B<escape> (B<STRING>, [B<ENCODING>])
@@ -100,32 +97,17 @@ sub escape {
 
     return '' unless defined $string;
 
-    require Locale::Recode;
+    $string =~ s/%/%25/g;
 
-    my $cd = Locale::Recode->new(
-	from => $encoding,
-	to => 'INTERNAL');
+    $string =~ s/\\/%5C/g;
+    $string =~ s/&/%26/g;
+    $string =~ s/</%3C/g;
+    $string =~ s/>/%3E/g;
+    $string =~ s/\"/%22/g;
+    $string =~ s/\'/%27/g;
+    $string =~ s/\n/%0A/g;
 
-    $cd->recode($string);
-
-    my $result = '';
-    foreach my $ord (@$string) {
-	if ($ord > 0xff) {
-	    $result .= sprintf "%%u%04X", $ord;
-	} elsif (
-	         ($ord >= 0x2a && $ord < 0x2c)
-	      || ($ord >= 0x2d && $ord < 0x39)
-	      || ($ord >= 0x40 && $ord < 0x5b)
-	      || ($ord >= 0x61 && $ord < 0x7b)
-	      ||  $ord == 0x5f) {
-	    $result .= chr $ord;
-	} else {
-	    $result .= sprintf "%%%02X", $ord;
-	}
-    }
-
-    return $result;
-
+    return $string;
 }
 
 =item B<unescape> (B<STRING>)

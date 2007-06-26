@@ -233,7 +233,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    if (!row_data) continue;
             var row = null;
 	    if (typeof row_data === 'string') {
-		new Insertion.Bottom(this.body, decodeURIComponent(row_data));
+		new Insertion.Bottom(this.body, unescape(row_data));
 		row = $A(this.body.rows).last();
 		if (!row.id)
 		    row.id = 'tree_row_' + Math.random();
@@ -345,7 +345,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	}.bind(this));
 	this.nav_images = {};
 	for (var i in images)
-	    this.nav_images[i] = decodeURIComponent(images[i]);
+	    this.nav_images[i] = unescape(images[i]);
 	this.nav_images['span'] = '<span class="tree_nav_con"></span>';
 	setTimeout(this.__initNavRebuild.bind(this, this.body.rows.length), 100);
 
@@ -735,7 +735,7 @@ Object.extend(Object.extend(Row, Widget), {
 	this.tree = tree;
 	this.childList = [];
 
-	var row_data = decodeURIComponent(this.readAttribute('iwl:treeRowData') || '{}').evalJSON();
+	var row_data = unescape(this.readAttribute('iwl:treeRowData') || '{}').evalJSON();
 	if (row_data.childList)
 	    row_data.childList = row_data.childList.map(function($_) {
 		return $($_);

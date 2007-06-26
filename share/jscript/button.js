@@ -213,11 +213,11 @@ Object.extend(Object.extend(Button, Widget), {
 	this.buttonParts = this.childElements();
 	this.buttonContent = $(id + '_content');
 
-	image = image ? decodeURIComponent(image) : '';
+	image = image ? unescape(image) : '';
 	this.buttonContent.update(
 	    image + '<span id="' + id + '_label" class="' + className +
 		'_label_' + this.options.size + '">' +
-		decodeURIComponent(label) + '</span>'
+		unescape(label) + '</span>'
 	);
 	this.buttonImage = $(id + '_image');
 	this.buttonLabel = $(id + '_label');

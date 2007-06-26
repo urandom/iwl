@@ -95,7 +95,7 @@ Object.extend(Event, {
     if (element.preparedEvents) return element;
     var events = element.readAttribute('iwl:RPCEvents');
     if (events) {
-      events = decodeURIComponent(events).evalJSON();
+      events = unescape(events).evalJSON();
       for (var name in events)
 	Event.registerEvent(element, name, events[name][0], events[name][1]);
       element.preparedEvents = true;

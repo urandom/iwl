@@ -11,7 +11,7 @@ use IWL::Config qw(%IWLConfig);
 
 use JSON;
 use Scalar::Util qw(weaken);
-use IWL::String qw(encodeURI escapeHTML);
+use IWL::String qw(encodeURI escapeHTML escape);
 
 # A hash to keep track of initialized js.
 my %initialized_js;
@@ -316,9 +316,11 @@ sub getContent {
 	    $content .= " $key";
 	    next;
 	}
-	if ($self->{_escapings} && defined $self->{_escapings}{$key} &&  $self->{_escapings}{$key} eq 'uri') {
+	if (defined $self->{_escapings}{$key} &&  $self->{_escapings}{$key} eq 'uri') {
 	    $value = encodeURI($value);
-	} elsif ($self->{_escapings} && defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'none') {
+	} elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'escape') {
+	    $value = escape($value);
+	} elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'none') {
 	    # No need to do anything here
 	} else {
 	    $value = escapeHTML($value);
@@ -423,9 +425,11 @@ sub getObject {
     my $attributes = {};
     foreach my $key (keys %{$self->{_attributes}}) {
         my $value = $self->{_attributes}{$key};
-	if ($self->{_escapings} && defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'uri') {
+	if (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'uri') {
 	    $value = encodeURI($value);
-	} elsif ($self->{_escapings} && defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'none') {
+	} elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'escape') {
+	    $value = escape($value);
+	} elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'none') {
 	    # No need to do anything here
 	} else {
 	    $value = escapeHTML($value);
@@ -523,6 +527,7 @@ Parameter:
   ESCAPING - optional, sets the method of escaping the value
     - html - html entity escaping [default]
     - uri - uri escaping
+    - escape - the string is escaped using IWL::String::escape(3pm)
     - none
 
 =cut
@@ -550,6 +555,8 @@ sub setAttribute {
 	$self->{_escapings}{$attr} = 'none';
     } elsif ($escaping && $escaping eq 'uri') {
 	$self->{_escapings}{$attr} = 'uri';
+    } elsif ($escaping && $escaping eq 'escape') {
+	$self->{_escapings}{$attr} = 'escape';
     } else {
 	delete $self->{_escapings}{$attr};
     }
@@ -593,9 +600,11 @@ sub getAttribute {
     return if $attr eq 'style';
     return $self->{_attributes}{$attr} if $unescaped;
 
-    if ($self->{_escapings} && defined $self->{_escapings}{$attr} && $self->{_escapings}{$attr} eq 'none') {
+    if (defined $self->{_escapings}{$attr} && $self->{_escapings}{$attr} eq 'none') {
 	return $value;
-    } elsif ($self->{_escapings}  && defined $self->{_escapings}{$attr} && $self->{_escapings}{$attr} eq 'uri') {
+    } elsif (defined $self->{_escapings}{$attr} && $self->{_escapings}{$attr} eq 'escape') {
+	$value = escape($value);
+    } elsif (defined $self->{_escapings}{$attr} && $self->{_escapings}{$attr} eq 'uri') {
 	return encodeURI($value);
     } else {
 	return escapeHTML($value);

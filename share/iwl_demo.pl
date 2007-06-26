@@ -7,7 +7,6 @@ use strict;
 use IWL;
 use IWL::Config qw(%IWLConfig);
 use IWL::Ajax qw(updaterCallback);
-use IWL::String qw(encodeURIComponent);
 
 my $rpc = IWL::RPC->new;
 my %form = $rpc->getParams();

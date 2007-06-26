@@ -6,7 +6,7 @@ package IWL::Iconbox;
 use strict;
 
 use IWL::Script;
-use IWL::String qw(randomize encodeURIComponent);
+use IWL::String qw(randomize escape);
 use Locale::TextDomain qw(org.bloka.iwl);
 
 use base qw(IWL::Container IWL::RPC::Request);
@@ -151,7 +151,7 @@ sub _refreshEvent {
     $list = [] unless ref $list eq 'ARRAY';
 
     print '{icons: ['
-           . join(',', map {'"' . encodeURIComponent($_->getContent) . '"'} @$list)
+           . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
            . '], user_extras: ' . (objToJson($user_extras) || 'null'). '}';
 }
 

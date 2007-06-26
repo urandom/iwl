@@ -109,7 +109,7 @@ Object.extend(Object.extend(Druid, Widget), {
 	this.pageContainer = this.down();
 	this.currentPage = this.pageContainer.getElementsByClassName(
 		$A(this.classNames()).first() + '_page_selected')[0];
-        this.finishText = decodeURIComponent(text);
+        this.finishText = unescape(text);
         this.nextText = this.nextButton.getLabel();
 	this.pages = [];
 	this.pageContainer.childElements().each(function($_) {
@@ -228,7 +228,7 @@ Object.extend(Object.extend(Page, Widget), {
 	this.druid = druid;
 	this.check = {
 	    callback: this.readAttribute('iwl:druidCheckCallback'),
-	    param: decodeURIComponent(this.readAttribute('iwl:druidCheckParam') || '[]').evalJSON()
+	    param: unescape(this.readAttribute('iwl:druidCheckParam') || '[]').evalJSON()
 	}
 	if (this.check.param) this.check.param = this.check.param.shift();
     },

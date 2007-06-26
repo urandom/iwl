@@ -12,7 +12,7 @@ use IWL::Input;
 use IWL::Anchor;
 use IWL::Image;
 use IWL::Container;
-use IWL::String qw(randomize encodeURIComponent);
+use IWL::String qw(randomize escape);
 
 use JSON;
 
@@ -200,7 +200,7 @@ sub setHref {
     } else {
         $self->signalConnect(click => "document.location.href = '$url'");
     }
-    $self->signalConnect(mouseover => "window.status = decodeURIComponent('" . encodeURIComponent($url) . "')");
+    $self->signalConnect(mouseover => "window.status = unescape('" . escape($url) . "')");
     return $self->signalConnect(mouseout => "window.status = ''");
 }
 
@@ -363,8 +363,8 @@ sub _realize {
     $self->{__button}{image}->signalConnect(load => "\$('$id').adjust()");
     $self->{__button}{_handlers} = $self->{_handlers};
     my $container = $self->{__button}->getJSON;
-    my $image     = encodeURIComponent($self->{__button}{image}->getContent);
-    my $label     = encodeURIComponent($self->{__button}{label});
+    my $image     = escape($self->{__button}{image}->getContent);
+    my $label     = escape($self->{__button}{label});
     my $json      =
       qq|{container:$container,image:"$image",label:"$label"}|;
 
