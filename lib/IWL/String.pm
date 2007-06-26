@@ -138,8 +138,10 @@ Parameters: B<STRING> - the string to unescape
 
 sub unescape {
     my ($string) = @_;
-    $string =~ s/%u([0-9a-f]{4})/chr(hex($1))/eig;
-    $string =~ s/%([0-9a-f]{2})/chr(hex($1))/eig;
+    $string =~ s/%u([0-9a-f]{4})/\\x{$1}/ig;
+    $string =~ s/%([0-9a-f]{2})/\\x{$1}/ig;
+
+    $string = eval qq|"$string"|;
 
     return $string;
 }
