@@ -61,7 +61,7 @@ Object.extend(Object.extend(Notebook, Widget), {
 	this.pageContainer = this.down().next(null, 1);
 
 	this.tabs = [];
-	this.currentTab = this.tabContainer.getElementsByClassName(
+	this.currentTab = this.tabContainer.getElementsBySelector('.' +
 		$A(this.classNames()).first() + '_tab_selected')[0];
 
 	var pages = this.pageContainer.childElements().select(function($_) {

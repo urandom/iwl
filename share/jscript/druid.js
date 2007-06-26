@@ -107,7 +107,7 @@ Object.extend(Object.extend(Druid, Widget), {
 	    return;
 	}
 	this.pageContainer = this.down();
-	this.currentPage = this.pageContainer.getElementsByClassName(
+	this.currentPage = this.pageContainer.getElementsBySelector('.' +
 		$A(this.classNames()).first() + '_page_selected')[0];
         this.finishText = unescape(text);
         this.nextText = this.nextButton.getLabel();

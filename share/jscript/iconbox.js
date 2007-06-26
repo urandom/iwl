@@ -429,7 +429,7 @@ Object.extend(Object.extend(Icon, Widget), {
 
     _init: function(id, iconbox) {
 	this.iconbox = iconbox;
-	this.label = this.getElementsByClassName('icon_label')[0];
+	this.label = this.getElementsBySelector('.icon_label')[0];
 	this.__initEvents();
 	if (this._loaded)
 	    this.iconbox._iconCountdown();
