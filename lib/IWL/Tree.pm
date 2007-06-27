@@ -37,6 +37,7 @@ Where B<%ARGS> is an optional hash parameter with with key-values:
   scrollToSelection: true if the selected row should be scrolled into
                      visibility
   alternate: true if the tree should alternate
+  animate: true if the tree should animate the collapse of its rows
 
 =cut
 
@@ -55,6 +56,7 @@ sub new {
     $options->{multipleSelect} = 1 if $args{multipleSelect};
     $options->{scrollToSelection} = 1 if $args{scrollToSelection};
     $options->{alternate} = 1 if $args{alternate};
+    $options->{animate} = 1 if $args{animate};
     delete @args{qw(list multipleSelect scrollToSelection alternate)};
 
     my $self = $class->SUPER::new(%args);
@@ -196,6 +198,7 @@ sub _realize {
     $self->SUPER::_realize;
     $options->{multipleSelect} = "true" if $self->{_options}{multipleSelect};
     $options->{isAlternating} = "true" if $self->{_options}{alternate};
+    $options->{animate} = "true" if $self->{_options}{animate};
     $options->{scrollToSelection} = "true" if $self->{_options}{scrollToSelection};
     $options = objToJson($options);
 

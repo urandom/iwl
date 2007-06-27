@@ -332,7 +332,8 @@ Object.extend(Object.extend(Tree, Widget), {
 	    isAlternating: false,
 	    multipleSelect: false,
 	    clickToExpand: false,
-	    scrollToSelection: false
+	    scrollToSelection: false,
+	    animate: false
 	}, arguments[2] || {});
 
 	if (!this.body) return;
@@ -645,7 +646,10 @@ Object.extend(Object.extend(Row, Widget), {
 	var child_rows = this.childRows(true);
 	if (!child_rows.length) return;
 	child_rows.each(function(child) {
-	    child.hide();
+	    if (child.tree.options.animate)
+		new Effect.SlideUp(child, {duration: 0.5});
+	    else
+		child.hide();
 	    if (child.isParent)
 		child.collapse();
 	});
@@ -663,7 +667,7 @@ Object.extend(Object.extend(Row, Widget), {
 	var child_rows = this.childRows(true);
 	if (child_rows.length) {
 	    child_rows.each(function(child) {
-		child.show();
+		child.show()
 		if (all && child.childList.length) child.expand(all);
 		else child._rebuildNav();
 	    });

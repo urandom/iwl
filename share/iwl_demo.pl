@@ -102,7 +102,7 @@ if (my $file = $form{upload_file}) {
 } else {
     my $page = IWL::Page->new;
     my $hbox = IWL::HBox->new;
-    my $tree = IWL::Tree->new(id => 'widgets_tree', alternate => 1);
+    my $tree = IWL::Tree->new(id => 'widgets_tree', alternate => 1, animate => 1);
     my $notebook = IWL::Notebook->new(id => 'main_notebook');
     my $container = IWL::Container->new(id => 'content');
     my $style = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/demo.css');
