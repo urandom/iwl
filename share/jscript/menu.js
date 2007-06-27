@@ -141,7 +141,9 @@ Object.extend(Object.extend(Menu, Widget), {
 	}, arguments[1] || {});
 
 	this.childElements().each(function ($_) {
-	    if ($_.hasClassName('menubar_item') || $_.hasClassName('menu_item'))
+	    if ($_.tagName == 'LI'
+		&& ($_.hasClassName('menubar_item')
+		    || $_.hasClassName('menu_item')))
 		this.menuItems.push(MenuItem.create($_, this));
 	}.bind(this));
 
@@ -334,8 +336,10 @@ Object.extend(Object.extend(MenuItem, Widget), {
 	this.menu = menu;
 
 	this.childElements().each(function(subs) {
-	    if (subs.className && subs.hasClassName('menu'))
+	    if (subs.hasClassName && subs.hasClassName('menu')) {
 		this.submenu = subs;
+		return;
+	    }
 	}.bind(this));
 	this.__initEvents();
 	this.checked = this.__checked();
