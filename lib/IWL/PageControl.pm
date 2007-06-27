@@ -169,6 +169,7 @@ sub __init {
     $self->{__options} = {};
     $self->{__options}{pageCount} = $args{pageCount};
     $self->{__options}{pageSize} = $args{pageSize};
+    $self->{__options}{page} = $args{page};
 
     $self->{__bind}{bound} = 0;
     delete @args{qw(pageCount pageSize)};

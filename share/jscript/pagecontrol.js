@@ -76,11 +76,11 @@ Object.extend(Object.extend(PageControl, Widget), {
 	this.label = $(this.id + '_page_count');
 	this.nextButton = $(this.id + '_next').signalConnect('load', buttonLoad.bind(this));
 	this.lastButton = $(this.id + '_last').signalConnect('load', buttonLoad.bind(this));
-	this.currentPage = 1;
-	this.input.value = this.currentPage;
 	this.options = Object.extend({
-	    bound: false
+	    bound: false,
+	    page: 1
 	}, arguments[1] || {});
+	this.input.value = this.currentPage = this.options.page;
 	this.show();
 
 	this.__initEvents();
