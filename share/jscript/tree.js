@@ -829,7 +829,7 @@ Object.extend(Object.extend(Row, Widget), {
 	}
     },
     _expandResponse: function(json, params) {
-	if (json.length != 0) {
+	if (json && json.length != 0) {
 	    this.append(json);
 	    this.expand(params.all);
 	}
