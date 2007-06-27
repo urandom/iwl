@@ -285,6 +285,17 @@ var ElementMethods = {
     Element.classNames(element).change(oldClassName, newClassName);
     return element;
   },
+  getScrollableParent: function(element) {
+    if (!(element = $(element))) return;
+    do {
+      var dims = element.getDimensions();
+      var scroll = {width: element.scrollWidth, height: element.scrollHeight};
+      if (dims.width != scroll.width || dims.height != scroll.height)
+	break;
+      element = element.up();
+    } while (element);
+    return element;
+  },
   /* = IWL RPC ======================================*/
   registerEvent: function(element, eventName, url, params) {
     Event.registerEvent.apply(Event, arguments);
