@@ -185,6 +185,7 @@ In order to actually use the library, the javascript and css files will also hav
   Locale::Messages
   Locale::TextDomain
   HTML::Parser
+  Cwd
 
 =head1 TODO
 

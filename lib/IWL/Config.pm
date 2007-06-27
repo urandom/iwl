@@ -114,7 +114,8 @@ if (!exists $IWLConfig{JS_DIR}) {
     if ($ENV{IWL_CONFIG_FILE} && -s $ENV{IWL_CONFIG_FILE}) {
 	parse_conf($ENV{IWL_CONFIG_FILE});
     } else {
-	use Cwd qw(abs_path);
+	require Cwd;
+	import Cwd qw(abs_path);
 
 	my $script_path = abs_path($0);
 	my $conf;
