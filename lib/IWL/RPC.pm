@@ -212,7 +212,11 @@ sub __defaultEvent {
     $params->{userData}{value} = $params->{value} if exists $params->{value};
     my ($data, $user_extras) = $handler->($params->{userData})
         if 'CODE' eq ref $handler;
-    $data = {} unless (ref $data eq 'ARRAY' || ref $data eq 'HASH') || $params->{update};
+    if (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
+	$data = objToJson($data);
+    } else {
+	$data = qq|"$data"| unless $params->{update};
+    }
 
     if ($params->{update}) {
 	IWL::Object::printHTMLHeader;
@@ -223,7 +227,7 @@ sub __defaultEvent {
 	}
     } else {
 	IWL::Object::printJSONHeader;
-	print '{data: ' . objToJson($data) . ', user_extras: ' . (objToJson($user_extras) || 'null') . '}';
+	print '{data: ' . $data . ', user_extras: ' . (objToJson($user_extras) || 'null') . '}';
     }
 }
 
