@@ -748,6 +748,9 @@ div.druid_page_selected {
     color: inherit;
     background-color: white;
 }
+div.druid_button_container {
+    float: right;
+}
 
 /* Notebook */
 div.notebook_navgroup {

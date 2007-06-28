@@ -15,6 +15,7 @@ use IWL::Combo;
 use IWL::Comment;
 use IWL::Container;
 use IWL::Contentbox;
+use IWL::Druid::Page;
 use IWL::Druid;
 use IWL::Entry;
 use IWL::File;

@@ -215,6 +215,7 @@ t/40list.t
 t/40submitimage.t
 t/40textarea.t
 t/41combo.t
+t/41druid.t
 t/41navbar.t
 t/50radiobutton.t
 t/iwl.conf
@@ -235,6 +236,7 @@ lib/IWL/Tree/Row.pm
 lib/IWL/Tree/Cell.pm
 lib/IWL/Menu/Item.pm
 lib/IWL/List/Definition.pm
+lib/IWL/Druid/Page.pm
 lib/IWL/Script.pm
 lib/IWL/SubmitImage.pm
 lib/IWL/String.pm

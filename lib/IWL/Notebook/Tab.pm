@@ -105,6 +105,16 @@ sub setSelected {
     return $self;
 }
 
+=item B<isSelected>
+
+Returns true if the tab is the currently selected one
+
+=cut
+
+sub isSelected {
+    return shift->{__selected};
+}
+
 # Overrides
 #
 sub setId {
@@ -124,11 +134,11 @@ sub setId {
 sub _setupDefaultClass {
     my $self = shift;
 
-    if ($self->{__selected}) {
-	$self->SUPER::prependClass($self->{_defaultClass} . '_selected');
+    if ($self->isSelected) {
+	$self->prependClass($self->{_defaultClass} . '_selected');
 	$self->{_page}->prependClass('notebook_page_selected');
     }
-    $self->SUPER::prependClass($self->{_defaultClass});
+    $self->prependClass($self->{_defaultClass});
     $self->{_page}->prependClass('notebook_page');
     $self->{__anchor}->prependClass($self->{_defaultClass} . '_anchor');
 }
@@ -142,7 +152,7 @@ sub __init {
 
     $self->{_tag} = 'li';
     $self->{_defaultClass} = 'notebook_tab';
-    $args{id} = randomize($self->{_defaultClass}) if !$args{id};
+    $args{id} ||= randomize($self->{_defaultClass});
 
     $self->{_page} = $page;
     $self->{__anchor} = $anchor;

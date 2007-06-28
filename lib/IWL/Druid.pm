@@ -12,6 +12,7 @@ use IWL::Label;
 use IWL::Button;
 use IWL::Script;
 use IWL::Break;
+use IWL::Druid::Page;
 
 use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
@@ -42,13 +43,8 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->{_noChildren} = 0;
-
     # The list of pages
     $self->{__pages} = [];
-
-    # Current page index
-    $self->{__current} = 0;
 
     $self->__init(%args);
 
@@ -99,7 +95,8 @@ Parameters: B<PAGE> - a druid page
 
 sub showFinish {
     my ($self, $page) = @_;
-    return $page->setAttribute('iwl:druidLastPage' => 1);
+    $page->showFinish;
+    return $self;
 }
 
 # Overrides
@@ -109,38 +106,38 @@ sub setId {
 
     $self->SUPER::setId($id);
     $self->{__content}->setId($id . '_content');
+    $self->{__buttonContainer}->setId($id . '_button_container');
     $self->{__backButton}->setId($id . '_back_button');
     $self->{__nextButton}->setId($id . '_next_button');
 
-    for (my $i = 0; $i < @{$self->{__pages}}; $i++) {
-        $self->{__pages}[$i]->setId($id . '_page_' . $i);
-    }
     return $self;
 }
 
 # Protected
 #
 sub _realize {
-    my $self = shift;
-    my $id = $self->getId;
+    my $self     = shift;
+    my $script   = IWL::Script->new;
+    my $id       = $self->getId;
+    my $selected = 0;
 
     $self->SUPER::_realize;
-    $self->{__init}->setScript("Druid.create('$id', '" . escape($self->{__finishText}) . "')");
+    foreach my $page (@{$self->{__pages}}) {
+        last if $selected = $page->isSelected;
+    }
+    $self->{__pages}[0]->setSelected(1) if !$selected;
+    $script->setScript(
+        "Druid.create('$id', '" . escape($self->{__finishText}) . "')");
+    $self->_appendAfter($script);
 }
 
 sub _setupDefaultClass {
     my $self = shift;
-    my $index = 0;
 
     $self->SUPER::prependClass($self->{_defaultClass});
     $self->{__content}->prependClass($self->{_defaultClass} . '_content');
-
-    foreach my $page (@{$self->{__pages}}) {
-	if ($self->{__current} == $index++) {
-	    $page->prependClass($self->{_defaultClass} . '_page_selected');
-	}
-        $page->prependClass($self->{_defaultClass} . '_page');
-    }
+    $self->{__buttonContainer}->prependClass($self->{_defaultClass} . '_button_container');
+    return $self;
 }
 
 # Internal
@@ -152,22 +149,20 @@ sub __init {
       IWL::Button->newFromStock('IWL_STOCK_BACK', size => 'medium');
     my $next_button =
       IWL::Button->newFromStock('IWL_STOCK_NEXT', size => 'medium');
-    my $button_container = IWL::Container->new(class => $args{id} . '_button_container');
-    my $init = IWL::Script->new;
-    my $span = IWL::Break->new(style => {clear => 'both'});
+    my $button_container = IWL::Container->new;
+    my $span             = IWL::Break->new(style => {clear => 'both'});
 
-    $self->{_defaultClass} = 'druid';
-    $self->{__content}     = $content;
-    $self->{__backButton}  = $back_button;
-    $self->{__nextButton}  = $next_button;
-    $self->{__init}        = $init;
-    $self->{__finishText}  = $__->{'Finish'};
+    $self->{_defaultClass}     = 'druid';
+    $self->{__content}         = $content;
+    $self->{__backButton}      = $back_button;
+    $self->{__nextButton}      = $next_button;
+    $self->{__buttonContainer} = $button_container;
+    $self->{__finishText}      = $__->{'Finish'};
     $self->appendChild($content);
     $button_container->appendChild($back_button);
     $button_container->appendChild($next_button);
     $self->appendChild($button_container);
     $self->appendChild($span);
-    $self->appendChild($init);
 
     my $id = $args{id} || randomize($self->{_defaultClass});
     delete @args{qw(id)};
@@ -181,25 +176,18 @@ sub __init {
 }
 
 sub __setup_page {
-    my ($self, $data, $callback, $param, $current, $reverse) = @_;
-    my $page = IWL::Container->new;
+    my ($self, $data, $callback, $param, $selected, $reverse) = @_;
+    my $page = IWL::Druid::Page->new;
     my $index;
 
-    $page->{_customSignals} = {select => [], unselect => [], remove => []};
     $page->appendChild($data);
-    if ($callback) {
-	my $param = objToJson([$param]) if $param;
-        $param ||= 'null';
-        $page->setAttribute('iwl:druidCheckCallback' => "$callback", 'none');
-	$page->setAttribute('iwl:druidCheckParam' => $param, 'escape') if $param;
-    }
+    $page->setCheckCB($callback, $param);
     if ($reverse) {
         $index = unshift @{$self->{__pages}}, $page;
     } else {
         $index = push @{$self->{__pages}}, $page;
     }
-    $index--;
-    $self->{__current} = $index if $current;
+    $page->setSelected($selected);
 
     if ($reverse) {
         $self->{__content}->prependChild($page);
@@ -207,7 +195,6 @@ sub __setup_page {
         $self->{__content}->appendChild($page);
     }
 
-    $self->setId($self->getId);
     return $page;
 }
 
