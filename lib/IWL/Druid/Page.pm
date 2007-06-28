@@ -8,13 +8,8 @@ use strict;
 use base 'IWL::Container';
 
 use IWL::String qw(randomize escape);
-use IWL::Label;
-use IWL::Button;
-use IWL::Script;
-use IWL::Break;
 
 use JSON;
-use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 
@@ -51,14 +46,31 @@ sub new {
 
 =over 4
 
-=item B<showFinish>
+=item B<setFinal> (B<BOOL>)
 
 Makes the page the last one, thus changing the 'next' button to a 'finish'
 
 =cut
 
-sub showFinish {
-    return shift->setAttribute('iwl:druidLastPage' => 1);
+sub setFinal {
+    my ($self, $bool) = @_;
+
+    if ($bool) {
+	$self->setAttribute('iwl:druidLastPage' => 1);
+    } else {
+	$self->deleteAttribute('iwl:druidLastPage');
+    }
+    return $self;
+}
+
+=item B<isFinal>
+
+Returns true if the page is the final page in the druid
+
+=cut
+
+sub isFinal {
+    return shift->getAttribute('iwl:druidLastPage', 1);
 }
 
 =item B<setSelected> (B<BOOL>)

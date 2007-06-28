@@ -205,6 +205,7 @@ t/31page.t
 t/40checkbox.t
 t/40combo_option.t
 t/40contentbox.t
+t/40druid_page.t
 t/40entry.t
 t/40file.t
 t/40frame.t

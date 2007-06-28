@@ -8,7 +8,6 @@ use strict;
 use base 'IWL::Container';
 
 use IWL::String qw(randomize escape);
-use IWL::Label;
 use IWL::Button;
 use IWL::Script;
 use IWL::Break;
@@ -95,7 +94,7 @@ Parameters: B<PAGE> - a druid page
 
 sub showFinish {
     my ($self, $page) = @_;
-    $page->showFinish;
+    $page->setFinal(1);
     return $self;
 }
 
