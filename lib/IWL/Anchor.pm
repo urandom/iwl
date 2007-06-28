@@ -129,6 +129,22 @@ sub setText {
     return $self->appendChild($text_obj);
 }
 
+=item B<getText>
+
+Rethrs the text of the anchor
+
+=cut
+
+sub getText {
+    my ($self) = @_;
+    my $text_label = '';
+    foreach (@{$self->{childNodes}}) {
+	$text_label .= $_->getContent if $_->isa('IWL::Text');
+    }
+
+    return $text_label;
+}
+
 1;
 
 =head1 LICENCE AND COPYRIGHT

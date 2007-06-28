@@ -198,6 +198,7 @@ t/30form.t
 t/30image.t
 t/30input.t
 t/30label.t
+t/30notebook_tab.t
 t/30page_body.t
 t/30parser.t
 t/31button.t

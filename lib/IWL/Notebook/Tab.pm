@@ -8,6 +8,8 @@ use strict;
 use base qw(IWL::Widget);
 
 use JSON;
+use IWL::Anchor;
+use IWL::Container;
 use IWL::String qw(randomize);
 
 =head1 NAME
@@ -88,6 +90,16 @@ sub setTitle {
 
     $self->{__anchor}->setText($text);
     return $self;
+}
+
+=item B<getTitle>
+
+Returns the title of the tab
+
+=cut
+
+sub getTitle {
+    return shift->{__anchor}->getText;
 }
 
 =item B<setSelected> (B<BOOL>)

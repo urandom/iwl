@@ -170,11 +170,9 @@ sub setText {
     return $self;
 }
 
-=item B<getText> (B<TEXT>)
+=item B<getText>
 
-setText sets the given text string to the label widget.
-
-Parameters: TEXT - the text string
+Rethrs the text of the label
 
 =cut
 
@@ -185,7 +183,7 @@ sub getText {
         if ($_->isa('IWL::Break')) {
             $text_label .= "\n";
         } else {
-            $text_label .= $_->getContent;
+            $text_label .= $_->getContent if $_->isa('IWL::Text');
         }
     }
 
