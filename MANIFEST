@@ -214,6 +214,7 @@ t/40hbox.t
 t/40hidden.t
 t/40inputbutton.t
 t/40list.t
+t/40notebook.t
 t/40submitimage.t
 t/40textarea.t
 t/41combo.t

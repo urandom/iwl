@@ -7,6 +7,7 @@ use strict;
 
 use base 'IWL::Container';
 
+use IWL::List;
 use IWL::Label;
 use IWL::Notebook::Tab;
 use IWL::String qw(randomize);
