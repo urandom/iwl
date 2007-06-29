@@ -62,7 +62,18 @@ sub setImage {
     my ($self, $src, $alt) = @_;
 
     $self->{image}->setAlt($alt);
-    return $self->{image}->set($src);
+    $self->{image}->set($src);
+    return $self;
+}
+
+=item B<getImage>
+
+Returns the icon image
+
+=cut
+
+sub getImage {
+    return shift->{image};
 }
 
 =item B<setText> (B<TEXT>)
@@ -80,6 +91,16 @@ sub setText {
     return $self;
 }
 
+=item B<getText>
+
+Returns the text of the icon label
+
+=cut
+
+sub getText {
+    return shift->{__label}->getText;
+}
+
 =item B<setSelected> (B<BOOL>)
 
 Sets whether the icon should be selected.
@@ -91,12 +112,18 @@ Parameters: B<BOOL> - true if the icon should be selected;
 sub setSelected {
     my ($self, $bool) = @_;
 
-    if ($bool) {
-	$self->{_selected} = 1;
-    } else {
-	$self->{_selected} = 0;
-    }
+    $self->{_selected} = $bool ? 1 : 0;
     return $self;
+}
+
+=item B<isSelected>
+
+Returns true if the icon is selected
+
+=cut
+
+sub isSelected {
+    return !(!shift->{_selected});
 }
 
 =item B<setDimensions> (B<WIDTH>, [B<HEIGHT>])
@@ -112,17 +139,21 @@ Note: the dimension units should be provided. Thus, the above parameters will be
 sub setDimensions {
     my ($self, $width, $height) = @_;
 
-    #    if ($height) {
-    #        $self->{image}->setStyle(height => $height, width => $width);
-    #    } else {
-    #        $self->{image}->setStyle(width => $width);
-    #    }
+    $self->{image}->setStyle(height  => $height) if $height;
     $self->{__label}->setStyle(width => $width);
-    return $self->setStyle(width    => $width);
+    return $self->setStyle(width     => $width);
 }
 
 # Overrides
 #
+sub setId {
+    my ($self, $id) = @_;
+
+    $self->{image}->setId($id . '_image');
+    $self->{__label}->setId($id . '_label');
+    return $self->SUPER::setId($id);
+}
+
 sub signalConnect {
     my ($self, $signal, $callback) = @_;
     if ($signal eq 'load') {
@@ -163,10 +194,9 @@ sub __init {
 
     $args{id} ||= randomize($self->{_defaultClass});
 
-    $self->setStyle(margin => $args{margin} || '5px');
     $self->setStyle(float => $args{direction}) if $args{direction};
     $self->{__label}->{_defaultClass} = "icon_label";
-    delete @args{qw(margin direction)};
+    delete @args{qw(direction)};
 
     $self->appendChild($self->{image});
     $self->appendChild($self->{__label});

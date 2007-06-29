@@ -212,6 +212,7 @@ t/40file.t
 t/40frame.t
 t/40hbox.t
 t/40hidden.t
+t/40iconbox_icon.t
 t/40inputbutton.t
 t/40list.t
 t/40notebook.t
