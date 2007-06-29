@@ -12,7 +12,7 @@ is($icon->setText('Some text'), $icon);
 is($icon->getText, 'Some text');
 is($icon->setSelected(1), $icon);
 ok($icon->isSelected);
-like($icon->getContent, qr(^<div (?:(?:class="(icon)"|id="(\1_\d+)")\s*){2}><img (?:(?:alt="Alt text"|src="/foo/alpha.jpg"|id="\2_image"|onload=".*?")\s*){4}/>
+like($icon->getContent, qr(^<div (?:(?:class="(icon)"|id="(\1_\d+)")\s*){2}><img (?:(?:alt="Alt text"|src="/foo/alpha.jpg"|id="\2_image"|onload=".*?"|class="\1_image")\s*){5}/>
 <p (?:(?:class="\1_label"|id="\2_label")\s*){2}>Some text</p>
 </div>
 $)s);

@@ -5,7 +5,7 @@ package IWL::Iconbox::Icon;
 
 use strict;
 
-use base qw(IWL::Container IWL::RPC::Request);
+use base qw(IWL::Container);
 
 use IWL::Image;
 use IWL::Label;
@@ -195,6 +195,7 @@ sub __init {
     $args{id} ||= randomize($self->{_defaultClass});
 
     $self->setStyle(float => $args{direction}) if $args{direction};
+    $self->{image}{_defaultClass} = "icon_image";
     $self->{__label}->{_defaultClass} = "icon_label";
     delete @args{qw(direction)};
 

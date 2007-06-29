@@ -152,12 +152,13 @@ div.iconbox_icons_container {
     border: 2px inset white;
 }
 
-div.iconbox_status {
+div.iconbox_status_label {
     border: 1px solid #6A81A3;
     padding: 2px;
     overflow: hidden;
     text-overflow:ellipsis;
     vertical-align: middle;
+    height: 1.5em;
 }
 
 div.iconbox {

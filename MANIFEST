@@ -220,6 +220,7 @@ t/40submitimage.t
 t/40textarea.t
 t/41combo.t
 t/41druid.t
+t/41iconbox.t
 t/41navbar.t
 t/50radiobutton.t
 t/iwl.conf
