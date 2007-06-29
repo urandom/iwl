@@ -54,13 +54,15 @@ sub new {
 
 Sets the image of the icon to the one provided 
 
-Parameters: B<IMAGE> - the location of the image, B<ALT> - the alt text of the image
+Parameters: B<IMAGE> - the url, or the stock id of the image, B<ALT> - the alt text of the image
 
 =cut
 
 sub setImage {
     my ($self, $src, $alt) = @_;
 
+    $src = IWL::Stock->new()->getSmallImage($src) if
+      defined $src && $src =~ /^IWL_STOCK_/;
     $self->{image}->setAlt($alt);
     $self->{image}->set($src);
     return $self;
