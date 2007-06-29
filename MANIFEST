@@ -225,6 +225,7 @@ t/41iconbox.t
 t/41navbar.t
 t/50radiobutton.t
 t/50menu.t
+t/50menubar.t
 t/iwl.conf
 t/test.html
 lib/IWL/Table/Row.pm
