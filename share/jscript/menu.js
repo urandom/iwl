@@ -314,8 +314,8 @@ Object.extend(Object.extend(MenuItem, Widget), {
 
 	if (submenu) {
 	    this.appendChild(submenu);
-	    if (!this.hasClassName('menubar_label')) {
-		this.firstChild.addClassName('menu_label_parent');
+	    if (!this.hasClassName('menubar_item_label')) {
+		this.firstChild.addClassName('menu_item_label_parent');
 	    }
 	}
     },

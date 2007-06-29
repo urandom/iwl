@@ -142,7 +142,7 @@ sub setSubmenu {
     $self->appendChild($submenu);
     unless ($self->{__parentType} eq 'menubar') {
         $submenu->appendClass('submenu');
-        $self->{__label}->appendClass('menu_label_parent');
+        $self->{__label}->appendClass('menu_item_label_parent');
     }
     return $self->{__submenu} = $submenu;
 }
@@ -201,6 +201,15 @@ sub isDisabled {
     return shift->hasClass('menu_item_disabled');
 }
 
+# Overrides
+#
+sub setId {
+    my ($self, $id) = @_;
+
+    $self->{__label}->setId($id . '_label');
+    return $self->SUPER::setId($id);
+}
+
 # Protected
 #
 sub _realize {
@@ -234,11 +243,7 @@ sub __init {
 
     $self->{__type} = 'none';
     $self->{__parentType} = $parentType;
-    if ($parentType eq 'menubar') {
-        $label->setClass('menubar_label');
-    } else {
-        $label->setClass('menu_label');
-    }
+    $label->{_defaultClass} = $parentType eq 'menubar' ? 'menubar_item_label' : 'menu_item_label';
     $self->{_customSignals} = {change => [], select => [], unselect => []};
 }
 

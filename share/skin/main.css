@@ -911,7 +911,7 @@ li.menubar_item {
     color: #545b63;
     line-height: 19px;
 }
-span.menubar_label {
+span.menubar_item_label {
     padding: 2px 2px 6px 2px;
     cursor: pointer;
 }
@@ -966,7 +966,7 @@ li.menu_item_disabled {
     color: #aaaaaa;
 }
 
-span.menu_label, span.menu_label_parent {
+span.menu_item_label, span.menu_item_label_parent {
     padding-left: 24px;
     padding-right: 0;
     display: block;
@@ -974,7 +974,7 @@ span.menu_label, span.menu_label_parent {
     white-space: nowrap;
     font-size: 9pt;
 }
-span.menu_label_parent {
+span.menu_item_label_parent {
     background: url(<IMAGE_PREFIX>/menu/menu_next.gif) no-repeat right;
     cursor: default;
     margin-right: 5px;
