@@ -127,6 +127,7 @@ sub bindToWidget {
     my $id = $self->getId;
 
     $widget->signalConnect($signal => "\$('$id')._bindPop(event, this)");
+    return $self;
 }
 
 =item B<setMaxHeight> (B<HEIGHT>)
@@ -146,6 +147,16 @@ sub setMaxHeight {
 	$self->{__options}{maxHeight} = 0;
     }
     return $self;
+}
+
+=item B<getMaxHeight>
+
+Returns the max height of the menu
+
+=cut
+
+sub getMaxHeight {
+    return shift->{__options}{maxHeight};
 }
 
 # Protected
@@ -170,7 +181,7 @@ sub __init {
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'menu.js');
-    $self->{__options} = {};
+    $self->{__options} = {maxHeight => 0};
 }
 
 sub __setup_menu_separator {
