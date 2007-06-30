@@ -71,12 +71,26 @@ Parameters: B<TEXT> - the text for the caption
 sub setCaption {
     my ($self, $text) = @_;
 
-    my $caption = IWL::Container->new;
-    my $child   = IWL::Text->new($text);
+    unless ($self->{__caption}) {
+	my $caption = IWL::Container->new;
+	$caption->{_tag} = 'caption';
+	$self->{__caption} = $caption;
+	$self->prependChild($caption);
+    }
+    $self->{__caption}->setChild(IWL::Text->new($text));
+    return $self;
+}
 
-    $caption->{_tag} = 'caption';
-    $caption->appendChild($child);
-    return $self->appendChild($caption);
+=item B<getCaption>
+
+Gets the caption of the table
+
+=cut
+
+sub getCaption {
+    my $self = shift;
+    return '' unless $self->{__caption} && $self->{__caption}{childNodes}[0];
+    return $self->{__caption}{childNodes}[0]->getContent;
 }
 
 =item B<setSummary> (B<TEXT>)
@@ -93,11 +107,21 @@ sub setSummary {
     return $self->setAttribute(summary => $text);
 }
 
+=item B<getSummary>
+
+Gets the summary of the table
+
+=cut
+
+sub getSummary {
+    return shift->getAttribute('summary', 1);
+}
+
 =item B<appendHeader> (B<ROW>)
 
 Appends an array of rows to the header to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Rows
+Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
 
 =cut
 
@@ -105,13 +129,24 @@ sub appendHeader {
     my ($self, $row) = @_;
 
     $self->{_header}->appendChild($row);
-    if ($row->isa("IWL::Table::Row") || $row->isa("IWL::Tree::Row")) {
-        $row->setClass($self->{_defaultClass} . "_header_row");
-        $row->setId($self->getId
-              . "_header_row_"
-              . (@{$self->{_header}{childNodes}} - 1))
-          if $self->getId && !$row->getId;
-    }
+    $row->appendClass($self->{_defaultClass} . "_header_row");
+
+    return $self;
+}
+
+=item B<prependHeader> (B<ROW>)
+
+Prepends an array of rows to the header to the table. 
+
+Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+
+=cut
+
+sub prependHeader {
+    my ($self, $row) = @_;
+
+    $self->{_header}->prependChild($row);
+    $row->appendClass($self->{_defaultClass} . "_header_row");
 
     return $self;
 }
@@ -120,7 +155,7 @@ sub appendHeader {
 
 Appends an array of rows to the body to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Rows
+Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
 
 =cut
 
@@ -129,21 +164,41 @@ sub appendBody {
 
     $self->{_body}->appendChild($row);
 
-    if ($row->isa("IWL::Table::Row")) {
-        unless ($row->{_defaultClass}) {
-            if ($self->{__alternate}) {
-                if (@{$self->{_body}{childNodes}} % 2) {
-                    $row->setClass($self->{_defaultClass} . "_body_row");
-                } else {
-                    $row->setClass($self->{_defaultClass} . "_body_row_alt");
-                }
-            } else {
-                $row->setClass($self->{_defaultClass} . "_body_row");
-            }
-        }
-        $row->setId(
-            $self->getId . "_body_row_" . (@{$self->{_body}{childNodes}} - 1))
-          if $self->getId && !$row->getId;
+    if ($self->{__alternate}) {
+	if (@{$self->{_body}{childNodes}} % 2) {
+	    $row->appendClass($self->{_defaultClass} . "_body_row");
+	} else {
+	    $row->appendClass($self->{_defaultClass} . "_body_row_alt");
+	}
+    } else {
+	$row->appendClass($self->{_defaultClass} . "_body_row");
+    }
+
+    return $self;
+}
+
+=item B<prependBody> (B<ROW>)
+
+Prepends an array of rows to the body to the table. 
+
+Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+
+=cut
+
+sub prependBody {
+    my ($self, $row) = @_;
+
+    $self->{_body}->prependChild($row);
+    if ($self->{__alternate}) {
+	for (my $i = 0; $i < @{$self->{_body}{childNodes}}; ++$i) {
+	    if ($i % 2) {
+		$row->appendClass($self->{_defaultClass} . "_body_row_alt");
+	    } else {
+		$row->appendClass($self->{_defaultClass} . "_body_row");
+	    }
+	}
+    } else {
+	$row->appendClass($self->{_defaultClass} . "_body_row");
     }
 
     return $self;
@@ -153,7 +208,7 @@ sub appendBody {
 
 Appends an array of rows to the footer to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Rows
+Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
 
 =cut
 
@@ -161,13 +216,24 @@ sub appendFooter {
     my ($self, $row) = @_;
 
     $self->{_footer}->appendChild($row);
-    if ($row->isa("IWL::Table::Row") || $row->isa("IWL::Tree::Row")) {
-	$row->setClass($self->{_defaultClass} . "_footer_row");
-        $row->setId($self->getId
-              . "_footer_row_"
-              . (@{$self->{_footer}{childNodes}} - 1))
-          if $self->getId && !$row->getId;
-    }
+    $row->appendClass($self->{_defaultClass} . "_footer_row");
+
+    return $self;
+}
+
+=item B<prependFooter> (B<ROW>)
+
+Prepends an array of rows to the footer to the table. 
+
+Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+
+=cut
+
+sub prependFooter {
+    my ($self, $row) = @_;
+
+    $self->{_footer}->prependChild($row);
+    $row->appendClass($self->{_defaultClass} . "_footer_row");
 
     return $self;
 }
@@ -187,6 +253,18 @@ sub setHeaderStyle {
     return $self;
 }
 
+=item B<getHeaderStyle> ([B<ATTR>])
+
+Gets the style of the header
+
+Parameters: B<ATTR> - the attribute style property to be returned
+
+=cut
+
+sub getHeaderStyle {
+    return shift->{_header}->getStyle(shift);
+}
+
 =item B<setBodyStyle> (B<STYLE>)
 
 Sets the style of the body
@@ -202,6 +280,18 @@ sub setBodyStyle {
     return $self;
 }
 
+=item B<getBodyStyle> ([B<ATTR>])
+
+Gets the style of the body
+
+Parameters: B<ATTR> - the attribute style property to be returned
+
+=cut
+
+sub getBodyStyle {
+    return shift->{_body}->getStyle(shift);
+}
+
 =item B<setFooterStyle> (B<STYLE>)
 
 Sets the style of the footer
@@ -215,6 +305,18 @@ sub setFooterStyle {
 
     $self->{_footer}->setStyle(%style);
     return $self;
+}
+
+=item B<getFooterStyle> ([B<ATTR>])
+
+Gets the style of the footer
+
+Parameters: B<ATTR> - the attribute style property to be returned
+
+=cut
+
+sub getFooterStyle {
+    return shift->{_footer}->getStyle(shift);
 }
 
 =item B<setAlternate> (B<BOOL>)

@@ -40,8 +40,10 @@ sub new {
 
     $self->{_tag}  = "tr";
     $self->{_defaultClass} = 'table_row';
-    $id ||= randomize($self->{_defaultClass});
-    $self->setId($id);
+    unless ($args{id}) {
+	$id ||= randomize($self->{_defaultClass});
+	$self->setId($id);
+    }
 
     return $self;
 }

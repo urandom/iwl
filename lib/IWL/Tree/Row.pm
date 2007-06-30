@@ -447,18 +447,6 @@ sub _rebuildPath {
     return $self;
 }
 
-sub _parentNumber {
-    my ($self, $num) = @_;
-    my $parent_row = $self->{_parentRow};
-
-    if ($parent_row) {
-        $num++;
-        $num = $parent_row->_parentNumber($num);
-    }
-
-    return $num;
-}
-
 sub _getAncestor {
     my ($self, $num) = @_;
     my $row = $self;
