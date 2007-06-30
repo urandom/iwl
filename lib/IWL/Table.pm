@@ -191,10 +191,13 @@ sub prependBody {
     $self->{_body}->prependChild($row);
     if ($self->{__alternate}) {
 	for (my $i = 0; $i < @{$self->{_body}{childNodes}}; ++$i) {
+	    my $r = $self->{_body}{childNodes}[$i];
+	    $r->removeClass($self->{_defaultClass} . "_body_row");
+	    $r->removeClass($self->{_defaultClass} . "_body_row_alt");
 	    if ($i % 2) {
-		$row->appendClass($self->{_defaultClass} . "_body_row_alt");
+		$r->appendClass($self->{_defaultClass} . "_body_row_alt");
 	    } else {
-		$row->appendClass($self->{_defaultClass} . "_body_row");
+		$r->appendClass($self->{_defaultClass} . "_body_row");
 	    }
 	}
     } else {
@@ -345,7 +348,7 @@ Returns whether the rows of the table will alternate
 =cut
 
 sub isAlternating {
-    return shift->{__alternate};
+    return !(!shift->{__alternate});
 }
 
 # Overrides
