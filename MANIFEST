@@ -201,8 +201,11 @@ t/30label.t
 t/30notebook_tab.t
 t/30page_body.t
 t/30parser.t
+t/30table_cell.t
+t/30table_container.t
 t/31button.t
 t/31page.t
+t/31table_row.t
 t/40checkbox.t
 t/40combo_option.t
 t/40contentbox.t

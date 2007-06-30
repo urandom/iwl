@@ -61,36 +61,21 @@ Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for 
 sub appendHeaderCell {
     my ($self, $object, %attrs) = @_;
 
-    return $self->__append_cell($object, %attrs, 'header');
+    return $self->__append_cell($object, \%attrs, 'header');
 }
 
-=item B<appendCell> (B<OBJECT>, [B<ATTRS>])
+=item B<prependHeaderCell> (B<OBJECT>, [B<ATTRS>])
 
-Adds a regular cell to the row, with B<OBJECT> as it's content.
+Prepends a header cell to the row, with B<OBJECT> as it's content.
 
 Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
 
 =cut
 
-sub appendCell {
+sub prependHeaderCell {
     my ($self, $object, %attrs) = @_;
 
-    return $self->__append_cell($object, %attrs);
-}
-
-=item B<appendTextCell> (B<TEXT>, [B<ATTRS>])
-
-Adds a regular cell to the row, with B<TEXT> as it's text content.
-
-Parameters: B<TEXT> - the text to fill the cell, B<ATTRS> - hash of attributes for the cell
-
-=cut
-
-sub appendTextCell {
-    my ($self, $text, %attrs) = @_;
-
-    my $text_obj = IWL::Text->new($text);
-    return $self->appendCell($text_obj, %attrs);
+    return $self->__prepend_cell($object, \%attrs, 'header');
 }
 
 =item B<appendTextHeaderCell> (B<TEXT>, [B<ATTRS>])
@@ -104,17 +89,85 @@ Parameters: B<TEXT> - the text to fill the cell, B<ATTRS> - hash of attributes f
 sub appendTextHeaderCell {
     my ($self, $text, %attrs) = @_;
 
-    my $text_obj = IWL::Text->new($text);
-    $attrs{type} = 'header';
-    return $self->appendCell($text_obj, %attrs);
+    return $self->appendHeaderCell(IWL::Text->new($text), %attrs);
+}
+
+=item B<prependTextHeaderCell> (B<TEXT>, [B<ATTRS>])
+
+Prepends a header cell to the row, with B<TEXT> as it's text content.
+
+Parameters: B<TEXT> - the text to fill the cell, B<ATTRS> - hash of attributes for the cell
+
+=cut
+
+sub prependTextHeaderCell {
+    my ($self, $text, %attrs) = @_;
+
+    return $self->prependHeaderCell(IWL::Text->new($text), %attrs);
+}
+
+=item B<appendCell> (B<OBJECT>, [B<ATTRS>])
+
+Adds a regular cell to the row, with B<OBJECT> as it's content.
+
+Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
+
+=cut
+
+sub appendCell {
+    my ($self, $object, %attrs) = @_;
+
+    return $self->__append_cell($object, \%attrs);
+}
+
+=item B<prependCell> (B<OBJECT>, [B<ATTRS>])
+
+Prepends a regular cell to the row, with B<OBJECT> as it's content.
+
+Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
+
+=cut
+
+sub prependCell {
+    my ($self, $object, %attrs) = @_;
+
+    return $self->__prepend_cell($object, \%attrs);
+}
+
+=item B<appendTextCell> (B<TEXT>, [B<ATTRS>])
+
+Adds a regular cell to the row, with B<TEXT> as it's text content.
+
+Parameters: B<TEXT> - the text to fill the cell, B<ATTRS> - hash of attributes for the cell
+
+=cut
+
+sub appendTextCell {
+    my ($self, $text, %attrs) = @_;
+
+    return $self->appendCell(IWL::Text->new($text), %attrs);
+}
+
+=item B<prependTextCell> (B<TEXT>, [B<ATTRS>])
+
+Prepends a regular cell to the row, with B<TEXT> as it's text content.
+
+Parameters: B<TEXT> - the text to fill the cell, B<ATTRS> - hash of attributes for the cell
+
+=cut
+
+sub prependTextCell {
+    my ($self, $text, %attrs) = @_;
+
+    return $self->prependCell(IWL::Text->new($text), %attrs);
 }
 
 # Internal
 #
 sub __append_cell {
-    my ($self, $data, %attrs, $type) = @_;
+    my ($self, $data, $attrs, $type) = @_;
 
-    my $cell = IWL::Table::Cell->new(type => $type, %attrs);
+    my $cell = IWL::Table::Cell->new(type => $type, %$attrs);
     $cell->appendChild($data);
     $self->appendChild($cell);
 
@@ -123,6 +176,22 @@ sub __append_cell {
 
     return $cell;
 }
+
+sub __prepend_cell {
+    my ($self, $data, $attrs, $type) = @_;
+
+    my $cell = IWL::Table::Cell->new(type => $type, %$attrs);
+    $cell->appendChild($data);
+    $self->prependChild($cell);
+
+    $cell->{_row} = $self;
+    for (my $i = 0; $i < @{$self->{childNodes}}; ++$i) {
+	$self->{childNodes}[$i]{_colNum} = $i;
+    }
+
+    return $cell;
+}
+
 1;
 
 =head1 LICENCE AND COPYRIGHT

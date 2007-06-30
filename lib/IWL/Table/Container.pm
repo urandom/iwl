@@ -30,16 +30,16 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    if (!$args{type}) {
+    if (!$args{type} || $args{type} eq 'body') {
         $self->{_tag} = "tbody";
     } elsif ($args{type} eq "header") {
-        delete $args{type};
         $self->{_tag} = "thead";
     } elsif ($args{type} eq "footer") {
         $self->{_tag} = "tfoot";
     } else {
         $self->{_tag} = "tbody";
     }
+    delete $args{type};
     $self->{_removeEmpty} = 1;
     $self->_constructorArguments(%args);
 
