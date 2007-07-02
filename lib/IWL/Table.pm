@@ -8,6 +8,7 @@ use strict;
 use base 'IWL::Widget';
 
 use IWL::Table::Container;
+use IWL::Container;
 use IWL::Text;
 use IWL::String qw(randomize);
 
@@ -71,12 +72,6 @@ Parameters: B<TEXT> - the text for the caption
 sub setCaption {
     my ($self, $text) = @_;
 
-    unless ($self->{__caption}) {
-	my $caption = IWL::Container->new;
-	$caption->{_tag} = 'caption';
-	$self->{__caption} = $caption;
-	$self->prependChild($caption);
-    }
     $self->{__caption}->setChild(IWL::Text->new($text));
     return $self;
 }
@@ -89,7 +84,7 @@ Gets the caption of the table
 
 sub getCaption {
     my $self = shift;
-    return '' unless $self->{__caption} && $self->{__caption}{childNodes}[0];
+    return '' unless $self->{__caption}{childNodes}[0];
     return $self->{__caption}{childNodes}[0]->getContent;
 }
 
@@ -356,9 +351,10 @@ sub isAlternating {
 sub setId {
     my ($self, $id) = @_;
     $self->SUPER::setId($id);
-    $self->{_header}->setId($id . '_header') if ($self->{_header});
-    $self->{_body}->setId($id . '_body')     if ($self->{_body});
-    $self->{_footer}->setId($id . '_footer') if ($self->{_footer});
+    $self->{_header}->setId($id . '_header');
+    $self->{_body}->setId($id . '_body');
+    $self->{_footer}->setId($id . '_footer');
+    $self->{__caption}->setId($id . '_caption');
 
     return $self;
 }
@@ -370,8 +366,9 @@ sub _setupDefaultClass {
 
     $self->prependClass($self->{_defaultClass});
     $self->{_header}->prependClass($self->{_defaultClass} . '_header');
-    $self->{_footer}->prependClass($self->{_defaultClass} . '_body');
-    $self->{_body}->prependClass($self->{_defaultClass} . '_footer');
+    $self->{_footer}->prependClass($self->{_defaultClass} . '_footer');
+    $self->{__caption}->prependClass($self->{_defaultClass} . '_caption');
+    $self->{_body}->prependClass($self->{_defaultClass} . '_body');
 }
 
 # Internal
@@ -383,29 +380,27 @@ sub __init {
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     my $class = $args{class} || $self->{_defaultClass};
 
-    my $header = IWL::Table::Container->new(
-        id    => "$args{id}_header",
-        type  => 'header',
-    );
-    my $body = IWL::Table::Container->new(
-        id    => "$args{id}_body",
-    );
-    my $footer = IWL::Table::Container->new(
-        id    => "$args{id}_footer",
-        type  => 'footer',
-    );
+    my $header = IWL::Table::Container->new(type  => 'header');
+    my $footer = IWL::Table::Container->new(type  => 'footer');
+    my $body = IWL::Table::Container->new;
+    my $caption = IWL::Container->new;
+
+    $caption->{_removeEmpty} = 1;
+    $caption->{_tag} = 'caption';
     $body->{_removeEmpty} = 0;
-    $self->_constructorArguments(%args);
 
-    $self->{_header} = $header;
-    $self->{_footer} = $footer;
-    $self->{_body}   = $body;
+    $self->{_header}   = $header;
+    $self->{_footer}   = $footer;
+    $self->{_body}     = $body;
+    $self->{__caption} = $caption;
 
+    $self->prependChild($caption);
     $self->appendChild($header);
     $self->appendChild($body);
     $self->appendChild($footer);
 
     $self->{__alternate} = 0;
+    $self->_constructorArguments(%args);
 
     return $self;
 }
