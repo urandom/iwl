@@ -8,7 +8,7 @@ use strict;
 use IWL::Script;
 use IWL::String qw(randomize escape);
 
-use base qw(IWL::Table IWL::RPC::Request);
+use base qw(IWL::Table);
 
 use Scalar::Util qw(weaken);
 use JSON;

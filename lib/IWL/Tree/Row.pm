@@ -5,7 +5,7 @@ package IWL::Tree::Row;
 
 use strict;
 
-use base qw(IWL::Table::Row IWL::RPC::Request);
+use base qw(IWL::Table::Row);
 
 use IWL::Tree::Cell;
 use IWL::Container;
