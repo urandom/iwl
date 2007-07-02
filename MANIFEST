@@ -223,11 +223,13 @@ t/40menu_item.t
 t/40notebook.t
 t/40submitimage.t
 t/40textarea.t
+t/40tree_cell.t
 t/41combo.t
 t/41druid.t
 t/41iconbox.t
 t/41navbar.t
 t/41pagecontrol.t
+t/41tree_row.t
 t/41upload.t
 t/50radiobutton.t
 t/50menu.t

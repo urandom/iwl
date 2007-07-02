@@ -14,7 +14,7 @@ use IWL::Table::Row;
 <th>Foo</th>
 <th>Bar</th>
 </tr>
-$)s);
+$)s); #"
 }
 
 {
@@ -29,5 +29,5 @@ $)s);
 <td>Foo</td>
 <td>Bar</td>
 </tr>
-$)s);
+$)s); #"
 }
