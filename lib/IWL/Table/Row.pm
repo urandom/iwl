@@ -169,11 +169,11 @@ sub prependTextCell {
 sub __append_cell {
     my ($self, $data, $attrs, $type) = @_;
 
-    my $cell = IWL::Table::Cell->new(type => $type, %$attrs);
+    my $cell = $self->__create_cell($type, $attrs);;
     $cell->appendChild($data);
     $self->appendChild($cell);
 
-    $cell->{_row}     = $self;
+    $cell->{_row}    = $self;
     $cell->{_colNum} = @{$self->{childNodes}} - 1;
 
     return $cell;
@@ -182,7 +182,7 @@ sub __append_cell {
 sub __prepend_cell {
     my ($self, $data, $attrs, $type) = @_;
 
-    my $cell = IWL::Table::Cell->new(type => $type, %$attrs);
+    my $cell = $self->__create_cell($type, $attrs);;
     $cell->appendChild($data);
     $self->prependChild($cell);
 
@@ -192,6 +192,11 @@ sub __prepend_cell {
     }
 
     return $cell;
+}
+
+sub __create_cell {
+    my ($self, $type, $attrs) = @_;
+    return IWL::Table::Cell->new(type => $type, %$attrs);
 }
 
 1;

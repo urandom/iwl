@@ -92,8 +92,6 @@ Adds a row as a child of another row in the tree.
 
 Parameters: B<ROW> - the row to be appended
 
-Returns undef if the parent row doesn't belong to a tree, or no child row is passed
-
 =cut
 
 sub appendRow {
@@ -104,11 +102,32 @@ sub appendRow {
     push @{$self->{_children}}, $row;
     $self->{_isParent} = 1;
 
-    my $id = @{$self->{_children}} - 1;
-    $row->{_childId} = $id;
-    if ($row->{_childId} > 0) {
-        $self->{_children}[$id - 1]->{_lastRow} = 0;
+    my $total = @{$self->{_children}} - 1;
+    $self->{_children}[$total - 1]->{_lastRow} = 0;
+
+    weaken($row->{_parentRow} = $self);
+    if ($self->{_tree}) {
+	$row->{_tree} = $self->{_tree};
     }
+    $row->_rebuildPath;
+    return $self;
+}
+
+=item B<prependRow> (B<ROW>)
+
+Prepends a row as a child of another row in the tree.
+
+Parameters: B<ROW> - the row to be prepended 
+
+=cut
+
+sub prependRow {
+    my ($self, $row) = @_;
+
+    return unless $row;
+
+    unshift @{$self->{_children}}, $row;
+    $self->{_isParent} = 1;
 
     weaken($row->{_parentRow} = $self);
     if ($self->{_tree}) {
@@ -168,7 +187,8 @@ Makes the row a parent row, even if it currently has no children
 sub makeParent {
     my $self = shift;
 
-    return $self->{_isParent} = 1;
+    $self->{_isParent} = 1;
+    return $self;
 }
 
 =item B<getPath>
@@ -191,9 +211,16 @@ Sets the row's path explicitly. The path then can be used to append child rows.
 
 sub setPath {
     my $self = shift;
-    my $path = shift;
+    my @path = @_;
+    my $path;
+    if (ref $path[0] eq 'ARRAY') {
+	$path = $path[0];
+    } else {
+	$path = \@path;
+    }
 
     $self->{path} = $path;
+    $self->_rebuildPath;
     return $self;
 }
 
@@ -257,17 +284,14 @@ sub setSelected {
     return $self;
 }
 
-=item B<setAjaxExpand> (B<url>, B<params>)
+=item B<isSelected>
 
-Sets the _is_parent flag on. Thus the row will be presented as expandable for the ajax expansion.
-It will also set to call URL with params for the expansion.
+Returns true if the row is selected
 
 =cut
 
-sub setAjaxExpand {
-    my ($self, $url, $params) = @_;
-
-    return $self->registerEvent('IWL-Tree-Row-expand', $url, $params);
+sub isSelected {
+    return !(!shift->{_selected});
 }
 
 sub setNotLast {
@@ -303,6 +327,17 @@ sub getFirstChildRow {
     my $self = shift;
 
     return $self->{_children}[0];
+}
+
+=item B<getLastChildRow>
+
+Returns the last child row of the current row
+
+=cut
+
+sub getLastChildRow {
+    my $self = shift;
+    return $self->{_children}[-1];
 }
 
 =item getFromPath (B<PATH>)
@@ -364,12 +399,6 @@ sub getContent {
 
     $self->__prepend_nav if $self->{__navigation} && !$list;
     return $self->SUPER::getContent;
-}
-
-sub appendCell {
-    my ($self, $data, %attrs) = @_;
-
-    return $self->__append_cell($data, %attrs);
 }
 
 # Protected
@@ -479,18 +508,9 @@ sub __prepend_nav {
     return $self;
 }
 
-sub __append_cell {
-    my ($self, $data, %attrs) = @_;
-
-    my $cell = IWL::Tree::Cell->new(%attrs);
-    $cell->appendChild($data);
-    $self->appendChild($cell);
-    my $col_num = @{$self->{childNodes}} - 1;
-
-    $cell->{_row}     = $self;
-    $cell->{_colNum} = $col_num;
-
-    return $cell;
+sub __create_cell {
+    my ($self, $type, $attrs) = @_;
+    return IWL::Tree::Cell->new(type => $type, %$attrs);
 }
 
 1;
