@@ -231,6 +231,7 @@ t/41navbar.t
 t/41pagecontrol.t
 t/41tree_row.t
 t/41upload.t
+t/42tree.t
 t/50radiobutton.t
 t/50menu.t
 t/50menubar.t

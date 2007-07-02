@@ -115,6 +115,16 @@ sub setList {
     return $self;
 }
 
+=item B<isList>
+
+Returns true if the tree is a list
+
+=cut
+
+sub isList {
+    return !(!shift->{_options}{list});
+}
+
 =item B<setSortableCallback> (B<COL_INDEX>, B<JS_CALLBACK>)
 
 Sets the callback to provide the sorting function for the tree/list, based on the column with index B<COL_NUM>
@@ -143,6 +153,19 @@ sub appendRow {
     return $self->appendBody($row);
 }
 
+=item B<prependRow> (B<ROW>)
+
+Prepeds an array of rows to the body to the tree. An alias to the B<prependBody> method.
+
+Parameters: B<ROW> - a row of IWL::Tree::Row(3pm)
+
+=cut
+
+sub prependRow {
+    my ($self, $row) = @_;
+    return $self->prependBody($row);
+}
+
 
 # Overrides
 #
@@ -164,6 +187,20 @@ sub appendBody {
     return $self;
 }
 
+sub prependBody {
+    my ($self, $row) = @_;
+
+    $self->{_body}->prependChild($row);
+    $self->{_bodyRows}{$row} = 1;
+    weaken($row->{_tree} = $self);
+    $self->__flag_children($row);
+    unshift @{$self->{_body}{_children}}, $row;
+
+    $row->_rebuildPath;
+
+    return $self;
+}
+
 sub appendHeader {
     my ($self, $row) = @_;
     weaken($row->{_tree} = $self);
@@ -171,10 +208,23 @@ sub appendHeader {
     $self->SUPER::appendHeader($row);
 }
 
+sub prependHeader {
+    my ($self, $row) = @_;
+    weaken($row->{_tree} = $self);
+    $row->setNavigation(0);
+    $self->SUPER::prependHeader($row);
+}
+
 sub appendFooter {
     my ($self, $row) = @_;
     weaken($row->{_tree} = $self);
     $self->SUPER::appendFooter($row);
+}
+
+sub prependFooter {
+    my ($self, $row) = @_;
+    weaken($row->{_tree} = $self);
+    $self->SUPER::prependFooter($row);
 }
 
 # Protected
@@ -202,9 +252,6 @@ sub _realize {
     $options->{scrollToSelection} = "true" if $self->{_options}{scrollToSelection};
     $options = objToJson($options);
 
-    $self->{_header}->prependClass($self->{_defaultClass} . '_header');
-    $self->{_footer}->prependClass($self->{_defaultClass} . '_footer');
-    $self->{_body}->prependClass($self->{_defaultClass} . '_body');
     $self->_set_alternate if $self->{_options}{alternate};
 
     my $images = qq({b:"$b",i:"$i",l:"$l",l_e:"$l_e",l_c:"$l_c",t:"$t",t_e:"$t_e",t_c:"$t_c"});

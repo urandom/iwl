@@ -7,7 +7,7 @@ use IWL::Tree::Row;
 	my $child1 = IWL::Tree::Row->new, my $child2 = IWL::Tree::Row->new, my $child3 = IWL::Tree::Row->new;
 	isa_ok($child1->prependTextHeaderCell('Bar'), 'IWL::Tree::Cell');
 	isa_ok($child2->prependCell(IWL::Text->new('Foo')), 'IWL::Tree::Cell');
-	is($row->appendRow($child1), $row);
+	is($row->prependRow($child1), $row);
 	is($row->appendRow($child2), $row);
 	is($child1->appendRow($child3), $child1);
 	is_deeply($row->getChildRows, [$child1, $child3, $child2]);
