@@ -746,7 +746,7 @@ sub show_the_code_for {
     my $paragraph = IWL::Label->new;
 
     if ($code_for eq 'buttons_container') {
-	$paragraph->appendTextType(read_code("generate_buttons", 22), 'pre');
+	$paragraph->appendTextType(read_code("generate_buttons", 24), 'pre');
     } elsif ($code_for eq 'entries_container') {
 	$paragraph->appendTextType(read_code("generate_entries", 24), 'pre');
     } elsif ($code_for eq 'images_container') {
@@ -770,7 +770,8 @@ sub show_the_code_for {
     } elsif ($code_for eq 'contentbox_container') {
 	$paragraph->appendTextType(read_code("generate_contentbox", 22), 'pre');
     } elsif ($code_for eq 'druid_container') {
-	$paragraph->appendTextType(read_code("generate_druid", 15), 'pre');
+	$paragraph->appendTextType(read_code("generate_druid", 18), 'pre');
+	$paragraph->appendTextType(read_code("Druid handler", 11), 'pre');
     } elsif ($code_for eq 'notebook_container') {
 	$paragraph->appendTextType(read_code("generate_notebook", 15), 'pre');
     } elsif ($code_for eq 'tooltips_container') {
