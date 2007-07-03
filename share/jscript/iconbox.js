@@ -420,7 +420,7 @@ Object.extend(Object.extend(Icon, Widget), {
 	if (prev) prev.setSelected(true);
 	dom_parent.removeChild(this);
 	this.iconbox.icons = this.iconbox.icons.without(this);
-	var message = this.iconbox.messages['delete'].replace(/{TITLE}/, title);
+	var message = unescape(this.iconbox.messages['delete']).replace(/{TITLE}/, title);
 	this.iconbox.statusbarPush(message);
 	this.iconbox._alignIconsVertically();
 	this.emitSignal('remove');

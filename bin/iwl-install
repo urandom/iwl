@@ -79,14 +79,16 @@ sub prefix_replace {
     my $image = $skindir . '/default' . $imagedir;
     my $icon  = $skindir . '/default' . $icondir;
 
+	return if $image eq '/iwl/skin/default/images' && $icon eq '/iwl/skin/default/images/icons';
+
     foreach my $file (@_) {
         next unless -f $file && -r $file && -w $file;
         local *FILE;
         my $content = '';
         open FILE, $file;
         while (<FILE>) {
-            $_ =~ s/<IMAGE_PREFIX>/$image/;
-            $_ =~ s/<ICON_PREFIX>/$icon/;
+            $_ =~ s,/iwl/skin/default/images,$image,;
+            $_ =~ s,/iwl/skin/default/images/icons,$icon,;
             $content .= $_;
         }
         close FILE;

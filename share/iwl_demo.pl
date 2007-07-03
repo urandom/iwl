@@ -292,9 +292,9 @@ sub generate_entries {
     $image_entry->setIconFromStock('IWL_STOCK_SAVE', 'left', 1);
     $image_entry->{image1}->signalConnect(click => updaterCallback(
 	    'entries_container', 'iwl_demo.pl',
-	    parameters => 'text: $F("image_entry_text") || false',
+	    parameters => "text: \$F('image_entry_text') || false",
 	    insertion => 'bottom',
-	    onComplete => 'displayStatus("Completed")',
+	    onComplete => q|displayStatus.bind(this, 'Completed')|,
     ));
     return $container->getObject;
 }
@@ -413,7 +413,7 @@ sub generate_menus {
     $menubar->appendMenuItem('Edit', undef, id => 'edit_mi')->setSubmenu($edit_menu);
     $menubar->appendMenuSeparator;
     $menubar->appendMenuItem('Help', undef, id => 'help_mi', class => 'demo')->
-      signalConnect('click' => q|displayStatus("Don't panic!")|);
+      signalConnect('click' => q|displayStatus('Don\\'t panic!')|);
 
     $file_menu->appendMenuItem('Open')->setClass('demo');
     $file_menu->appendMenuItem('Save', 'IWL_STOCK_SAVE');
