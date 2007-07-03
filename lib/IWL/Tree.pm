@@ -287,7 +287,7 @@ sub _refreshEvent {
 
     print '{rows: ['
            . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
-           . '], user_extras: ' . (objToJson($user_extras) || 'null'). '}';
+           . '], userExtras: ' . (objToJson($user_extras) || 'null'). '}';
 }
 
 # Internal

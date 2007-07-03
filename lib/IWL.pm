@@ -190,10 +190,6 @@ In order to actually use the library, the javascript and css files will also hav
 
 =head1 TODO
 
-=head2 General
-
- - Write more testcases
-
 =head2 Perl
 
  - Add more stock items to IWL::Stock

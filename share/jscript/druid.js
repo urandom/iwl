@@ -166,9 +166,13 @@ Object.extend(Object.extend(Page, Widget), {
 	} else {
 	    if (!this.isSelected()) return;
 	    var callback;
-	    if (this.check.callback && !ignoreCheck) {
-		if (window[this.check.callback]) var retval = window[this.check.callback].call(this, this.check.param);
-		if (!retval) return;
+	    if (!ignoreCheck) {
+		if (this.check.callback) {
+		    if (window[this.check.callback]) var retval = window[this.check.callback].call(this, this.check.param);
+		    if (!retval) return;
+		} else if (this.emitEvent('IWL-Druid-Page-check', {onComplete: this.__completeCheck.bind(this)})) {
+		    return;
+		}
 	    }
 	    this.removeClassName(base_class + '_selected');
 	    this.hide();
@@ -248,5 +252,13 @@ Object.extend(Object.extend(Page, Widget), {
 
 	if (prev) this.druid.backButton.setStyle({visibility: 'visible'});
 	else this.druid.backButton.setStyle({visibility: 'hidden'});
+    },
+    __completeCheck: function(data, params) {
+	if (!data.userExtras.deter) {
+	    var next = this.nextPage();
+	    if (next) next.setSelected(true, true);
+	} else {
+	    eval(data.data);
+	}
     }
 });

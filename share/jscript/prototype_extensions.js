@@ -88,7 +88,7 @@ Object.extend(Event, {
 	});
       }
     }
-    return element;
+    return Event;
   },
   prepareEvents: function(element) {
     if (!(element = $(element))) return;
@@ -99,14 +99,14 @@ Object.extend(Event, {
       for (var name in events)
 	Event.registerEvent(element, name, events[name][0], events[name][1]);
       element.preparedEvents = true;
-      return element;
+      return Event;
     }
   },
   emitEvent: function(element, eventName, params) {
     if (!(element = $(element))) return;
     if (!('handlers' in element) || !(eventName in element['handlers'])) return;
     element['handlers'][eventName](params);
-    return element;
+    return Event;
   },
   /* ================================================ */
           
@@ -298,16 +298,16 @@ var ElementMethods = {
   },
   /* = IWL RPC ======================================*/
   registerEvent: function(element, eventName, url, params) {
-    Event.registerEvent.apply(Event, arguments);
-    return $A(arguments).first();        
+    if (Event.registerEvent.apply(Event, arguments))
+      return $A(arguments).first();        
   },
   prepareEvents: function(element) {
-    Event.prepareEvents.apply(Event, arguments);
-    return $A(arguments).first();       
+    if (Event.prepareEvents.apply(Event, arguments))
+      return $A(arguments).first();       
   },
   emitEvent: function(element, eventName, params) {
-    Event.emitEvent.apply(Event, arguments);
-    return $A(arguments).first();  
+    if (Event.emitEvent.apply(Event, arguments))
+      return $A(arguments).first();  
   },
   /*==================================================*/
 

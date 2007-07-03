@@ -215,7 +215,8 @@ sub __defaultEvent {
     if (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
 	$data = objToJson($data);
     } else {
-	$data = qq|"$data"| unless $params->{update};
+	$data = $data ? qq|"$data"| : "''"
+	  unless $params->{update};
     }
 
     if ($params->{update}) {
@@ -227,7 +228,7 @@ sub __defaultEvent {
 	}
     } else {
 	IWL::Object::printJSONHeader;
-	print '{data: ' . $data . ', user_extras: ' . (objToJson($user_extras) || 'null') . '}';
+	print '{data: ' . $data . ', userExtras: ' . (objToJson($user_extras) || 'null') . '}';
     }
 }
 

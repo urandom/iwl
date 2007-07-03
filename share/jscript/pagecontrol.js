@@ -158,7 +158,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	    };
 	    var options = {page: page[data.type]};
 	} else {
-	    var options = json.user_extras;
+	    var options = json.userExtras;
 	}
 	if (options) {
 	    if (options.page)

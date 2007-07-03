@@ -90,6 +90,18 @@ EOF
     }
 );
 
+# Druid handler
+$rpc->handleEvent(
+    'IWL-Druid-Page-check',
+    sub {
+	my $params = shift;
+	my $extra = {};
+
+	$extra->{deter} = 1 unless $params->{check};
+	return "displayStatus('To proceed to the next page, select the checkbox and try again.')", $extra;
+    }
+);
+
 if (my $file = $form{upload_file}) {
     my $name = $file->[1];
     IWL::Upload::printMessage("$name uploaded.");
@@ -547,15 +559,19 @@ sub generate_contentbox {
 
 sub generate_druid {
     my $container = IWL::Container->new(id => 'druid_container');
-    my $druid = IWL::Druid->new(id => 'druid');
+    my $druid = IWL::Druid->new(id => 'druid')->setStyle(width => '300px');
     my $label1 = IWL::Label->new;
     my $label2 = IWL::Label->new;
 
-    $container->appendChild($druid);
-    $druid->appendPage($label1)->signalConnect(remove => "displayStatus('Page 1 removed.')");;
+    my $page1 = $druid->appendPage($label1)->signalConnect(remove => "displayStatus('Page 1 removed.')");;
     $druid->appendPage($label2)->signalConnect(select => "displayStatus('Page 2 selected.')");
+    $container->appendChild($druid);
     $label1->setText('This is page 1');
     $label2->setText('This is page 2');
+    $page1->appendChild(IWL::Checkbox->new(id => 'druid_check'));
+    $page1->registerEvent('IWL-Druid-Page-check', 'iwl_demo.pl', {
+	    onStart => q|params.check = $('druid_check').checked|
+    });
 
     return $container->getObject;
 }
