@@ -1,3 +1,10 @@
+Release: 0.47 - 03/07/07
+	Speedups in Internet Explorer. Internally escape every string that is
+	passed to the browser using an 'escape' compatible function.
+	Complete test coverage
+	Documentation improvements
+	More methods
+
 Release: 0.46 - 25/06/07
 	Changed the order of the parameter passing in handleEvent
 	And some minor issues
