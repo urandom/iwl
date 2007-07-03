@@ -47,6 +47,16 @@ Where B<STOCK_ID> is the B<IWL::Stock> id.
         medium - 20px in height,
 	small - 13px in height,
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the button has finished loading and adjusting
+
+=back
+
 =cut
 
 sub new {

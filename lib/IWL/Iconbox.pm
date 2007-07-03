@@ -35,6 +35,24 @@ Where B<%ARGS> is an optional hash parameter with with key-value options. These 
   height: height of the iconbox without the borders
   multipleSelect: true if the iconbox should be able to select multiple icons
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<select_all>
+
+Fires when all the icons have been selected
+
+=item B<unselect_all>
+
+Fires when all the icons have been unselected
+
+=item B<load>
+
+Fires when the iconbox and its icons have finished loading
+
+=back
+
 =cut
 
 sub new {

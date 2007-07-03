@@ -30,6 +30,24 @@ IWL::Menu::Item->new ([B<%ARGS>])
 Where B<%ARGS> is an optional hash parameter with with key-values.
   - parentType - 'menu' (default) or 'menubar'
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<select>
+
+Fires when the item is selected
+
+=item B<unselect>
+
+Fires when the item is unselected
+
+=item B<change>
+
+Fires when the item's state has been changed. Only menu radio and check menu items fire this signal
+
+=back
+
 =cut
 
 sub new {

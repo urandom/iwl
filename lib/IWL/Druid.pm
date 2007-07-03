@@ -34,6 +34,16 @@ IWL::Druid->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<current_page_change>
+
+Fires when the current page of the druid has changed
+
+=back
+
 =cut
 
 sub new {

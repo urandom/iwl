@@ -30,6 +30,16 @@ IWL::Notebook->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<current_tab_change>
+
+Fires when the current tab of the notebook has changed
+
+=back
+
 =cut
 
 sub new {

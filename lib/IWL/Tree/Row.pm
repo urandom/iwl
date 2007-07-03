@@ -30,10 +30,35 @@ The Row widget provides a row for IWL::Tree. It inherits from IWL::Table::Row.
 
 IWL::Tree::Row->new ()
 
-=head1 NOTICE
+=head1 SIGNALS
 
-A valid ID attirbute for the row is required for most of the additional features to work.
-It is recommended to always set the ID of a IWL::Tree::Row object, although it is not enforced to do so.
+=over 4
+
+=item B<select>
+
+Fires when the row is selected
+
+=item B<unselect>
+
+Fires when the row is unselected
+
+=item B<remove>
+
+Fires when the row is removed
+
+=item B<activate>
+
+Fires when the row is activated
+
+=item B<collapse>
+
+Fires when the row has collapsed
+
+=item B<expand>
+
+Fires when the row has expanded
+
+=back
 
 =cut
 

@@ -48,6 +48,16 @@ IWL::Contentbox->new ([B<%ARGS>])
   closeModalOnClick 
              - makes the window close when the user clicks outside of it
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<close>
+
+Fires when the contentbox has closed
+
+=back
+
 =cut
 
 sub new {

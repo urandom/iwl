@@ -39,6 +39,32 @@ Where B<%ARGS> is an optional hash parameter with with key-values:
   alternate: true if the tree should alternate
   animate: true if the tree should animate the collapse of its rows
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<select_all>
+
+Fires when all rows of the tree have been selected
+
+=item B<unselect_all>
+
+Fires when all rows of the tree have been unselected
+
+=item B<row_activate>
+
+Fires when a row has been activated by double-clicking on it, or pressing [Enter]
+
+=item B<row_collapse>
+
+Fires when a row has collapsed
+
+=item B<row_expand>
+
+Fires when a row has expanded
+
+=back
+
 =cut
 
 sub new {

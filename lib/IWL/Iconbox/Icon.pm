@@ -33,6 +33,28 @@ Where B<%ARGS> is an optional hash parameter with with key-value options. These 
   direction: the direction in which the icon will float in the iconbox
   margin: the margin around the icon. Defaults to '5px'
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<select>
+
+Fires when the icon is selected
+
+=item B<unselect>
+
+Fires when the icon is unselected
+
+=item B<remove>
+
+Fires when the icon is removed
+
+=item B<activate>
+
+Fires when the icon is activated
+
+=back
+
 =cut
 
 sub new {

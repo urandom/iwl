@@ -32,6 +32,24 @@ IWL::PageControl->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the pagecontrol has finished loading
+
+=item B<current_page_is_changing>
+
+Fires when the current page of the pagecontrol begins to change
+
+=item B<current_page_change>
+
+Fires when the current page of the pagecontrol has changed
+
+=back
+
 =cut
 
 sub new {

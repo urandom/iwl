@@ -30,6 +30,24 @@ IWL::Notebook::Tab->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<select>
+
+Fires when the tab is selected
+
+=item B<unselect>
+
+Fires when the tab is unselected
+
+=item B<remove>
+
+Fires when the tab is removed
+
+=back
+
 =cut
 
 sub new {

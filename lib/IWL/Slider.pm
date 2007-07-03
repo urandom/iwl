@@ -31,6 +31,20 @@ IWL::Slider->new ([B<%ARGS>])
 Where B<%ARGS> is an optional hash parameter with with key-values.
   disabled: true if the slider is disabled
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<change>
+
+Fires when the value of the slider has changed
+
+=item B<slide>
+
+Fires when the slider position has changed
+
+=back
+
 =cut
 
 sub new {
@@ -179,9 +193,9 @@ sub setId {
 sub signalConnect {
     my ($self, $signal, $callback) = @_;
     if ($signal eq 'change') {
-	push @{$self->{_customSignals}{change}}, $callback;
+	push @{$self->{__sliderSignals}{change}}, $callback;
     } elsif ($signal eq 'slide') {
-	push @{$self->{_customSignals}{slide}}, $callback;
+	push @{$self->{__sliderSignals}{slide}}, $callback;
     } else {
         $self->SUPER::signalConnect($signal, $callback);
     }
@@ -210,8 +224,8 @@ sub _realize {
     }
     $self->SUPER::_realize;
 
-    $onchange = join ';', @{$self->{_customSignals}{change}};
-    $onslide = join ';', @{$self->{_customSignals}{slide}};
+    $onchange = join ';', @{$self->{__sliderSignals}{change}};
+    $onslide = join ';', @{$self->{__sliderSignals}{slide}};
     $onchange = "onChange: function(value, control) { " . $onchange . " }" if $onchange;
     $onslide = "onSlide: function(value, control) { " . $onslide . " }" if $onslide;
     $range = "range: $self->{__range}" if $self->{__range};
@@ -277,7 +291,7 @@ sub __init {
     $self->{_options}{disabled} = 1 if $args{disabled};
     $self->{_options}{sliderValue} = 1 if $args{value};
     $self->{_options}{axis} = $args{vertical} ? 'vertical' : '';
-    $self->{_customSignals} = {slide => [], change => []};
+    $self->{__sliderSignals} = {slide => [], change => []};
     delete @args{qw(disabled value)};
     $self->requiredJs('base.js', 'dist/slider.js');
     $self->_constructorArguments(%args);
