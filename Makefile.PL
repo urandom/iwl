@@ -9,7 +9,7 @@ requires		'File::ShareDir' => 0.05;
 requires		'HTML::Parser' => 2.25;
 requires		'Cwd' => 3.10;
 
-build_requires	'Test::Weaken' => 0.99;
+build_requires	'Task::Weaken' => 0.99;
 recommends		'Syntax::Highlight::Perl' => 1.00;
 
 install_script	'bin/iwl-install';
