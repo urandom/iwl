@@ -10,7 +10,6 @@
     margin: 2px;
 }
 #contentbox_container {
-    width: 600px;
     height: 600px;
 }
 #contentbox {
@@ -22,6 +21,7 @@
 }
 #main_notebook {
     margin-left: 10px;
+    width: 500px;
 }
 .demo, .demo_label, div.demo span.button_label_default, .demo * {
     color: #4546d0;
@@ -49,11 +49,10 @@ span.c_misc {
     color: #bf6c33;
 }
 #menus_container {
-    height: 150px;
-    width: 200px;
+    height: 250px;
 }
 #menus_container div.button {
-    margin: 40px auto;
+    margin: 100px auto;
     float: none;
 }
 #rpc_button, #rpc_combo, #rpc_label {
