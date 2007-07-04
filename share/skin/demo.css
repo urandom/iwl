@@ -63,3 +63,6 @@ span.c_misc {
 #rpc_label {
     width: 15em;
 }
+#source_page {
+    overflow: auto;
+}
