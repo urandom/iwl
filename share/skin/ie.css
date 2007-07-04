@@ -15,3 +15,6 @@ div.notebook_content {
     width: 99.7%;
     margin-top: 0;
 }
+div.shadowbox div.contentbox_footerr {
+    padding-bottom: 1px;
+}
