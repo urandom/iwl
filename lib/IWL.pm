@@ -61,7 +61,7 @@ use IWL::Upload;
 
 use vars qw($VERSION);
 
-$VERSION = '0.47';
+$VERSION = '0.48';
 
 1;
 
@@ -71,7 +71,7 @@ IWL - A widget library for the web
 
 =head1 VERSION
 
-This documentation refers to B<IWL> version 0.47
+This documentation refers to B<IWL> version 0.48
 
 =head1 SYNOPSIS
 

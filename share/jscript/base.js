@@ -375,3 +375,15 @@ function tryEval(text, total) {
 	setTimeout(function () {if (++total < 20) tryEval(text, total)}, 500);
     }
 }
+
+var browser_css = function() {
+    var b = Prototype.Browser;
+    var class_name = b.IE7 ? 'ie7' :
+		  b.IE     ? 'ie' :
+		  b.Opera  ? 'opera' :
+		  b.KHTML  ? 'khtml' :
+		  b.WebKit ? 'webkit' :
+		  b.Gecko  ? 'gecko' : 'other';
+    var h = $(document.getElementsByTagName('html')[0]);
+    h.addClassName(class_name);
+}();
