@@ -18,7 +18,7 @@ IWL::Notebook::Tab - a tab used in a notebook
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Notebook::Tab
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Notebook::Tab>
 
 =head1 DESCRIPTION
 

@@ -16,7 +16,7 @@ IWL::RadioButton - a radio button
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Checkbox -> IWL::RadioButton
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Checkbox> -> L<IWL::RadioButton>
 
 =head1 DESCRIPTION
 
@@ -27,8 +27,18 @@ The radio button provides a radio button most commonly used in forms.
 IWL::RadioButton->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  checked: set to true if the check button should be checked on default
-  label: set the label of the checkbutton
+
+=over 4
+
+=item B<checked>
+
+Set to true if the check button should be checked on default
+
+=item B<label>
+
+Set the label of the checkbutton
+
+=back
 
 =cut
 

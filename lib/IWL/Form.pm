@@ -13,7 +13,7 @@ IWL::Form - a form object
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Form
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Form>
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ The form object provides the B<<form>> html markup, with all it's attributes.
 
 IWL::Form->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<form>> markup would have.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>formE<gt>> markup would have.
 
 =head1 SIGNALS
 

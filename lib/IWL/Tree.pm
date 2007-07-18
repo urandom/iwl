@@ -19,11 +19,11 @@ IWL::Tree - a tree widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Table -> IWL::Tree
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Tree>
 
 =head1 DESCRIPTION
 
-The tree widget provides a container that holds cells arranged in a tree layout, with multiple rows. Inherits from IWL::Table;
+The tree widget provides a container that holds cells arranged in a tree layout, with multiple rows. Inherits from IWL::Table(3pm)
 
 =head1 CONSTRUCTOR
 
@@ -31,13 +31,29 @@ IWL::Tree->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values:
 
-  list: boolean. true if the tree is a list.
-  multipleSelect: true if the iconbox should be able to select multiple
-                  icons
-  scrollToSelection: true if the selected row should be scrolled into
-                     visibility
-  alternate: true if the tree should alternate
-  animate: true if the tree should animate the collapse of its rows
+=over 4
+
+=item B<list>
+
+Boolean. true if the tree is a list.
+
+=item B<multipleSelect>
+
+True if the iconbox should be able to select multiple icons
+
+=item B<scrollToSelection>
+
+True if the selected row should be scrolled into visibility
+
+=item B<alternate>
+
+True if the tree should alternate
+
+=item B<animate>
+
+True if the tree should animate the collapse of its rows
+
+=back
 
 =head1 SIGNALS
 

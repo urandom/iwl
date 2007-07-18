@@ -28,15 +28,17 @@ IWL::Tree::Cell - a cell widget for a tree row
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Table::Cell -> IWL::Tree::Cell
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell> -> L<IWL::Tree::Cell>
 
 =head1 DESCRIPTION
 
-The Cell widget provides a cell for IWL::Tree. It shouldn't be used standalone. It inherits from IWL:Table::Cell
+The Cell widget provides a cell for IWL::Tree(3pm). It shouldn't be used standalone. It inherits from IWL::Table::Cell(3pm)
 
 =head1 CONSTRUCTOR
 
-IWL::Cell->new ()
+IWL::Tree::Cell->new ([B<%ARGS>])
+
+Where B<%ARGS> is an optional hash parameter with with key-values.
 
 =cut
 

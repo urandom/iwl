@@ -16,17 +16,17 @@ IWL::Image - an image widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Image
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Image>
 
 =head1 DESCRIPTION
 
-The Image widget provides a wrapper for the B<<img>> markup tag.
+The Image widget provides a wrapper for the B<E<lt>imgE<gt>> markup tag.
 
 =head1 CONSTRUCTOR
 
 IWL::Image->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<img>> markup would have.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>imgE<gt>> markup would have.
 
 IWL::Image->newFromStock (B<STOCK_ID>, [B<%ARGS>])
 

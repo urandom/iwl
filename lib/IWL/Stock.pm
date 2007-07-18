@@ -12,10 +12,6 @@ use Locale::TextDomain qw(org.bloka.iwl);
 
 IWL::Stock - stock item support
 
-=head1 INHERITANCE
-
-IWL::Object
-
 =head1 DESCRIPTION
 
 The stock object provides an easy reference to stock images and labels for widgets

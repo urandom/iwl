@@ -25,13 +25,21 @@ Registers an event handler to the given event. The event will be processed by a 
 
 Parameters: B<EVENT> - The event name to register. B<URL> the script url, which will provide the event handling. B<PARAMS> - a hash of parameters to be passed to the handler subroutine as a parameter. The following parameters are also interpretted:
 
-  onStart     - a javascript expression to be evaluated before the 
-  		request takes place. It receives I<params> as 
-		an argument
-  onComplete  - a javascript expression to be evaluated after the
-  		request takes place
-  emitOnce    - a boolean flag, causes the event to be emitted only
-  		once
+=over 8
+
+=item B<onStart>
+
+A javascript expression to be evaluated before the request takes place. It receives I<params> as an argument
+
+=item B<onComplete>
+
+A javascript expression to be evaluated after the request takes place
+
+=item B<emitOnce>
+
+A boolean flag, causes the event to be emitted only once
+
+=back
 
 =cut
 

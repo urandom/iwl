@@ -13,7 +13,7 @@ IWL::HBox - A horizontal box container
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::HBox
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::HBox>
 
 =head1 DESCRIPTION
 

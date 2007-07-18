@@ -47,7 +47,7 @@ IWL::Page - The root widget, containing the body and header markup.
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Page
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Page>
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,14 @@ Page is the primary widget of IWL. It acts as a container for everything else an
 IWL::Page->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  simple - true if the page should be a simple document, useful for iframes
+
+=over 4
+
+=item B<simple>
+
+True if the page should be a simple document, useful for iframes
+
+=back
 
 =cut
 

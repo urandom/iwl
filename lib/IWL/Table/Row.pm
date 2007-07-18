@@ -16,7 +16,7 @@ IWL::Table::Row - a row widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Table::Row
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Row>
 
 =head1 DESCRIPTION
 

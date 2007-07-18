@@ -17,7 +17,7 @@ IWL::Upload - a file upload widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Form -> IWL::Upload
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Form> -> L<IWL::Upload>
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,14 @@ The Upload widget is a form widget, with it's own file selector.
 IWL::File->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  action - the form action
+
+=over 4
+
+=item B<action>
+
+The form action
+
+=back
 
 =cut
 

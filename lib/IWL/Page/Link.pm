@@ -13,7 +13,7 @@ IWL::Page::Link - a link object
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Page::Link
+L<IWL::Object> -> L<IWL::Page::Link>
 
 =head1 DESCRIPTION
 

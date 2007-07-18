@@ -18,7 +18,7 @@ IWL::Entry - a text entry widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Entry
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Entry>
 
 =head1 DESCRIPTION
 
@@ -29,10 +29,26 @@ The entry widget is a single-line, text entry, also capable of showing password-
 IWL::Entry->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  password: set to true if the entry is a password field.
-  readonly: set to true if the entry is read-only
-  text: set to whatever string should be shown as a default
-  maxlength: the maximum number of characters the entry can hold
+
+=over 4
+
+=item B<password>
+
+Set to true if the entry is a password field.
+
+=item B<readonly>
+
+Set to true if the entry is read-only
+
+=item B<text>
+
+Set to whatever string should be shown as a default
+
+=item B<maxlength>
+
+The maximum number of characters the entry can hold
+
+=back
 
 =head1 NOTES
 
@@ -253,6 +269,8 @@ Sets the icon that is shown in the entry
 
 Parameters: B<SRC> - the source of the image, B<ALT> - the alternate text of the image, B<POSITION> - the icon position, either "left", or "right" (default: "left"), B<CLICKABLE> - true if the icon is clickable (sets the cursor)
 
+Returns the set image
+
 =cut
 
 sub setIcon {
@@ -280,6 +298,8 @@ sub setIcon {
 Sets the icon that is shown in the entry, from a stock image
 
 Parameters: B<STOCK_ID> - the stock id of the image, B<POSITION> - the icon position, either "left", or "right" (default: "left"), B<CLICKABLE> - true if the icon is clickable (sets the cursor)
+
+Returns the set image
 
 =cut
 
@@ -323,12 +343,23 @@ sub addClearButton {
 Adds auto-completion for the entry
 
 Parameters: B<URL> - the url of the destination script, B<%OPTIONS> - a hash with the following options:
-  paramName - the name of the parameter, which will hold the 
-	      currently written string
-  minChars  - the minimum number of typed character, 
-              in order to invoke an ajax call
-  indicator - id of an element to be shown, during the ajax call
-    
+
+=over 8
+
+=item B<paramName>
+
+The name of the parameter, which will hold the currently written string
+
+=item B<minChars>
+
+The minimum number of typed character, in order to invoke an ajax call
+
+=item B<indicator>
+
+Id of an element to be shown, during the ajax call
+
+=back
+
 =cut
 
 sub setAutoComplete {

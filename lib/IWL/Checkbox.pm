@@ -16,7 +16,7 @@ IWL::Checkbox - a checkbox
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Checkbox
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Checkbox>
 
 =head1 DESCRIPTION
 
@@ -27,8 +27,18 @@ The checkbox provides a checkbox most commonly used in forms.
 IWL::Checkbox->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  checked: set to true if the checkbox should be checked on default
-  label: set the label of the checkbox
+
+=over 4
+
+=item B<checked>
+
+Set to true if the checkbox should be checked on default
+
+=item B<label>
+
+Set the label of the checkbox
+
+=back
 
 =cut
 

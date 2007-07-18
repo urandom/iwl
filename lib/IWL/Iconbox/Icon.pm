@@ -19,7 +19,7 @@ IWL::Iconbox::Icon - an icon widget for the iconbox
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::Iconbox::Icon
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Iconbox::Icon>
 
 =head1 DESCRIPTION
 
@@ -30,8 +30,18 @@ The Icon widget is a basic widget for the iconbox. It features an icon, and a ti
 IWL::Iconbox::Icon->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-value options. These include:
-  direction: the direction in which the icon will float in the iconbox
-  margin: the margin around the icon. Defaults to '5px'
+
+=over 4
+
+=item B<direction>
+
+The direction in which the icon will float in the iconbox
+
+=item B<margin>
+
+The margin around the icon. Defaults to '5px'
+
+=back
 
 =head1 SIGNALS
 

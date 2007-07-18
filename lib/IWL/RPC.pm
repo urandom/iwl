@@ -14,7 +14,7 @@ IWL::RPC - an RPC handler
 
 =head1 INHERITANCE
 
-IWL::RPC
+L<IWL::RPC>
 
 =head1 DESCRIPTION
 

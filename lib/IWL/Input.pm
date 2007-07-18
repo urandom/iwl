@@ -13,7 +13,7 @@ IWL::Input - input widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input>
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ The Input widget provides the base for it's offspring widgets, such as the combo
 
 IWL::Input->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<input>> markup would have.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>inputE<gt>> markup would have.
 
 IWL::Input->newMultipleFromHash (B<NAME> => B<VALUE>, ...)
 

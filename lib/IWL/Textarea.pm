@@ -15,7 +15,7 @@ IWL::Textarea - a text area widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Textarea
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Textarea>
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,14 @@ The text area is a multi-line text entry.
 IWL::Textarea->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  readonly: set to true if the textarea is read-only
+
+=over 4
+
+=item B<readonly>
+
+Set to true if the textarea is read-only
+
+=back
 
 =cut
 

@@ -13,7 +13,7 @@ IWL::Break - A text break widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Break
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Break>
 
 =head1 DESCRIPTION
 

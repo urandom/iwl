@@ -15,7 +15,7 @@ IWL::File - a file upload widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::File
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::File>
 
 =head1 DESCRIPTION
 

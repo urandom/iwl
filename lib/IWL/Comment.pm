@@ -13,7 +13,7 @@ IWL::Comment - a simple comment object
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Text
+L<IWL::Object> -> L<IWL::Text>
 
 =head1 DESCRIPTION
 

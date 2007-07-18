@@ -17,7 +17,7 @@ IWL::Druid::Page - a page in a druid
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::Druid::Page
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Druid::Page>
 
 =head1 DESCRIPTION
 

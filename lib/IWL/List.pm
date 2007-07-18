@@ -16,7 +16,7 @@ IWL::List - a list container
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::List
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List>
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,14 @@ A list widget, for ordered, unordered and definition lists
 IWL::List->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  - type - unordered [default], ordered, definition
+
+=over 4
+
+=item B<type>
+
+I<unordered> [default], I<ordered>, I<definition>
+
+=back
 
 =cut
 

@@ -20,7 +20,7 @@ IWL::Iconbox - an iconbox widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::Iconbox
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Iconbox>
 
 =head1 DESCRIPTION
 
@@ -31,9 +31,22 @@ The iconbox widget provides a container that holds icons.
 IWL::Iconbox->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-value options. These include:
-  width: width of the iconbox without the borders
-  height: height of the iconbox without the borders
-  multipleSelect: true if the iconbox should be able to select multiple icons
+
+=over 4
+
+=item B<width>
+
+Width of the iconbox without the borders
+
+=item B<height>
+
+Height of the iconbox without the borders
+
+=item B<multipleSelect>
+
+True if the iconbox should be able to select multiple icons
+
+=back
 
 =head1 SIGNALS
 

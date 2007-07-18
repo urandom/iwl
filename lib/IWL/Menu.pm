@@ -17,7 +17,7 @@ IWL::Menu - a menu widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::List -> IWL::Menu
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List> -> L<IWL::Menu>
 
 =head1 DESCRIPTION
 

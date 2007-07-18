@@ -51,7 +51,7 @@ IWL::Label - a label widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Label
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Label>
 
 =head1 DESCRIPTION
 
@@ -62,9 +62,14 @@ The Label widget is a basic container widget specifically targeted for holding o
 IWL::Label->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values:
-  expand - true if the label should expand to fill all the given area
-           false if the label should be as long as the text inside it.
-	      (expand => false doesn't work with multi-line labels)
+
+=over 4
+
+=item B<expand>
+
+True if the label should expand to fill all the given area false if the label should be as long as the text inside it. (expand => false doesn't work with multi-line labels)
+
+=back
 
 =cut
 

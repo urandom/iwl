@@ -16,7 +16,7 @@ IWL::Parser - an HTML parser
 
 =head1 INHERITANCE
 
-HTML::Parser -> IWL::Parser
+L<HTML::Parser> -> L<IWL::Parser>
 
 =head1 DESCRIPTION
 

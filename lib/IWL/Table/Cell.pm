@@ -13,7 +13,7 @@ IWL::Table::Cell - a cell widget for a table
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Table::Cell
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell>
 
 =head1 DESCRIPTION
 
@@ -23,8 +23,15 @@ The Cell widget provides a cell for IWL::Table. It shouldn't be used standalone.
 
 IWL::Table::Cell->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<td>> and B<<th>> markup would have, and also:
-  type - "header" or regular if unspecified.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>tdE<gt>> and B<E<lt>thE<gt>> markup would have, and also:
+
+=over 4
+
+=item B<type>
+
+I<header> or regular if unspecified.
+
+=back
 
 =cut
 

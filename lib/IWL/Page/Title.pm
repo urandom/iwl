@@ -15,7 +15,7 @@ IWL::Page::Title - the <title> markup
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Page::Title
+L<IWL::Object> -> L<IWL::Page::Title>
 
 =head1 DESCRIPTION
 

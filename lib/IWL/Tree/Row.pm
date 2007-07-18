@@ -20,15 +20,17 @@ IWL::Tree::Row - a row widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Table::Row -> IWL::Tree::Row
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Row> -> L<IWL::Tree::Row>
 
 =head1 DESCRIPTION
 
-The Row widget provides a row for IWL::Tree. It inherits from IWL::Table::Row.
+The Row widget provides a row for IWL::Tree(3pm). It inherits from IWL::Table::Row(3pm).
 
 =head1 CONSTRUCTOR
 
-IWL::Tree::Row->new ()
+IWL::Tree::Row->new ([B<%ARGS>])
+
+Where B<%ARGS> is an optional hash parameter with with key-values.
 
 =head1 SIGNALS
 

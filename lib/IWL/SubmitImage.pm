@@ -13,9 +13,9 @@ IWL::SubmitImage - an image used as a submit button
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::SubmitImage
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::SubmitImage>
 
-IWL::Object -> IWL::Widget -> IWL::Image -> IWL::SubmitImage
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Image> -> L<IWL::SubmitImage>
 
 =head1 DESCRIPTION
 

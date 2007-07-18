@@ -15,7 +15,7 @@ IWL::Style - a stylesheet object
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Style
+L<IWL::Object> -> L<IWL::Style>
 
 =head1 DESCRIPTION
 

@@ -17,7 +17,7 @@ IWL::Menu::Item - a menu item widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::Menu::Item
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Menu::Item>
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,14 @@ A menu item widget
 IWL::Menu::Item->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  - parentType - 'menu' (default) or 'menubar'
+
+=over 4
+
+=item B<parentType>
+
+I<menu> (default) or I<menubar>
+
+=back
 
 =head1 SIGNALS
 

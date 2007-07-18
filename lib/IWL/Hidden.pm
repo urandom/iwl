@@ -13,7 +13,7 @@ IWL::Hidden - a hidden value field
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Hidden
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Hidden>
 
 =head1 DESCRIPTION
 

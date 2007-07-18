@@ -15,7 +15,7 @@ IWL::InputButton - a input button
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::InputButton
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::InputButton>
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,14 @@ The InputButton provides a regular input of type button
 IWL::InputButton->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  submit: set to true if the input should be of type 'submit'
+
+=over 4
+
+=item B<submit>
+
+Set to true if the input should be of type 'submit'
+
+=back
 
 =cut
 

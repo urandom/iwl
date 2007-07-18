@@ -22,7 +22,7 @@ IWL::Druid - a sequential content widget.
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::Druid
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Druid>
 
 =head1 DESCRIPTION
 

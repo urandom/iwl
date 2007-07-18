@@ -15,17 +15,17 @@ IWL::Script - A script object.
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Script
+L<IWL::Object> -> L<IWL::Script>
 
 =head1 DESCRIPTION
 
-The script object provides the B<<script type="text/javascipt">> html markup, with all it's attributes.
+The script object provides the B<E<lt>script type="text/javascipt"E<gt>> html markup, with all it's attributes.
 
 =head1 CONSTRUCTOR
 
 IWL::Script->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<script>> markup would have.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>scriptE<gt>> markup would have.
 
 =cut
 

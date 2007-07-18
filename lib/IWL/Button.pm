@@ -22,7 +22,7 @@ IWL::Button - a button with a background
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Button
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Button>
 
 =head1 DESCRIPTION
 
@@ -33,19 +33,30 @@ The Button widget is different from a regular Button widget, in that it can be s
 IWL::Button->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  image: set the image of the button
-  alt: set the alt text for the image of the button
-  label: set the label of the button
-  size: default - 26px in height, 
-        medium - 20px in height,
-	small - 13px in height,
+
+=over 4
+
+=item I<image>
+
+Set the image of the button
+
+=item B<alt>
+
+Set the alt text for the image of the button
+
+=item B<label>
+
+Set the label of the button
+
+=item B<size>
+
+default - 26px in height, medium - 20px in height, small - 13px in height,
+
+=back
 
 IWL::Button->newFromStock (B<STOCK_ID>, [B<%ARGS>])
 
 Where B<STOCK_ID> is the B<IWL::Stock> id.
-  size: default - 26px in height, 
-        medium - 20px in height,
-	small - 13px in height,
 
 =head1 SIGNALS
 
@@ -100,7 +111,7 @@ sub setLabel {
 
 =item B<getLabel>
 
-Gets the text of the button label
+Returns the text of the button label
 
 =cut
 

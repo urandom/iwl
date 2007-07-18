@@ -20,7 +20,7 @@ IWL::PageControl - a page control widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::PageControl
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::PageControl>
 
 =head1 DESCRIPTION
 

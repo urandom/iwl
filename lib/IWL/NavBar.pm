@@ -17,7 +17,7 @@ IWL::NavBar - a navigation bar
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::NavBar
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::NavBar>
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,14 @@ The Navigation Bar provides a breadcrumb style navigation
 IWL::NavBar->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
- - delimeter : the delimeter between the crumbs (defaults to "/")
+
+=over 4
+
+=item B<delimete>
+
+The delimeter between the crumbs (defaults to "/")
+
+=back
 
 =cut
 

@@ -18,7 +18,7 @@ IWL::Slider - a sliding control widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Input -> IWL::Slider
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Slider>
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,14 @@ The slider is a sliding control widget for setting values by dragging a handle
 IWL::Slider->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  disabled: true if the slider is disabled
+
+=over 4
+
+=item B<disabled>
+
+True if the slider is disabled
+
+=back
 
 =head1 SIGNALS
 

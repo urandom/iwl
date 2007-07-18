@@ -13,7 +13,7 @@ IWL::Page::Meta - a meta object
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Page::Meta
+L<IWL::Object> -> L<IWL::Page::Meta>
 
 =head1 DESCRIPTION
 

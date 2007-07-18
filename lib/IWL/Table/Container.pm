@@ -11,6 +11,10 @@ use base 'IWL::Widget';
 
 IWL::Table::Container - a container widget for a table
 
+=head1 INHERITANCE
+
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Container>
+
 =head1 DESCRIPTION
 
 The Container widget provides a headers, footers, and a body for IWL::Table. It shouldn't be used standalone.
@@ -20,7 +24,14 @@ The Container widget provides a headers, footers, and a body for IWL::Table. It 
 IWL::Table::Container->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values pairs:
-  type - "header", "footer" or body if unspecified.
+
+=over 4
+
+=item B<type>
+
+I<header>, I<footer> or I<body> if unspecified.
+
+=back
 
 =cut
 

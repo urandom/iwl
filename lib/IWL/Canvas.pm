@@ -13,7 +13,7 @@ IWL::Canvas - a canvas widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Canvas
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Canvas>
 
 =head1 DESCRIPTION
 

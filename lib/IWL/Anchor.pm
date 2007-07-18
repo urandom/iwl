@@ -15,7 +15,7 @@ IWL::Anchor - an anchor widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Anchor
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Anchor>
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ The anchor widget provides a way to associate links to other widgets.
 
 IWL::Anchor->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<a>> markup would have.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>aE<gt>> markup would have.
 
 =head1 SIGNALS
 

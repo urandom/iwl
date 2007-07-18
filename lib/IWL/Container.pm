@@ -13,7 +13,7 @@ IWL::Container - a container widget
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container>
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ The container widget is a basic <div> element in markup notation. It also serves
 
 IWL::Container->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<<div>> markup would have.
+Where B<%ARGS> is an optional hash parameter with with key-values corresponding to the attributes that a regular B<E<lt>divE<gt>> markup would have.
 
 =over 4
 
@@ -34,7 +34,7 @@ it is a block container, default: false.
 
 =item B<tag>
 
-You can use a custom tag like 'h1', 'pre', or whatever you want.
+You can use a custom tag like I<h1>, I<pre>, or whatever you want.
 
 =back
 
@@ -48,7 +48,6 @@ sub new {
 
     if ($args{tag}) {
 	$self->{_tag} = $args{tag};
-	delete $args{tag};
     } else {
 	if ($args{inline}) {
 	    $self->{_tag} = "span";
@@ -56,7 +55,7 @@ sub new {
 	    $self->{_tag} = "div";
 	}
     }
-    delete $args{inline};
+    delete @args{qw(inline tag)};
     $self->_constructorArguments(%args);
 
     return $self;

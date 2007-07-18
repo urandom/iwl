@@ -13,7 +13,7 @@ IWL::List::Definition - a defintion list item
 
 =head1 INHERITANCE
 
-IWL::Object -> IWL::Widget -> IWL::Container -> IWL::List::Definition
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List::Definition>
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,14 @@ Provides a the B<dt> and B<dd> markup elements for use with definition lists.
 IWL::List::Definition->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
-  - type - key [default, the <dt> element], value [the <dd> element]
+
+=over 4
+
+=item B<type>
+
+key [default, the I<dt> element], value [the I<dd> element]
+
+=back
 
 =cut
 
