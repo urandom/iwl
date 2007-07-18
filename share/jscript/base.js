@@ -199,6 +199,7 @@ var disabled_view_cnt = 0;
  * */
 function disableView() {
     var options = Object.extend({
+	fullCover: false,
 	noCover: false,
 	opacity: 0.8 
     }, arguments[0] || {});
@@ -210,13 +211,34 @@ function disableView() {
 
 	var container = $(Builder.node('div', {id: "disabled_view",
 		    className: "disabled_view", style: 'visibility: hidden'}));
-	var rail = Builder.node('div', {"className": "disabled_view_rail"});
-	if (options.opacity < 1.0)
-	    container.setOpacity(options.opacity);
-	container.appendChild(rail);
-	document.body.appendChild(container);
-	container.positionAtCenter();
-	container.setStyle({visibility: 'visible'});
+	var rail = $(Builder.node('div', {id: "disabled_view_rail",
+		    className: "disabled_view_rail", style: 'visibility: hidden'}));
+	if (options.fullCover) {
+	    var page_dims = pageDimensions();
+
+	    container.addClassName('full_cover');
+	    container.setStyle({
+		height: page_dims.height + 'px',
+		width: page_dims.width + 'px'
+	    });
+	    if (options.opacity < 1.0)
+		container.setOpacity(options.opacity);
+	    document.body.appendChild(container);
+	    container.setStyle({visibility: 'visible'});
+	    Event.observe(window, 'resize', function() {
+		var page_dims = pageDimensions();
+		container.setStyle({
+		    height: page_dims.height + 'px',
+		    width: page_dims.width + 'px'
+		});
+	    }.bind(this));
+	} else {
+	    if (options.opacity < 1.0)
+		rail.setOpacity(options.opacity);
+	}
+	document.body.appendChild(rail);
+	rail.positionAtCenter();
+	rail.setStyle({visibility: 'visible'});
     }
 }
 
@@ -230,9 +252,12 @@ function enableView() {
 	document.body.setStyle({cursor: ''});
 	disabled_view_cnt = 0;
 
+	var rail = $('disabled_view_rail');
+	if (!rail) return;
+	rail.remove();
 	var container = $('disabled_view');
-	if (!container) return;
-	document.body.removeChild(container)
+	if (container)
+	    container.remove();
     }
 }
 

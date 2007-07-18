@@ -829,22 +829,18 @@ div.disabled_view {
     top: 0px;
     left: 0px;
     margin: auto;
-    width: 64px;
-    height: 64px;
     z-index: 90;
     background-color: #858c96;
-    color: black;
-    vertical-align: middle;
-    text-align: left;
-    border: 1px solid #454545;
 }
 div.disabled_view_rail {
-    background: transparent url(/iwl/skin/default/images/loader/loader.gif) no-repeat top left;
+    background: transparent url(/iwl/skin/default/images/loader/loader.gif) no-repeat center;
     position: absolute;
-    width: 32px;
-    height: 32px;
-    margin: 16px;
+    width: 64px;
+    height: 64px;
     z-index: 99;
+    background-color: #858c96;
+    color: black;
+    border: 1px solid #454545;
 }
 div.disabled_view_bouncer {
     width: 20px;
