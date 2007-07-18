@@ -672,6 +672,7 @@ sub register_row_event {
 	$function =~ s/_row$//;
 	$row->registerEvent('IWL-Tree-Row-activate', 'iwl_demo.pl', {
 		function => $function,
+		disableView => 1,
 		onComplete => 'activate_widgets_response(json)',
 	});
     }

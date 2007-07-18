@@ -44,6 +44,8 @@ Object.extend(Event, {
       if (params.userData.onStart)
 	eventStart(params.userData.onStart).call(element, params.userData);
 
+      var disable = params.disableView ? disableView.bind(element, {}) : Prototype.emptyFunction;
+      var enable = params.disableView ? enableView : Prototype.emptyFunction;
       var cgiParams = {};
       Object.extend(cgiParams, params).userData = {};
       Object.extend(cgiParams.userData, params.userData);
@@ -53,6 +55,7 @@ Object.extend(Event, {
       if (typeof params.update === 'undefined') {
 	element['handlers'][eventName].ajaxRequest = new Ajax.Request(url, {
 	  onException: exceptionHandler,
+	  onLoading: disable,
 	  onComplete: function(or) {
 	    var json = (or.responseText || '{}').evalJSON();
 	    if (params.method && params.method in element) 
@@ -63,6 +66,7 @@ Object.extend(Event, {
 	      var callback = eventCompletion(params.userData.onComplete);
 	      callback.call(element, json, params.userData);
 	    }
+	    enable();
 	    element['handlers'][eventName].ajaxRequest = null;
 	  },
           parameters: {IWLEvent: Object.toJSON({eventName: eventName, params: cgiParams})}
@@ -73,14 +77,17 @@ Object.extend(Event, {
 	    params.onComplete.call(element, {}, params);
 	  var callback = eventCompletion(params.userData.onComplete);
 	  callback.call(element, {}, params.userData);
+	  enable();
 	  element['handlers'][eventName].ajaxRequest = null;
 	} : function() {
 	  if (params.onComplete && typeof params.onComplete === 'function') 
 	    params.onComplete.call(element, {}, params);
+	  enable();
 	  element['handlers'][eventName].ajaxRequest = null
 	};
 	element['handlers'][eventName].ajaxRequest = new Ajax.Updater(params.update, url, {
 	  onException: exceptionHandler,
+	  onLoading: disable,
 	  onComplete: onComplete,
 	  insertion: eval(params.insertion || false),
 	  evalScripts: params.evalScripts || false,

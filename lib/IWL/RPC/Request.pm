@@ -39,6 +39,10 @@ A javascript expression to be evaluated after the request takes place
 
 A boolean flag, causes the event to be emitted only once
 
+=item B<disableView>
+
+If true, an indication will be shown that a response is active
+
 =back
 
 =cut
@@ -53,6 +57,7 @@ sub registerEvent {
       ? $self->_registerEvent($event, $params) || {}
       : {};
     $event_params->{emitOnce} = $params->{emitOnce} if exists $params->{emitOnce};
+    $event_params->{disableView} = $params->{disableView} if exists $params->{disableView};
     $self->{_handlers}{$event} = [$url, {userData => $params, %$event_params}];
 
     return $self;
