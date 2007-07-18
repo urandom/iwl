@@ -44,7 +44,7 @@ Object.extend(Event, {
       if (params.userData.onStart)
 	eventStart(params.userData.onStart).call(element, params.userData);
 
-      var disable = params.disableView ? disableView.bind(element, {}) : Prototype.emptyFunction;
+      var disable = params.disableView ? disableView.bind(element, params.disableView) : Prototype.emptyFunction;
       var enable = params.disableView ? enableView : Prototype.emptyFunction;
       var cgiParams = {};
       Object.extend(cgiParams, params).userData = {};

@@ -41,7 +41,23 @@ A boolean flag, causes the event to be emitted only once
 
 =item B<disableView>
 
-If true, an indication will be shown that a response is active
+An indication will be shown that a response is active, if the parameter exists. It can be a hash with the following options:
+
+=over 12
+
+=item B<noCover> I<BOOL>
+
+If true, the screen will not be covered, only the mouse cursor will indicate that a response is active (default: I<false>)
+
+=item B<fullCover> I<BOOL>
+
+If true, the screen will be fully covered (default: I<false>)
+
+=item B<opacity> I<FLOAT>
+
+The opacity of the covering element (default: I<0.8>)
+
+=back
 
 =back
 
@@ -57,7 +73,13 @@ sub registerEvent {
       ? $self->_registerEvent($event, $params) || {}
       : {};
     $event_params->{emitOnce} = $params->{emitOnce} if exists $params->{emitOnce};
-    $event_params->{disableView} = $params->{disableView} if exists $params->{disableView};
+    if ($params->{disableView}) {
+	if (ref $params->{disableView} eq 'HASH') {
+	    $event_params->{disableView} = $params->{disableView};
+	} else {
+	    $event_params->{disableView} = 'true';
+	}
+    }
     $self->{_handlers}{$event} = [$url, {userData => $params, %$event_params}];
 
     return $self;

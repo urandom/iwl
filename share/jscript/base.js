@@ -209,12 +209,12 @@ function disableView() {
 	document.body.setStyle({cursor: 'wait'});
 	if (options.noCover) return;
 
-	var container = $(Builder.node('div', {id: "disabled_view",
-		    className: "disabled_view", style: 'visibility: hidden'}));
 	var rail = $(Builder.node('div', {id: "disabled_view_rail",
 		    className: "disabled_view_rail", style: 'visibility: hidden'}));
 	if (options.fullCover) {
 	    var page_dims = pageDimensions();
+	    var container = $(Builder.node('div', {id: "disabled_view",
+			className: "disabled_view", style: 'visibility: hidden'}));
 
 	    container.addClassName('full_cover');
 	    container.setStyle({

@@ -128,6 +128,7 @@ if (my $file = $form{upload_file}) {
     $page->requiredJs(@scripts);
     $notebook->appendTab('Display', $container)->setId('display_tab');
     $notebook->appendTab('Source')->setId('source_tab')->registerEvent('IWL-Notebook-Tab-select' => 'iwl_demo.pl', {
+	    disableView => {fullCover => 1},
 	    onStart => <<'EOF',
 var content = $('content').down();
 if (content)
@@ -164,7 +165,7 @@ sub build_tree {
     $misc->appendTextCell('Miscellaneous');
     $tree->appendBody($event);
     $event->appendTextCell('IWL Events');
-    $event->registerEvent('IWL-Tree-Row-expand', 'iwl_demo.pl', { jijii => 1});
+    $event->registerEvent('IWL-Tree-Row-expand', 'iwl_demo.pl');
 
     build_basic_widgets($basic_widgets);
     build_advanced_widgets($advanced_widgets);
