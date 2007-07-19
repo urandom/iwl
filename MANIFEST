@@ -157,6 +157,7 @@ share/jscript/dist/slider.js
 share/jscript/dist/dragdrop.js
 share/jscript/dist/resizer.js
 share/jscript/dist/controls.js
+share/jscript/dist/accordion.js
 share/jscript/menu.js
 share/jscript/druid.js
 share/jscript/base.js
@@ -207,6 +208,7 @@ t/31button.t
 t/31page.t
 t/31table_row.t
 t/32table.t
+t/40accordion_page.t
 t/40checkbox.t
 t/40combo_option.t
 t/40contentbox.t
@@ -232,6 +234,7 @@ t/41pagecontrol.t
 t/41tree_row.t
 t/41upload.t
 t/42tree.t
+t/50accordion.t
 t/50radiobutton.t
 t/50menu.t
 t/50menubar.t
@@ -254,6 +257,7 @@ lib/IWL/Tree/Cell.pm
 lib/IWL/Menu/Item.pm
 lib/IWL/List/Definition.pm
 lib/IWL/Druid/Page.pm
+lib/IWL/Accordion/Page.pm
 lib/IWL/Script.pm
 lib/IWL/SubmitImage.pm
 lib/IWL/String.pm
@@ -303,6 +307,7 @@ lib/IWL/Input.pm
 lib/IWL/HBox.pm
 lib/IWL/Style.pm
 lib/IWL/Comment.pm
+lib/IWL/Accordion.pm
 lib/IWL.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Base.pm

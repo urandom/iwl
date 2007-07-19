@@ -225,11 +225,14 @@ sub build_advanced_widgets {
 
 sub build_containers {
     my $row = shift;
+    my $accordions = IWL::Tree::Row->new(id => 'accordions_row');
     my $contentbox = IWL::Tree::Row->new(id => 'contentbox_row');
     my $druid = IWL::Tree::Row->new(id => 'druid_row');
     my $notebook = IWL::Tree::Row->new(id => 'notebook_row');
     my $tooltips = IWL::Tree::Row->new(id => 'tooltips_row');
 
+    $accordions->appendTextCell('Accordions');
+    $row->appendRow($accordions);
     $contentbox->appendTextCell('Contentbox');
     $row->appendRow($contentbox);
     $druid->appendTextCell('Druid');
@@ -239,7 +242,7 @@ sub build_containers {
     $tooltips->appendTextCell('Tooltips');
     $row->appendRow($tooltips);
 
-    register_row_event($contentbox, $druid, $notebook, $tooltips);
+    register_row_event($accordions, $contentbox, $druid, $notebook, $tooltips);
 }
 
 sub build_misc {
@@ -535,6 +538,27 @@ sub generate_tree {
     return $container->getObject;
 }
 
+sub generate_accordions {
+    my $container  = IWL::Container->new(id => 'accordions_container');
+    my $accordion  = IWL::Accordion->new(id => 'vertical_accordion');
+    my $horizontal = IWL::Accordion->new(id => 'horizontal_accordion', horizontal => 1, eventActivation => 'mouseover');
+
+    $accordion->appendPage('Introduction', IWL::Label->new->setText('An accordion is a graphical user interface widget in which several sections of a document can be expanded or collapsed, displaying one at a time.')->appendTextType('Whenever a section is selected for opening, the open one is closed.', 'h2'))->setId('intro');
+    $accordion->appendPage('Music', IWL::Label->new->setText('An accordion is a musical instrument of the handheld bellows-driven free reed aerophone family, sometimes referred to as squeezeboxes.'), 1)->setId('music');
+    $accordion->appendPage('History', IWL::Label->new->setText('The accordion\'s basic form was invented in Berlin in 1822 by Friedrich Buschmann. The accordion is one of several European inventions of the early 19th century that used free reeds driven by a bellows; notable among them were:'))->setId('history');
+    $accordion->appendPage('Horizontal', $horizontal);
+    $accordion->appendPage('Misc', IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif'))->appendContent(IWL::Label->new->setText('The Moon (Latin: Luna) is Earth\'s only natural satellite and the fifth largest moon in the Solar System. The average centre-to-centre distance from the Earth to the Moon is 384,403 kilometres (238,857 miles),a which is about 30 times the diameter of the Earth. The Moon has a diameter of 3,474 kilometres (2,159 miles)[1] — slightly more than a quarter that of the Earth. This means that the volume of the Moon is only 1/50th that of Earth. The gravitational pull at its surface is about a 1/6th of Earth\'s. The Moon makes a complete orbit around the Earth every 27.3 days, and the periodic variations in the geometry of the Earth–Moon–Sun system are responsible for the lunar phases that repeat every 29.5 days.'));
+
+    $horizontal->setStyle(height => '150px')->setDefaultSize(width => 400);
+    $horizontal->appendPage('1', IWL::Label->new->setText('Integer commodo nibh sit amet odio. Pellentesque semper. Integer dolor. Donec scelerisque sapien placerat velit.'));
+    $horizontal->appendPage('2', IWL::Label->new->setText('Sed at pede vitae turpis porta condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla facilisi. Morbi erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.'));
+    $horizontal->appendPage('3', IWL::Label->new->setText('Curabitur quam lorem, laoreet molestie, eleifend id, pulvinar vel, nunc. Proin congue felis quis purus. Aenean porttitor, lacus vel bibendum pulvinar, leo nulla suscipit leo, nec lobortis orci diam eget turpis. Sed eu eros et orci consectetuer molestie. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.'));
+
+    $container->appendChild($accordion);
+
+    return $container->getObject;
+}
+
 sub generate_contentbox {
     my $container = IWL::Container->new(id => 'contentbox_container');
     my $contentbox = IWL::Contentbox->new(id => 'contentbox', autoWidth => 1);
@@ -768,9 +792,11 @@ sub show_the_code_for {
     } elsif ($code_for eq 'table_container') {
 	$paragraph->appendTextType(read_code("generate_table", 41), 'pre');
     } elsif ($code_for eq 'tree_container') {
-	$paragraph->appendTextType(read_code("sub build_tree", 109), 'pre');
+	$paragraph->appendTextType(read_code("sub build_tree", 113), 'pre');
     } elsif ($code_for eq 'contentbox_container') {
 	$paragraph->appendTextType(read_code("generate_contentbox", 22), 'pre');
+    } elsif ($code_for eq 'accordions_container') {
+	$paragraph->appendTextType(read_code("generate_accordions", 20), 'pre');
     } elsif ($code_for eq 'druid_container') {
 	$paragraph->appendTextType(read_code("generate_druid", 18), 'pre');
 	$paragraph->appendTextType(read_code("Druid handler", 11), 'pre');

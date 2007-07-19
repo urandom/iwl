@@ -97,9 +97,9 @@ sub prependPage {
 
 =item B<setTitle> (B<TEXT>)
 
-Sets the title of the tab label
+Sets the text of the tab title 
 
-Parameters: B<TEXT> - the text of the tab label
+Parameters: B<TEXT> - the text of the tab title 
 
 =cut
 

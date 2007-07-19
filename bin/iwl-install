@@ -87,8 +87,8 @@ sub prefix_replace {
         my $content = '';
         open FILE, $file;
         while (<FILE>) {
-            $_ =~ s,/iwl/skin/default/images,$image,;
-            $_ =~ s,/iwl/skin/default/images/icons,$icon,;
+			$_ =~ s,(?<=\W)/iwl/skin/default/images(?!/icons),$image,;
+			$_ =~ s,(?<=\W)/iwl/skin/default/images/icons,$icon,;
             $content .= $_;
         }
         close FILE;

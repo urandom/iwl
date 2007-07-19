@@ -1033,7 +1033,6 @@ div.vertical_slider div.slider_handle {
 }
 
 /* Page control */
-
 span.pagecontrol_label {
     float: left;
     margin-top: 3px;
@@ -1066,4 +1065,37 @@ span.pagecontrol_label input {
 }
 #radios_label {
     margin-bottom: 10px;
+}
+
+/* Accordions */
+.accordion_page_title {
+    background: #f1ece6;
+    color: #535c64;
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #cde99f;
+    padding: 5px;
+    margin: 0;
+}
+
+.accordion_page_title_selected {
+    background: #6a81a3;
+    color: #fefefe;
+}
+
+.accordion_page_content_vertical {
+    height: 0px;
+    overflow: hidden;
+}
+
+.accordion_page_title_horizontal {
+    float: left;
+    border-right: 1px solid #cde99f;
+    height: 100%;
+}
+
+.accordion_page_content_horizontal {
+    float: left;
+    overflow: hidden;
+    height: 100%;
 }

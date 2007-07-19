@@ -5,6 +5,8 @@ package IWL;
 
 use strict;
 
+use IWL::Accordion;
+use IWL::Accordion::Page;
 use IWL::Anchor;
 use IWL::Break;
 use IWL::Button;

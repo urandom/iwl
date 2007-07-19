@@ -50,7 +50,7 @@ sub new {
 
     $self->{_noChildren} = 0;
 
-    # The list of pages
+    # The list of tabs
     $self->{__tabs} = [];
 
     $self->__init(%args);
@@ -68,6 +68,8 @@ Appends a new tab and adds the object to the tab page
 
 Parameter: B<OBJECT> - the IWL::Object(3pm) to be appended, B<TEXT> - the text for the tab label, B<SELECTED> - true if the tab should be the selected one
 
+Returns: the newly created tab 
+
 =cut
 
 sub appendTab {
@@ -80,6 +82,8 @@ sub appendTab {
 Prepends a new tab and adds the object to the tab page
 
 Parameter: B<OBJECT> - the IWL::Object(3pm) to be prepended, B<TEXT> - the text for the tab label, B<SELECTED> - true if the tab should be the selected one
+
+Returns: the newly created tab 
 
 =cut
 
@@ -180,13 +184,12 @@ sub __init {
 sub __setup_page {
     my ($self, $object, $text, $selected, $reverse) = @_;
     my $tab = IWL::Notebook::Tab->new;
-    my $index;
 
     $tab->appendPage($object);
     if ($reverse) {
-	$index = unshift @{$self->{__tabs}}, $tab;
+	unshift @{$self->{__tabs}}, $tab;
     } else {
-	$index = push @{$self->{__tabs}}, $tab;
+	push @{$self->{__tabs}}, $tab;
     }
 
     $tab->setSelected($selected) if $object;
