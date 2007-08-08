@@ -439,11 +439,8 @@ sub _realize {
     my $data  = {};
     $data->{path} = $self->getPath;
     @{$data->{childList}} = map { $_->getId } @{$self->{_children}};
-    $data->{parent}     = $self->{_parentRow}->getId if $self->{_parentRow};
     $data->{isParent}   = $self->{_isParent};
     $data->{collapsed}  = $self->{_collapsed};
-    $data->{ajaxUrl}    = $self->{__ajaxUrl};
-    $data->{ajaxParams} = $self->{__ajaxParams};
 
     $self->setAttribute('iwl:treeRowData' => objToJson($data), 'uri');
 
