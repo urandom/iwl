@@ -136,7 +136,7 @@ sub appendRow {
     if ($self->{_tree}) {
 	$row->{_tree} = $self->{_tree};
     }
-    $row->_rebuildPath;
+    $self->_rebuildPath;
     return $self;
 }
 
@@ -160,7 +160,7 @@ sub prependRow {
     if ($self->{_tree}) {
 	$row->{_tree} = $self->{_tree};
     }
-    $row->_rebuildPath;
+    $self->_rebuildPath;
     return $self;
 }
 
