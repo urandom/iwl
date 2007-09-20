@@ -60,30 +60,6 @@ sub setSrc {
     return $self->setAttribute(src => $source, 'uri');
 }
 
-=item B<setDynamicSrc> (B<SOURCE>)
-
-Creates source script elements dynamically, through javascript. Useful for adding additional script files after the page has loaded.
-
-Parameter: B<SOURCE> - a string, or list of strings with URLs to javascript files
-
-=cut
-
-sub setDynamicSrc {
-    my ($self, @sources) = @_;
-
-    $self->setScript(<<EOJS);
-var head = document.getElementsByTagName('head')[0];
-EOJS
-
-    foreach my $src (@sources) {
-        $self->appendScript(<<EOJS);
-head.appendChild(new Element('script', {src: '$src', type: 'text/javascript'}));
-EOJS
-    }
-
-    return $self;
-}
-
 =item B<appendScript> (B<STRING>)
 
 Appends the strings as a child of the script object

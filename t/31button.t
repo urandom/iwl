@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 15;
 
 use IWL::Button;
 
@@ -25,4 +25,6 @@ use Locale::TextDomain qw(org.bloka.iwl);
     is($button->getId, 'foo');
     is($button->setHref('iwl_demo.pl'), $button);
     is($button->getHref, 'iwl_demo.pl');
+    is($button->setDisabled(1), $button);
+    ok($button->isDisabled);
 }

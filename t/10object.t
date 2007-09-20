@@ -1,4 +1,4 @@
-use Test::More tests => 21;
+use Test::More tests => 29;
 
 use IWL::Object;
 
@@ -48,4 +48,27 @@ use IWL::Object;
 
 	$object->deleteAttribute('foo');
 	ok(!$object->hasAttribute('foo'), 'Delete attribute "foo"');
+}
+
+{
+    my $object = IWL::Object->new;
+    my $child1 = IWL::Object->new;
+    my $child2 = IWL::Object->new;
+
+    $object->setAttribute(foo => 'bar');
+    $child1->setAttribute(alpha => 'beta');
+    $child2->setAttribute(one => 'two');
+    
+    $object->appendChild($child1, $child2);
+
+    my $clone = $object->clone;
+
+    isa_ok($clone, 'IWL::Object');
+    isnt($clone, $object);
+    isnt($clone->{childNodes}[0], $object->{childNodes}[0]);
+    isnt($clone->{childNodes}[1], $object->{childNodes}[1]);
+    is_deeply($clone, $object);
+    is_deeply($clone->{childNodes}[0], $object->{childNodes}[0]);
+    is_deeply($clone->{childNodes}[1], $object->{childNodes}[1]);
+    is($clone->{childNodes}[1]->{parentNode}, $clone);
 }
