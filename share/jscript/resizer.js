@@ -120,6 +120,7 @@ var Resizer = Class.create((function() {
       return;
     this.resize = true;
     this.resizeType = event.element().type || '';
+    fillElementPosition.call(this);
   }
 
   function mouseMove(event) {
@@ -185,6 +186,10 @@ var Resizer = Class.create((function() {
       return;
     toggleHandles.call(this);
 
+    fillElementPosition.call(this);
+  }
+
+  function fillElementPosition() {
     var dimensions = this.element.getDimensions();
     this.elementPosition.w = dimensions.width;
     this.elementPosition.h = dimensions.height;
