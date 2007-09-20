@@ -480,7 +480,6 @@ Object.extend(Object.extend(Contentbox, Widget), {
         return element.pointerPosition;
     },
     __resizeCallback: function(element, d) {
-        debugger;
 	this.childElements().each(function($_) {
 	    if ($_ != this.contentboxContent.parentNode.parentNode) {
 		var dims = $_.getDimensions();

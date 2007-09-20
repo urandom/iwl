@@ -1116,3 +1116,59 @@ span.pagecontrol_label input {
     overflow: hidden;
     height: 100%;
 }
+
+/* Resizer */
+
+.resizer_handle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    font-size: 1px;
+    background: #eeeeee;
+    border: 1px solid #6a81a3;
+}
+
+.resizer_handle_tl {
+    top: -6px;
+    left: -6px;
+    cursor: nw-resize;
+}
+.resizer_handle_t {
+    top: -6px;
+    left: 50%;
+    margin-left: -3px;
+    cursor: n-resize;
+}
+.resizer_handle_tr {
+    top: -6px;
+    right: -6px;
+    cursor: ne-resize;
+}
+.resizer_handle_l {
+    top: 50%;
+    left: -6px;
+    margin-top: -3px;
+    cursor: w-resize;
+}
+.resizer_handle_r {
+    top: 50%;
+    right: -6px;
+    margin-top: -3px;
+    cursor: e-resize;
+}
+.resizer_handle_bl {
+    bottom: -6px;
+    left: -6px;
+    cursor: sw-resize;
+}
+.resizer_handle_b {
+    bottom: -6px;
+    left: 50%;
+    margin-left: -3px;
+    cursor: s-resize;
+}
+.resizer_handle_br {
+    bottom: -6px;
+    right: -6px;
+    cursor: se-resize;
+}

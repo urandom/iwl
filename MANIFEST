@@ -208,14 +208,12 @@ share/images/contentbox/middle_l1.png
 share/images/contentbox/middle_r1.png
 share/images/contentbox/mr1100_shadow1.gif
 share/images/contentbox/mr1100_shadow1.png
-share/images/contentbox/title50_r1.png
 share/images/contentbox/title_l1.png
 share/images/contentbox/title_r1.gif
 share/images/contentbox/title_r1.png
 share/images/contentbox/tl.gif
 share/images/contentbox/tl_shadow1.gif
 share/images/contentbox/tl_shadow1.png
-share/images/contentbox/tr1000.gif
 share/images/contentbox/tr1100_shadow1.gif
 share/images/contentbox/tr1100_shadow1.png
 share/images/contentbox/tr3000.gif
@@ -262,7 +260,6 @@ share/jscript/dist/excanvas.js
 share/jscript/dist/json.js
 share/jscript/dist/minify.pl
 share/jscript/dist/prototype.js
-share/jscript/dist/resizer.js
 share/jscript/dist/scriptaculous.js
 share/jscript/dist/slider.js
 share/jscript/dist/sound.js
@@ -275,6 +272,7 @@ share/jscript/minify.pl
 share/jscript/notebook.js
 share/jscript/pagecontrol.js
 share/jscript/prototype_extensions.js
+share/jscript/resizer.js
 share/jscript/scriptaculous_extensions.js
 share/jscript/tags
 share/jscript/tooltip.js
