@@ -42,17 +42,17 @@ var Resizer = Class.create((function() {
   function createHandles(observer) {
     if (!this.options.vertical && !this.options.horizontal) {
       ['tl', 'tr', 'bl', 'br'].each(function($_) {
-          createHandle($_, observer);
+          createHandle.call(this, $_, observer);
       }.bind(this));
     } 
     if (this.options.vertical || !this.options.horizontal) {
       ['t', 'b'].each(function($_) {
-          createHandle($_, observer);
+          createHandle.call(this, $_, observer);
       }.bind(this));
     }
     if (!this.options.vertical) {
       ['l', 'r'].each(function($_) {
-          createHandle($_, observer);
+          createHandle.call(this, $_, observer);
       }.bind(this));
     }
   }
@@ -89,8 +89,8 @@ var Resizer = Class.create((function() {
   }
 
   function mouseDown(event) {
-    if (this.options.resizeStartCallback
-      && !(this.options.resizeStartCallback(this.element, event)))
+    if (this.options.onResizeStart
+      && !(this.options.onResizeStart(this.element, event)))
       return;
     this.resize = true;
     this.resizeType = event.element().type || '';
@@ -142,15 +142,15 @@ var Resizer = Class.create((function() {
     this.element.style.left   = this.elementPosition.x + 'px';
     this.element.style.top    = this.elementPosition.y + 'px';
 
-    if (this.options.resizeCallback)
-      this.options.resizeCallback(this.element, event, this.elementPosition);
+    if (this.options.onResize)
+      this.options.onResize(this.element, event, this.elementPosition);
   }
 
   function selectElement(event) {
     var element = event.element();
     if (element.hasClassName('resizer_handle'))
       return;
-    toggleHandles();
+    toggleHandles.call(this);
 
     var dimensions = this.element.getDimensions();
     this.elementPosition.w = dimensions.width;
@@ -174,8 +174,8 @@ var Resizer = Class.create((function() {
         minWidth: 10,
         className: 'resizer_handle',
         togglers: [],
-        resizeStartCallback: function() { return true; },
-        resizeCallback: Prototype.emptyFunction,
+        onResizeStart: function() { return true; },
+        onResize: Prototype.emptyFunction,
       }, arguments[1] || {});
       if (!this.element)
         return;

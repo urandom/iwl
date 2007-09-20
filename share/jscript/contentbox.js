@@ -266,7 +266,6 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	this.contentboxHeader = $(id + '_header');
 	this.contentboxContent = $(id + '_content');
 	this.contentboxFooter = $(id + '_footerr');
-	this.pointerPosition = false;
 	this.modalElement = null;
 	this.hiddenQuirks = [];
 
@@ -363,23 +362,6 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	}
 	return d;
     },
-    __getRelativePointerPosition: function(evt) {
-	var scroll = this.cumulativeScrollOffset();
-	var offset = this.cumulativeOffset();
-	var position = scroll[0]  == 0 && scroll[1] == 0 ? offset : scroll;
-	var dimension = this.getDimensions();
-	var pointer = [Event.pointerX(evt), Event.pointerY(evt)];
-	var se = [position[0] + dimension.width, position[1] + dimension.height];
-	padding = parseInt($(this.id + '_middler').getStyle('padding-right'));
-
-	if (pointer[0] >= se[0] - padding && pointer[0] <= se[0] && pointer[1] >= se[1] - padding && pointer[1] <= se[1]) {
-	    this.setStyle({cursor: 'se-resize'});
-	    this.pointerPosition = 'se';
-	} else {
-	    this.setStyle({cursor: 'default'});
-	    this.pointerPosition = false;
-	}
-    },
     __setupDrag: function() {
 	this.contentboxTitle.style.cursor = 'move';
 	this.contentboxTitle.parentNode.style.cursor = 'move';
@@ -395,18 +377,12 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	return this;
     },
     __setupResize: function() {
-        this.observe('mousemove', this.__getRelativePointerPosition.bindAsEventListener(this));
-	this._resizer = new Resizer(this, {
-	    handle: this,
-	    contentbox: this,
-	    horizontal: true,
-	    vertical: true,
+	new Resizer(this, {
 	    maxHeight: 1000,
 	    maxWidth: 1000,
 	    minHeight: 70,
 	    minWidth: 70,
-            resizeStartCallback: this.__resizeStartCallback.bind(this),
-	    resizeCallback: this.__resizeCallback.bind(this)
+	    onResize: this.__resizeCallback.bind(this)
         });
 
         return this;
@@ -476,17 +452,19 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	this.__qframe = $(qframe);
 	this.insertBefore(qframe, this.firstChild);
     },
-    __resizeStartCallback: function(element, event) {
-        return element.pointerPosition;
-    },
-    __resizeCallback: function(element, d) {
+    __resizeCallback: function(element, event, d) {
+        var middle;
+        var height = 0;
 	this.childElements().each(function($_) {
-	    if ($_ != this.contentboxContent.parentNode.parentNode) {
-		var dims = $_.getDimensions();
-		d.height -= dims.height;
-	    }
+            if ($_.hasClassName('resizer_handle'))
+                return;
+            if ($_.hasClassName($A(this.classNames()).first() + '_middle')) {
+                middle = $_;
+                return;
+            }
+            height += $_.getHeight();
 	}.bind(this));
-	this.contentboxContent.setStyle({height: d.height + 'px'});
+        middle.setStyle({height: (d.h - height) + 'px'});
     },
     __hideQuirks: function() {
 	if (!ie4 || ie7) return;

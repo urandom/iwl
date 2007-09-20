@@ -510,7 +510,7 @@ sub __init {
 
     $self->_appendAfter($self->{__init});
     $self->_constructorArguments(%args);
-    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dist/resizer.js', 'contentbox.js');
+    $self->requiredJs('base.js', 'dist/dragdrop.js', 'resizer.js', 'contentbox.js');
     $self->{_customSignals} = {close => []};
 
     # Callbacks
