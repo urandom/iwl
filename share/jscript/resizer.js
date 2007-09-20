@@ -14,6 +14,7 @@ var Resizer = Class.create((function() {
   var resize = false;
   var resizeType;
   var elementPosition = {w: 0, h: 0, x: 0, y: 0};
+  var elementStyle = {};
 
   function setup() {
     eventMouseUp   = mouseUp.bindAsEventListener(this);
@@ -21,6 +22,10 @@ var Resizer = Class.create((function() {
     eventMouseMove = mouseMove.bindAsEventListener(this);
     eventSelect    = selectElement.bindAsEventListener(this);
 
+    if (this.element.getStyle('position') == 'static') {
+      this.element.style.position = 'relative';
+      elementStyle.position = 'static';
+    }
     this.element.resizer = this;
 
     createHandles.call(this);
@@ -33,7 +38,7 @@ var Resizer = Class.create((function() {
     if (!this.options.vertical && !this.options.horizontal) {
       ['tl', 'tr', 'bl', 'br'].each(createHandle.bind(this));
     } 
-    if (this.vertical || !this.options.horizontal) {
+    if (this.options.vertical || !this.options.horizontal) {
       ['t', 'b'].each(createHandle.bind(this));
     }
     if (!this.options.vertical) {
@@ -44,6 +49,7 @@ var Resizer = Class.create((function() {
   function destroyHandles() {
     for (var h in handles)
       h.remove();
+    handles = {};
   }
 
   function createHandle(type) {
@@ -168,6 +174,7 @@ var Resizer = Class.create((function() {
 
     destroy: function() {
       destroyHandles.call(this);
+      this.element.setStyle(elementStyle);
       this.element.resizer = undefined;
     }
   }
