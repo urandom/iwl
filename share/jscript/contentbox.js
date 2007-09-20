@@ -455,8 +455,10 @@ Object.extend(Object.extend(Contentbox, Widget), {
     __resizeCallback: function(element, event, d) {
         var middle;
         var height = 0;
+        var resizerName = this.resizer ? this.resizer.options.className : '';
 	this.childElements().each(function($_) {
-            if ($_.hasClassName('resizer_handle'))
+            if ($_.hasClassName(resizerName + '_handle')
+                || $_.hasClassName(resizerName + '_outline'))
                 return;
             if ($_.hasClassName($A(this.classNames()).first() + '_middle')) {
                 middle = $_;
