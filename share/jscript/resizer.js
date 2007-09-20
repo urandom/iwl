@@ -175,7 +175,7 @@ var Resizer = Class.create((function() {
         className: 'resizer_handle',
         togglers: [],
         onResizeStart: function() { return true; },
-        onResize: Prototype.emptyFunction,
+        onResize: Prototype.emptyFunction
       }, arguments[1] || {});
       if (!this.element)
         return;
