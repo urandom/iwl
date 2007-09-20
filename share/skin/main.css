@@ -310,7 +310,9 @@ div.button {
     float: left;
     margin: 3px;
     cursor: pointer;
-    cursor: hand;
+}
+div.button_disabled {
+    cursor: default;
 }
 div.button_tl {
     position: absolute;
@@ -393,7 +395,7 @@ img.button_image {
     vertical-align: middle;
     background-color: transparent;
 }
-span.button_label_default, span.button_label_medium, span.button_label_small {
+span.button_label {
     padding: 0px;
     margin: 0px;
     border: 0px;
@@ -406,6 +408,11 @@ span.button_label_default, span.button_label_medium, span.button_label_small {
     font-weight: bold;
     font-size: 12px;
     text-align: center;
+}
+
+div.button_disabled span.button_label {
+    color: #999;
+    font-weight: normal;
 }
 
 span.button_label_medium {
@@ -752,6 +759,11 @@ div.druid_page_selected {
 }
 div.druid_button_container {
     float: right;
+}
+
+div.druid_page_error {
+    height: 0px;
+    overflow: hidden;
 }
 
 /* Notebook */
