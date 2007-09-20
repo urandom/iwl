@@ -118,6 +118,7 @@ sub setId {
     $self->{__buttonContainer}->setId($id . '_button_container');
     $self->{__backButton}->setId($id . '_back_button');
     $self->{__nextButton}->setId($id . '_next_button');
+    $self->{__okButton}->setId($id . '_ok_button');
 
     return $self;
 }
@@ -158,6 +159,8 @@ sub __init {
       IWL::Button->newFromStock('IWL_STOCK_BACK', size => 'medium');
     my $next_button =
       IWL::Button->newFromStock('IWL_STOCK_NEXT', size => 'medium');
+    my $ok_button =
+      IWL::Button->newFromStock('IWL_STOCK_OK', size => 'medium', style => {visibility => 'hidden'});
     my $button_container = IWL::Container->new;
     my $span             = IWL::Break->new(style => {clear => 'both'});
 
@@ -165,9 +168,11 @@ sub __init {
     $self->{__content}         = $content;
     $self->{__backButton}      = $back_button;
     $self->{__nextButton}      = $next_button;
+    $self->{__okButton}        = $ok_button;
     $self->{__buttonContainer} = $button_container;
     $self->{__finishText}      = $__->{'Finish'};
     $self->appendChild($content);
+    $button_container->appendChild($ok_button);
     $button_container->appendChild($back_button);
     $button_container->appendChild($next_button);
     $self->appendChild($button_container);

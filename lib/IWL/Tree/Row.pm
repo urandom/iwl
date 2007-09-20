@@ -156,7 +156,7 @@ sub prependRow {
     unshift @{$self->{_children}}, $row;
     $self->{_isParent} = 1;
 
-    weaken($row->{_parentRow} = $self);
+    $row->{_parentRow} = $self and weaken $row->{_parentRow};
     if ($self->{_tree}) {
 	$row->{_tree} = $self->{_tree};
     }
@@ -455,10 +455,10 @@ sub _realize {
 }
 
 sub _expandEvent {
-    my ($params, $handler) = @_;
+    my ($event, $handler) = @_;
 
     IWL::Object::printJSONHeader;
-    my ($list, $user_extras) = $handler->($params->{userData}, $params->{all})
+    my ($list, $extras) = $handler->($event->{params}, $event->{options}{all})
         if 'CODE' eq ref $handler;
     $list = [] unless ref $list eq 'ARRAY';
 
@@ -466,17 +466,16 @@ sub _expandEvent {
 }
 
 sub _registerEvent {
-    my ($self, $event, $params) = @_;
+    my ($self, $event, $params, $options) = @_;
 
-    my $handlers = {};
     if ($event eq 'IWL-Tree-Row-expand') {
 	$self->makeParent;
-	$handlers->{method} = '_expandResponse';
+	$options->{method} = '_expandResponse';
     } else {
-	$self->SUPER::_registerEvent($event, $params);
+	return $self->SUPER::_registerEvent($event, $params, $options);
     }
 
-    return $handlers;
+    return $options;
 }
 
 sub _rebuildPath {

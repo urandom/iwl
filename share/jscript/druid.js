@@ -12,7 +12,7 @@ Object.extend(Object.extend(Druid, Widget), {
      * @returns The object
      * */
     selectPage: function(page, ignoreCheck) {
-	page = $(page);
+        page = $(page);
         if (!page) return;
 	page.setSelected(true, ignoreCheck);
 	return this;
@@ -20,7 +20,7 @@ Object.extend(Object.extend(Druid, Widget), {
     /**
      * Returns the next page, relative to the given one
      * @param page The page object. If not specified, the current page is used
-     * @returns The next page 
+     * @returns The next page
      * */
     getNextPage: function(page) {
 	page = $(page) || this.currentPage;
@@ -30,7 +30,7 @@ Object.extend(Object.extend(Druid, Widget), {
     /**
      * Returns the previous page, relative to the given one
      * @param page The page object. If not specified, the current page is used
-     * @returns The previous page 
+     * @returns The previous page
      * */
     getPrevPage: function(page) {
 	page = $(page) || this.currentPage;
@@ -39,7 +39,7 @@ Object.extend(Object.extend(Druid, Widget), {
     },
     /**
      * Returns the current page
-     * @returns The current page 
+     * @returns The current page
      * */
     getCurrentPage: function() {
 	return this.currentPage;
@@ -47,7 +47,7 @@ Object.extend(Object.extend(Druid, Widget), {
     /**
      * Removes the given page
      * @param page The page object. If not specified, the current page is used
-     * @returns The object 
+     * @returns The object
      * */
     removePage: function(page) {
 	page = $(page) || this.currentPage;
@@ -57,32 +57,82 @@ Object.extend(Object.extend(Druid, Widget), {
     },
     /**
      * Appends a new page to the druid
-     * @param {Boolean} last True if the new page should be the last page in the druid
+     * @param {Boolean} final True if the new page should be the final page in the druid
      * @returns The created page
      * */
-    appendPage: function(last) {
-	var page = Builder.node('div', {
-	    'class': $A(this.classNames()).first() + '_page',
-	    id: this.id + '_page_' + this.pages.length
-	});
-	page.style.display = 'none';
-        if (last)
-            page.setAttribute('iwl:druidLastPage', 1);
+    appendPage: function(final) {
+        var page = this.__createPage(final);
 	this.pageContainer.appendChild(page);
 	this.pages.push(page);
-        this.nextButton.setStyle({visibility: 'visible'});
-        return Page.create(page, this);
+	this._refreshButtons();
+
+        return page;
     },
     /**
-     * Checkes whether the given page is the last page of the druid
+     * Replaces the page before the given one
+     * @param {Boolean} final True if the new page should be the final page in the druid
+     * @param p The new page should be inserted before this one. If omited the current page is used
+     * @returns The created page
+     * */
+    replacePageBefore: function(final, p) {
+        var page = this.__createPage(final);
+        if (!p || this.pages.indexOf(p) == -1)
+            p = this.currentPage;
+        var i = this.pages.indexOf(p);
+        var before_p = p.prevPage();
+        if (i >= 0) {
+            if (i == 0) {
+                this.pageContainer.insertBefore(page, this.pages[0]);
+                this.pages.unshift(page);
+            } else {
+                this.pageContainer.replaceChild(page, before_p);
+                if (before_p == this.currentPage)
+                    page.setSelected(true, true);
+
+                this.pages[i - 1] = page;
+            }
+        }
+
+	this._refreshButtons();
+        return page;
+    },
+    /**
+     * Replaces the page after the given one or appends a new one
+     * @param {Boolean} final True if the new page should be the final page in the druid
+     * @param p The new page should be inserted after this one. If omited the current page is used
+     * @returns The created page
+     * */
+    replacePageAfter: function(final, p) {
+	var page = this.__createPage(final);
+        if (!p || this.pages.indexOf(p) == -1)
+            p = this.currentPage;
+        var i = this.pages.indexOf(p);
+        if (i >= 0) {
+            var after_p = p.nextPage();
+            if (after_p) {
+                this.pageContainer.replaceChild(page, after_p);
+                if (after_p == this.currentPage)
+                    page.setSelected(true, true);
+            } else {
+                this.pageContainer.appendChild(page);
+            }
+
+            this.pages[i + 1] = page;
+        }
+
+	this._refreshButtons();
+        return page;
+    },
+    /**
+     * Checkes whether the given page is the final page of the druid
      * @param page The page object. If not specified, the current page is used
-     * @returns True if the page is last
+     * @returns True if the page is final
      * @type Boolean
      * */
-    pageIsLast: function(page) {
+    pageIsFinal: function(page) {
 	page = $(page) || this.currentPage;
 	if (!page) return;
-	return page.isLast();
+	return page.isFinal();
     },
     /**
      * Sets a callback function to be called when the 'finish' button is pressed
@@ -100,38 +150,91 @@ Object.extend(Object.extend(Druid, Widget), {
     },
 
     _init: function (id, text) {
+        this.okButton = $(this.id + '_ok_button');
 	this.backButton = $(this.id + '_back_button');
         this.nextButton = $(this.id + '_next_button');
 	if (!this.nextButton) {
 	    this.__timeout = setTimeout(this._init.apply.bind(this, arguments), 500);
 	    return;
 	}
+        this.okButton 
 	this.pageContainer = this.down();
 	this.currentPage = this.pageContainer.getElementsBySelector('.' +
 		$A(this.classNames()).first() + '_page_selected')[0];
         this.finishText = unescape(text);
         this.nextText = this.nextButton.getLabel();
+        this.errorPage = new Element('div', {className: $A(this.classNames()).first() + '_page_error'});
+        this.pageContainer.appendChild(this.errorPage);
 	this.pages = [];
 	this.pageContainer.childElements().each(function($_) {
 	    if ($_.hasClassName('druid_page'))
 		this.pages.push(Page.create($_, this));
 	}.bind(this));
-
-        if (this.currentPage == this.pages[0])
-            this.backButton.setStyle({visibility: 'hidden'});
-
+	
+    	this._refreshButtons();
 	this.nextButton.signalConnect('click', function() {
-	    if (this.currentPage.isLast()) {
-		this.nextButton.finish.apply(this.nextButton.finish_this);
+	    if (this.currentPage.isFinal()) {
+		if (this.nextButton.finish)
+		    this.nextButton.finish.apply(this.nextButton.finish_this);
+		else
+                   this.currentPage.emitEvent('IWL-Druid-Page-final', {},
+                       {id: this.currentPage.id}); 
 		return;
 	    }
-	    var page = this.currentPage.nextPage();
-	    if (page) page.setSelected(true);
+	    if (this.currentPage.hasEvent('IWL-Druid-Page-next'))
+                this.currentPage.emitEvent('IWL-Druid-Page-next', {},
+                    {id: this.currentPage.id}); 
+            else {
+		var page = this.currentPage.nextPage();
+		if (page) page.setSelected(true);
+	    }
 	}.bind(this));
 	this.backButton.signalConnect('click', function () {
-	    var page = this.currentPage.prevPage();
-	    if (page) page.setSelected(true, true);
+	    if (this.currentPage.hasEvent('IWL-Druid-Page-previous'))
+                this.currentPage.emitEvent('IWL-Druid-Page-previous', {},
+                    {id: this.currentPage.id}); 
+            else {
+		var page = this.currentPage.prevPage();
+		if (page) page.setSelected(true, true);
+	    }
 	}.bind(this));
+        this.okButton.signalConnect('click', function() {
+            this.currentPage._restorePage();
+            if (this.currentPage._handler)
+                this.currentPage['handlers'][this.currentPage._handler.name] = this.currentPage._handler.value;
+        }.bind(this));
+    },
+    _refreshButtons: function() {
+        var pos = this.pages.indexOf(this.currentPage);
+        var next = true;
+        var back = true;
+       
+	if (pos == 0 && !this.currentPage.hasEvent('IWL-Druid-Page-previous'))
+            back = false;
+	if (pos == this.pages.length - 1 && !this.currentPage.hasEvent('IWL-Druid-Page-next'))
+            next = false;
+        
+	if (this.currentPage.isFinal()) {
+            next = true;
+            this.nextButton.setLabel(this.finishText);
+        } else
+            this.nextButton.setLabel(this.nextText);
+
+        this.backButton.setStyle({visibility: back ? 'visible' : 'hidden'});
+        this.nextButton.setStyle({visibility: next ? 'visible' : 'hidden'});
+    },
+
+    __createPage: function(final) {
+        var class_name = $A(this.classNames()).first() + '_page';
+        var page = new Element('div', {
+            'class': class_name,
+            id: class_name + '_' + Math.random()
+	});
+	page.style.display = 'none';
+        if (final)
+            page.setAttribute('iwl:druidFinalPage', 1);
+
+        return Page.create(page, this);
     }
 });
 
@@ -145,7 +248,7 @@ Object.extend(Object.extend(Page, Widget), {
      * Sets whether the page is selected
      * @param {Boolean} select True if the page should be selected
      * @param {Boolean} ignoreCheck True if the check callback should be skipped
-     * @returns The object 
+     * @returns The object
      * */
     setSelected: function(select, ignoreCheck) {
 	var base_class = $A(this.classNames()).first();
@@ -159,7 +262,7 @@ Object.extend(Object.extend(Page, Widget), {
 	    this.addClassName(base_class + '_selected');
 	    this.show();
 	    this.druid.currentPage = this;
-	    this._buttonCorrection();
+	    this.druid._refreshButtons();
 
 	    this.druid.emitSignal('current_page_change', this);
 	    this.emitSignal('select');
@@ -167,11 +270,13 @@ Object.extend(Object.extend(Page, Widget), {
 	    if (!this.isSelected()) return;
 	    var callback;
 	    if (!ignoreCheck) {
+		var control_params = this.getControlElementParams();
 		if (this.check.callback) {
-		    if (window[this.check.callback]) var retval = window[this.check.callback].call(this, this.check.param);
+		    if (window[this.check.callback]) {
+                        if (!this.check.collect) control_params = null;
+			var retval = window[this.check.callback].call(this, this.check.param, control_params);
+                    }
 		    if (!retval) return;
-		} else if (this.emitEvent('IWL-Druid-Page-check', {onComplete: this.__completeCheck.bind(this)})) {
-		    return;
 		}
 	    }
 	    this.removeClassName(base_class + '_selected');
@@ -195,12 +300,12 @@ Object.extend(Object.extend(Page, Widget), {
 	return this.hasClassName($A(this.classNames()).first() + '_selected');
     },
     /**
-     * Checks whether the page is the last page in the druid 
-     * @returns True if the page is the last one
+     * Checks whether the page is the final page in the druid
+     * @returns True if the page is the final one
      * @type Boolean
      * */
-    isLast: function() {
-	return !!this.readAttribute('iwl:druidLastPage');
+    isFinal: function() {
+	return !!this.readAttribute('iwl:druidFinalPage');
     },
     /**
      * @returns The previous page
@@ -212,18 +317,18 @@ Object.extend(Object.extend(Page, Widget), {
      * @returns The next page
      * */
     nextPage: function() {
-	if (this.isLast()) return;
+	if (this.isFinal()) return;
 	return this.druid.pages[this.druid.pages.indexOf(this) + 1];
     },
     /**
      * Removes the page
-     * @returns The object 
+     * @returns The object
      * */
     remove: function() {
 	this.setSelected(false);
 	this.parentNode.removeChild(this);
 	this.druid.pages = this.druid.pages.without(this);
-	this.druid.currentPage._buttonCorrection();
+	this.druid._refreshButtons();
 	this.emitSignal('remove');
 	return this;
     },
@@ -232,33 +337,98 @@ Object.extend(Object.extend(Page, Widget), {
 	this.druid = druid;
 	this.check = {
 	    callback: this.readAttribute('iwl:druidCheckCallback'),
-	    param: unescape(this.readAttribute('iwl:druidCheckParam') || '[]').evalJSON()
+	    param: unescape(this.readAttribute('iwl:druidCheckParam') || '[]').evalJSON(),
+            collect: false
 	}
-	if (this.check.param) this.check.param = this.check.param.shift();
+	if (this.check.param) {
+            this.check.collect = this.check.param.pop();
+            this.check.param = this.check.param.shift();
+        }
     },
-    _buttonCorrection: function() {
-	var prev = this.prevPage();
-	var next = this.nextPage();
-	var is_last = this.isLast();
-	if (next && !is_last) {
-	    this.druid.nextButton.setStyle({visibility: 'visible'});
-	    this.druid.nextButton.setLabel(this.druid.nextText);
-	} else if (is_last) {
-	    this.druid.nextButton.setStyle({visibility: 'visible'});
-	    this.druid.nextButton.setLabel(this.druid.finishText);
-	} else {
-	    this.druid.nextButton.setStyle({visibility: 'hidden'});
-	}
+    _restorePage: function() {
+        this.__showPage(this);
+        this.__hidePage(this.druid.errorPage, function() {
+                if (this.__expression)
+                    (function () {
+                        try { eval(this.__expression) } catch(e) {};
+                    }).call(this);
+                this.__expression = null;
+                this.druid.okButton.setStyle({visibility: 'hidden'});
+                this.druid._refreshButtons();
+            }.bind(this));
+    },
+    _previousResponse: function(json, params, options) {
+	var final = !!json.extras.final;
+	this.__buttonResponse(this.druid.replacePageBefore(final, this), json, 'previous');
+    },
+    _nextResponse: function(json, params, options) {
+	var final = !!json.extras.final;
+	this.__buttonResponse(this.druid.replacePageAfter(final, this), json, 'next');
+    },
 
-	if (prev) this.druid.backButton.setStyle({visibility: 'visible'});
-	else this.druid.backButton.setStyle({visibility: 'hidden'});
+    __buttonResponse: function(new_page, json, event_type) {
+	var extras = json.extras;
+        if (extras.deter) {
+            this.druid.errorPage.update(unescape(json.data));
+            this._defaultHeight = this.getStyle('height');
+            this.__expression = extras.expression;
+            this.__showError();
+            var event_name = 'IWL-Druid-Page-' + event_type;
+            this._handler = {name: event_name, value: this.hasEvent(event_name)};
+            return;
+        }
+
+	var new_id = extras.newId;
+	if (new_id)
+	    new_page.id = new_id;
+	new_page.update(unescape(json.data));
+
+	["final", "next", "previous"].each(function(type) {
+	    if (!(type in extras)) return;
+	    if (!(extras[type]['url'])) return;
+            var options = Object.extend(extras[type]['options'] || {}, 
+                {method: type == 'next' 
+		         ? '_nextResponse' 
+		         : type == 'previous' 
+			   ? '_previousResponse' : null
+                });
+	    new_page.registerEvent('IWL-Druid-Page-' + type, extras[type]['url'], 
+		extras[type]['params'], options);
+	});
+	new_page.setSelected(true);
     },
-    __completeCheck: function(data, params) {
-	if (!data.userExtras.deter) {
-	    var next = this.nextPage();
-	    if (next) next.setSelected(true, true);
-	} else {
-	    eval(data.data);
-	}
+    __hidePage: function(element, after_finish) {
+        if (!(element = $(element))) return;
+        if (element.hidden === true) return;
+        if (!after_finish) after_finish = Prototype.emptyFunction;
+        element._defaultOverflow = element.getStyle('overflow');
+        element.setStyle({overflow: 'hidden'});
+        var options = {scaleContent: false, transition: Effect.Transitions.sinoidal, duration: 0.6,
+            scaleX: false, afterFinish: after_finish};
+        new Effect.Scale(element, 0 , options);
+        element.hidden = true;
+    },
+    __showPage: function(element) {
+        if (!(element = $(element))) return;
+        if (element.hidden === false) return;
+        var options = $H({scaleX: false, scaleFrom: 0, scaleContent: false, duration: 0.6,
+                transition: Effect.Transitions.sinoidal, scaleMode: 'content',
+                afterFinish: function() {
+                    if (element._defaultOverflow)
+                        element.setStyle({overflow: element._defaultOverflow});
+                    if (element._defaultHeight)
+                        element.setStyle({height: element._defaultHeight});
+                }
+            });
+        new Effect.Scale(element, 100 , options);
+        element.hidden = false;
+    },
+    __showError: function() {
+        this.__hidePage(this, function() {
+                this.druid.okButton.setStyle({visibility: 'visible'});
+                this.druid.backButton.setStyle({visibility: 'hidden'});
+                this.druid.nextButton.setStyle({visibility: 'hidden'});
+            }.bind(this));
+        this.__showPage(this.druid.errorPage);
     }
 });

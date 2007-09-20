@@ -125,16 +125,13 @@ sub _realize {
 }
 
 sub _registerEvent {
-    my ($self, $event, $params) = @_;
+    my ($self, $event, $params, $options) = @_;
 
-    my $handlers = {};
     if ($event eq 'IWL-Notebook-Tab-add') {
-	return $handlers;
+	return $options;
     } else {
-	$self->SUPER::_registerEvent($event, $params);
+	return $self->SUPER::_registerEvent($event, $params, $options);
     }
-
-    return $handlers;
 }
 
 sub _setupDefaultClass {

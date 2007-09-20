@@ -19,7 +19,7 @@ is($t->appendHeader(IWL::Tree::Row->new(id => 'header2')), $t);
 is($t->prependHeader(IWL::Tree::Row->new(id => 'header1')), $t);
 is($t->appendFooter(IWL::Tree::Row->new(id => 'footer2')), $t);
 is($t->prependFooter(IWL::Tree::Row->new(id => 'footer1')), $t);
-like($t->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/builder.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*tree.js.*?
+like($t->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*tree.js.*?
 <table (?:(?:class="(tree)"|id="(\1_\d+)"|cellspacing="0"|cellpadding="0")\s*){4}><thead (?:(?:class="\1_header"|id="\2_header")\s*){2}><tr (?:(?:iwl:treeRowData=".*?"|id="header1"|class="\1_row \1_header_row")\s*){3}></tr>
 <tr (?:(?:iwl:treeRowData=".*?"|id="header2"|class="\1_row \1_header_row")\s*){3}></tr>
 </thead>

@@ -410,6 +410,11 @@ span.button_label {
     text-align: center;
 }
 
+div.button_disabled div.button_top,
+div.button_disabled div.button_bottom {
+    background-color: #cccccc;
+}
+
 div.button_disabled span.button_label {
     color: #999;
     font-weight: normal;

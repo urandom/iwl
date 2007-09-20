@@ -111,7 +111,7 @@ Update the IWL::Stash(3pm) B<STATE> according to the combo state,
 ie. reflect the selected and unselected entries.
 
 Note that this method does not work absolutely correct if you have
-multiple HTML input elements with the same name (attribute).  It 
+multiple HTML input elements with the same name (attribute).  It
 will update B<STATE> as if it was the only element in the entire form.
 
 =cut
@@ -130,7 +130,7 @@ sub extractState {
 	    $value = '' unless defined $value;
 
 	    $first_value = $value unless defined $first_value;
-	    
+
 	    $state->pushValues($name, $value) if $child->isSelected;
 	}
     }
@@ -138,7 +138,7 @@ sub extractState {
     unless ($state->getValues($name)) {
 	$state->pushValues($name, $first_value) if defined $first_value;
     }
-    
+
     return 1;
 }
 
@@ -149,11 +149,11 @@ sub applyState {
     my @values = $state->deleteValues($name);
     my %values = map {$_ => 1} @values;
     my $children = $self->{childNodes};
-    
+
     foreach my $child (@$children) {
 	if ($child->isa('IWL::Combo::Option')) {
 	    my $value = $child->getAttribute('value', 1);
-	    
+
 	    if (defined $value && exists $values{$value}) {
 		$child->setSelected(1);
 	    } else {

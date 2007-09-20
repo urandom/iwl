@@ -233,7 +233,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    if (!row_data) continue;
             var row = null;
 	    if (typeof row_data === 'string') {
-		new Insertion.Bottom(this.body, unescape(row_data));
+                $(this.body).insert(unescape(row_data));
 		row = $A(this.body.rows).last();
 		if (!row.id)
 		    row.id = 'tree_row_' + Math.random();
@@ -296,7 +296,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    if (this.sortImage)
 		this.sortImage.parentNode.removeChild
 		    (this.sortImage);
-	    this.sortImage = Builder.node('img', {
+	    this.sortImage = new Element('img', {
 		className: 'sort_column_image',
 		src: window.IWLConfig.ICON_DIR + icon
 	    });
@@ -449,10 +449,10 @@ Object.extend(Object.extend(Tree, Widget), {
 	}.bind(this));
 	return this;
     },
-    _refreshResponse: function(json, params) {
+    _refreshResponse: function(json, params, options) {
 	if (!json.rows.length) return;
 	if (this.currentRow) this.currentRow.setSelected(false);
-	if (!params.append) {
+	if (!options.append) {
 	    this.body.update();
 	    this.body.childList = [];
 	}
@@ -678,7 +678,7 @@ Object.extend(Object.extend(Row, Widget), {
 	} else {
 	    if (this._expanding) return;
 	    this._expanding = true;
-	    this.emitEvent('IWL-Tree-Row-expand', {all: all});
+	    this.emitEvent('IWL-Tree-Row-expand', {}, {all: all});
 	}
     },
     /**
@@ -761,10 +761,10 @@ Object.extend(Object.extend(Row, Widget), {
 	if (!nav) {
 	    var cell = this.firstChild;
 	    if (!cell) {
-		new Insertion.Bottom(this, "<td>");
+                this.insert("<td>");
 		cell = this.firstChild;
 	    }
-	    new Insertion.Top(cell, this.tree.nav_images.span);
+            $(cell).insert({top: this.tree.nav_images.span});
 	    nav = cell.firstChild;
 	    nav.id = this.id + '_nav_con';
 	}
@@ -828,10 +828,10 @@ Object.extend(Object.extend(Row, Widget), {
 		    this.collapse();}.bind(this));
 	}
     },
-    _expandResponse: function(json, params) {
+    _expandResponse: function(json, params, options) {
 	if (json && json.length != 0) {
 	    this.append(json);
-	    this.expand(params.all);
+	    this.expand(options.all);
 	}
 	this._expanding = false;
     },

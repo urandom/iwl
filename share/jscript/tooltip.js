@@ -47,8 +47,8 @@ Object.extend(Object.extend(Tooltip, Widget), {
      * */
     placeAtElement: function() {
 	if (!this.element) return;
-	var pos = Position.cumulativeOffset(this.element);
-	var scroll = Position.scrollOffset(this.element);
+	var pos = this.element.cumulativeOffset();
+	var scroll = this.element.cumulativeScrollOffset();
 	pos[0] -= scroll[0];
 	pos[1] -= scroll[1];
 	pos[1] += this.element.getDimensions().height;
@@ -113,11 +113,11 @@ Object.extend(Object.extend(Tooltip, Widget), {
     },
 
     __build: function(id) {
-        var container = $(Builder.node('div', {className: 'tooltip', id: id}));
-        var content = $(Builder.node('div', {className: 'tooltip_content'}));
-        var bubble1 = $(Builder.node('div', {className: 'tooltip_bubble tooltip_bubble_1'}));
-        var bubble2 = $(Builder.node('div', {className: 'tooltip_bubble tooltip_bubble_2'}));
-        var bubble3 = $(Builder.node('div', {className: 'tooltip_bubble tooltip_bubble_3'}));
+        var container = new Element('div', {className: 'tooltip', id: id});
+        var content = new Element('div', {className: 'tooltip_content'});
+        var bubble1 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_1'});
+        var bubble2 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_2'});
+        var bubble3 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_3'});
 
         container.appendChild(bubble3);
         container.appendChild(bubble2);

@@ -507,8 +507,10 @@ sub __setup_completion {
     my $self = shift;
     my $id = $self->{__entry}->getId;
     my $url = $self->{__completeOptions}{url};
+    return $self unless $url;
+
     my $receiver = $self->{__receiver}->getId;
-    return unless $url && $receiver;
+    return unless $receiver;
     my $options = $self->{__completeOptions}{options};
     my $text = "new Ajax.Autocompleter('$id', '$receiver', '$url', {";
     foreach my $key (keys %$options) {

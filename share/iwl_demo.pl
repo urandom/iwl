@@ -1,4 +1,5 @@
-#! /usr/bin/perl
+#! /usr/local/bin/perl
+#! /usr/local/bin/perl -d:ptkdb
 # vim: set autoindent shiftwidth=4 tabstop=8:
 
 use strict;
@@ -11,6 +12,7 @@ use IWL::Ajax qw(updaterCallback);
 my $rpc = IWL::RPC->new;
 my %form = $rpc->getParams();
 
+# Tree row handlers
 $rpc->handleEvent(
     'IWL-Tree-Row-expand',
     sub {
@@ -55,9 +57,9 @@ $rpc->handleEvent(
     },
     'IWL-Combo-change',
     sub {
-	my $params = shift;
+        my ($params, $id, $elementData) = @_;
 
-	return {text => 'The combo was changed to ' . $params->{value}}, $params;
+        return {text => 'The combo was changed to ' . $elementData->{$id}}, $params;
     },
 );
 
@@ -79,9 +81,9 @@ $rpc->handleEvent(
 	    return IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
 	} elsif ($page_number == 2) {
 	    return IWL::Label->new(expand => 1)->setText(<<EOF);
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOF
 	} elsif ($page_number == 3) {
@@ -90,15 +92,58 @@ EOF
     }
 );
 
-# Druid handler
+# Druid handlers
 $rpc->handleEvent(
-    'IWL-Druid-Page-check',
+    'IWL-Druid-Page-previous',
     sub {
-	my $params = shift;
-	my $extra = {};
+	my ($params, $id) = @_;
+	my $image = IWL::Image->new, my $label = IWL::Label->new;
 
-	$extra->{deter} = 1 unless $params->{check};
-	return "displayStatus('To proceed to the next page, select the checkbox and try again.')", $extra;
+	if ($id eq 'first_page') {
+	    $image->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
+	    $label->setText('Final page');
+	}
+        return [$image, $label],
+               {
+                   final => {url => 'iwl_demo.pl', options => {update => 'druid_container'}},
+                   newId => 'final_page',
+               }
+    },
+    'IWL-Druid-Page-final',
+    sub {
+	my ($params, $id) = @_;
+	my $label = IWL::Label->new->appendTextType(
+	    'The druid actions have ended', 'h1', style => {'font-style' => 'italic'});
+
+	return $label;
+    },
+    'IWL-Druid-Page-next',
+    sub {
+	my ($params, $id, $elementData) = @_;
+
+	if ($id eq 'first_page') {
+	    my $label = IWL::Label->new->setText(<<'EOF');
+	    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+EOF
+            my $checkbox = IWL::Checkbox->new(name => 'checkbox')->setValue('bar')->setLabel('Confirm?');
+	    return [$label, $checkbox], {
+		newId => 'second_page',
+                next => {url => 'iwl_demo.pl', params => {what => 'third_page'},
+                    options => {emitOnce => 1, collectData => 1}}
+	    };
+	} elsif ($id eq 'second_page') {
+	    my $label, my %deter;
+            if ($elementData->{checkbox}) {
+                $label = IWL::Label->new->setText('The third page');
+            } else {
+                $label = IWL::Label->new->setText('Please confirm!');
+                %deter = (deter => 1, expression => "displayStatus('Fix it!')");
+            }
+	    return [$label], {
+		newId => 'third_page',
+                %deter
+	    };
+	}
     }
 );
 
@@ -127,14 +172,14 @@ if (my $file = $form{upload_file}) {
     $hbox->packStart($notebook);
     $page->requiredJs(@scripts);
     $notebook->appendTab('Display', $container)->setId('display_tab');
-    $notebook->appendTab('Source')->setId('source_tab')->registerEvent('IWL-Notebook-Tab-select' => 'iwl_demo.pl', {
-	    disableView => {fullCover => 1},
+    $notebook->appendTab('Source')->setId('source_tab')->registerEvent('IWL-Notebook-Tab-select' => 'iwl_demo.pl', {}, {
 	    onStart => <<'EOF',
 var content = $('content').down();
 if (content)
     params.codeFor = content.id;
 EOF
 	    update => "source_page",
+	    disableView => {fullCover => 1},
     });
 
     build_tree($tree);
@@ -260,16 +305,19 @@ sub generate_buttons {
     my $normal_button = IWL::Button->new(style => {float => 'none'}, id => 'normal_button');
     my $stock_button = IWL::Button->newFromStock('IWL_STOCK_APPLY', style => {float => 'none'}, id => 'stock_button', size => 'medium');
     my $image_button = IWL::Button->new(style => {float => 'none'}, id => 'image_button', size => 'small')->setHref('iwl_demo.pl');
+    my $disabled_button = IWL::Button->new(style => {float => 'none'}, id => 'disabled_button');
     my $input_button = IWL::InputButton->new(id => 'input_button');
     my $check = IWL::Checkbox->new;
     my $radio1 = IWL::RadioButton->new;
     my $radio2 = IWL::RadioButton->new;
 
-    $container->appendChild($normal_button, $stock_button, $image_button, $input_button, $check, IWL::Break->new, $radio1, $radio2);
+    $container->appendChild($normal_button, $stock_button, $image_button, $disabled_button,
+        $input_button, $check, IWL::Break->new, $radio1, $radio2);
     $normal_button->setTitle('This is a title');
     $image_button->setImage('IWL_STOCK_DELETE');
     $normal_button->setLabel('Labeled button')->setClass('demo');
     $stock_button->signalConnect(load => "displayStatus('Stock button loaded')");
+    $disabled_button->setLabel('Disabled button')->setDisabled(1);
     $input_button->setLabel('Input Button');
     $check->setLabel('A check button');
     $radio1->setLabel('A radio button');
@@ -329,9 +377,9 @@ sub generate_labels {
     $container->appendChild($paragraph);
     $normal_label->setText('A label');
     $paragraph->setText(<<EOF);
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOF
 
@@ -584,19 +632,17 @@ sub generate_contentbox {
 
 sub generate_druid {
     my $container = IWL::Container->new(id => 'druid_container');
-    my $druid = IWL::Druid->new(id => 'druid')->setStyle(width => '300px');
+    my $druid = IWL::Druid->new(id => 'druid');
     my $label1 = IWL::Label->new;
-    my $label2 = IWL::Label->new;
 
-    my $page1 = $druid->appendPage($label1)->signalConnect(remove => "displayStatus('Page 1 removed.')");;
-    $druid->appendPage($label2)->signalConnect(select => "displayStatus('Page 2 selected.')");
     $container->appendChild($druid);
+    my $page = $druid->appendPage($label1)->signalConnect(remove => "displayStatus('Page 1 removed.')");;
+    $page->registerEvent(
+	'IWL-Druid-Page-previous', 'iwl_demo.pl', {where => 'going back...'}
+    )->registerEvent(
+        'IWL-Druid-Page-next', 'iwl_demo.pl', {}, {emitOnce => 1}
+    )->setId('first_page');
     $label1->setText('This is page 1');
-    $label2->setText('This is page 2');
-    $page1->appendChild(IWL::Checkbox->new(id => 'druid_check'));
-    $page1->registerEvent('IWL-Druid-Page-check', 'iwl_demo.pl', {
-	    onStart => q|params.check = $('druid_check').checked|
-    });
 
     return $container->getObject;
 }
@@ -663,13 +709,19 @@ sub generate_rpc_events {
     $combo->appendOption('First option' => 'first');
     $combo->appendOption('Second option' => 'second');
 
-    $link->registerEvent('IWL-Anchor-click', 'iwl_demo.pl', {
+    $link->registerEvent('IWL-Anchor-click', 'iwl_demo.pl', {}, {
 	    onStart => "this.remove()",
 	    update => 'rpc_label',
 	    insertion => 'bottom',
     });
-    $button->registerEvent('IWL-Button-click', 'iwl_demo.pl', {onComplete => "displayStatus(arguments[0].data.text)", emitOnce => 1});
-    $combo->registerEvent('IWL-Combo-change', 'iwl_demo.pl', {onComplete => "displayStatus(arguments[0].data.text)"});
+    $button->registerEvent('IWL-Button-click', 'iwl_demo.pl', {}, {
+            onComplete => "displayStatus(arguments[0].data.text)",
+            emitOnce => 1
+    });
+    $combo->registerEvent('IWL-Combo-change', 'iwl_demo.pl', {}, {
+            onComplete => "displayStatus(arguments[0].data.text)",
+            collectData => 1
+    });
 
     $label->appendChild($link);
     $container->appendChild($label, $button, $combo);
@@ -681,7 +733,7 @@ sub generate_rpc_pagecontrol {
     my $container = IWL::Container->new(id => 'rpc_pagecontrol_container');
     my $content = IWL::Container->new(id => 'page_content');
     my $pager = IWL::PageControl->new(pageCount => 3, pageSize => 10, id => 'pagecontrol')->bindToWidget(
-	  $content, 'iwl_demo.pl', {update => 'page_content', evalScripts => 1}
+          $content, 'iwl_demo.pl', {}, {update => 'page_content', evalScripts => 1}
     );
 
     $content->appendChild(IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif'));
@@ -697,8 +749,9 @@ sub register_row_event {
 	$function =~ s/_row$//;
 	$row->registerEvent('IWL-Tree-Row-activate', 'iwl_demo.pl', {
 		function => $function,
-		disableView => 1,
+        }, {
 		onComplete => 'activate_widgets_response(json)',
+		disableView => 1,
 	});
     }
 }
@@ -772,7 +825,7 @@ sub show_the_code_for {
     my $paragraph = IWL::Label->new;
 
     if ($code_for eq 'buttons_container') {
-	$paragraph->appendTextType(read_code("generate_buttons", 24), 'pre');
+	$paragraph->appendTextType(read_code("generate_buttons", 27), 'pre');
     } elsif ($code_for eq 'entries_container') {
 	$paragraph->appendTextType(read_code("generate_entries", 24), 'pre');
     } elsif ($code_for eq 'images_container') {
@@ -793,13 +846,15 @@ sub show_the_code_for {
 	$paragraph->appendTextType(read_code("generate_table", 41), 'pre');
     } elsif ($code_for eq 'tree_container') {
 	$paragraph->appendTextType(read_code("sub build_tree", 113), 'pre');
+        $paragraph->appendTextType(read_code("Tree row handlers", 21), 'pre');
+        $paragraph->appendTextType(read_code('^\);', 1), 'pre');
     } elsif ($code_for eq 'contentbox_container') {
 	$paragraph->appendTextType(read_code("generate_contentbox", 22), 'pre');
     } elsif ($code_for eq 'accordions_container') {
 	$paragraph->appendTextType(read_code("generate_accordions", 20), 'pre');
     } elsif ($code_for eq 'druid_container') {
-	$paragraph->appendTextType(read_code("generate_druid", 18), 'pre');
-	$paragraph->appendTextType(read_code("Druid handler", 11), 'pre');
+	$paragraph->appendTextType(read_code("generate_druid", 16), 'pre');
+	$paragraph->appendTextType(read_code("Druid handlers", 54), 'pre');
     } elsif ($code_for eq 'notebook_container') {
 	$paragraph->appendTextType(read_code("generate_notebook", 15), 'pre');
     } elsif ($code_for eq 'tooltips_container') {

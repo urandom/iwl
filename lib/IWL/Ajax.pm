@@ -45,7 +45,7 @@ A javascript function to be called after the update takes place
 
 =back
 
-=cut 
+=cut
 
 sub updaterCallback {
     my ($id, $url, %options) = @_;
@@ -63,10 +63,10 @@ sub updaterCallback {
 
     $options .= ",evalScripts: true" if $options{evalScripts};
     $options .= {
-	after  => ',insertion: Insertion.After',
-	before => ',insertion: Insertion.Before',
-	bottom => ',insertion: Insertion.Bottom',
-	top    => ',insertion: Insertion.Top',
+	after  => ",insertion: 'after'",
+	before => ",insertion: 'before'",
+	bottom => ",insertion: 'bottom'",
+	top    => ",insertion: 'top'",
     }->{$options{insertion}} if $options{insertion};
 
     return "new Ajax.Updater('$id', '$url', {$options})";

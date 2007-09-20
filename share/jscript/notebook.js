@@ -75,18 +75,18 @@ Object.extend(Object.extend(Notebook, Widget), {
     },
 
     __createTab: function(text, data) {
-	var tab = Builder.node('li', {
+	var tab = new Element('li', {
 	    'class': $A(this.classNames()).first() + '_tab',
 	    id: this.id + '_tab_' + this.tabs.length
 	});
 	
-	var page = Builder.node('div', {
+	var page = new Element('div', {
 	    'class': $A(this.classNames()).first() + '_page',
 	    id: this.id + '_page_' + this.tabs.length
 	});
 	page.style.display = 'none';
 
-	var anchor = Builder.node('a', text);
+	var anchor = new Element('a', text);
 	tab.appendChild(anchor);
 	Tab.create(tab, this, page);
 	this.tabs.push(tab);

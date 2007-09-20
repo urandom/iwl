@@ -47,7 +47,7 @@ sub newFromCGI {
     }
     bless {
 	__state => $info,
-    }, $class;    
+    }, $class;
 }
 
 sub newFromHash {
@@ -163,7 +163,7 @@ sub shiftValue {
     my $state = $self->{__state};
 
     return unless exists $state->{$key};
-    
+
     my $value = shift @{$state->{$key}};
     delete $state->{$key} unless @{$state->{$key}};
 
@@ -175,7 +175,7 @@ sub popValue {
     my $state = $self->{__state};
 
     return unless exists $state->{$key};
-    
+
     my $value = pop @{$state->{$key}};
     delete $state->{$key} unless @{$state->{$key}};
 
@@ -315,7 +315,7 @@ sub toURIParams {
     foreach my $key ($self->keys) {
 	my @values = $self->getValues ($key);
 	foreach my $value (@values) {
-	    push @result, (encodeURI($key) . '=' 
+	    push @result, (encodeURI($key) . '='
 			   . encodeURI($value));
 	}
     }
@@ -328,7 +328,7 @@ sub toHiddenInputs {
 
     require IWL::Container;
     require IWL::Hidden;
-    
+
     my $container = IWL::Container->new;
     foreach my $key ($self->keys) {
 	my @values = $self->getValues ($key);
@@ -420,7 +420,7 @@ IWL::Stash - Encapsulation of HTML form information
 
 =head1 DESCRIPTION
 
-The B<IWL::Stash> class encapsulates the information that can be 
+The B<IWL::Stash> class encapsulates the information that can be
 carried by an HTML form.
 
 =head1 CONSTRUCTORS
@@ -456,7 +456,7 @@ fields).  Example:
                                template => '911dvd');
 
 
-Note that a reference to the B<FORMHASH> is used, and the array references 
+Note that a reference to the B<FORMHASH> is used, and the array references
 possibly used as values are B<not>
 dereferenced.  If that is an issue for you, copy your freshly created object
 with the clone() constructor (see below).

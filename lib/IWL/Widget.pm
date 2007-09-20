@@ -26,7 +26,7 @@ The Widget package provides basic methods that every widget inherits.
 
 IWL::Widget->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-value options. 
+Where B<%ARGS> is an optional hash parameter with with key-value options.
 
 IWL::Widget->newMultiple (B<ARGS>, B<ARGS>, ...)
 
@@ -157,7 +157,7 @@ Registers a javascript expression to be evaluated on each emission of the B<SIGN
 Parameters: B<SIGNAL> - the signal string, B<EXPR> - the javascript expression to be invoked
 
 Returns: returns false if the signal is invalid
-  
+
 =cut
 
 sub signalConnect {
@@ -527,83 +527,15 @@ sub _constructorArguments {
     }
 }
 
-=item B<registerEvent> (B<EVENT>, B<URL>, B<PARAMS>)
-
-Registers a generic event handler to the given event. The event will be processed by a IWL::RPC::handleEvent(3pm) call in the handling script.
-
-Parameters: B<EVENT> - The event name to register. B<URL> the script url, which will provide the event handling. B<PARAMS> - a hash of parameters to be passed to the handler subroutine as a parameter. The following parameters are also interpretted:
-
-=over 8
-
-=item B<onStart>
-
-A javascript expression to be evaluated before the request takes place. It receives I<PARAMS> as an argument
-
-=item B<onComplete>
-
-A javascript expression to be evaluated after the request takes place
-
-=item B<update>
-
-The id of element to be updated. If empty, the document body is updated. The following parameters are also taken under consideration if this one is specified:
-
-=over 12
-
-=item B<evalScripts>
-
-True, if any script elements in the response should be evaluated using javascript's eval() function
-
-=item B<insertion>
-
-If omitted, the contents of the container will be replaced with the response of the script. Otherwise, depeding on the value, the reponse will be placed around the exsting content. Valid values are:
-
-=over 16
-
-=item B<after>
-
-Will be inserted as the next sibling of the container, 
-
-=item B<before>
-
-Will be inserted as the previous sibling of the container,
-
-=item B<bottom>
-
-Will be inserted as the last child of the container,
-
-=item B<top>
-
-Will be inserted as the first child of the container
-
-=back
-
-=back
-
-=back
-
-=cut 
-
 sub _registerEvent {
-    my ($self, $event, $params) = @_;
+    my ($self, $event, $params, $options) = @_;
 
-    my $handlers = {};
     my ($package, $signal) = $event =~ /^(.*)-(\w+)$/;
     $package =~ s/-/::/g;
     return unless ref $self eq $package;
 
-    if (exists $params->{update}) {
-	$handlers->{update} = $params->{update} || 'document.body';
-	$handlers->{insertion} = {
-	    after  => 'Insertion.After',
-	    before => 'Insertion.Before',
-	    bottom => 'Insertion.Bottom',
-	    top    => 'Insertion.Top',
-	}->{$params->{insertion}} if $params->{insertion};
-	$handlers->{evalScripts} = 'true' if $params->{evalScripts};
-    }
-
-    $self->signalConnect($signal => "this.emitEvent('$event', {value: this.value})");
-    return $handlers;
+    $self->signalConnect($signal => "this.emitEvent('$event', {}, {id: this.id})");
+    return $options;
 }
 
 # Internal

@@ -4,14 +4,17 @@
 package IWL::Object;
 
 use strict;
-use constant JSON_HEADER => "Content-type: text/plain\nX-IWL: 1\n\n";
+use constant JSON_HEADER => "Content-type: application/json\nX-IWL: 1\n\n";
 use constant HTML_HEADER => "Content-type: text/html; charset=utf-8\n\n";
 
 use IWL::Config qw(%IWLConfig);
 
 use JSON;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken isweak);
 use IWL::String qw(encodeURI escapeHTML escape);
+
+# Used to detect looped networks and avoid infinite recursion.
+use vars qw(%cloneCache);
 
 # A hash to keep track of initialized js.
 my %initialized_js;
@@ -195,7 +198,7 @@ sub appendChild {
     return if !@objects;
     return if $self->{_noChildren};
 
-    weaken($_->{parentNode} = $self)
+    $_->{parentNode} = $self and weaken $_->{parentNode}
         foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
 
     push @{$self->{childNodes}}, @objects;
@@ -217,7 +220,7 @@ sub prependChild {
     return if !@objects;
     return if $self->{_noChildren};
 
-    weaken($_->{parentNode} = $self)
+    $_->{parentNode} = $self and weaken $_->{parentNode}
         foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
 
     unshift @{$self->{childNodes}}, @objects;
@@ -239,7 +242,7 @@ sub insertAfter {
     return if !@objects;
     return if $self->{_noChildren};
 
-    weaken($_->{parentNode} = $self)
+    $_->{parentNode} = $self and weaken $_->{parentNode}
         foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
 
     my $i;
@@ -267,13 +270,108 @@ sub setChild {
     return if !@objects;
     return if $self->{_noChildren};
 
-    weaken($_->{parentNode} = $self)
+    $_->{parentNode} = $self and weaken $_->{parentNode}
         foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
 
     $self->{childNodes} = [];
     push @{$self->{childNodes}}, @objects;
 
     return $self;
+}
+
+=item B<clone> (B<DEPTH>)
+
+Clones itself and optionally, its children
+
+Parameters: B<DEPTH> - The optional depth limit of the cloining
+
+Note: Copied the implementation from Clone::PP(3pm). Weak pointers are discarded, and not cloned. This is done to ensure that objects, such as the parent node of an object, are not cloned.
+
+=cut
+
+sub clone {
+    my ($self, $depth) = @_;
+
+    # Optional depth limit: after a given number of levels, do shallow copy.
+    return $self if (defined $depth and $depth -- < 1);
+
+    # Maintain a shared cache during recursive calls, then clear it at the end.
+    local %cloneCache = (undef => undef) unless exists $cloneCache{undef};
+
+    return $cloneCache{$self} if exists $cloneCache{$self};
+
+    # Non-reference values are copied shallowly
+    my $ref_type = ref $self or return $self;
+
+    # Extract both the structure type and the class name of referent
+    my $class_name;
+    if ("$self" =~ /^\Q$ref_type\E\=([A-Z]+)\(0x[0-9a-f]+\)$/) {
+        $class_name = $ref_type;
+        $ref_type = $1;
+        # Some objects would prefer to clone themselves
+        return $cloneCache{$self} = $self->_IWLClone()
+          if $self->can('_IWLClone');
+    }
+
+    # To make a copy:
+    # - Prepare a reference to the same type of structure;
+    # - Store it in the cache, to avoid looping it it refers to itself;
+    # - Tie in to the same class as the original, if it was tied;
+    # - Assign a value to the reference by cloning each item in the original;
+
+    my $copy;
+    if ($ref_type eq 'HASH') {
+        $cloneCache{$self} = $copy = {};
+        if (my $tied = tied(%$self)) {tie %$copy, ref $tied}
+        foreach my $key (keys %$self) {
+            if (ref $self->{$key}) {
+                if (isweak $self->{$key}) {
+                    $copy->{$key} = $cloneCache{$self->{$key}} || $self->{$key};
+                    weaken $copy->{$key};
+                } else {
+                    $copy->{$key} = clone($self->{$key}, $depth);
+                }
+            } else {
+                $copy->{$key} = $self->{$key};
+            }
+        }
+    } elsif ($ref_type eq 'ARRAY') {
+        $cloneCache{$self} = $copy = [];
+        if (my $tied = tied(@$self)) {tie @$copy, ref $tied}
+        foreach my $val (@$self) {
+            if (ref $val) {
+                if (isweak $val) {
+                    push @$copy, ($cloneCache{$val} || $val);
+                    weaken @$copy[$#$copy];
+                } else {
+                    push @$copy, clone($val, $depth);
+                }
+            } else {
+                push @$copy, $val;
+            }
+        }
+    } elsif ($ref_type eq 'REF' or $ref_type eq 'SCALAR') {
+        $cloneCache{$self} = $copy = \(my $var = "");
+        if (my $tied = tied($$self)) {tie $$copy, ref $tied}
+        if (isweak $self) {
+            $copy = $cloneCache{$self} || $self;
+            weaken $copy;
+        } else {
+            $$copy = clone($$self, $depth);
+        }
+    } else {
+        # Shallow copy anything else; this handles a reference to code, glob, regex
+        $cloneCache{$self} = $copy = $self;
+    }
+
+    # - Bless it into the same class as the original, if it was blessed;
+    # - If it has a post-cloning initialization method, call it.
+    if ($class_name) {
+        bless $copy, $class_name;
+        $copy->_IWLCloneInit if $copy->can('_IWLCloneInit');
+    }
+
+    return $copy;
 }
 
 =item B<getContent>
@@ -661,7 +759,7 @@ sub appendAfter {
 
 =item B<requiredJs> [B<URLS>]
 
-Adds the list of urls (relative to JS_DIR) as required by the object 
+Adds the list of urls (relative to JS_DIR) as required by the object
 
 Parameters: B<URLS> - a list of required javascript files
 
@@ -677,7 +775,6 @@ sub requiredJs {
 	    $self->requiredJs(
 		'dist/prototype.js',
 		'prototype_extensions.js',
-		'dist/builder.js',
 		'dist/effects.js',
 		'dist/controls.js',
 		'scriptaculous_extensions.js');
@@ -685,7 +782,7 @@ sub requiredJs {
 
 	my $script = IWL::Script->new;
 	my $src    = $url ;
-	$src       = $IWLConfig{JS_DIR} . '/' . $src 
+	$src       = $IWLConfig{JS_DIR} . '/' . $src
 	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
 	$script->setSrc($src);
@@ -697,7 +794,7 @@ sub requiredJs {
 
 =item B<requiredConditionalJs> [B<CONDITION>, B<URLS>]
 
-Adds the list of urls inside a conditonal comment (relative to JS_DIR) as required by the object 
+Adds the list of urls inside a conditonal comment (relative to JS_DIR) as required by the object
 
 Parameters: B<CONDITION> - the comment condition, see IWL::Comment(3pm) B<URLS> - a list of required javascript files
 
@@ -714,7 +811,6 @@ sub requiredConditionalJs {
 	    $self->requiredConditionalJs($condition,
 		'dist/prototype.js',
 		'prototype_extensions.js',
-		'dist/builder.js',
 		'dist/effects.js',
 		'scriptaculous_extensions.js');
 	}
@@ -915,7 +1011,7 @@ sub getState {
 
     require IWL::Stash;
     my $state = IWL::Stash->new;
-    
+
     $self->__iterateForm ($self, $state, 'extractState');
 
     $state->setDirty (0);
@@ -946,7 +1042,7 @@ sub __iterateForm {
 	my $type = $obj->getAttribute ('type');
 	return 1 if $type && 'submit' eq lc $type;
 	return 1 if $type && 'image' eq lc $type;
-	
+
 	$obj->$method ($state);
 
 	return $self;
@@ -955,8 +1051,8 @@ sub __iterateForm {
     my $children = $obj->{childNodes};
     foreach my $child (@$children) {
 	$self->__iterateForm ($child, $state, $method);
-    }    
-    
+    }
+
     return $self;
 }
 

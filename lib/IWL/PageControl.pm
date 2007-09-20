@@ -67,18 +67,18 @@ sub new {
 
 =over 4
 
-=item B<bindToWidget> (B<WIDGET>, B<URL>, B<PARAMS>)
+=item B<bindToWidget> (B<WIDGET>, B<URL>, [B<PARAMS>, B<OPTIONS>])
 
 Binds the widget to the page control and automatically registers a 'refresh' event for it
 
-Parameters: B<WIDGET> - the widget to bind to, B<URL> - the url that will process the created event, B<PARAMS> - the user parameters
+Parameters: B<WIDGET> - the widget to bind to, B<URL> - the url that will process the created event, B<PARAMS> - the user parameters, B<OPTIONS> - event options
 
 Note: The widget id must not be changed after this method is called.
 
 =cut
 
 sub bindToWidget {
-    my ($self, $widget, $url, $params) = @_;
+    my ($self, $widget, $url, $params, $options) = @_;
     my $id = $widget->getId;
 
     return unless $widget && $widget->can('registerEvent') && $id;
@@ -89,7 +89,7 @@ sub bindToWidget {
     $self->{__bind}{widgetId} = $id;
     $self->{__options}{bound} = 1;
 
-    $widget->registerEvent($event_name, $url, $params);
+    $widget->registerEvent($event_name, $url, $params, $options);
     return $self;
 }
 

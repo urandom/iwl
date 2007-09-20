@@ -66,7 +66,7 @@ sub new {
 
 =item B<setFinal> (B<BOOL>)
 
-Makes the page the last one, thus changing the 'next' button to a 'finish'
+Makes the page the final one, thus changing the 'next' button to a 'finish'
 
 =cut
 
@@ -74,9 +74,9 @@ sub setFinal {
     my ($self, $bool) = @_;
 
     if ($bool) {
-	$self->setAttribute('iwl:druidLastPage' => 1);
+	$self->setAttribute('iwl:druidFinalPage' => 1);
     } else {
-	$self->deleteAttribute('iwl:druidLastPage');
+	$self->deleteAttribute('iwl:druidFinalPage');
     }
     return $self;
 }
@@ -88,7 +88,7 @@ Returns true if the page is the final page in the druid
 =cut
 
 sub isFinal {
-    return shift->getAttribute('iwl:druidLastPage', 1);
+    return shift->getAttribute('iwl:druidFinalPage', 1);
 }
 
 =item B<setSelected> (B<BOOL>)
@@ -116,20 +116,20 @@ sub isSelected {
     return shift->{__selected};
 }
 
-=item B<setCheckCB> (B<CALLBACK>, B<PARAM>)
+=item B<setCheckCB> (B<CALLBACK>, B<PARAM>, B<COLLECT>)
 
 Sets the check callback for the page
 
-Parameters: B<CALLBACK> - the function to be called when pressing the C<NEXT> button (if it returns true, the druid will proceed to the next page), B<PARAM> the parameter of the callback
+Parameters: B<CALLBACK> - the function to be called when pressing the C<NEXT> button (if it returns true, the druid will proceed to the next page), B<PARAM> the parameter of the callback, B<COLLECT> - if true, collects all the control elements inside the page, and converts their names and values into a hash
 
 =cut
 
 sub setCheckCB {
-    my ($self, $callback, $param) = @_;
+    my ($self, $callback, $param, $collect) = @_;
     return unless $callback;
     $self->setAttribute('iwl:druidCheckCallback' => "$callback", 'none');
     if ($param) {
-	$param = objToJson([$param]);
+        $param = objToJson([$param, !(!$collect)]);
 	$self->setAttribute('iwl:druidCheckParam' => $param, 'escape');
     }
 
@@ -138,6 +138,28 @@ sub setCheckCB {
 
 # Protected
 #
+sub _registerEvent {
+    my ($self, $event, $params, $options) = @_;
+
+    if ($event eq 'IWL-Druid-Page-next') {
+	$options->{method} = '_nextResponse';
+    } elsif ($event eq 'IWL-Druid-Page-previous') {
+	$options->{method} = '_previousResponse';
+    } else {
+	return $self->SUPER::_registerEvent($event, $params, $options);
+    }
+
+    return $options;
+}
+
+sub _previousEvent {
+    __buttonEvent(@_);
+}
+
+sub _nextEvent {
+    __buttonEvent(@_);
+}
+
 sub _setupDefaultClass {
     my $self = shift;
     my $index = 0;
@@ -159,6 +181,18 @@ sub __init {
     $self->_constructorArguments(%args);
 
     return $self;
+}
+
+sub __buttonEvent {
+    my ($event, $handler) = @_;
+    my ($list, $extras) = $handler->($event->{params}, $event->{options}{id}, $event->{options}{elementData})
+        if 'CODE' eq ref $handler;
+    $list = [] unless ref $list eq 'ARRAY';
+    my $html = escape(join('', map {$_->getContent} @$list));
+
+    IWL::Object::printJSONHeader;
+    print '{data: "' . $html . '", extras: '
+      . (objToJson($extras) || 'null') . '}';
 }
 
 1;

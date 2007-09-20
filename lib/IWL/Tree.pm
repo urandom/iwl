@@ -220,7 +220,7 @@ sub appendBody {
         $prev_row->{_lastRow} = 0;
     }
     $self->{_bodyRows}{$row} = 1;
-    weaken($row->{_tree} = $self);
+    $row->{_tree} = $self and weaken $row->{_tree};
     $self->__flag_children($row);
     push @{$self->{_body}{_children}}, $row;
 
@@ -245,7 +245,7 @@ sub prependBody {
 
 sub appendHeader {
     my ($self, $row) = @_;
-    weaken($row->{_tree} = $self);
+    $row->{_tree} = $self and weaken $row->{_tree};
     $row->setNavigation(0);
     $self->SUPER::appendHeader($row);
 }
@@ -259,7 +259,7 @@ sub prependHeader {
 
 sub appendFooter {
     my ($self, $row) = @_;
-    weaken($row->{_tree} = $self);
+    $row->{_tree} = $self and weaken $row->{_tree};
     $self->SUPER::appendFooter($row);
 }
 
@@ -306,30 +306,28 @@ sub _realize {
 }
 
 sub _registerEvent {
-    my ($self, $event, $params) = @_;
+    my ($self, $event, $params, $options) = @_;
 
-    my $handlers = {};
     if ($event eq 'IWL-Tree-refresh') {
-	$handlers->{method} = '_refreshResponse';
-        $handlers->{append} = $params->{append} ? 'true' : 'false';
+	$options->{method} = '_refreshResponse';
     } else {
-	$self->SUPER::_registerEvent($event, $params);
+	return $self->SUPER::_registerEvent($event, $params, $options);
     }
 
-    return $handlers;
+    return $options;
 }
 
 sub _refreshEvent {
-    my ($params, $handler) = @_;
+    my ($event, $handler) = @_;
 
     IWL::Object::printJSONHeader;
-    my ($list, $user_extras) = $handler->($params->{userData})
+    my ($list, $extras) = $handler->($event->{params})
         if 'CODE' eq ref $handler;
     $list = [] unless ref $list eq 'ARRAY';
 
     print '{rows: ['
            . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
-           . '], userExtras: ' . (objToJson($user_extras) || 'null'). '}';
+           . '], extras: ' . (objToJson($extras) || 'null'). '}';
 }
 
 # Internal

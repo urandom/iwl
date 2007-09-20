@@ -22,7 +22,7 @@ is($cb->setShadows(1), $cb);
 is($cb->setAutoWidth(1), $cb);
 is($cb->setTitleImage, $cb);
 
-like($cb->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/builder.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*dist/dragdrop.js.*dist/resizer.js.*contentbox.js.*?
+like($cb->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*dist/dragdrop.js.*dist/resizer.js.*contentbox.js.*?
 <div (?:(?:class="contentbox shadowbox"|id="cb")\s*){2}><div (?:(?:class="contentbox_top"|id="cb_top")\s*){2}><div (?:(?:class="contentbox_topr"|id="cb_topr")\s*){2}></div>
 </div>
 <div (?:(?:class="contentbox_title"|id="cb_title"|style="cursor: move; ")\s*){3}><div (?:(?:class="contentbox_titler"|id="cb_titler"|style="cursor: move; ")\s*){3}><span id="label_\d+">Foo bar<br />

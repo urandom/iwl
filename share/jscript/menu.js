@@ -23,10 +23,10 @@ Object.extend(Object.extend(Menu, Widget), {
             if (this.parentMenu && !this.parentMenu.hasClassName('menubar'))
                 this.parentMenu.setStyle({display: 'block'});
 	    if (this.parentMenu && this.parentMenu.getStyle('position') == 'absolute')
-		paren_position = Position.cumulativeOffset(this.parentItem);
+		paren_position = this.parentItem.cumulativeOffset();
 	    else
-		paren_position = Position.positionedOffset(this.parentItem);
-	    var paren_dimensions = Element.getDimensions(this.parentItem);
+		paren_position = this.parentItem.positionedOffset();
+	    var paren_dimensions = this.parentItem.getDimensions();
 	    if (this.hasClassName('submenu')) {
 		Element.setStyle(this, {left: paren_dimensions.width + 'px'});
 	    } else {
@@ -184,7 +184,7 @@ Object.extend(Object.extend(Menu, Widget), {
     },
     _bindPop: function(event, parentItem) {
 	if (parentItem)
-	    this.parentItem = parentItem;
+	    this.parentItem = $(parentItem);
 	if (this.popped)
 	    this.popDown();
 	else
@@ -196,7 +196,7 @@ Object.extend(Object.extend(Menu, Widget), {
 	if (!ie4 || ie7) return;
 	if (this.__qframe) return;
 	var dims = Element.getDimensions(this);
-	var qframe = Builder.node('iframe', {
+	var qframe = new Element('iframe', {
 	    src: "javascript: false", className: "qframe",
 	    style: "width: " + dims.width + "px; height: " + dims.height + "px;"
 	});
@@ -215,9 +215,9 @@ Object.extend(Object.extend(Menu, Widget), {
 	var new_width = parseInt(width) + 20;
 	this.addClassName('scrolling_menu');
 	if (opera)
-	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', 'overflow': 'auto'});
+	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflow: 'auto'});
 	else
-	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', 'overflow-y': 'scroll'});
+	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflowY: 'scroll'});
     },
     __KeyEventsCB: function(event) {
 	var keyCode = getKeyCode(event);

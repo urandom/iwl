@@ -94,7 +94,7 @@ function $s(style) {
 
 Object.extend(Ajax.Autocompleter.prototype, {
   fixIEOverlapping: function() {
-    Position.clone(this.update, this.iefix, {setTop:(!this.update.style.height)});
+    this.update.clone(this.iefix, {setTop:(!this.update.style.height)});
     this.iefix.style.zIndex = $s('iframe.completion').zIndex;
     this.update.style.zIndex = $s('ul.completion').zIndex;
     Element.show(this.iefix);

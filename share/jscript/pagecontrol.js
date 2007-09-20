@@ -89,44 +89,44 @@ Object.extend(Object.extend(PageControl, Widget), {
 	this.firstButton.signalConnect('click', function() {
 	    if (!this.element) return;
 	    this.emitSignal('current_page_is_changing', {type: 'first'});
-	    this.element.emitEvent(this.eventName, {userData: {
+	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'first',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
-	    }, onComplete: this.__onEventComplete.bind(this)});
+	    }, {responseCallback: this.__onEventComplete.bind(this)});
 	}.bind(this));
 	this.prevButton.signalConnect('click', function() {
 	    if (!this.element) return;
 	    this.emitSignal('current_page_is_changing', {type: 'prev'});
-	    this.element.emitEvent(this.eventName, {userData: {
+	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'prev',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
-	    }, onComplete: this.__onEventComplete.bind(this)});
+	    }, {responseCallback: this.__onEventComplete.bind(this)});
 	}.bind(this));
 	this.nextButton.signalConnect('click', function() {
 	    if (!this.element) return;
 	    this.emitSignal('current_page_is_changing', {type: 'next'});
-	    this.element.emitEvent(this.eventName, {userData: {
+	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'next',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
-	    }, onComplete: this.__onEventComplete.bind(this)});
+	    }, {responseCallback: this.__onEventComplete.bind(this)});
 	}.bind(this));
 	this.lastButton.signalConnect('click', function() {
 	    if (!this.element) return;
 	    this.emitSignal('current_page_is_changing', {type: 'last'});
-	    this.element.emitEvent(this.eventName, {userData: {
+	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'last',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
-	    }, onComplete: this.__onEventComplete.bind(this)});
+	    }, {responseCallback: this.__onEventComplete.bind(this)});
 	}.bind(this));
 	this.input.signalConnect('keydown', function(event) {
 	    if (!this.element) return;
 	    if (event.keyCode == 13 && this.input.value != this.currentPage) {
 		if (!checkElementValue(this.input, {reg:/^\d*$/})) return;
 		this.emitSignal('current_page_is_changing', {type: 'input', value: this.input.value});
-		this.element.emitEvent(this.eventName, {userData: {
+		this.element.emitEvent(this.eventName, {
 		    page: this.currentPage, type: 'input',
 		    value: this.input.value, pageSize: this.options.pageSize, pageCount: this.options.pageCount
-		}, onComplete: this.__onEventComplete.bind(this)});
+		}, {responseCallback: this.__onEventComplete.bind(this)});
 	    }
 	}.bind(this));
     },
@@ -146,28 +146,27 @@ Object.extend(Object.extend(PageControl, Widget), {
 	    this.input.value = this.currentPage;
 	}
     },
-    __onEventComplete: function(json, params) {
-	if (params.update) {
-	    var data = params.userData;
+    __onEventComplete: function(json, params, options) {
+	if (options.update) {
 	    var page = {
-		input: data.value,
+		input: params.value,
 		first: 1,
-		prev: data.page - 1 || 1,
-		next: data.page + 1 > data.pageCount ? data.pageCount : data.page + 1,
-		last: data.pageCount
+		prev: params.page - 1 || 1,
+		next: params.page + 1 > params.pageCount ? params.pageCount : params.page + 1,
+		last: params.pageCount
 	    };
-	    var options = {page: page[data.type]};
+	    var page_options = {page: page[params.type]};
 	} else {
-	    var options = json.userExtras;
+	    var page_options = json.extras;
 	}
-	if (options) {
-	    if (options.page)
-		this.currentPage = options.page;
-	    if (options.pageSize)
-		this.setPageSize(options.pageSize);
+	if (page_options) {
+	    if (page_options.page)
+		this.currentPage = page_options.page;
+	    if (page_options.pageSize)
+		this.setPageSize(page_options.pageSize);
 
-	    if (options.pageCount) {
-		this.setPageCount(options.pageCount);
+	    if (page_options.pageCount) {
+		this.setPageCount(page_options.pageCount);
 	    } else {
 		this.__refresh();
 	    }

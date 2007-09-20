@@ -209,12 +209,12 @@ function disableView() {
 	document.body.setStyle({cursor: 'wait'});
 	if (options.noCover) return;
 
-	var rail = $(Builder.node('div', {id: "disabled_view_rail",
-		    className: "disabled_view_rail", style: 'visibility: hidden'}));
+	var rail = new Element('div', {id: "disabled_view_rail",
+		    className: "disabled_view_rail", style: 'visibility: hidden'});
 	if (options.fullCover) {
-	    var page_dims = pageDimensions();
-	    var container = $(Builder.node('div', {id: "disabled_view",
-			className: "disabled_view", style: 'visibility: hidden'}));
+	    var page_dims = document.viewport.getDimensions();
+	    var container = new Element('div', {id: "disabled_view",
+			className: "disabled_view", style: 'visibility: hidden'});
 
 	    container.addClassName('full_cover');
 	    container.setStyle({
@@ -226,7 +226,7 @@ function disableView() {
 	    document.body.appendChild(container);
 	    container.setStyle({visibility: 'visible'});
 	    Event.observe(window, 'resize', function() {
-		var page_dims = pageDimensions();
+                var page_dims = document.viewport.getDimensions();
 		container.setStyle({
 		    height: page_dims.height + 'px',
 		    width: page_dims.width + 'px'
@@ -275,10 +275,14 @@ var display_status_cnt = 0;
 function displayStatus(text) {
     if (display_status_cnt++) {
         var status_bar = $('status_bar');
-        status_bar.appendChild(Builder.node('br'));
+        if (!status_bar) {
+            display_status_cnt = 0;
+            displayStatus(text);
+        }
+        status_bar.appendChild(new Element('br'));
         status_bar.appendChild(text.createTextNode());
     } else {
-        var status_bar = Builder.node('div', {id: 'status_bar'});
+        var status_bar = new Element('div', {id: 'status_bar'});
         Element.hide(status_bar);
         status_bar.appendChild(text.createTextNode());
         Effect.Appear(status_bar);
@@ -318,6 +322,7 @@ function displayStatusRemove() {
  * */
 function checkElementValue(el) {
     el = $(el);
+    if (!el) return false;
     var options = Object.extend({
 	reg: false,
 	errorString: false,
@@ -326,11 +331,14 @@ function checkElementValue(el) {
 	endColor: '#ffffff',
 	finishColor: 'transparent',
 	deleteValue: false,
-	duration: 0.5
+	duration: 0.5,
+        flash: false
     }, arguments[1] || {});
-    if (!el || (options.reg && !el.value.match(options.reg))
+    if ((options.reg && !el.value.match(options.reg))
 	|| (!options.passEmpty && el.value == "")
-	|| (options.errorString && el.value == options.errorString)) {
+	|| (options.errorString && el.value == options.errorString)
+	|| (options.flash)
+    ) {
 	new Effect.Highlight(el, {
 	    startcolor: options.startColor,
 	    endcolor: options.endColor,

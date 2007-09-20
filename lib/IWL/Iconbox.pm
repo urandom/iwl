@@ -95,7 +95,7 @@ Parameters: B<ICON> - the IWL::Iconbox::Icon object to be appended
 sub appendIcon {
     my ($self, $icon) = @_;
     $self->{__iconCon}->appendChild($icon);
-    weaken($icon->{_iconbox} = $self);
+    $icon->{_iconbox} = $self and weaken $icon->{_iconbox};
     push @{$self->{__icons}}, $icon;
     return $icon;
 }
@@ -111,7 +111,7 @@ Parameters: B<ICON> - the IWL::Iconbox::Icon object to be prepended
 sub prependIcon {
     my ($self, $icon) = @_;
     $self->{__iconCon}->prependChild($icon);
-    weaken($icon->{_iconbox} = $self);
+    $icon->{_iconbox} = $self and weaken $icon->{_iconbox};;
     unshift @{$self->{__icons}}, $icon;
     return $icon;
 }
@@ -164,30 +164,28 @@ sub _setupDefaultClass {
 }
 
 sub _registerEvent {
-    my ($self, $event, $params) = @_;
+    my ($self, $event, $params, $options) = @_;
 
-    my $handlers = {};
     if ($event eq 'IWL-Iconbox-refresh') {
-	$handlers->{method} = '_refreshResponse';
-        $handlers->{append} = $params->{append} ? 'true' : 'false';
+	$options->{method} = '_refreshResponse';
     } else {
-	$self->SUPER::_registerEvent($event, $params);
+	return $self->SUPER::_registerEvent($event, $params, $options);
     }
 
-    return $handlers;
+    return $options;
 }
 
 sub _refreshEvent {
-    my ($params, $handler) = @_;
+    my ($event, $handler) = @_;
 
     IWL::Object::printJSONHeader;
-    my ($list, $user_extras) = $handler->($params->{userData})
+    my ($list, $extras) = $handler->($event->{params})
         if 'CODE' eq ref $handler;
     $list = [] unless ref $list eq 'ARRAY';
 
     print '{icons: ['
            . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
-           . '], userExtras: ' . (objToJson($user_extras) || 'null'). '}';
+           . '], extras: ' . (objToJson($extras) || 'null'). '}';
 }
 
 # Internal

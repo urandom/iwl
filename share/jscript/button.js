@@ -27,6 +27,7 @@ Object.extend(Object.extend(Button, Widget), {
 	var state = this.__visibilityToggle();
 
 	if (!content) return;
+        this.__loaded = false;
 	if (!label.getText()) {
 	    var ml = parseInt(image.getStyle('margin-left')) || 0;
 	    var mr = parseInt(image.getStyle('margin-right')) || 0;
@@ -120,6 +121,7 @@ Object.extend(Object.extend(Button, Widget), {
 	    button.style.height = 2 * square + height + 'px';
 	}
 	this.emitSignal('load');
+        this.__loaded = true;
 
 	return this;
     },
@@ -156,6 +158,41 @@ Object.extend(Object.extend(Button, Widget), {
 	if (form)
 	    form.submit();
     },
+    /**
+     * Sets whether the button should be disabled
+     * @param {Boolean} disabled True if the button is disabled
+     * */
+    setDisabled: function(disabled) {
+        if (disabled == this._disabled)
+            return;
+        if (!this.__loaded)
+            this.signalConnect('load', this.setDisabled.bind(this, disabled));
+        if (disabled) {
+            this.addClassName($A(this.classNames()).first() + '_disabled');
+            this._disabled = true;
+            this.__disabledImageChange();
+            setTimeout(function() {
+                this.__createDisabledLayer();
+            }.bind(this), 500);
+            this.adjust();
+        } else {
+            this.removeClassName($A(this.classNames()).first() + '_disabled');
+            this._disabled = false;
+            this.__defaultImageChange();
+            this.__deleteDisabledLayer();
+            this.adjust();
+        }
+        return this;
+    },
+    /**
+     * Checks whether the button is disabled
+     * @returns True if the button is disabled
+     * @type Boolean
+     * Note: isDisabled is a read-only attribute in Internet Explorer
+     * */
+    isNotEnabled: function() {
+        return this._disabled;
+    },
 
     _pre_init: function(id, json) {
 	var script = $(id + '_noscript');
@@ -176,19 +213,27 @@ Object.extend(Object.extend(Button, Widget), {
 	this.buttonContent = null;
 	this.options = Object.extend({
 	    size: 'default',
+            disabled: false,
 	    submit: false 
 	}, arguments[2] || {});
 	this.button_submit = this.options.submit ? this.next() : null;
+        this.__loaded = false;
 	this.__createElements(json.image, json.label);
 	this.__checkComplete();
-	Event.observe(this, 'click', this.__clickImageChange.bind(this));
+	this.observe('mousedown', this.__clickImageChange.bindAsEventListener(this));
+	this.observe('mouseup', this.__defaultImageChange.bindAsEventListener(this));
+        if (this.options.disabled)
+            this.setDisabled(true);
     },
 
+    __disabledImageChange: function() {
+	for (var i = 0; i < this.buttonParts.length; i++)
+	    this.__buttonChangeBgImage(this.buttonParts[i], "disabled");
+    },
     __clickImageChange: function() {
 	removeSelectionFromNode(this.id);
 	for (var i = 0; i < this.buttonParts.length; i++)
 	    this.__buttonChangeBgImage(this.buttonParts[i], "click");
-	setTimeout(function () {this.__defaultImageChange()}.bind(this), 90);
     },
     __defaultImageChange: function(id) {
 	for (var i = 0; i < this.buttonParts.length; i++)
@@ -214,9 +259,9 @@ Object.extend(Object.extend(Button, Widget), {
 	this.buttonContent = $(id + '_content');
 
 	image = image ? unescape(image) : '';
+        var classNames = className + '_label ' + className + '_label_' + this.options.size;
 	this.buttonContent.update(
-	    image + '<span id="' + id + '_label" class="' + className +
-		'_label_' + this.options.size + '">' +
+	    image + '<span id="' + id + '_label" class="' + classNames + '">' +
 		unescape(label) + '</span>'
 	);
 	this.buttonImage = $(id + '_image');
@@ -261,5 +306,48 @@ Object.extend(Object.extend(Button, Widget), {
 		els.visibility = state.visibility;
 	    }
 	}
+    },
+    __createDisabledLayer: function() {
+        if (!this.parentNode)
+            return;
+
+        var position     = this.cumulativeOffset();
+        var dims         = this.getDimensions();
+        var marginTop    = parseInt(this.getStyle('margin-top'));
+        var marginRight  = parseInt(this.getStyle('margin-right'));
+        var marginBottom = parseInt(this.getStyle('margin-bottom'));
+        var marginLeft   = parseInt(this.getStyle('margin-left'));
+        var zIndex       = parseInt(this.getStyle('z-index'));
+        if (isNaN(marginTop))    marginTop    = 0;
+        if (isNaN(marginRight))  marginRight  = 0;
+        if (isNaN(marginBottom)) marginBottom = 0;
+        if (isNaN(marginLeft))   marginLeft   = 0;
+        if (isNaN(zIndex))       zIndex       = 0;
+
+        this.disabledLayer = new Element('div', {
+                className: $A(this.classNames()).first() + '_disabled_layer'
+            });
+        this.disabledLayer.setStyle({
+                opacity: 0.01, position: 'absolute',
+                width: dims.width + marginRight + marginLeft + 'px',
+                height: dims.height + marginTop + marginBottom + 'px',
+                zIndex: zIndex + 1, backgroundColor: 'white',
+                left: position[0] - marginLeft + 'px',
+                top: position[1] - marginTop + 'px'
+            });
+        this.disabledLayer.signalConnect('click', function(evt) {
+                evt.stop();
+            });
+        this.parentNode.appendChild(this.disabledLayer);
+
+        return this;
+    },
+    __deleteDisabledLayer: function() {
+        if (!this.disabledLayer)
+            return;
+
+        this.disabledLayer.remove();
+        this.disabledLayer = undefined;
+        return this;
     }
 });

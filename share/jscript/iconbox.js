@@ -143,7 +143,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	    if (!icon_data) continue;
             var icon = null;
 	    if (typeof icon_data === 'string') {
-		new Insertion.Bottom(this.iconsContainer, unescape(icon_data));
+                this.iconsContainer.insert(unescape(icon_data));
 		icon = this.iconsContainer.childElements().last();
 		if (!icon.id)
 		    icon.id = 'iconbox_icon_' + Math.random();
@@ -273,7 +273,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
         }
         return height;
     },
-    _refreshResponse: function(json, params) {
+    _refreshResponse: function(json, params, options) {
 	if (!json.icons.length) return;
 	if (this.currentIcon) this.currentIcon.setSelected(false);
 	this.iconsContainer.update();

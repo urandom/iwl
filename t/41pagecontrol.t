@@ -10,7 +10,7 @@ ok(!$pc->isBound);
 $con->setId('bar');
 is($pc->bindToWidget($con, 'iwl_demo.pl', {foo => 'bar'}), $pc);
 ok($pc->isBound);
-like($pc->getContent, qr(^<script.*dist/prototype.js.*prototype_extensions.js.*dist/builder.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*pagecontrol.js.*?</script>
+like($pc->getContent, qr(^<script.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*pagecontrol.js.*?</script>
 <div (?:(?:class="(pagecontrol)"|id="(\1_\d+)"|style="display: none; ")\s*){3}><script.*?button.js.*?</script>
 <noscript (?:(?:class="button_noscript \1_first"|id="\2_first_noscript")\s*){2}></noscript>
 <script .*?Button.create.'\2_first',.*?</script>

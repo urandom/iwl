@@ -195,9 +195,9 @@ sub handleEvent {
 		$method = *{"${package}::_${func}Event"}{CODE};
 	    }
 	    if (defined $method) {
-		$method->($form{IWLEvent}{params}, $handler);
+		$method->($form{IWLEvent}, $handler);
 	    } else {
-		$self->__defaultEvent($form{IWLEvent}{params}, $handler);
+		$self->__defaultEvent($form{IWLEvent}, $handler);
 	    }
 	    exit 0;
 	}
@@ -207,19 +207,18 @@ sub handleEvent {
 # Internal
 #
 sub __defaultEvent {
-    my ($self, $params, $handler) = @_;
+    my ($self, $event, $handler) = @_;
 
-    $params->{userData}{value} = $params->{value} if exists $params->{value};
-    my ($data, $user_extras) = $handler->($params->{userData})
-        if 'CODE' eq ref $handler;
+    my ($data, $extras) = $handler->($event->{params}, $event->{options}{id},
+        $event->{options}{collectData} ? $event->{options}{elementData} : undef)
+      if 'CODE' eq ref $handler;
     if (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
 	$data = objToJson($data);
     } else {
-	$data = $data ? qq|"$data"| : "''"
-	  unless $params->{update};
+        $data = qq|"$data"| unless $event->{options}{update};
     }
 
-    if ($params->{update}) {
+    if ($event->{options}{update}) {
 	IWL::Object::printHTMLHeader;
 	if (UNIVERSAL::isa($data, 'IWL::Object')) {
 	    $data->print;
@@ -228,7 +227,7 @@ sub __defaultEvent {
 	}
     } else {
 	IWL::Object::printJSONHeader;
-	print '{data: ' . $data . ', userExtras: ' . (objToJson($user_extras) || 'null') . '}';
+	print '{data: ' . $data . ', extras: ' . (objToJson($extras) || 'null') . '}';
     }
 }
 

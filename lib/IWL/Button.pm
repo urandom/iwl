@@ -225,6 +225,31 @@ sub setHref {
     return $self->signalConnect(mouseout => "window.status = ''");
 }
 
+=item B<setDisabled> (B<BOOL>)
+
+Sets whether the button will be disabled
+
+Parameters: B<BOOL> - true if the button should be disabled (i.e. will not react to user input)
+
+=cut
+
+sub setDisabled {
+    my ($self, $bool) = @_;
+
+    $self->{_options}{disabled} = !(!$bool) ? 'true' : 'false';
+    return $self;
+}
+
+=item B<isDisabled>
+
+Returns true if the button is disabled
+
+=cut
+
+sub isDisabled {
+    return shift->{_options}{disabled} eq 'true' ? 1 : '';
+}
+
 # Overrides
 #
 sub setStyle {
@@ -431,6 +456,7 @@ sub __init {
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
+    $self->{_options}{disabled} = !(!$args{disabled}) ? 'true' : 'false';
     $self->{_options}{submit} = 0;
 
     delete @args{qw(size id)};

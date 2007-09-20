@@ -10,6 +10,7 @@ Object.extend(Object.extend(Resizer.prototype), {
         minHeight: 10,
         maxWidth:  1000,
         minWidth: 10,
+        resizeStartCallback: Prototype.emptyFunction,
         resizeCallback: Prototype.emptyFunction
     }, arguments[1] || {});
     this.setup() ;
@@ -33,6 +34,9 @@ Object.extend(Object.extend(Resizer.prototype), {
     this.resize = false ;
   },
   eventDown: function(event) {
+    if (this.options.resizeStartCallback
+        && !(this.options.resizeStartCallback(this.element, event)))
+      return;
     this.resize = true ;
   },
   eventMove: function(event) {
@@ -44,15 +48,15 @@ Object.extend(Object.extend(Resizer.prototype), {
         {
             var width = ( Event.pointerX(event) - this.left ) ;
             if(width < this.options.maxWidth && width > this.options.minWidth)
-		d.width = Math.round(width) + 'px';
+		d.width = Math.round(width);
         }
         if(this.options.vertical)
         {
             var height = ( Event.pointerY(event) - this.top ) ;
             if(height < this.options.maxHeight && height > this.options.minHeight)
-		d.height = Math.round(height) + 'px';
+		d.height = Math.round(height);
         }
-        this.element.setStyle(d);
+        this.element.setStyle({width: d.width + 'px', height: d.height + 'px'});
 	if (this.options.resizeCallback)
 	    this.options.resizeCallback(this.element, d);
     }

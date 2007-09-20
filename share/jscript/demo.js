@@ -1,4 +1,4 @@
-Event.signalConnect(window, 'domready', demo_init);
+document.observe('contentloaded', demo_init);
 
 function demo_init () {
     displayStatus('To display a widget demo, double click its row');
