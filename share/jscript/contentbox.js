@@ -126,6 +126,8 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	    this.contentbox_resize.parentNode.removeChild(this.contentbox_resize);
 	    this.contentbox_resize = null;
 	}
+        if (this.resizer)
+            this.resizer.destroy();
 	return this;
     },
     /**
