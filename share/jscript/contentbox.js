@@ -43,7 +43,8 @@ Object.extend(Object.extend(Contentbox, Widget), {
      * */
     setType: function(type, options) {
 	this.options.type = type;
-        this.options.typeOptions = Object.extend({}, options);
+        this.options.typeOptions =
+            Object.extend(this.options.typeOptions, options || {});
 
 	if (type == 'drag')
 	    this.setDrag();
@@ -262,6 +263,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	this.options = Object.extend({
 	    auto: false,
 	    type: 'none',
+            typeOptions: {},
 	    modal: false,
 	    hasShadows: false,
 	    closeModalOnClick: false,

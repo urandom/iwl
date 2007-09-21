@@ -231,13 +231,17 @@ sub appendFooterText {
     return $self;
 }
 
-=item B<setType> (B<TYPE>)
+=item B<setType> (B<TYPE>, B<OPTIONS>)
 
 Sets the type of the content box
 
-Parameters: B<TYPE> - the type of the content box
+Parameters:
 
 =over 8
+
+=item B<TYPE> - the type of the content box
+
+=over 12
 
 =item B<none>
 
@@ -265,14 +269,29 @@ Window without resizing
 
 =back
 
+=item B<OPTIONS> - a hashref of options for use with the different types:
+
+=over 12
+
+=item B<outline>
+
+If true, an outline of the contentbox will apear when it is moved or resized.
+
+=back
+
+=back
+
 =cut 
 
 sub setType {
-    my ($self, $type) = @_;
+    my ($self, $type, $options) = @_;
 
     return if !exists TYPE->{$type};
+    my $ref = ref $options;
+    $options = {} unless $ref && $ref == 'HASH';
 
     $self->{_options}{type} = $type;
+    $self->{_options}{typeOptions} = $options;
     return $self;
 }
 
