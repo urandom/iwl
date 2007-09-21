@@ -91,16 +91,21 @@ var Resizer = Class.create((function() {
   function toggleHandles() {
     for (var h in this.handlers) {
       var v = this.handlers[h].getStyle('visibility');
-      this.handlers[h].setStyle({visibility: v == 'hidden' ? '' : 'hidden'});
+      this.handlers[h].setStyle({visibility: v == 'hidden' ? 'visible' : 'hidden'});
     }
+  }
+
+  function toggleOutline() {
     if (this.outline) {
       var v = this.outline.getStyle('visibility');
-      this.outline.setStyle({visibility: v == 'hidden' ? '' : 'hidden'});
+      this.outline.setStyle({visibility: v == 'hidden' ? 'visible' : 'hidden'});
     }
   }
 
   function mouseUp(event) {
     if (this.resize && this.outline) {
+      toggleOutline.call(this);
+
       this.element.style.width  = this.elementPosition.w + 'px';
       this.element.style.height = this.elementPosition.h + 'px';
       this.element.style.left   = this.elementPosition.x + 'px';
@@ -121,6 +126,7 @@ var Resizer = Class.create((function() {
     this.resize = true;
     this.resizeType = event.element().type || '';
     fillElementPosition.call(this);
+    toggleOutline.call(this);
   }
 
   function mouseMove(event) {

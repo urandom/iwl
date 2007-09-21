@@ -611,12 +611,13 @@ sub generate_contentbox {
     my $container = IWL::Container->new(id => 'contentbox_container');
     my $contentbox = IWL::Contentbox->new(id => 'contentbox', autoWidth => 1);
     my $chooser = IWL::Combo->new(id => 'contentbox_chooser');
+    my $outline = IWL::Checkbox->new(id => 'contentbox_outline_check');
 
     $container->appendChild($contentbox);
     $contentbox->appendTitleText('The title');
     $contentbox->appendHeaderText('The header of the contentbox');
     $contentbox->appendContentText('Select the type of the contentbox');
-    $contentbox->appendContent(IWL::Break->new, $chooser);
+    $contentbox->appendContent(IWL::Break->new, $chooser, IWL::Break->new, $outline);
     $contentbox->appendFooterText('The footer of the contentbox');
     $contentbox->setShadows(1);
     $contentbox->signalConnect(close => q|displayStatus("Don't close me!"); this.show()|);
@@ -627,6 +628,7 @@ sub generate_contentbox {
     $chooser->appendOption('window');
     $chooser->appendOption('noresize');
     $chooser->signalConnect(change => "contentbox_chooser_change(this)");
+    $outline->setLabel('Outline moving/resizing');
     return $container->getObject;
 }
 
@@ -849,7 +851,7 @@ sub show_the_code_for {
         $paragraph->appendTextType(read_code("Tree row handlers", 21), 'pre');
         $paragraph->appendTextType(read_code('^\);', 1), 'pre');
     } elsif ($code_for eq 'contentbox_container') {
-	$paragraph->appendTextType(read_code("generate_contentbox", 22), 'pre');
+	$paragraph->appendTextType(read_code("generate_contentbox", 24), 'pre');
     } elsif ($code_for eq 'accordions_container') {
 	$paragraph->appendTextType(read_code("generate_accordions", 20), 'pre');
     } elsif ($code_for eq 'druid_container') {

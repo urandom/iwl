@@ -37,10 +37,13 @@ Object.extend(Object.extend(Contentbox, Widget), {
      * 		window - enables dragging, resizing and closing
      * 		noresize - enables dragging and closing
      * 		none - disables everything
+     * @param {Hash} options Options for the selected type
+     *          outline - turns on outline moving/resizing
      * @returns The object
      * */
-    setType: function(type) {
+    setType: function(type, options) {
 	this.options.type = type;
+        this.options.typeOptions = Object.extend({}, options);
 
 	if (type == 'drag')
 	    this.setDrag();
@@ -384,6 +387,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	    maxWidth: 1000,
 	    minHeight: 70,
 	    minWidth: 70,
+            outline: this.options.typeOptions.outline,
 	    onResize: this.__resizeCallback.bind(this)
         });
 
