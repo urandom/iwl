@@ -173,6 +173,7 @@ Object.extend(IWLRPC, (function() {
             onLoading: disable,
             onComplete: function(or) {
               var json = or.responseJSON;
+              if (!json) return;
               if (options.method && options.method in element) 
                 element[options.method].call(element, json, params, options);
               if (options.responseCallback && typeof options.responseCallback === 'function') 

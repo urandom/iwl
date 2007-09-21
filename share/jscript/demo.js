@@ -5,6 +5,7 @@ function demo_init () {
 }
 
 function activate_widgets_response(json) {
+    if (!json) return;
     enableView();
     if (!json.data) return;
     var content = $('content');

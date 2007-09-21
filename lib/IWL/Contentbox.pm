@@ -275,7 +275,7 @@ Window without resizing
 
 =item B<outline>
 
-If true, an outline of the contentbox will apear when it is moved or resized.
+If true, an outline of the contentbox will apear when it is resized.
 
 =back
 
