@@ -620,7 +620,7 @@ sub generate_contentbox {
     $contentbox->appendContent(IWL::Break->new, $chooser, IWL::Break->new, $outline);
     $contentbox->appendFooterText('The footer of the contentbox');
     $contentbox->setShadows(1);
-    $contentbox->signalConnect(close => q|displayStatus("Don't close me!"); this.show()|);
+    $contentbox->signalConnect(close => q|displayStatus("The contentbox has been closed.")|);
     $chooser->appendOption('none');
     $chooser->appendOption('drag');
     $chooser->appendOption('resize');

@@ -462,17 +462,24 @@ Object.extend(Object.extend(Contentbox, Widget), {
         var middle;
         var height = 0;
         var resizerName = this.resizer ? this.resizer.options.className : '';
+        var className =$A(this.classNames()).first(); 
 	this.childElements().each(function($_) {
-            if ($_.hasClassName(resizerName + '_handle')
-                || $_.hasClassName(resizerName + '_outline'))
-                return;
-            if ($_.hasClassName($A(this.classNames()).first() + '_middle')) {
+            if ($_.hasClassName(className + '_middle')) {
                 middle = $_;
                 return;
             }
+
+            var ok = false;
+            ['top', 'title', 'header', 'footer', 'bottom'].each(function(c) {
+                if ($_.hasClassName(className + '_' + c)) {
+                    ok = true;
+                    throw $break;
+                }
+            }.bind(this));
+            if (!ok) return;
             height += $_.getHeight();
 	}.bind(this));
-        middle.setStyle({height: (d.h - height) + 'px'});
+        middle.style.height = (d.h - height) + 'px';
     },
     __hideQuirks: function() {
 	if (!ie4 || ie7) return;

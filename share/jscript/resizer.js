@@ -21,11 +21,16 @@ var Resizer = Class.create((function() {
       this.elementStyle.position = 'static';
     }
     if (this.options.outline) {
-      var dimensions = this.element.getDimensions();
       this.outline = new Element('div',
         {className: this.options.className + '_outline'});
+      this.handlerHolder = new Element('div',
+        {className: this.options.className + '_handler_holder'});
+
       this.outline.setStyle({opacity: this.options.outlineOpacity, visibility: 'hidden'});
+      this.handlerHolder.setStyle({backgroundColor: 'transparent', visibility: 'hidden'});
+
       this.element.appendChild(this.outline);
+      this.element.appendChild(this.handlerHolder);
     }
 
     this.element.resizer = this;
@@ -80,8 +85,8 @@ var Resizer = Class.create((function() {
           + this.options.className + '_handle_' + type,
         style: 'visibility: hidden;'
     });
-    if (this.outline)
-      this.handlers[type] = this.outline.appendChild(handle);
+    if (this.handlerHolder)
+      this.handlers[type] = this.handlerHolder.appendChild(handle);
     else
       this.handlers[type] = this.element.appendChild(handle);
     handle.type = type;
@@ -92,6 +97,10 @@ var Resizer = Class.create((function() {
     for (var h in this.handlers) {
       var v = this.handlers[h].getStyle('visibility');
       this.handlers[h].setStyle({visibility: v == 'hidden' ? 'visible' : 'hidden'});
+    }
+    if (this.handlerHolder) {
+      var v = this.handlerHolder.getStyle('visibility');
+      this.handlerHolder.setStyle({visibility: v == 'hidden' ? 'visible' : 'hidden'});
     }
   }
 
@@ -106,13 +115,16 @@ var Resizer = Class.create((function() {
     if (this.resize && this.outline) {
       toggleOutline.call(this);
 
+      if (this.options.onResize)
+        this.options.onResize(this.element, event, this.elementPosition);
+
       this.element.style.width  = this.elementPosition.w + 'px';
       this.element.style.height = this.elementPosition.h + 'px';
       this.element.style.left   = this.elementPosition.x + 'px';
       this.element.style.top    = this.elementPosition.y + 'px';
 
-      if (this.options.onResize)
-        this.options.onResize(this.element, event, this.elementPosition);
+      this.outline.style.left   = this.handlerHolder.style.left = '';
+      this.outline.style.top    = this.handlerHolder.style.top  = '';
     }
     this.resize = false;
     this.prevPointerX = 0;
@@ -142,6 +154,12 @@ var Resizer = Class.create((function() {
     this.prevPointerY = pY;
 
     if (this.resizeType.indexOf('t') >= 0) {
+      if (this.outline) {
+        var outlineTop = parseInt(this.outline.style.top);
+        if (isNaN(outlineTop)) outlineTop = 0;
+        this.outline.style.top  = dY + outlineTop + 'px';
+      }
+
       this.elementPosition.y += dY;
       this.elementPosition.h -= dY;
       ok = true;
@@ -151,6 +169,12 @@ var Resizer = Class.create((function() {
     }
 
     if (this.resizeType.indexOf('l') >= 0) {
+      if (this.outline) {
+        var outlineLeft = parseInt(this.outline.style.left);
+        if (isNaN(outlineLeft)) outlineLeft = 0;
+        this.outline.style.left = dX + outlineLeft + 'px';
+      }
+
       this.elementPosition.x += dX;
       this.elementPosition.w -= dX;
       ok = true;
@@ -173,8 +197,9 @@ var Resizer = Class.create((function() {
     if (this.outline) {
       this.outline.style.width  = this.elementPosition.w + 'px';
       this.outline.style.height = this.elementPosition.h + 'px';
-      this.outline.style.left   = this.elementPosition.x + 'px';
-      this.outline.style.top    = this.elementPosition.y + 'px';
+      ['width', 'height', 'top', 'left'].each(function(s) {
+        this.handlerHolder.style[s] = this.outline.style[s];
+      }.bind(this));
     } else {
       this.element.style.width  = this.elementPosition.w + 'px';
       this.element.style.height = this.elementPosition.h + 'px';
@@ -203,8 +228,14 @@ var Resizer = Class.create((function() {
     this.elementPosition.y = parseInt(this.element.style.top);
     if (isNaN(this.elementPosition.x)) this.elementPosition.x = 0;
     if (isNaN(this.elementPosition.y)) this.elementPosition.y = 0;
-  }
 
+    if (this.outline) {
+      this.outline.style.width = this.handlerHolder.style.width =
+        (this.elementPosition.w + 'px');
+      this.outline.style.height = this.handlerHolder.style.height =
+        (this.elementPosition.h + 'px');
+    }
+  }
 
   return {
     initialize: function(element) {
@@ -234,6 +265,8 @@ var Resizer = Class.create((function() {
       destroyHandles.call(this);
       if (this.outline)
         this.outline.remove();
+      if (this.handlerHolder)
+        this.handlerHolder.remove();
 
       this.element.setStyle(this.elementStyle);
       this.element.resizer = undefined;

@@ -1172,12 +1172,15 @@ span.pagecontrol_label input {
     right: -6px;
     cursor: se-resize;
 }
-.resizer_outline {
+.resizer_handler_holder, .resizer_outline {
     position: absolute;
     top: 0px;
     left: 0px;
     right: 0px;
     bottom: 0px;
+}
+
+.resizer_outline {
     background: #eeeeee;
     border: 1px solid  #6a81a3;
 }
