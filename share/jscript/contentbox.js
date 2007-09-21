@@ -130,8 +130,8 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	    this.contentbox_resize.parentNode.removeChild(this.contentbox_resize);
 	    this.contentbox_resize = null;
 	}
-        if (this.resizer)
-            this.resizer.destroy();
+        if (this._resizer)
+            this._resizer.destroy();
 	return this;
     },
     /**
@@ -355,13 +355,16 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	    var max = 0;
 	    var cumulative = 0;
 	    for (var i = 0; i < element.childNodes.length; i++) {
-		var child = $(element.childNodes[i]);
+		var child = Element.extend(element.childNodes[i]);
 		var width = child.getDimensions().width;
-		if (!width) continue;
-		if (child.getStyle('display') == 'inline' || child.id == this.id + '_buttons') {
+                if (child.tagName != 'BR' && (
+                        child.getStyle('display') == 'inline' ||
+                        child.getStyle('float') != 'none')
+                ) {
 		    cumulative += width;
 		    max = max > cumulative ? max : cumulative;
 		} else {
+                    cumulative = 0;
 		    max = max > width ? max : width;
 		}
 	    }
@@ -384,7 +387,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	return this;
     },
     __setupResize: function() {
-	new Resizer(this, {
+	this._resizer = new Resizer(this, {
 	    maxHeight: 1000,
 	    maxWidth: 1000,
 	    minHeight: 70,
@@ -463,7 +466,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
     __resizeCallback: function(element, event, d) {
         var middle;
         var height = 0;
-        var resizerName = this.resizer ? this.resizer.options.className : '';
+        var resizerName = this._resizer ? this._resizer.options.className : '';
         var className =$A(this.classNames()).first(); 
 	this.childElements().each(function($_) {
             if ($_.hasClassName(className + '_middle')) {

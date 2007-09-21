@@ -33,7 +33,6 @@ var Resizer = Class.create((function() {
       this.element.appendChild(this.handlerHolder);
     }
 
-    this.element.resizer = this;
     this.handlers = {};
 
     createHandles.call(this, eventMouseDown);
@@ -256,8 +255,6 @@ var Resizer = Class.create((function() {
       }, arguments[1] || {});
       if (!this.element)
         return;
-      if (this.element.resizer && this.element.resizer.destroy)
-        this.element.resizer.destroy();
       setup.call(this);
     },
 
@@ -269,7 +266,6 @@ var Resizer = Class.create((function() {
         this.handlerHolder.remove();
 
       this.element.setStyle(this.elementStyle);
-      this.element.resizer = undefined;
     }
   }
 })());
