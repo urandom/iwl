@@ -503,7 +503,13 @@ Object.extend(Date.prototype, {
 
     return Math.round((((now.getTime() - first.getTime()) / 86400000)
         + compensation)/7);
-  }
+  },
+  getDayOfYear: function() {
+    var cumulative = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var ret = this.getDate() + cumulative[this.getMonth()];
+
+    return this.isLeapYear() && ret > 59 && this.getMonth() > 1 ? ++ret : ret;
+  },
 });
 
 /* Abort works correctly in 1.6
