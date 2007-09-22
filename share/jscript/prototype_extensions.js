@@ -399,6 +399,83 @@ function $(element) {
   return Element.extend(element);
 }
 
+Object.extend(Date.prototype, {
+  isLeapYear: function() {
+    var year = this.getFullYear();
+    return !!((year & 3) == 0 && (year % 100 || (year % 400 == 0 && year)));
+  },
+  getNextFullYear: function() {
+    var ret = new Date(this.getTime());
+    ret.setFullYear(ret.getFullYear() + 1);
+    return ret.getFullYear();
+  },
+  getPreviousFullYear: function() {
+    var ret = new Date(this.getTime());
+    ret.setFullYear(ret.getFullYear() - 1);
+    return ret.getFullYear();
+  },
+  getNextMonth: function() {
+    var ret = new Date(this.getTime());
+    ret.setMonth(ret.getMonth() + 1);
+    return ret.getMonth();
+  },
+  getPreviousMonth: function() {
+    var ret = new Date(this.getTime());
+    ret.setMonth(ret.getMonth() - 1);
+    return ret.getMonth();
+  },
+  getNextDate: function() {
+    var ret = new Date(this.getTime());
+    ret.setDate(ret.getDate() + 1);
+    return ret.getDate();
+  },
+  getPreviousDate: function() {
+    var ret = new Date(this.getTime());
+    ret.setDate(ret.getDate() - 1);
+    return ret.getDate();
+  },
+  getNextHours: function() {
+    var ret = new Date(this.getTime());
+    ret.setHours(ret.getHours() + 1);
+    return ret.getHours();
+  },
+  getPreviousHours: function() {
+    var ret = new Date(this.getTime());
+    ret.setHours(ret.getHours() - 1);
+    return ret.getHours();
+  },
+  getNextMinutes: function() {
+    var ret = new Date(this.getTime());
+    ret.setMinutes(ret.getMinutes() + 1);
+    return ret.getMinutes();
+  },
+  getPreviousMinutes: function() {
+    var ret = new Date(this.getTime());
+    ret.setMinutes(ret.getMinutes() - 1);
+    return ret.getMinutes();
+  },
+  getNextSeconds: function() {
+    var ret = new Date(this.getTime());
+    ret.setSeconds(ret.getSeconds() + 1);
+    return ret.getSeconds();
+  },
+  getPreviousSeconds: function() {
+    var ret = new Date(this.getTime());
+    ret.setSeconds(ret.getSeconds() - 1);
+    return ret.getSeconds();
+  },
+  getNextMiliseconds: function() {
+    var ret = new Date(this.getTime());
+    ret.setMiliseconds(ret.getMiliseconds() + 1);
+    return ret.getMiliseconds();
+  },
+  getPreviousMiliseconds: function() {
+    var ret = new Date(this.getTime());
+    ret.setMiliseconds(ret.getMiliseconds() - 1);
+    return ret.getMiliseconds();
+  }
+});
+
 /* Abort works correctly in 1.6
 // Overload this, for aborting the request
 Object.extend(Ajax.Request.prototype, {
