@@ -249,7 +249,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
         }.bind(this), 10);
     },
 
-    _pre_init: function() {
+    _preInit: function() {
 	if (!this.current) {
 	    var args = arguments;
 	    setTimeout(function() {

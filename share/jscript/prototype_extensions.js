@@ -17,6 +17,9 @@ var EventMethods = {
       }
     } catch (e) {return false;}
     return false;
+  },
+  getKeyCode: function(event) {
+    return event.keyCode ? event.keyCode : event.which ? event.which : 0;
   }
 };
 Object.extend(Event.Methods, EventMethods);
@@ -404,85 +407,85 @@ Object.extend(Date.prototype, {
     var year = this.getFullYear();
     return !!((year & 3) == 0 && (year % 100 || (year % 400 == 0 && year)));
   },
-  increaseYear: function(amount) {
+  incrementYear: function(amount) {
     var ret = new Date(this.getTime());
     ret.setFullYear(ret.getFullYear() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseYear: function(amount) {
+  decrementYear: function(amount) {
     var ret = new Date(this.getTime());
     ret.setFullYear(ret.getFullYear() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  increaseMonth: function(amount) {
+  incrementMonth: function(amount) {
     var ret = new Date(this.getTime());
     ret.setMonth(ret.getMonth() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseMonth: function(amount) {
+  decrementMonth: function(amount) {
     var ret = new Date(this.getTime());
     ret.setMonth(ret.getMonth() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  increaseDate: function(amount) {
+  incrementDate: function(amount) {
     var ret = new Date(this.getTime());
     ret.setDate(ret.getDate() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseDate: function(amount) {
+  decrementDate: function(amount) {
     var ret = new Date(this.getTime());
     ret.setDate(ret.getDate() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  increaseHours: function(amount) {
+  incrementHours: function(amount) {
     var ret = new Date(this.getTime());
     ret.setHours(ret.getHours() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseHours: function(amount) {
+  decrementHours: function(amount) {
     var ret = new Date(this.getTime());
     ret.setHours(ret.getHours() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  increaseMinutes: function(amount) {
+  incrementMinutes: function(amount) {
     var ret = new Date(this.getTime());
     ret.setMinutes(ret.getMinutes() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseMinutes: function(amount) {
+  decrementMinutes: function(amount) {
     var ret = new Date(this.getTime());
     ret.setMinutes(ret.getMinutes() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  increaseSeconds: function(amount) {
+  incrementSeconds: function(amount) {
     var ret = new Date(this.getTime());
     ret.setSeconds(ret.getSeconds() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseSeconds: function(amount) {
+  decrementSeconds: function(amount) {
     var ret = new Date(this.getTime());
     ret.setSeconds(ret.getSeconds() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  increaseMiliseconds: function(amount) {
+  incrementMiliseconds: function(amount) {
     var ret = new Date(this.getTime());
     ret.setMiliseconds(ret.getMiliseconds() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decreaseMiliseconds: function(amount) {
+  decrementMiliseconds: function(amount) {
     var ret = new Date(this.getTime());
     ret.setMiliseconds(ret.getMiliseconds() - (amount || 1));
     this.setTime(ret.getTime());
@@ -496,7 +499,7 @@ Object.extend(Date.prototype, {
     var first = new Date(this.getFullYear(), 0, 1);
     var compensation = first.getDay();
 
-    now.increaseDate();
+    now.incrementDate();
 
     if (compensation > 4) compensation -= 4;
     else compensation += 3;

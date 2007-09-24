@@ -96,7 +96,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
 	return this;
     },
 
-    _pre_init: function(id) {
+    _preInit: function(id) {
         this.options = Object.extend({
             width:      'auto',
             centerOnElement: true,

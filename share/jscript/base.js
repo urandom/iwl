@@ -24,8 +24,8 @@ var Widget = {};
 Widget = {
     create: function(id) {
 	this.current = $(id);
-	if (this._pre_init)
-	    if (!this._pre_init.apply(this, arguments)) return;
+	if (this._preInit)
+	    if (!this._preInit.apply(this, arguments)) return;
 	Object.extend(this.current, this);
   	if (this.current.prepareEvents)    
             this.current.prepareEvents();

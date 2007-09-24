@@ -250,6 +250,7 @@ share/images/tree/t.gif
 share/iwl_demo.pl
 share/jscript/base.js
 share/jscript/button.js
+share/jscript/calendar.js
 share/jscript/contentbox.js
 share/jscript/demo.js
 share/jscript/dist/accordion.js

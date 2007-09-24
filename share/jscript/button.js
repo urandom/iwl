@@ -194,7 +194,7 @@ Object.extend(Object.extend(Button, Widget), {
         return this._disabled;
     },
 
-    _pre_init: function(id, json) {
+    _preInit: function(id, json) {
 	var script = $(id + '_noscript');
 	if (!script) {
 	    setTimeout(function () {this.create(id, json)}.bind(this), 500);
