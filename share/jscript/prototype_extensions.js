@@ -513,6 +513,19 @@ Object.extend(Date.prototype, {
 
     return this.isLeapYear() && ret > 59 && this.getMonth() > 1 ? ++ret : ret;
   },
+  getTimezoneName: function() {
+    var string = this.toString();
+    if (Prototype.Browser.Gecko) {
+      var zone_name = string.match(/\((\w+)\)$/);
+      if (zone_name && zone_name[1]) return zone_name[1];
+    } else if (Prototype.Browser.IE) {
+      var zone_name = string.split(/ /);
+      if (zone_name && zone_name[4]) return zone_name[4];
+    } else {
+      var offset = (this.getTimezoneOffset() / -60) * 100;
+      return "GMT+" + (offset < 1000 ? '0' + offset : offset);
+    }
+  }
 });
 
 /* Abort works correctly in 1.6

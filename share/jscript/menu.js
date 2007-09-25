@@ -168,10 +168,7 @@ Object.extend(Object.extend(Menu, Widget), {
 	    if (paren === document) break;
 	    paren = paren.up();
 	}
-	Event.observe(this, 'mouseover', function() {
-	    focused_widget = this.id}.bind(this));
-	Event.observe(this, 'click', function() {
-	    focused_widget = this.id}.bind(this));
+        registerFocus(this);
 	Event.observe(window, 'click', function(event) {
 	    if (!Event.checkElement(event, this))
 		this.popDown();
@@ -220,7 +217,7 @@ Object.extend(Object.extend(Menu, Widget), {
 	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflowY: 'scroll'});
     },
     __KeyEventsCB: function(event) {
-	var keyCode = getKeyCode(event);
+	var keyCode = Event.getKeyCode(event);
 	var shift = event.shiftKey;
 	if (focused_widget != this.id)
 	    return;

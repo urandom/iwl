@@ -225,7 +225,7 @@ function disableView() {
 		container.setOpacity(options.opacity);
 	    document.body.appendChild(container);
 	    container.setStyle({visibility: 'visible'});
-	    Event.observe(window, 'resize', function() {
+	    Event.signalConnect(window, 'resize', function() {
                 var page_dims = document.viewport.getDimensions();
 		container.setStyle({
 		    height: page_dims.height + 'px',
@@ -261,11 +261,6 @@ function enableView() {
     }
 }
 
-function getKeyCode(event) {
-    return event.keyCode ? event.keyCode :
-	event.which ? event.which : event.charCode;
-}
-
 var display_status_cnt = 0;
 
 /**
@@ -287,7 +282,7 @@ function displayStatus(text) {
         status_bar.appendChild(text.createTextNode());
         Effect.Appear(status_bar);
         document.body.appendChild(status_bar);
-        Event.observe(status_bar, 'click', displayStatusRemove);
+        Event.signalConnect(status_bar, 'click', displayStatusRemove);
     }
     setTimeout(displayStatusRemove, 10000);
 }
@@ -390,9 +385,16 @@ function removeSelectionFromNode(id) {
 
 function keyLogEvent(callback) {
     if (ie4)
-	Event.observe(document.body, 'keydown', callback);
+	Event.signalConnect(document.body, 'keydown', callback);
     else
-	Event.observe(window, 'keypress', callback);
+	Event.signalConnect(window, 'keypress', callback);
+}
+
+function registerFocus(element) {
+    Event.signalConnect(element, 'mouseover', function() {
+        focused_widget = element.id});
+    Event.signalConnect(element, 'click', function() {
+        focused_widget = element.id});
 }
 
 function loseFocus(e) {

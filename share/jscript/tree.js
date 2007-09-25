@@ -350,10 +350,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	this.nav_images['span'] = '<span class="tree_nav_con"></span>';
 	setTimeout(this.__initNavRebuild.bind(this, this.body.rows.length), 100);
 
-	Event.observe(this, "click", function (event) {
-	    focused_widget = this.id}.bind(this));
-	Event.observe(this, "mouseover", function (event) {
-	    focused_widget = this.id}.bind(this));
+        registerFocus(this);
 	keyLogEvent(this.__keyEventsCB.bindAsEventListener(this));
     },
     _bodySort: function(dir, col_num) {
@@ -471,7 +468,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	return this;
     },
     __keyEventsCB: function(event) {
-	var keyCode = getKeyCode(event);
+	var keyCode = Event.getKeyCode(event);
 	var row;
 	if (focused_widget != this.id)
 	    return;
@@ -591,7 +588,7 @@ Object.extend(Object.extend(Row, Widget), {
 	return this.visible();
     },
     /**
-     * Activated the row
+     * Activates the row
      * @returns The object
      * */
     activate: function() {
