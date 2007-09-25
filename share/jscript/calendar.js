@@ -228,7 +228,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
     Object.extend(Date.prototype, {
         sprintf: function(string) {
-            var reg = new RegExp(/%./);
+            var reg = /%./g;
             var day = this.getDay();
             var date = this.getDate();
             var month = this.getMonth();
@@ -262,7 +262,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 k: hour,
                 l: pmhour,
                 m: month < 10 ? '0' + month : month,
-                M: minute < 10 ? '0' + monute : minute,
+                M: minute < 10 ? '0' + minute : minute,
                 n: '\n',
                 p: pm ? 'PM' : 'AM',
                 P: pm ? 'pm' : 'am',
@@ -275,7 +275,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 y: syear,
                 Y: year,
                 z: this.getTimezoneOffset() / 60,
-                Z: zone_name[1],
+                Z: zone_name,
                 '+': time_string,
                 '%': '%'
             };
