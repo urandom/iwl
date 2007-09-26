@@ -283,6 +283,19 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             format.R = format.H + ':' + format.M;
             format.T = format.H + ':' + format.M + ':' + format.S;
 
+            if (Prototype.Browser.KTHML) {
+                var match;
+                if (match = string.match(reg)) {
+                    match.each(function(m) {
+                        var replacer = format[m.substring(1)];
+                        var reg1 = new RegExp(m, 'g');
+                        if (replacer)
+                            string = string.replace(reg1, replacer);
+                    });
+                }
+                return string;
+            }
+
             return string.replace(reg, function(match) {
                 return format[match.substring(1)] || match;
             });
