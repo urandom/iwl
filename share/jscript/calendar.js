@@ -8,7 +8,11 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var month = this.date.getMonth();
         var heading_cells = this.getElementsBySelector('.calendar_heading')[0].cells;
         var week_days = this.getElementsBySelector('.calendar_week_days')[0];
-        var date = new Date(year, month, 1);
+        var date = this.getDate();
+
+        date.setFullYear(year);
+        date.setMonth(month);
+        date.setDate(1);
 
         $(heading_cells[1]).down().value = Calendar.months[month];
         $(heading_cells[4]).down().value = year;
@@ -21,7 +25,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 Element.extend(week_days.cells[1]).update(Calendar.shortWeekDays[6]).addClassName('calendar_weekend_header');
                 for (day = 0; day < 6; day++) {
                     var cell = Element.extend(week_days.cells[day + 2]);
-                    cell.update(Calendar.shortWeekDays[day]);
+                    cell.innerHTML = Calendar.shortWeekDays[day];
                     if (day == 5)
                         cell.addClassName('calendar_weekend_header');
                     else
@@ -30,7 +34,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             } else {
                 for (day = 0; day < 7; day++) {
                     var cell = Element.extend(week_days.cells[day + 1]);
-                    cell.update(Calendar.shortWeekDays[day]);
+                    cell.innerHTML = Calendar.shortWeekDays[day];
                     if (day == 5 || day == 6)
                         cell.addClassName('calendar_weekend_header');
                     else
@@ -44,7 +48,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var week_rows = this.getElementsBySelector('.calendar_week');
         for (week = 0; week < weeks_in_month; week++) {
             var row = week_rows[week];
-            Element.extend(row.cells[0]).update(date.getWeek());
+            Element.extend(row.cells[0]).innerHTML = date.getWeek();
 
             for (day = 0; day < 7; day++) {
                 var cell = Element.extend(row.cells[day + 1]);
@@ -63,11 +67,11 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                         cell.addClassName('calendar_week_day_disabled');
                     else
                         cell.removeClassName('calendar_week_day_disabled');
-                    cell.update(date.getDate());
+                    cell.innerHTML = date.getDate();
                 } else {
                     if (this_month == month)
-                        cell.update(date.getDate());
-                    else cell.update();
+                        cell.innerHTML = date.getDate();
+                    else cell.innerHTML = '';
                 }
 
                 if ([0,6].include(date.getDay()))
@@ -79,6 +83,26 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 date.incrementDate();
             }
         }
+    }
+
+    function fillTime() {
+        var hours = this.getElementsBySelector('.calendar_hours')[0];
+        var minutes = this.getElementsBySelector('.calendar_minutes')[0];
+        var seconds = this.getElementsBySelector('.calendar_seconds')[0];
+        var notation = this.getElementsBySelector('.calendar_hours_notation')[0];
+
+        var hour = this.date.getHours();
+        if (!this.options.astronomicalTime) {
+            var pm = hour >= 12;
+            hour = pm ? hour - 12 : hour;
+            hour = hour == 0 ? 12 : hour;
+            notation.innerHTML = pm ? 'PM' : 'AM';
+        } else {
+            notation.innerHTML = '';
+        }
+        hours.value = hour;
+        minutes.value = this.date.getMinutes();
+        seconds.value = this.date.getSeconds();
     }
 
     function selectDate() {
@@ -142,6 +166,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             var date = this.getDate();
             date.setMonth(input.value - 1);
             input.blur();
+            this.emitSignal("change_month", date);
             this.setDate(date);
         }
     }
@@ -162,6 +187,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             var date = this.getDate();
             date.setFullYear(input.value);
             input.blur();
+            this.emitSignal("change_year", date);
             this.setDate(date);
         }
     }
@@ -169,6 +195,24 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var element = event.element();
         element.value = this.date.getFullYear();
         element.removeClassName('calendar_year_selected');
+    }
+
+    function connectTimeSignals(event) {
+        var notation = this.getElementsBySelector('.calendar_hours_notation')[0];
+
+        var notation_click = notationClickEvent.bindAsEventListener(this);
+
+        notation.signalConnect('click', notation_click);
+    }
+
+    function notationClickEvent(event) {
+        var element = event.element();
+        var date = this.getDate();
+        var hours = date.getHours();
+        var pm = hours >= 12;
+
+        date.setHours(pm ? hours - 12 : hours + 12);
+        this.setDate(date);
     }
 
     function keyEventsCB(event) {
@@ -220,10 +264,57 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 && cell_date.getMonth() != this.date.getMonth())
                 return;
 
+            Event.stop(event);
             this.setDate(cell.getDate());
         } else if (change) {
+            Event.stop(event);
             this.setDate(date);
         }
+    }
+
+    function updateElement(element, format, date) {
+        if (!(date instanceof Date))
+            date = this.getDate();
+        if ("value" in element) {
+            element.value = date.sprintf(format);
+            if (typeof element.onchange == 'function')
+                element.onchange.call(element);
+            element.emitSignal('change');
+        } else {
+            element.innerHTML = date.sprintf(format);
+        }
+    }
+
+    function changeDate(old_date, date) {
+        if (this.date.getFullYear() == date.getFullYear() &&
+            this.date.getMonth() == date.getMonth() &&
+            this.date.getDate() == date.getDate())
+            return false;
+
+        if ((this.options.fromYear && (
+                date.getFullYear() < this.options.fromYear 
+                || (date.getFullYear() == this.options.fromYear
+                    && date.getMonth() < this.options.fromMonth)
+            )) || (this.options.toYear && (
+                    (date.getFullYear() == this.options.toYear
+                    && date.getMonth() > this.options.toMonth)
+                || date.getFullYear() > this.options.toYear
+            )))
+            return false;
+
+        if (this.currentDate)
+            this.currentDate.setSelected(false);
+
+        return true;
+    }
+
+    function changeTime(old_date, date) {
+        if (old_date.getHours () == date.getHours()
+            && old_date.getMinutes() == date.getMinutes()
+            && old_date.getSeconds() == date.getSeconds())
+            return false;
+
+        return true;
     }
 
     Object.extend(Date.prototype, {
@@ -238,12 +329,14 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             var week = this.getWeek();
 
             var hour = this.getHours();
-            var pm = hour > 12;
+            var pm = hour >= 12;
             var pmhour = pm ? hour - 12 : hour;
             var minute = this.getMinutes();
             var seconds = this.getSeconds();
             var time_string = this.toString();
             var zone_name = this.getTimezoneName();
+
+            pmhour = pmhour == 0 ? 12 : pmhour;
 
             var format = {
                 a: Calendar.shortWeekDays[day],
@@ -305,25 +398,24 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     return {
         setDate: function(date) {
             if (date instanceof Date && !isNaN(date.valueOf())) {
-                if ((this.options.fromYear && (
-                        date.getFullYear() < this.options.fromYear 
-                        || (date.getFullYear() == this.options.fromYear
-                            && date.getMonth() < this.options.fromMonth)
-                    )) || (this.options.toYear && (
-                            (date.getFullYear() == this.options.toYear
-                            && date.getMonth() > this.options.toMonth)
-                        || date.getFullYear() > this.options.toYear
-                    )))
-                    return;
-                if (this.currentDate)
-                    this.currentDate.setSelected(false);
                 var old_date = this.date;
-                this.date = date;
-                if (old_date.getFullYear() != date.getFullYear()
-                        || old_date.getMonth() != date.getMonth())
-                    fillMonth.call(this);
+                var change_date = changeDate.call(this, old_date, date);
+                var change_time = changeTime.call(this, old_date, date);
 
-                selectDate.call(this);
+                if (change_date || change_time) {
+                    this.date = date;
+                    if (change_date) {
+                        if (old_date.getFullYear() != date.getFullYear()
+                            || old_date.getMonth() != date.getMonth())
+                            fillMonth.call(this);
+                        selectDate.call(this);
+                    }
+                    if (change_time) {
+                        fillTime.call(this);
+                    }
+
+                    this.emitSignal("change", this.getDate());
+                }
                 return this;
             }
         },
@@ -341,16 +433,32 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             row.toggle();
             return this;
         },
+        toggleTime: function() {
+            var row = this.getElementsBySelector('.calendar_time')[0];
+            row.toggle();
+            return this;
+        },
         getByDate: function(date) {
-            var cell_date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
             var cell;
             this.dateCells.each(function(d) {
-                if (d.date.getTime() == cell_date.getTime()) {
+                if (!d.date) return;
+                if (d.date.getFullYear() == date.getFullYear()
+                    && d.date.getMonth() == date.getMonth()
+                    && d.date.getDate() == date.getDate()) {
                     cell = d;
                     throw $break;
                 }
             });
             return cell;
+        },
+        updateOnSignal: function(signal, element, format) {
+            if (!(element = $(element)))
+                return;
+            var update_function = function() {
+                updateElement.apply(this, [element, format].concat($A(arguments)));
+            }.bind(this);
+            this.signalConnect(signal, update_function);
+            return this;
         },
 
         _init: function() {
@@ -364,29 +472,39 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 showHeading: true,
                 startOnMonday: true,
                 showAdjacentMonths: true,
-                markWeekends: true
+                markWeekends: true,
+                showTime: true,
+                astronomicalTime: true
             }, arguments[1] || {});
             this.date = this.options.startDate;
-            Calendar.shortWeekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            Calendar.weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            Calendar.shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            Calendar.months =
-                ['January', 'February', 'March', 'April',
-                'May', 'June', 'July', 'August',
-                'September', 'October', 'November', 'December'];
+
+            if (!("shortWeekDays" in Calendar)) {
+                Calendar.shortWeekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                Calendar.weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                Calendar.shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                Calendar.months =
+                    ['January', 'February', 'March', 'April',
+                    'May', 'June', 'July', 'August',
+                    'September', 'October', 'November', 'December'];
+            }
 
             if (!this.options.showWeekNumber)
                 this.toggleWeekNumber();
             if (!this.options.showHeading)
                 this.toggleHeading();
+            if (!this.options.showTime)
+                this.toggleTime();
 
             this.dateCells = this.getElementsBySelector('.calendar_week_day');
             this.dateCells.each(function(d) { CalendarDate.create(d, this) }.bind(this));
             this._startDayChanged = true;
+            fillTime.call(this);
             fillMonth.call(this);
+            selectDate.call(this);
             this.setDate(this.date);
 
             connectHeadingSignals.call(this);
+            connectTimeSignals.call(this);
             keyLogEvent(keyEventsCB.bindAsEventListener(this));
             registerFocus(this);
 
@@ -421,13 +539,13 @@ Object.extend(Object.extend(CalendarDate, Widget), (function() {
                 this.addClassName('calendar_week_day_selected');
                 this.calendar.currentDate = this;
 
-                this.calendar.emitSignal('select_date', this);
-                this.emitSignal('select');
+                this.calendar.emitSignal('select_date', this.getDate());
+                this.emitSignal('select', this.getDate());
             } else {
                 this.removeClassName('calendar_week_day_selected');
                 if (this.calendar.currentDate == this)
                     this.calendar.currentDate = null;
-                this.emitSignal('unselect');
+                this.emitSignal('unselect', this.getDate());
             }
 
             return this;
@@ -444,8 +562,8 @@ Object.extend(Object.extend(CalendarDate, Widget), (function() {
          * @returns The object
          * */
         activate: function() {
-            this.calendar.emitSignal('activate_date', this);
-            this.emitSignal('activate');
+            this.calendar.emitSignal('activate_date', this.getDate());
+            this.emitSignal('activate', this.getDate());
             return this;
         },
         /**
