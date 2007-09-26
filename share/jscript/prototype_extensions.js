@@ -29,6 +29,7 @@ Object.extend(Event, EventMethods);
 Object.extend(Event, (function() {
   Event.DOMEvents.push((Prototype.Browser.Gecko) ? 'DOMMouseScroll' : 'mousewheel');
   return {
+    KEY_SPACE: 32,
     signalConnect: function(element, name, observer) {
       if (!element || !name || !observer) return;
       if (!element.signals) element.signals = {};

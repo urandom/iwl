@@ -198,12 +198,112 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
 
     function connectTimeSignals(event) {
+        var hours = this.getElementsBySelector('.calendar_hours')[0];
+        var minutes = this.getElementsBySelector('.calendar_minutes')[0];
+        var seconds = this.getElementsBySelector('.calendar_seconds')[0];
         var notation = this.getElementsBySelector('.calendar_hours_notation')[0];
+
+        var hours_focus = hoursFocusEvent.bindAsEventListener(this);
+        var hours_key = hoursKeyEvent.bindAsEventListener(this);
+        var hours_blur = hoursBlurEvent.bindAsEventListener(this);
+
+        var minutes_focus = minutesFocusEvent.bindAsEventListener(this);
+        var minutes_key = minutesKeyEvent.bindAsEventListener(this);
+        var minutes_blur = minutesBlurEvent.bindAsEventListener(this);
+
+        var seconds_focus = secondsFocusEvent.bindAsEventListener(this);
+        var seconds_key = secondsKeyEvent.bindAsEventListener(this);
+        var seconds_blur = secondsBlurEvent.bindAsEventListener(this);
 
         var notation_click = notationClickEvent.bindAsEventListener(this);
 
+        hours.signalConnect('focus', hours_focus);
+        hours.signalConnect('keypress', hours_key);
+        hours.signalConnect('blur', hours_blur);
+
+        minutes.signalConnect('focus', minutes_focus);
+        minutes.signalConnect('keypress', minutes_key);
+        minutes.signalConnect('blur', minutes_blur);
+
+        seconds.signalConnect('focus', seconds_focus);
+        seconds.signalConnect('keypress', seconds_key);
+        seconds.signalConnect('blur', seconds_blur);
+
         notation.signalConnect('click', notation_click);
     }
+
+    function hoursFocusEvent(event) {
+        var element = event.element();
+        element.addClassName('calendar_time_selected');
+    }
+    function hoursKeyEvent(event) {
+        var input = event.element();
+
+        if (Event.getKeyCode(event) == Event.KEY_RETURN) {
+            var date = this.getDate();
+            var hours = parseInt(input.value);
+            if (hours < 13 && !this.options.astronomicalTime) {
+                hours = hours == 12 ? 0 : hours;
+                hours = date.getHours() > 12 ? hours + 12 : hours;
+            }
+            date.setHours(hours);
+            input.blur();
+            this.setDate(date);
+        }
+    }
+    function hoursBlurEvent(event) {
+        var element = event.element();
+        var hours = this.date.getHours();
+        if (!this.options.astronomicalTime) {
+            hours = hours >= 12 ? hours - 12 : hours;
+            hours = hours == 0 ? 12 : hours;
+        }
+        element.value = hours;
+        element.removeClassName('calendar_time_selected');
+    }
+
+    function minutesFocusEvent(event) {
+        var element = event.element();
+        element.addClassName('calendar_time_selected');
+    }
+    function minutesKeyEvent(event) {
+        var input = event.element();
+
+        if (Event.getKeyCode(event) == Event.KEY_RETURN) {
+            var date = this.getDate();
+            var minutes = parseInt(input.value);
+            date.setMinutes(minutes);
+            input.blur();
+            this.setDate(date);
+        }
+    }
+    function minutesBlurEvent(event) {
+        var element = event.element();
+        element.value = this.date.getMinutes();
+        element.removeClassName('calendar_time_selected');
+    }
+
+    function secondsFocusEvent(event) {
+        var element = event.element();
+        element.addClassName('calendar_time_selected');
+    }
+    function secondsKeyEvent(event) {
+        var input = event.element();
+
+        if (Event.getKeyCode(event) == Event.KEY_RETURN) {
+            var date = this.getDate();
+            var seconds = parseInt(input.value);
+            date.setSeconds(seconds);
+            input.blur();
+            this.setDate(date);
+        }
+    }
+    function secondsBlurEvent(event) {
+        var element = event.element();
+        element.value = this.date.getSeconds();
+        element.removeClassName('calendar_time_selected');
+    }
+
 
     function notationClickEvent(event) {
         var element = event.element();
@@ -252,7 +352,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             } else if (key_code == Event.KEY_RETURN) {
                 if (this.currentDate)
                     this.currentDate.activate();
-            } else if (key_code == 32) {
+            } else if (key_code == Event.KEY_ESC) {
                 this.setDate(new Date);
             }
         }
@@ -516,7 +616,9 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 var CalendarDate = {};
 Object.extend(Object.extend(CalendarDate, Widget), (function() {
     function dateClickEvent(event) {
-        this.calendar.setDate(this.getDate());
+        var date = this.calendar.getDate();
+        date.setDate(this.date.getDate());
+        this.calendar.setDate(date);
     }
 
     return {
