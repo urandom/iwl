@@ -83,6 +83,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 date.incrementDate();
             }
         }
+        showSpecialDates.call(this);
     }
 
     function fillTime() {
@@ -417,6 +418,35 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         return true;
     }
 
+    function showSpecialDates() {
+        if (!this.options.specialDates.length) {
+            this.getElementsBySelector('.calendar_week_day_special').each(function(d) {
+                d.removeClassName('calendar_week_day_special');
+                d.removeClassName('calendar_week_day_special_disabled');
+            });
+            return;
+        }
+        this.dateCells.each(function (d) {
+            var date = {year: d.date.getFullYear(), month: d.date.getMonth(), date: d.date.getDate()};
+            var ok = false;
+            for (var i = 0, s = this.options.specialDates[i];
+                i < this.options.specialDates.length; s = this.options.specialDates[++i]) {
+                if ((!s.year || s.year == date.year)
+                    && (!s.month || s.month == date.month)
+                    && (s.date == date.date)) {
+                    d.addClassName('calendar_week_day_special');
+                    if (d.hasClassName('calendar_week_day_disabled'))
+                        d.addClassName('calendar_week_day_special_disabled');
+                    ok = true;
+                }
+            }
+            if (!ok) {
+                d.removeClassName('calendar_week_day_special');
+                d.removeClassName('calendar_week_day_special_disabled');
+            }
+        }.bind(this));
+    }
+
     Object.extend(Date.prototype, {
         sprintf: function(string) {
             var reg = /%./g;
@@ -560,6 +590,51 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             this.signalConnect(signal, update_function);
             return this;
         },
+        addSpecialDate: function(date) {
+            if (typeof date != 'object')
+                return;
+
+            if (date instanceof Date) {
+                var year = date.getFullYear();
+                var month = date.getMonth();
+                var date = date.getDate();
+            } else {
+                var year = date.year;
+                var month = date.month;
+                var date = date.date;
+            }
+
+            if (!date) return;
+
+            this.options.specialDates.push({year: year, month: month, date: date});
+            showSpecialDates.call(this);
+
+            return this;
+        },
+        removeSpecialDate: function(date) {
+            if (typeof date != 'object')
+                return;
+
+            if (date instanceof Date) {
+                var year = date.getFullYear();
+                var month = date.getMonth();
+                var date = date.getDate();
+            } else {
+                var year = date.year;
+                var month = date.month;
+                var date = date.date;
+            }
+
+            if (!date) return;
+            this.options.specialDates = this.options.specialDates.findAll(function(i) {
+                if (i.year == year && i.month == month && i.date == date)
+                    return false;
+                return true;
+            });
+            showSpecialDates.call(this);
+
+            return this;
+        },
 
         _init: function() {
             this.options = Object.extend({
@@ -574,7 +649,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 showAdjacentMonths: true,
                 markWeekends: true,
                 showTime: true,
-                astronomicalTime: true
+                astronomicalTime: true,
+                specialDates: []
             }, arguments[1] || {});
             this.date = this.options.startDate;
 
