@@ -14,8 +14,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         date.setMonth(month);
         date.setDate(1);
 
-        $(heading_cells[1]).down().value = Calendar.months[month];
-        $(heading_cells[4]).down().value = year;
+        $(heading_cells[2]).down().value = Calendar.months[month];
+        $(heading_cells[5]).down().value = year;
 
         while (date.getDay() != start_day)
             date.decrementDate();
@@ -118,20 +118,20 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var prev_year = previousYearEvent.bindAsEventListener(this);
         var next_year = nextYearEvent.bindAsEventListener(this);
 
-        var month = $(heading_cells[1]).down();
+        var month = $(heading_cells[2]).down();
         var month_focus = monthFocusEvent.bindAsEventListener(this);
         var month_blur = monthBlurEvent.bindAsEventListener(this);
         var month_key = monthKeyEvent.bindAsEventListener(this);
 
-        var year = $(heading_cells[4]).down();
+        var year = $(heading_cells[5]).down();
         var year_focus = yearFocusEvent.bindAsEventListener(this);
         var year_blur = yearBlurEvent.bindAsEventListener(this);
         var year_key = yearKeyEvent.bindAsEventListener(this);
 
-        $(heading_cells[0]).signalConnect('click', prev_month);
-        $(heading_cells[2]).signalConnect('click', next_month);
-        $(heading_cells[3]).signalConnect('click', prev_year);
-        $(heading_cells[5]).signalConnect('click', next_year);
+        $(heading_cells[1]).signalConnect('click', prev_month);
+        $(heading_cells[3]).signalConnect('click', next_month);
+        $(heading_cells[4]).signalConnect('click', prev_year);
+        $(heading_cells[6]).signalConnect('click', next_year);
 
         month.signalConnect('blur', month_blur);
         month.signalConnect('focus', month_focus);
@@ -672,7 +672,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                     'September', 'October', 'November', 'December'];
             }
 
-            if (!this.options.showWeekNumber)
+            if (!this.options.showWeekNumbers)
                 this.showWeekNumbers(false);
             if (!this.options.showHeading)
                 this.showHeading(false);
