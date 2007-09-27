@@ -20,7 +20,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         while (date.getDay() != start_day)
             date.decrementDate();
 
-        if (this._startDayChanged) {
+        if (this._startDayChanged && this.options.markWeekends) {
             if (start_day == 0) {
                 Element.extend(week_days.cells[1]).update(Calendar.shortWeekDays[6]).addClassName('calendar_weekend_header');
                 for (day = 0; day < 6; day++) {
@@ -552,20 +552,22 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         getDate: function() {
             return new Date(this.date.getTime());
         },
-        toggleWeekNumber: function() {
+        showWeekNumbers: function(show) {
             var cells = this.getElementsBySelector('.calendar_week_number_header').concat(
                 this.getElementsBySelector('.calendar_week_number'));
-            cells.invoke('toggle');
+            cells.invoke(show ? 'show' : 'hide');
             return this;
         },
-        toggleHeading: function() {
+        showHeading: function(show) {
             var row = this.getElementsBySelector('.calendar_heading')[0];
-            row.toggle();
+            if (show) row.show();
+            else row.hide();
             return this;
         },
-        toggleTime: function() {
+        showTime: function(show) {
             var row = this.getElementsBySelector('.calendar_time')[0];
-            row.toggle();
+            if (show) row.show();
+            else row.hide();
             return this;
         },
         getByDate: function(date) {
@@ -649,12 +651,12 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 toYear: false,
                 toMonth: 0,
                 startDate: new Date,
-                showWeekNumber: true,
+                showWeekNumbers: true,
                 showHeading: true,
-                startOnMonday: true,
-                showAdjacentMonths: true,
-                markWeekends: true,
                 showTime: true,
+                showAdjacentMonths: true,
+                startOnMonday: true,
+                markWeekends: true,
                 astronomicalTime: true,
                 markedDates: []
             }, arguments[1] || {});
@@ -671,11 +673,11 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             }
 
             if (!this.options.showWeekNumber)
-                this.toggleWeekNumber();
+                this.showWeekNumbers(false);
             if (!this.options.showHeading)
-                this.toggleHeading();
+                this.showHeading(false);
             if (!this.options.showTime)
-                this.toggleTime();
+                this.showTime(false);
 
             this.dateCells = this.getElementsBySelector('.calendar_week_day');
             this.dateCells.each(function(d) { CalendarDate.create(d, this) }.bind(this));

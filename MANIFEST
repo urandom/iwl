@@ -316,6 +316,7 @@ t/31page.t
 t/31table_row.t
 t/32table.t
 t/40accordion_page.t
+t/40calendar.t
 t/40checkbox.t
 t/40combo_option.t
 t/40contentbox.t
