@@ -6,7 +6,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var start_day = this.options.startOnMonday ? 1 : 0;
         var year = this.date.getFullYear();
         var month = this.date.getMonth();
-        var heading_cells = this.getElementsBySelector('.calendar_heading')[0].cells;
+        var month_input = this.getElementsBySelector('.calendar_month')[0];
+        var year_input = this.getElementsBySelector('.calendar_year')[0];
         var week_days = this.getElementsBySelector('.calendar_week_days')[0];
         var date = this.getDate();
 
@@ -14,8 +15,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         date.setMonth(month);
         date.setDate(1);
 
-        $(heading_cells[2]).down().value = Calendar.months[month];
-        $(heading_cells[5]).down().value = year;
+        month_input.value = Calendar.months[month];
+        year_input.value = year;
 
         while (date.getDay() != start_day)
             date.decrementDate();
@@ -112,26 +113,30 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
 
     function connectHeadingSignals() {
-        var heading_cells = this.getElementsBySelector('.calendar_heading')[0].cells;
+        var month_prev = this.getElementsBySelector('.calendar_month_prev')[0];
+        var month_next = this.getElementsBySelector('.calendar_month_next')[0];
+        var year_prev = this.getElementsBySelector('.calendar_year_prev')[0];
+        var year_next = this.getElementsBySelector('.calendar_year_next')[0];
+        var month = this.getElementsBySelector('.calendar_month')[0];
+        var year = this.getElementsBySelector('.calendar_year')[0];
+
         var prev_month = previousMonthEvent.bindAsEventListener(this);
         var next_month = nextMonthEvent.bindAsEventListener(this);
         var prev_year = previousYearEvent.bindAsEventListener(this);
         var next_year = nextYearEvent.bindAsEventListener(this);
 
-        var month = $(heading_cells[2]).down();
         var month_focus = monthFocusEvent.bindAsEventListener(this);
         var month_blur = monthBlurEvent.bindAsEventListener(this);
         var month_key = monthKeyEvent.bindAsEventListener(this);
 
-        var year = $(heading_cells[5]).down();
         var year_focus = yearFocusEvent.bindAsEventListener(this);
         var year_blur = yearBlurEvent.bindAsEventListener(this);
         var year_key = yearKeyEvent.bindAsEventListener(this);
 
-        $(heading_cells[1]).signalConnect('click', prev_month);
-        $(heading_cells[3]).signalConnect('click', next_month);
-        $(heading_cells[4]).signalConnect('click', prev_year);
-        $(heading_cells[6]).signalConnect('click', next_year);
+        month_prev.signalConnect('click', prev_month);
+        month_next.signalConnect('click', next_month);
+        year_prev.signalConnect('click', prev_year);
+        year_next.signalConnect('click', next_year);
 
         month.signalConnect('blur', month_blur);
         month.signalConnect('focus', month_focus);
