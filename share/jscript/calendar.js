@@ -83,7 +83,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 date.incrementDate();
             }
         }
-        showSpecialDates.call(this);
+        showMarkedDates.call(this);
     }
 
     function fillTime() {
@@ -418,8 +418,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         return true;
     }
 
-    function showSpecialDates() {
-        if (!this.options.specialDates.length) {
+    function showMarkedDates() {
+        if (!this.options.markedDates.length) {
             this.getElementsBySelector('.calendar_week_day_special').each(function(d) {
                 d.removeClassName('calendar_week_day_special');
                 d.removeClassName('calendar_week_day_special_disabled');
@@ -429,10 +429,10 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         this.dateCells.each(function (d) {
             var date = {year: d.date.getFullYear(), month: d.date.getMonth(), date: d.date.getDate()};
             var ok = false;
-            for (var i = 0, s = this.options.specialDates[i];
-                i < this.options.specialDates.length; s = this.options.specialDates[++i]) {
-                if ((!s.year || s.year == date.year)
-                    && (!s.month || s.month == date.month)
+            for (var i = 0, s = this.options.markedDates[i];
+                i < this.options.markedDates.length; s = this.options.markedDates[++i]) {
+                if ((typeof s.year != 'number' || s.year == date.year)
+                    && (typeof s.month != 'number' || s.month == date.month)
                     && (s.date == date.date)) {
                     d.addClassName('calendar_week_day_special');
                     if (d.hasClassName('calendar_week_day_disabled'))
@@ -590,7 +590,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             this.signalConnect(signal, update_function);
             return this;
         },
-        addSpecialDate: function(date) {
+        markDate: function(date) {
             if (typeof date != 'object')
                 return;
 
@@ -606,12 +606,12 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
             if (!date) return;
 
-            this.options.specialDates.push({year: year, month: month, date: date});
-            showSpecialDates.call(this);
+            this.options.markedDates.push({year: year, month: month, date: date});
+            showMarkedDates.call(this);
 
             return this;
         },
-        removeSpecialDate: function(date) {
+        unmarkDate: function(date) {
             if (typeof date != 'object')
                 return;
 
@@ -626,12 +626,18 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             }
 
             if (!date) return;
-            this.options.specialDates = this.options.specialDates.findAll(function(i) {
+            this.options.markedDates = this.options.markedDates.findAll(function(i) {
                 if (i.year == year && i.month == month && i.date == date)
                     return false;
                 return true;
             });
-            showSpecialDates.call(this);
+            showMarkedDates.call(this);
+
+            return this;
+        },
+        clearMarks: function() {
+            this.options.markedDates = [];
+            showMarkedDates.call(this);
 
             return this;
         },
@@ -650,7 +656,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 markWeekends: true,
                 showTime: true,
                 astronomicalTime: true,
-                specialDates: []
+                markedDates: []
             }, arguments[1] || {});
             this.date = this.options.startDate;
 
@@ -692,8 +698,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 var CalendarDate = {};
 Object.extend(Object.extend(CalendarDate, Widget), (function() {
     function dateClickEvent(event) {
-        var date = this.calendar.getDate();
-        date.setDate(this.date.getDate());
+        var date = this.getDate();
         this.calendar.setDate(date);
     }
 
