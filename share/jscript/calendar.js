@@ -549,7 +549,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                         fillTime.call(this);
                     }
 
-                    this.emitSignal("change", this.getDate());
+                    this.emitSignal("change", this.getDate(), this.currentDate);
                 }
                 return this;
             }
@@ -604,16 +604,16 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             if (date instanceof Date) {
                 var year = date.getFullYear();
                 var month = date.getMonth();
-                var date = date.getDate();
+                var day = date.getDate();
             } else {
                 var year = date.year;
                 var month = date.month;
-                var date = date.date;
+                var day = date.date;
             }
 
-            if (!date) return;
+            if (!day) return;
 
-            this.options.markedDates.push({year: year, month: month, date: date});
+            this.options.markedDates.push({year: year, month: month, date: day});
             showMarkedDates.call(this);
 
             return this;
@@ -625,16 +625,16 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             if (date instanceof Date) {
                 var year = date.getFullYear();
                 var month = date.getMonth();
-                var date = date.getDate();
+                var day = date.getDate();
             } else {
                 var year = date.year;
                 var month = date.month;
-                var date = date.date;
+                var day = date.date;
             }
 
-            if (!date) return;
+            if (!day) return;
             this.options.markedDates = this.options.markedDates.findAll(function(i) {
-                if (i.year == year && i.month == month && i.date == date)
+                if (i.year == year && i.month == month && i.date == day)
                     return false;
                 return true;
             });
@@ -729,7 +729,7 @@ Object.extend(Object.extend(CalendarDate, Widget), (function() {
                 this.addClassName('calendar_week_day_selected');
                 this.calendar.currentDate = this;
 
-                this.calendar.emitSignal('select_date', this.getDate());
+                this.calendar.emitSignal('select_date', this.getDate(), this);
                 this.emitSignal('select', this.getDate());
             } else {
                 this.removeClassName('calendar_week_day_selected');
@@ -752,7 +752,7 @@ Object.extend(Object.extend(CalendarDate, Widget), (function() {
          * @returns The object
          * */
         activate: function() {
-            this.calendar.emitSignal('activate_date', this.getDate());
+            this.calendar.emitSignal('activate_date', this.getDate(), this);
             this.emitSignal('activate', this.getDate());
             return this;
         },

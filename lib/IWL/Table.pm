@@ -62,7 +62,7 @@ sub new {
         $self->setAttribute(cellpadding => 0);
     }
     delete @args{qw(spacing padding)};
-    $self->__init(%args);
+    $self->IWL::Table::__init(%args);
 
     return $self;
 }
@@ -388,7 +388,6 @@ sub __init {
 
     $self->{_defaultClass} = 'table';
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
-    my $class = $args{class} || $self->{_defaultClass};
 
     my $header = IWL::Table::Container->new(type  => 'header');
     my $footer = IWL::Table::Container->new(type  => 'footer');

@@ -138,10 +138,18 @@ sub newMultiple {
 	    push @widgets, $widget;
 	}
     } else {
-	foreach my $args (@args) {
-	    my $widget = $proto->new(%$args);
-	    push @widgets, $widget;
-	}
+        if ($args[0] =~ /^\d+$/) {
+            my $number = shift @args;
+            foreach (1 .. $number) {
+                my $widget = $proto->new(@args);
+                push @widgets, $widget;
+            }
+        } else {
+            foreach my $args (@args) {
+                my $widget = $proto->new(%$args);
+                push @widgets, $widget;
+            }
+        }
     }
     return @widgets;
 }

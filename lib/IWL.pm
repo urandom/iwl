@@ -10,6 +10,7 @@ use IWL::Accordion::Page;
 use IWL::Anchor;
 use IWL::Break;
 use IWL::Button;
+use IWL::Calendar;
 use IWL::Canvas;
 use IWL::Checkbox;
 use IWL::Combo::Option;

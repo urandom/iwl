@@ -473,7 +473,7 @@ Prints the HTML content of current object and all of its children, along with an
 sub printHTML {
     my $self = shift;
 
-    $self->printHTMLHeader;
+    $self->printHTMLHeader unless $self->isa('IWL::Page');
     print $self->getContent;
     return $self;
 }
