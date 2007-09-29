@@ -396,7 +396,7 @@ sub generate_calendars {
     my $label = IWL::Label->new->setText("Click the icon to bring up another calendar.\nActivate a date to update the entry and close the calendar.");
     my $icon = IWL::Image->newFromStock('IWL_STOCK_CALENDAR');
     my $tip1 = IWL::Tooltip->new;
-    my $calendar2 = IWL::Calendar->new(id => 'calendar2', astronomicalTime => 0, showHeading => 0, showWeekNumbers => 0, startOnMonday => 0, markWeekends => 0);
+    my $calendar2 = IWL::Calendar->new(id => 'calendar2', astronomicalTime => 0, showHeading => 0, showWeekNumbers => 0, startOnMonday => 0, markWeekends => 0, showAdjacentMonths => 0);
     my $entry2 = IWL::Entry->new(readonly => 1);
 
     $tip1->bindToWidget($icon, 'click');
