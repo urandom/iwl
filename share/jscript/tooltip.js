@@ -11,7 +11,8 @@ Object.extend(Object.extend(Tooltip, Widget), {
      * */
     showTooltip: function() {
         this.placeAtElement();
-        this.__appear = Effect.Appear(this);
+        if (this.__fade) this.__fade.cancel();
+        this.__appear = Effect.Appear(this, {duration: 0.25});
 	return this;
     },
     /**
@@ -20,7 +21,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
      * */
     hideTooltip: function() {
 	if (this.__appear) this.__appear.cancel();
-        Element.hide(this);
+        this._fade = Effect.Fade(this, {duration: 0.5});
 	return this;
     },
     /**
