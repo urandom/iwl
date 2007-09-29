@@ -22,25 +22,31 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         while (date.getDay() != start_day)
             date.decrementDate();
 
-        if (this._startDayChanged && this.options.markWeekends) {
+        if (this._startDayChanged) {
             if (start_day == 0) {
-                Element.extend(week_days.cells[1]).update(Calendar.shortWeekDays[6]).addClassName('calendar_weekend_header');
+                var sunday = Element.extend(week_days.cells[1]).update(Calendar.shortWeekDays[6]);
+                if (this.options.markWeekends)
+                    sunday.addClassName('calendar_weekend_header');
                 for (day = 0; day < 6; day++) {
                     var cell = Element.extend(week_days.cells[day + 2]);
                     cell.innerHTML = Calendar.shortWeekDays[day];
-                    if (day == 5)
-                        cell.addClassName('calendar_weekend_header');
-                    else
-                        cell.removeClassName('calendar_weekend_header');
+                    if (this.options.markWeekends) {
+                        if (day == 5)
+                            cell.addClassName('calendar_weekend_header');
+                        else
+                            cell.removeClassName('calendar_weekend_header');
+                    }
                 }
             } else {
                 for (day = 0; day < 7; day++) {
                     var cell = Element.extend(week_days.cells[day + 1]);
                     cell.innerHTML = Calendar.shortWeekDays[day];
-                    if (day == 5 || day == 6)
-                        cell.addClassName('calendar_weekend_header');
-                    else
-                        cell.removeClassName('calendar_weekend_header');
+                    if (this.options.markWeekends) {
+                        if (day == 5 || day == 6)
+                            cell.addClassName('calendar_weekend_header');
+                        else
+                            cell.removeClassName('calendar_weekend_header');
+                    }
                 }
             }
 
@@ -76,10 +82,12 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                     else cell.innerHTML = '';
                 }
 
-                if ([0,6].include(date.getDay()))
-                    cell.addClassName('calendar_weekend');
-                else
-                    cell.removeClassName('calendar_weekend');
+                if (this.options.markWeekends) {
+                    if ([0,6].include(date.getDay()))
+                        cell.addClassName('calendar_weekend');
+                    else
+                        cell.removeClassName('calendar_weekend');
+                }
 
                 cell.date = new Date(date.getTime());
                 date.incrementDate();
