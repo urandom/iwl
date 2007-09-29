@@ -7,7 +7,7 @@ use strict;
 
 use base qw(IWL::Script IWL::Widget);
 
-use IWL::String qw(encodeURI randomize);
+use IWL::String qw(escape randomize);
 
 =head1 NAME
 
@@ -96,9 +96,13 @@ Parameters: B<CONTENT> - text or widget to add as the content of the tooltip
 sub setContent {
     my ($self, $content) = @_;
     if (UNIVERSAL::isa($content, 'IWL::Widget')) {
-	$self->{__content} = encodeURI($content->getContent);
+        if ($content->{_requiredJs}) {
+            push @{$self->{_requiredJs}}, @{$content->{_requiredJs}};
+            $content->{_requiredJs} = [];
+        }
+	$self->{__content} = escape($content->getContent);
     } else {
-	$self->{__content} = encodeURI($content);
+	$self->{__content} = escape($content);
     }
     return $self;
 }
@@ -111,11 +115,11 @@ sub _realize {
 
     $self->SUPER::_realize;
     $self->setScript("Tooltip.create('$id', {hidden: true});");
+    $self->appendScript("\$('$id').setContent('$self->{__content}')") if $self->{__content};
     $self->appendScript("\$('$id').bindToWidget('$self->{__bound}', '$self->{__bindSignal}');")
       if $self->{__bound};
     $self->appendScript("\$('$id').bindHideToWidget('$self->{__boundHide}', '$self->{__bindHideSignal}');")
       if $self->{__boundHide};
-    $self->appendScript("\$('$id').setContent('$self->{__content}')") if $self->{__content};
 }
 
 # Internal

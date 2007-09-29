@@ -1,3 +1,4 @@
+// vim: set autoindent shiftwidth=4 tabstop=8:
 var Calendar = {};
 Object.extend(Object.extend(Calendar, Widget), (function() {
     var weeks_in_month = 6;
@@ -457,11 +458,14 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             var reg = /%./g;
             var day = this.getDay();
             var date = this.getDate();
-            var month = this.getMonth();
+            var month = this.getMonth() + 1;
             var year = this.getFullYear();
             var syear = year.toString().substring(2);
             var day_of_year = this.getDayOfYear();
             var week = this.getWeek();
+
+            var padded_month = month < 10 ? '0' + month : month;
+            var padded_date = date < 10 ? '0' + date : date;
 
             var hour = this.getHours();
             var pm = hour >= 12;
@@ -479,17 +483,17 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 b: Calendar.shortMonths[month],
                 B: Calendar.months[month],
                 C: this.getCentury(),
-                d: date < 10 ? '0' + date : date,
+                d: padded_date,
                 D: month + '/' + date + '/' + syear,
                 e: date < 10 ? ' ' + date : date,
-                F: year + '-' + month + '-' + date,
+                F: year + '-' + padded_month + '-' + padded_date,
                 h: Calendar.shortMonths[month],
                 H: hour < 10 ? '0' + hour : hour,
                 I: pmhour < 10 ? '0' + pmhour : pmhour,
                 j: day_of_year < 10 ? '00' + day_of_year : day_of_year < 100 ? '0' + day_of_year : day_of_year,
                 k: hour,
                 l: pmhour,
-                m: month < 10 ? '0' + month : month,
+                m: padded_month,
                 M: minute < 10 ? '0' + minute : minute,
                 n: '\n',
                 p: pm ? 'PM' : 'AM',
@@ -595,6 +599,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 updateElement.apply(this, [element, format].concat($A(arguments)));
             }.bind(this);
             this.signalConnect(signal, update_function);
+            update_function.call(this, this.getDate(), this.currentDate);
             return this;
         },
         markDate: function(date) {
@@ -665,7 +670,25 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 astronomicalTime: true,
                 markedDates: []
             }, arguments[1] || {});
-            this.date = this.options.startDate;
+            if (this.options.startDate instanceof Date)
+                this.date = this.options.startDate;
+            else if (typeof this.options.startDate == 'number')
+                this.date = new Date(this.options.startDate)
+            else if (this.options.startDate.join) {
+                var date = this.options.startDate.clone();
+                var starting = date.splice(0,3).join(',');
+                this.date = new Date(starting);
+                if (typeof date[0] == 'number')
+                    this.date.setHours(date[0]);
+                if (typeof date[1] == 'number')
+                    this.date.setMinutes(date[1]);
+                if (typeof date[2] == 'number')
+                    this.date.setSeconds(date[2]);
+                if (typeof date[3] == 'number')
+                    this.date.setMilliseconds(date[3]);
+            } else {
+                this.date = new Date;
+            }
 
             if (!("shortWeekDays" in Calendar)) {
                 Calendar.shortWeekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -761,8 +784,13 @@ Object.extend(Object.extend(CalendarDate, Widget), (function() {
          * @type Date
          * */
         getDate: function() {
-            if (this.date)
-                return new Date(this.date.getTime());
+            if (this.date) {
+                var date = this.calendar.getDate();
+                date.setFullYear(this.date.getFullYear());
+                date.setMonth(this.date.getMonth());
+                date.setDate(this.date.getDate());
+                return date;
+            }
         },
 
         _init: function(id, calendar) {

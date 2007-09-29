@@ -31,7 +31,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
     setContent: function(elements) {
 	this.content.update();
 	if (typeof elements == 'string') {
-	    this.content.update(decodeURI(elements));
+	    this.content.update(unescape(elements));
 	} else if (typeof elements == 'object') {
 	    if ($A(elements).length && !(elements.nodeType == 3)) {
 		$A(elements).each(function($_) {this.content.appendChild($_)}.bind(this));
@@ -78,7 +78,13 @@ Object.extend(Object.extend(Tooltip, Widget), {
     bindToWidget: function(element, signal) {
 	this.element = $(element);
 	if (!this.element) return;
-	this.element.signalConnect(signal, this.showTooltip.bind(this));
+        this.element.signalConnect(signal, function (event) {
+            if (!this.visible()) {
+                this.showTooltip();
+                if (event.stop)
+                    event.stop();
+            }
+        }.bind(this));
 	if (!this.options.hidden)
 	    this.showTooltip();
 	return this;
@@ -92,7 +98,13 @@ Object.extend(Object.extend(Tooltip, Widget), {
     bindHideToWidget: function(element, signal) {
 	this.hideElement = $(element);
 	if (!this.hideElement) return;
-	this.hideElement.signalConnect(signal, this.hideTooltip.bind(this));
+        this.hideElement.signalConnect(signal, function (event) {
+            if (this.visible()) {
+                this.hideTooltip();
+                if (event.stop)
+                    event.stop();
+            }
+        }.bind(this));
 	return this;
     },
 
@@ -130,7 +142,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
         content.setStyle({top: '-18px', width: this.options.width});
         container.setStyle({width: this.options.width, display: 'none'});
 
-        document.body.appendChild(container);
+        this.current.parentNode.appendChild(container);
         if (this.options.followMouse)
             Event.observe(document, 'mousemove', this.__move.bindAsEventListener(this), false);
         this.current = container;

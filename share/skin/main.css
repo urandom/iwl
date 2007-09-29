@@ -1254,3 +1254,6 @@ span.pagecontrol_label input {
     white-space: nowrap;
 }
 
+.calendar caption {
+    font-size: 0.8em;
+}

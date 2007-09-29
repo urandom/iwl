@@ -240,6 +240,7 @@ sub build_basic_widgets {
 sub build_advanced_widgets {
     my $row = shift;
     my $tables = IWL::Tree::Row->new(id => 'tables_row');
+    my $calendars = IWL::Tree::Row->new(id => 'calendars_row');
     my $combobox = IWL::Tree::Row->new(id => 'combobox_row');
     my $sliders = IWL::Tree::Row->new(id => 'sliders_row');
     my $iconbox = IWL::Tree::Row->new(id => 'iconbox_row');
@@ -248,6 +249,8 @@ sub build_advanced_widgets {
     my $table = IWL::Tree::Row->new(id => 'table_row');
     my $tree = IWL::Tree::Row->new(id => 'tree_row');
 
+    $calendars->appendTextCell('Calendars');
+    $row->appendRow($calendars);
     $combobox->appendTextCell('Combobox');
     $row->appendRow($combobox);
     $sliders->appendTextCell('Sliders');
@@ -265,7 +268,7 @@ sub build_advanced_widgets {
     $tree->appendTextCell('Tree');
     $tables->appendRow($tree);
 
-    register_row_event($combobox, $sliders, $iconbox, $menus, $list, $table, $tree);
+    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $list, $table, $tree);
 }
 
 sub build_containers {
@@ -382,6 +385,27 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOF
+
+    return $container->getObject;
+}
+
+sub generate_calendars {
+    my $container = IWL::Container->new(id => 'calendars_container');
+    my $entry1 = IWL::Entry->new(readonly => 1);
+    my $calendar1 = IWL::Calendar->new(id => 'calendar1', fromYear => 1989, fromMonth => 2, toYear => 2010, toMonth => 7, startDate => [1990, 3, 1, 12], markedDates => [{month => 0, date => 8}, {year => 1989, month => 11, date => 15}], showTime => 0);
+    my $label = IWL::Label->new->setText("Click the icon to bring up another calendar.\nActivate a date to update the entry and close the calendar.");
+    my $icon = IWL::Image->newFromStock('IWL_STOCK_CALENDAR');
+    my $tip1 = IWL::Tooltip->new;
+    my $calendar2 = IWL::Calendar->new(id => 'calendar2', astronomicalTime => 0, showHeading => 0, showWeekNumbers => 0, startOnMonday => 0, markWeekends => 0);
+    my $entry2 = IWL::Entry->new(readonly => 1);
+
+    $tip1->bindToWidget($icon, 'click');
+    $tip1->bindHideToWidget($calendar2, 'activate_date');
+    $calendar1->setCaption("This calendar has a lower boundary at 1989/3, and an upper one at 2010/8. It also has 2 marked dates.");
+    $calendar1->updateOnSignal(change => $entry1, "%F");
+    $calendar2->updateOnSignal(activate_date => $entry2, "%F - %T");
+    $tip1->setContent($calendar2);
+    $container->appendChild($calendar1, $entry1, IWL::Break->new, $label, $icon, $tip1, IWL::Break->new, $entry2);
 
     return $container->getObject;
 }
@@ -834,6 +858,8 @@ sub show_the_code_for {
 	$paragraph->appendTextType(read_code("generate_images", 17), 'pre');
     } elsif ($code_for eq 'labels_container') {
 	$paragraph->appendTextType(read_code("generate_labels", 18), 'pre');
+    } elsif ($code_for eq 'calendars_container') {
+	$paragraph->appendTextType(read_code("generate_calendars", 20), 'pre');
     } elsif ($code_for eq 'combobox_container') {
 	$paragraph->appendTextType(read_code("generate_combobox", 13), 'pre');
     } elsif ($code_for eq 'slider_container') {
@@ -847,7 +873,7 @@ sub show_the_code_for {
     } elsif ($code_for eq 'table_container') {
 	$paragraph->appendTextType(read_code("generate_table", 41), 'pre');
     } elsif ($code_for eq 'tree_container') {
-	$paragraph->appendTextType(read_code("sub build_tree", 113), 'pre');
+	$paragraph->appendTextType(read_code("sub build_tree", 116), 'pre');
         $paragraph->appendTextType(read_code("Tree row handlers", 21), 'pre');
         $paragraph->appendTextType(read_code('^\);', 1), 'pre');
     } elsif ($code_for eq 'contentbox_container') {

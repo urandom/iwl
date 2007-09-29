@@ -361,7 +361,7 @@ sub __init {
 
     $options->{fromYear}  = $args{fromYear}  if defined $args{fromYear};
     $options->{fromMonth} = $args{fromMonth} if defined $args{fromMonth};
-    $options->{toYear}    = $args{fromYear}  if defined $args{toYear};
+    $options->{toYear}    = $args{toYear}    if defined $args{toYear};
     $options->{toMonth}   = $args{toMonth}   if defined $args{toMonth};
 
     $options->{showWeekNumbers}    = !(!$args{showWeekNumbers})    if defined $args{showWeekNumbers};
@@ -377,7 +377,7 @@ sub __init {
     $self->{_options}  = $options;
     $self->{__updates} = [];
 
-    $self->setDate($args{startDate});
+    $self->setDate(ref $args{startDate} eq 'ARRAY' ? @{$args{startDate}} : $args{startDate});
     $self->markDate(@{$args{markedDates}});
     delete @args{qw(fromYear fromMonth toYear toMonth showWeekNumbers
                     showHeading showTime showAdjacentMonths startOnMonday
@@ -435,8 +435,8 @@ sub __init {
         $self->appendBody($row);
     }
     my $time_row = IWL::Table::Row->new(class => 'calendar_time');
-    $time_row->appendCell(undef, colspan => 3);
-    my $time_cell = $time_row->appendCell(undef, colspan => 3);
+    $time_row->appendCell(undef, colspan => 2);
+    my $time_cell = $time_row->appendCell(undef, colspan => 4);
     $time_cell->appendChild(
         IWL::Input->new(type => 'text', class => 'calendar_hours'),
         IWL::Text->new(':'),
