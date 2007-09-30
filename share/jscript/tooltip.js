@@ -113,7 +113,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
         this.options = Object.extend({
             width:      'auto',
             centerOnElement: true,
-	    hidden: false,
+            hidden: false,
             followMouse: false
         }, arguments[1] || {})
         if (!id) id = 'tooltip' + Math.random();
@@ -143,7 +143,10 @@ Object.extend(Object.extend(Tooltip, Widget), {
         content.setStyle({top: '-18px', width: this.options.width});
         container.setStyle({width: this.options.width, display: 'none'});
 
-        this.current.parentNode.appendChild(container);
+        if (this.current && this.current.parentNode)
+            this.current.parentNode.appendChild(container);
+        else
+            document.body.appendChild(container);
         if (this.options.followMouse)
             Event.observe(document, 'mousemove', this.__move.bindAsEventListener(this), false);
         this.current = container;
