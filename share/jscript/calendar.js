@@ -494,14 +494,14 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             var format = {
                 a: Calendar.shortWeekDays[day],
                 A: Calendar.weekDays[day],
-                b: Calendar.shortMonths[month],
-                B: Calendar.months[month],
+                b: Calendar.shortMonths[month - 1],
+                B: Calendar.months[month - 1],
                 C: this.getCentury(),
                 d: padded_date,
                 D: month + '/' + date + '/' + syear,
                 e: date < 10 ? ' ' + date : date,
                 F: year + '-' + padded_month + '-' + padded_date,
-                h: Calendar.shortMonths[month],
+                h: Calendar.shortMonths[month - 1],
                 H: hour < 10 ? '0' + hour : hour,
                 I: pmhour < 10 ? '0' + pmhour : pmhour,
                 j: day_of_year < 10 ? '00' + day_of_year : day_of_year < 100 ? '0' + day_of_year : day_of_year,
@@ -712,8 +712,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             if (isNaN(this.date.getFullYear()))
                 this.date = new Date;
 
-            if (!("shortWeekDays" in Calendar))
-                Object.extend(Calendar, arguments[2]);
+            Object.extend(Calendar, arguments[2]);
 
             if (!this.options.showWeekNumbers)
                 this.showWeekNumbers(false);

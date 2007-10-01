@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-25 16:50+0300\n"
+"POT-Creation-Date: 2007-10-01 13:53+0300\n"
 "PO-Revision-Date: 2006-11-15 17:14+0100\n"
 "Last-Translator: Guido Flohr <guido@imperia.net>\n"
 "Language-Team: French <guido@imperia.net>\n"
@@ -14,219 +14,370 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../lib/IWL/GoogleMap.pm:158
+#: ../lib/IWL/GoogleMap.pm:159
 #, fuzzy
 msgid "Container has no id"
 msgstr "Le document ne contient pas de données"
 
-#: ../lib/IWL/GoogleMap.pm:270
+#: ../lib/IWL/GoogleMap.pm:271
 msgid ""
 "No key provided.  Please follow this link in order to obtain a key from "
 "Google."
 msgstr ""
 
-#: ../lib/IWL/Druid.pm:164
+#: ../lib/IWL/Druid.pm:173
 #, fuzzy
 msgid "Finish"
 msgstr "Terminé"
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:145
+#: ../lib/IWL/PageControl.pm:167
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr ""
 
-#: ../lib/IWL/Stock.pm:32
+#: ../lib/IWL/Stock.pm:28
 msgid "Add"
 msgstr ""
 
-#: ../lib/IWL/Stock.pm:36
+#: ../lib/IWL/Stock.pm:32
 msgid "Apply"
 msgstr "Appliquer"
 
-#: ../lib/IWL/Stock.pm:40
+#: ../lib/IWL/Stock.pm:36
 msgid "Back"
 msgstr "Retour"
 
-#: ../lib/IWL/Stock.pm:44
+#: ../lib/IWL/Stock.pm:40
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../lib/IWL/Stock.pm:48
+#: ../lib/IWL/Stock.pm:44
 msgid "Clear"
 msgstr "Effacer"
 
-#: ../lib/IWL/Stock.pm:52
+#: ../lib/IWL/Stock.pm:48
 msgid "Close"
 msgstr "Fermer"
 
-#: ../lib/IWL/Stock.pm:56
+#: ../lib/IWL/Stock.pm:52
 msgid "Delete"
 msgstr "Effacer"
 
-#: ../lib/IWL/Stock.pm:60
+#: ../lib/IWL/Stock.pm:56
 msgid "Download"
 msgstr "Télécharger"
 
-#: ../lib/IWL/Stock.pm:64
+#: ../lib/IWL/Stock.pm:60
 msgid "Edit"
 msgstr "Éditer"
 
-#: ../lib/IWL/Stock.pm:68
+#: ../lib/IWL/Stock.pm:64
 msgid "Export"
 msgstr "Exporter"
 
-#: ../lib/IWL/Stock.pm:72
+#: ../lib/IWL/Stock.pm:68
 msgid "Fullscreen"
 msgstr ""
 
-#: ../lib/IWL/Stock.pm:76
+#: ../lib/IWL/Stock.pm:72
 msgid "Go"
 msgstr ""
 
-#: ../lib/IWL/Stock.pm:80
+#: ../lib/IWL/Stock.pm:76
 msgid "Go back"
 msgstr ""
 
-#: ../lib/IWL/Stock.pm:84
+#: ../lib/IWL/Stock.pm:80
 msgid "Go forward"
 msgstr ""
 
-#: ../lib/IWL/Stock.pm:88
+#: ../lib/IWL/Stock.pm:84
 #, fuzzy
 msgid "Go to first"
 msgstr "Aller au thème"
 
-#: ../lib/IWL/Stock.pm:92
+#: ../lib/IWL/Stock.pm:88
 #, fuzzy
 msgid "Go to last"
 msgstr "Aller au thème"
 
-#: ../lib/IWL/Stock.pm:96
+#: ../lib/IWL/Stock.pm:92
 msgid "Help"
 msgstr "Aide"
 
-#: ../lib/IWL/Stock.pm:100
+#: ../lib/IWL/Stock.pm:96
 #, fuzzy
 msgid "Information"
 msgstr "Méta-informations"
 
-#: ../lib/IWL/Stock.pm:104
+#: ../lib/IWL/Stock.pm:100
 #, fuzzy
 msgid "Lock"
 msgstr "Blocages"
 
-#: ../lib/IWL/Stock.pm:108
+#: ../lib/IWL/Stock.pm:104
 #, fuzzy
 msgid "Minimize"
 msgstr "Menu principal"
 
-#: ../lib/IWL/Stock.pm:112
+#: ../lib/IWL/Stock.pm:108
 msgid "New"
 msgstr "Nouveau"
 
-#: ../lib/IWL/Stock.pm:116
+#: ../lib/IWL/Stock.pm:112
 msgid "Next"
 msgstr "Prochain"
 
-#: ../lib/IWL/Stock.pm:120
+#: ../lib/IWL/Stock.pm:116
 msgid "OK"
 msgstr "OK"
 
-#: ../lib/IWL/Stock.pm:124
+#: ../lib/IWL/Stock.pm:120
 #, fuzzy
 msgid "Preferences"
 msgstr "Différences"
 
-#: ../lib/IWL/Stock.pm:128
+#: ../lib/IWL/Stock.pm:124
 msgid "Preview"
 msgstr "Aperçu avant impression"
 
-#: ../lib/IWL/Stock.pm:132
+#: ../lib/IWL/Stock.pm:128
 #, fuzzy
 msgid "Refresh"
 msgstr "Références"
 
-#: ../lib/IWL/Stock.pm:136
+#: ../lib/IWL/Stock.pm:132
 msgid "Remove"
 msgstr "Supprimer"
 
-#: ../lib/IWL/Stock.pm:140
+#: ../lib/IWL/Stock.pm:136
 msgid "Save"
 msgstr "Enregistrer"
 
-#: ../lib/IWL/Stock.pm:144
+#: ../lib/IWL/Stock.pm:140
 #, fuzzy
 msgid "Save and close"
 msgstr "Enregistrer sous"
 
-#: ../lib/IWL/Stock.pm:148
+#: ../lib/IWL/Stock.pm:144
 msgid "Upload"
 msgstr "Charger"
 
-#: ../lib/IWL/Stock.pm:153
+#: ../lib/IWL/Stock.pm:149
 msgid "Add Filter"
 msgstr "Ajouter un filtre"
 
-#: ../lib/IWL/Stock.pm:157
+#: ../lib/IWL/Stock.pm:153
 msgid "Directory"
 msgstr "Répertoire"
 
-#: ../lib/IWL/Stock.pm:161
+#: ../lib/IWL/Stock.pm:157
 msgid "Delete directory"
 msgstr "Supprimer un répertoire"
 
-#: ../lib/IWL/Stock.pm:165
+#: ../lib/IWL/Stock.pm:161
 #, fuzzy
 msgid "Edit directory"
 msgstr "Éditer le répertoire"
 
-#: ../lib/IWL/Stock.pm:169
+#: ../lib/IWL/Stock.pm:165
 msgid "Create directory"
 msgstr "Créer un répertoire"
 
-#: ../lib/IWL/Stock.pm:174
+#: ../lib/IWL/Stock.pm:170
 msgid "Bottom"
 msgstr "Bas"
 
-#: ../lib/IWL/Stock.pm:178 ../lib/IWL/Stock.pm:190
+#: ../lib/IWL/Stock.pm:174 ../lib/IWL/Stock.pm:186
 #, fuzzy
 msgid "Main menu"
 msgstr "Menu principal"
 
-#: ../lib/IWL/Stock.pm:182
+#: ../lib/IWL/Stock.pm:178
 msgid "Info"
 msgstr "Info"
 
-#: ../lib/IWL/Stock.pm:186
+#: ../lib/IWL/Stock.pm:182
 #, fuzzy
 msgid "Mail"
 msgstr "Mails"
 
-#: ../lib/IWL/Stock.pm:194
+#: ../lib/IWL/Stock.pm:190
 msgid "Quit"
 msgstr "Quitter"
 
-#: ../lib/IWL/Stock.pm:198
+#: ../lib/IWL/Stock.pm:194
 #, fuzzy
 msgid "Available roles"
 msgstr "Rôles disponibles"
 
-#: ../lib/IWL/Stock.pm:202
+#: ../lib/IWL/Stock.pm:198
 msgid "Top"
 msgstr "Haut"
 
-#: ../lib/IWL/Stock.pm:207
+#: ../lib/IWL/Stock.pm:203
 #, fuzzy
 msgid "Calendar"
 msgstr "Effacer"
 
-#: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
+#: ../lib/IWL/Stock.pm:208 ../lib/IWL/Stock.pm:212
 msgid "Generic Text"
 msgstr ""
 
 #. TRANSLATORS: {TITLE} is a placeholder
-#: ../lib/IWL/Iconbox.pm:106
+#: ../lib/IWL/Iconbox.pm:140
 #, perl-brace-format
 msgid "The icon '{TITLE}' was removed."
+msgstr ""
+
+#. TRANSLATORS: week day abbreviations
+#: ../lib/IWL/Calendar.pm:21
+msgid "Mon"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Tue"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Wed"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Thu"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Fri"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Sat"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Sun"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Monday"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Tuesday"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Wednesday"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Thursday"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Friday"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Saturday"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Sunday"
+msgstr ""
+
+#. TRANSLATORS: month abbreviations
+#: ../lib/IWL/Calendar.pm:24
+msgid "Jan"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Feb"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Mar"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Apr"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24 ../lib/IWL/Calendar.pm:27
+msgid "May"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Jun"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Jul"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Aug"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Sep"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Oct"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Nov"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Dec"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "January"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "February"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "March"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:26
+#, fuzzy
+msgid "April"
+msgstr "Appliquer"
+
+#: ../lib/IWL/Calendar.pm:27
+msgid "June"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:27
+msgid "July"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:27
+msgid "August"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "September"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "October"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "November"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "December"
 msgstr ""

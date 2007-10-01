@@ -16,7 +16,7 @@ use base qw(IWL::Table);
 use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
 
-my $translations = objToJson({
+my $strings = {
     # TRANSLATORS: week day abbreviations
     shortWeekDays => [N__"Mon", N__"Tue", N__"Wed", N__"Thu", N__"Fri", N__"Sat", N__"Sun"],
     weekDays      => [N__"Monday", N__"Tuesday", N__"Wednesday", N__"Thursday", N__"Friday", N__"Saturday", N__"Sunday"],
@@ -26,7 +26,7 @@ my $translations = objToJson({
         [N__"January", N__"February", N__"March", N__"April",
         N__"May", N__"June", N__"July", N__"August",
         N__"September", N__"October", N__"November", N__"December"],
-});
+};
 
 =head1 NAME
 
@@ -356,6 +356,14 @@ sub _realize {
 
     $self->SUPER::_realize;
     my $options = objToJson($self->{_options});
+    my $translations = {};
+    foreach my $key (keys %$strings) {
+        $translations->{$key} = [];
+        foreach my $value (@{$strings->{$key}}) {
+            push @{$translations->{$key}}, __ $value;
+        }
+    }
+    $translations = objToJson($translations);
 
     $script->setScript("Calendar.create('$id', $options, $translations);");
     foreach my $update (@{$self->{__updates}}) {

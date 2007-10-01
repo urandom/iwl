@@ -1,3 +1,4 @@
+# vim: set keymap=bulgarian-phonetic:
 # Bulgarian translations for Imperia CMS.
 # Copyright (C) 1995-2004 Imperia AG.
 # This file is distributed under the same license as Imperia itself.
@@ -6,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-06-25 16:50+0300\n"
-"PO-Revision-Date: 2007-06-20 19:37+0300\n"
+"POT-Creation-Date: 2007-10-01 13:53+0300\n"
+"PO-Revision-Date: 2007-10-01 14:57+0300\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net,"
 "viktor@imperia.net>\n"
@@ -16,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lib/IWL/GoogleMap.pm:158
+#: ../lib/IWL/GoogleMap.pm:159
 msgid "Container has no id"
 msgstr "Контейнерът няма ИД"
 
-#: ../lib/IWL/GoogleMap.pm:270
+#: ../lib/IWL/GoogleMap.pm:271
 msgid ""
 "No key provided.  Please follow this link in order to obtain a key from "
 "Google."
@@ -28,194 +29,344 @@ msgstr ""
 "Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ от "
 "Google."
 
-#: ../lib/IWL/Druid.pm:164
+#: ../lib/IWL/Druid.pm:173
 msgid "Finish"
 msgstr "Край"
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:145
+#: ../lib/IWL/PageControl.pm:167
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr "{PAGEENTRY} от {PAGECOUNT}"
 
-#: ../lib/IWL/Stock.pm:32
+#: ../lib/IWL/Stock.pm:28
 msgid "Add"
 msgstr "Добавяне"
 
-#: ../lib/IWL/Stock.pm:36
+#: ../lib/IWL/Stock.pm:32
 msgid "Apply"
 msgstr "Прилагане"
 
-#: ../lib/IWL/Stock.pm:40
+#: ../lib/IWL/Stock.pm:36
 msgid "Back"
 msgstr "Обратно"
 
-#: ../lib/IWL/Stock.pm:44
+#: ../lib/IWL/Stock.pm:40
 msgid "Cancel"
 msgstr "Отказване"
 
-#: ../lib/IWL/Stock.pm:48
+#: ../lib/IWL/Stock.pm:44
 msgid "Clear"
 msgstr "Изчистване"
 
-#: ../lib/IWL/Stock.pm:52
+#: ../lib/IWL/Stock.pm:48
 msgid "Close"
 msgstr "Затваряне"
 
-#: ../lib/IWL/Stock.pm:56
+#: ../lib/IWL/Stock.pm:52
 msgid "Delete"
 msgstr "Изтриване"
 
-#: ../lib/IWL/Stock.pm:60
+#: ../lib/IWL/Stock.pm:56
 msgid "Download"
 msgstr "Сваляне"
 
-#: ../lib/IWL/Stock.pm:64
+#: ../lib/IWL/Stock.pm:60
 msgid "Edit"
 msgstr "Редактиране"
 
-#: ../lib/IWL/Stock.pm:68
+#: ../lib/IWL/Stock.pm:64
 msgid "Export"
 msgstr "Износ"
 
-#: ../lib/IWL/Stock.pm:72
+#: ../lib/IWL/Stock.pm:68
 msgid "Fullscreen"
 msgstr "Цял екран"
 
-#: ../lib/IWL/Stock.pm:76
+#: ../lib/IWL/Stock.pm:72
 msgid "Go"
 msgstr "Отиване"
 
-#: ../lib/IWL/Stock.pm:80
+#: ../lib/IWL/Stock.pm:76
 msgid "Go back"
 msgstr "Назад"
 
-#: ../lib/IWL/Stock.pm:84
+#: ../lib/IWL/Stock.pm:80
 msgid "Go forward"
 msgstr "Напред"
 
-#: ../lib/IWL/Stock.pm:88
+#: ../lib/IWL/Stock.pm:84
 msgid "Go to first"
 msgstr "Отиване в началото"
 
-#: ../lib/IWL/Stock.pm:92
+#: ../lib/IWL/Stock.pm:88
 msgid "Go to last"
 msgstr "Отиване накрая"
 
-#: ../lib/IWL/Stock.pm:96
+#: ../lib/IWL/Stock.pm:92
 msgid "Help"
 msgstr "Помощ"
 
-#: ../lib/IWL/Stock.pm:100
+#: ../lib/IWL/Stock.pm:96
 msgid "Information"
 msgstr "Информация"
 
-#: ../lib/IWL/Stock.pm:104
+#: ../lib/IWL/Stock.pm:100
 msgid "Lock"
 msgstr "Заключване"
 
-#: ../lib/IWL/Stock.pm:108
+#: ../lib/IWL/Stock.pm:104
 msgid "Minimize"
 msgstr "Намаляване"
 
-#: ../lib/IWL/Stock.pm:112
+#: ../lib/IWL/Stock.pm:108
 msgid "New"
 msgstr "Нов"
 
-#: ../lib/IWL/Stock.pm:116
+#: ../lib/IWL/Stock.pm:112
 msgid "Next"
 msgstr "Следваща страница"
 
-#: ../lib/IWL/Stock.pm:120
+#: ../lib/IWL/Stock.pm:116
 msgid "OK"
 msgstr "Добре"
 
-#: ../lib/IWL/Stock.pm:124
+#: ../lib/IWL/Stock.pm:120
 msgid "Preferences"
 msgstr "Предпочитания"
 
-#: ../lib/IWL/Stock.pm:128
+#: ../lib/IWL/Stock.pm:124
 msgid "Preview"
 msgstr "Преглед"
 
-#: ../lib/IWL/Stock.pm:132
+#: ../lib/IWL/Stock.pm:128
 msgid "Refresh"
 msgstr "Обновяване"
 
-#: ../lib/IWL/Stock.pm:136
+#: ../lib/IWL/Stock.pm:132
 msgid "Remove"
 msgstr "Премахване"
 
-#: ../lib/IWL/Stock.pm:140
+#: ../lib/IWL/Stock.pm:136
 msgid "Save"
 msgstr "Запазване"
 
-#: ../lib/IWL/Stock.pm:144
+#: ../lib/IWL/Stock.pm:140
 msgid "Save and close"
 msgstr "Запазване и излизане"
 
-#: ../lib/IWL/Stock.pm:148
+#: ../lib/IWL/Stock.pm:144
 msgid "Upload"
 msgstr "Качване"
 
-#: ../lib/IWL/Stock.pm:153
+#: ../lib/IWL/Stock.pm:149
 msgid "Add Filter"
 msgstr "Добавяне на филтър"
 
-#: ../lib/IWL/Stock.pm:157
+#: ../lib/IWL/Stock.pm:153
 msgid "Directory"
 msgstr "Директория"
 
-#: ../lib/IWL/Stock.pm:161
+#: ../lib/IWL/Stock.pm:157
 msgid "Delete directory"
 msgstr "Изтриване на директория"
 
-#: ../lib/IWL/Stock.pm:165
+#: ../lib/IWL/Stock.pm:161
 msgid "Edit directory"
 msgstr "Редактиране на директория"
 
-#: ../lib/IWL/Stock.pm:169
+#: ../lib/IWL/Stock.pm:165
 msgid "Create directory"
 msgstr "Създаване на директория"
 
-#: ../lib/IWL/Stock.pm:174
+#: ../lib/IWL/Stock.pm:170
 msgid "Bottom"
 msgstr "Най-долу"
 
-#: ../lib/IWL/Stock.pm:178 ../lib/IWL/Stock.pm:190
+#: ../lib/IWL/Stock.pm:174 ../lib/IWL/Stock.pm:186
 msgid "Main menu"
 msgstr "Главно меню"
 
-#: ../lib/IWL/Stock.pm:182
+#: ../lib/IWL/Stock.pm:178
 msgid "Info"
 msgstr "Инфо"
 
-#: ../lib/IWL/Stock.pm:186
+#: ../lib/IWL/Stock.pm:182
 msgid "Mail"
 msgstr "Поща"
 
-#: ../lib/IWL/Stock.pm:194
+#: ../lib/IWL/Stock.pm:190
 msgid "Quit"
 msgstr "Изход"
 
-#: ../lib/IWL/Stock.pm:198
+#: ../lib/IWL/Stock.pm:194
 msgid "Available roles"
 msgstr "Подръчни роли"
 
-#: ../lib/IWL/Stock.pm:202
+#: ../lib/IWL/Stock.pm:198
 msgid "Top"
 msgstr "Най-горе"
 
-#: ../lib/IWL/Stock.pm:207
+#: ../lib/IWL/Stock.pm:203
 msgid "Calendar"
 msgstr "Календар"
 
-#: ../lib/IWL/Stock.pm:212 ../lib/IWL/Stock.pm:216
+#: ../lib/IWL/Stock.pm:208 ../lib/IWL/Stock.pm:212
 msgid "Generic Text"
 msgstr "Общ текст"
 
 #. TRANSLATORS: {TITLE} is a placeholder
-#: ../lib/IWL/Iconbox.pm:106
+#: ../lib/IWL/Iconbox.pm:140
 #, perl-brace-format
 msgid "The icon '{TITLE}' was removed."
 msgstr "Иконата „{TITLE}“ е премахната."
+
+#. TRANSLATORS: week day abbreviations
+#: ../lib/IWL/Calendar.pm:21
+msgid "Mon"
+msgstr "Пн"
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Tue"
+msgstr "Вт"
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Wed"
+msgstr "Ср"
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Thu"
+msgstr "Чт"
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Fri"
+msgstr "Пт"
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Sat"
+msgstr "Сб"
+
+#: ../lib/IWL/Calendar.pm:21
+msgid "Sun"
+msgstr "Нд"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Monday"
+msgstr "Понеделник"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Tuesday"
+msgstr "Вторник"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Wednesday"
+msgstr "Сряда"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Thursday"
+msgstr "Четвъртък"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Friday"
+msgstr "Петък"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Saturday"
+msgstr "Събота"
+
+#: ../lib/IWL/Calendar.pm:22
+msgid "Sunday"
+msgstr "Неделя"
+
+#. TRANSLATORS: month abbreviations
+#: ../lib/IWL/Calendar.pm:24
+msgid "Jan"
+msgstr "Ян"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Feb"
+msgstr "Феб"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Mar"
+msgstr "Мар"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Apr"
+msgstr "Апр"
+
+#: ../lib/IWL/Calendar.pm:24 ../lib/IWL/Calendar.pm:27
+msgid "May"
+msgstr "Май"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Jun"
+msgstr "Юни"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Jul"
+msgstr "Юли"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Aug"
+msgstr "Авг"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Sep"
+msgstr "Сеп"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Oct"
+msgstr "Окт"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Nov"
+msgstr "Ное"
+
+#: ../lib/IWL/Calendar.pm:24
+msgid "Dec"
+msgstr "Дек"
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "January"
+msgstr "Януари"
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "February"
+msgstr "Февруари"
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "March"
+msgstr "Март"
+
+#: ../lib/IWL/Calendar.pm:26
+msgid "April"
+msgstr "Април"
+
+#: ../lib/IWL/Calendar.pm:27
+msgid "June"
+msgstr "Юни"
+
+#: ../lib/IWL/Calendar.pm:27
+msgid "July"
+msgstr "Юли"
+
+#: ../lib/IWL/Calendar.pm:27
+msgid "August"
+msgstr "Август"
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "September"
+msgstr "Септември"
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "October"
+msgstr "Октомври"
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "November"
+msgstr "Ноември"
+
+#: ../lib/IWL/Calendar.pm:28
+msgid "December"
+msgstr "Декември"
