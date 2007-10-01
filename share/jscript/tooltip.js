@@ -180,10 +180,6 @@ Object.extend(Object.extend(Tooltip, Widget), {
     },
     __position: function(x, y) {
         if (x >= 24) x -= 16;
-//        if (ie4) {
-//            x += 8;
-//            y += 16;
-//        }
 	return this.setStyle({top: y + 'px', left: x + 'px'});
     }
 });
