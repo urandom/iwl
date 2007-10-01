@@ -84,6 +84,10 @@ True, if the time should be shown. Defaults to I<true>. See IWL::Calendar::showT
 
 True, if days from the adjacent months should be shown. Defaults to I<true>
 
+=item B<noMonthChange>
+
+True, if the user should be prevented from switching months/years. Defaults to I<false>
+
 =item B<startOnMonday>
 
 True, if the calendar week should start on monday. Defaults to I<true>
@@ -389,6 +393,7 @@ sub __init {
     $options->{showHeading}        = !(!$args{showHeading})        if defined $args{showHeading};
     $options->{showTime}           = !(!$args{showTime})           if defined $args{showTime};
     $options->{showAdjacentMonths} = !(!$args{showAdjacentMonths}) if defined $args{showAdjacentMonths};
+    $options->{noMonthChange}      = !(!$args{noMonthChange})      if defined $args{noMonthChange};
     $options->{startOnMonday}      = !(!$args{startOnMonday})      if defined $args{startOnMonday};
     $options->{markWeekends}       = !(!$args{markWeekends})       if defined $args{markWeekends};
     $options->{astronomicalTime}   = !(!$args{astronomicalTime})   if defined $args{astronomicalTime};

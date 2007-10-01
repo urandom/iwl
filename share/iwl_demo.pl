@@ -691,20 +691,19 @@ sub generate_notebook {
 sub generate_tooltips {
     my $container = IWL::Container->new(id => 'tooltips_container');
     my $button = IWL::Button->new(size => 'medium', style => {float => 'none', margin => '0 auto'});
-    my $label = IWL::Label->new(expand => 1, style => {'text-align' => 'center'});
-    my $image = IWL::Image->new;
+    my $label = IWL::Label->new(expand => 1, style => {'text-align' => 'center', border => '1px solid gray'});
     my $tip1 = IWL::Tooltip->new;
-    my $tip2 = IWL::Tooltip->new;
+    my $tip2 = IWL::Tooltip->new(followMouse => 1);
+    my $calendar = IWL::Calendar->new(id => 'calendar', showTime => 0, showWeekNumbers => 0, noMonthChange => 1);
 
-    $image->set($IWLConfig{SKIN_DIR} . '/images/contentbox/arrow_right.gif');
-    $tip1->bindToWidget($button, 'mouseenter');
-    $tip1->bindHideToWidget($button, 'mouseleave');
-    $tip1->setContent('Some text here.');
+    $tip1->bindToWidget($button, 'click');
+    $tip1->bindHideToWidget($button, 'click');
+    $tip1->setContent($calendar);
     $tip2->bindToWidget($label, 'mouseover');
     $tip2->bindHideToWidget($label, 'mouseout');
-    $tip2->setContent($image);
-    $button->setLabel("Hover over me");
-    $label->setText("Hover over me");
+    $tip2->setContent('Some text here. Кирилица.');
+    $button->setLabel('Click for date');
+    $label->setText('Hover over me');
     $container->appendChild($button, $label, $tip1, $tip2);
 
     return $container->getObject;
@@ -886,7 +885,7 @@ sub show_the_code_for {
     } elsif ($code_for eq 'notebook_container') {
 	$paragraph->appendTextType(read_code("generate_notebook", 15), 'pre');
     } elsif ($code_for eq 'tooltips_container') {
-	$paragraph->appendTextType(read_code("generate_tooltips", 22), 'pre');
+	$paragraph->appendTextType(read_code("generate_tooltips", 20), 'pre');
     } elsif ($code_for eq 'file_container') {
 	$paragraph->appendTextType(read_code("generate_file", 13), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {

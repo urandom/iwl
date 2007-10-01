@@ -8,6 +8,7 @@ use strict;
 use base qw(IWL::Script IWL::Widget);
 
 use IWL::String qw(escape randomize);
+use JSON;
 
 =head1 NAME
 
@@ -26,7 +27,19 @@ The tooltip widget provides a balloon type tooltip. It is generated in javascrip
 
 IWL::Tooltip->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values.
+Where B<%ARGS> is an optional hash parameter with with key-values:
+
+=over 4
+
+=item B<centerOnElement>
+
+True, if the tooltip should appear in the center of the bound element
+
+=item B<followMouse>
+
+True, if the tooltip should follow the mouse
+
+=back
 
 =cut
 
@@ -110,10 +123,14 @@ sub setContent {
 sub _realize {
     my $self = shift;
     my $id   = $self->getId;
+    my $options;
 
+    $self->{_options}{hidden} = 1;
+
+    $options = objToJson($self->{_options});
     $self->setId($id . '_script');
     $self->SUPER::_realize;
-    $self->setScript("Tooltip.create('$id', {hidden: true});");
+    $self->setScript("Tooltip.create('$id', $options);");
     $self->appendScript("\$('$id').setContent('$self->{__content}')") if $self->{__content};
     $self->appendScript("\$('$id').bindToWidget('$self->{__bound}', '$self->{__bindSignal}');")
       if $self->{__bound};
@@ -127,8 +144,14 @@ sub __init {
     my ($self, %args) = @_;
     $self->{_defaultClass} = 'tooltip';
 
+    $self->{_options} = {};
+    $self->{_options}{centerOnElement} = !(!$args{centerOnElement}) if defined $args{centerOnElement};
+    $self->{_options}{followMouse}     = !(!$args{followMouse})     if defined $args{followMouse};
+
     $args{id} ||= randomize($self->{_defaultClass});
     $self->{_tag} = "script";
+
+    delete @args{qw(centerOnElement followMouse)};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'tooltip.js');
 

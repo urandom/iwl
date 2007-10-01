@@ -89,7 +89,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                         cell.removeClassName('calendar_weekend');
                 }
 
-                cell.date = new Date(date.getTime());
+                if (this_month == month || !this.options.noMonthChange)
+                    cell.date = new Date(date.getTime());
                 date.incrementDate();
             }
         }
@@ -148,10 +149,17 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var year_blur = yearBlurEvent.bindAsEventListener(this);
         var year_key = yearKeyEvent.bindAsEventListener(this);
 
-        month_prev.signalConnect('click', prev_month);
-        month_next.signalConnect('click', next_month);
-        year_prev.signalConnect('click', prev_year);
-        year_next.signalConnect('click', next_year);
+        if (this.options.noMonthChange) {
+            month_prev.update();
+            month_next.update();
+            year_prev.update();
+            year_next.update();
+        } else {
+            month_prev.signalConnect('click', prev_month);
+            month_next.signalConnect('click', next_month);
+            year_prev.signalConnect('click', prev_year);
+            year_next.signalConnect('click', next_year);
+        }
 
         month.signalConnect('blur', month_blur);
         month.signalConnect('focus', month_focus);
@@ -387,7 +395,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
             Event.stop(event);
             this.setDate(cell.getDate());
-        } else if (change) {
+        } else if (change && !this.options.noMonthChange) {
             Event.stop(event);
             this.setDate(date);
         }
@@ -679,6 +687,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 showHeading: true,
                 showTime: true,
                 showAdjacentMonths: true,
+                noMonthChange: false,
                 startOnMonday: true,
                 markWeekends: true,
                 astronomicalTime: true,

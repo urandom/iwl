@@ -116,15 +116,16 @@ Object.extend(Object.extend(Tooltip, Widget), {
 	return this;
     },
 
-    _preInit: function(id, pivot) {
+    _preInit: function(id) {
         this.options = Object.extend({
             width:      'auto',
             centerOnElement: true,
             hidden: false,
+            pivot: false,
             followMouse: false
         }, arguments[1] || {})
         if (!id) id = 'tooltip' + Math.random();
-	this.__build(id, pivot);
+	this.__build(id);
 	return true;
     },
     _init: function() {
@@ -132,7 +133,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
             this.options.width = parseInt(this.options.width) + 'px';
     },
 
-    __build: function(id, pivot) {
+    __build: function(id) {
         var container;
         if (container = $(id)) {
             if (container.setContent)
@@ -160,15 +161,17 @@ Object.extend(Object.extend(Tooltip, Widget), {
         container.setStyle({width: this.options.width, display: 'none'});
 
         var script = $(id + '_script');
-        pivot = $(pivot);
+        pivot = $(this.options.pivot);
         if (script)
             script.parentNode.appendChild(container);
         else if (pivot)
             pivot.parentNode.appendChild(container);
         else
             document.body.appendChild(container);
-        if (this.options.followMouse)
-            Event.observe(document, 'mousemove', this.__move.bindAsEventListener(this), false);
+        if (this.options.followMouse) {
+            container.setStyle({marginTop: '5px'});
+            Event.observe(document, 'mousemove', this.__move.bindAsEventListener(container), false);
+        }
 
         this.current = container;
         this.content = content;

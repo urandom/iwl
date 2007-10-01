@@ -42,7 +42,7 @@ Object.extend(Object.extend(Upload, Widget), {
     },
     __uploadFile: function() {
 	this.submit();
-	this.tooltip = Tooltip.create(this.id + '_tooltip', {centerOnElement: false});
+	this.tooltip = Tooltip.create(this.id + '_tooltip', {centerOnElement: false, pivot: this});
 	this.tooltip.bindToWidget(this.button);
 	this.tooltip.setContent('Uploading ...');
 
