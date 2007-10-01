@@ -394,7 +394,7 @@ sub generate_calendars {
     my $entry1 = IWL::Entry->new(readonly => 1);
     my $calendar1 = IWL::Calendar->new(id => 'calendar1', fromYear => 1989, fromMonth => 2, toYear => 2010, toMonth => 7, startDate => [1990, 3, 1, 12], markedDates => [{month => 0, date => 8}, {year => 1989, month => 11, date => 15}], showTime => 0);
     my $label = IWL::Label->new->setText("Click the icon to bring up another calendar.\nActivate a date to update the entry and close the calendar.");
-    my $icon = IWL::Image->newFromStock('IWL_STOCK_CALENDAR');
+    my $icon = IWL::Image->newFromStock('IWL_STOCK_CALENDAR')->setId('calendar_image');
     my $tip1 = IWL::Tooltip->new;
     my $calendar2 = IWL::Calendar->new(id => 'calendar2', astronomicalTime => 0, showHeading => 0, showWeekNumbers => 0, startOnMonday => 0, markWeekends => 0, showAdjacentMonths => 0);
     my $entry2 = IWL::Entry->new(readonly => 1);

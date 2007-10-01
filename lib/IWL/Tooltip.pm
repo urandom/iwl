@@ -57,7 +57,6 @@ Note: The tooltip and widget ids must not be changed after this method is called
 
 sub bindToWidget {
     my ($self, $widget, $signal) = @_;
-    my $id = $self->getId;
     my $to = $widget->getId;
 
     $self->{__bound} = $to;
@@ -77,7 +76,6 @@ Note: The tooltip and widget ids must not be changed after this method is called
 
 sub bindHideToWidget {
     my ($self, $widget, $signal) = @_;
-    my $id = $self->getId;
     my $to = $widget->getId;
 
     $self->{__boundHide} = $to;
@@ -113,6 +111,7 @@ sub _realize {
     my $self = shift;
     my $id   = $self->getId;
 
+    $self->setId($id . '_script');
     $self->SUPER::_realize;
     $self->setScript("Tooltip.create('$id', {hidden: true});");
     $self->appendScript("\$('$id').setContent('$self->{__content}')") if $self->{__content};

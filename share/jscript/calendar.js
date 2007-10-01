@@ -111,9 +111,15 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         } else {
             notation.innerHTML = '';
         }
+        var padded_minutes = this.date.getMinutes();
+        var padded_seconds = this.date.getSeconds();
+        hour = hour < 10 ? '0' + hour : hour;
+        padded_minutes = padded_minutes < 10 ? '0' + padded_minutes : padded_minutes;
+        padded_seconds = padded_seconds < 10 ? '0' + padded_seconds : padded_seconds;
+
         hours.value = hour;
-        minutes.value = this.date.getMinutes();
-        seconds.value = this.date.getSeconds();
+        minutes.value = padded_minutes;
+        seconds.value = padded_seconds;
     }
 
     function selectDate() {
@@ -683,20 +689,28 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             else if (typeof this.options.startDate == 'number')
                 this.date = new Date(this.options.startDate)
             else if (this.options.startDate.join) {
-                var date = this.options.startDate.clone();
-                var starting = date.splice(0,3).join(',');
-                this.date = new Date(starting);
+                var date = this.options.startDate;
+                this.date = new Date();
                 if (typeof date[0] == 'number')
-                    this.date.setHours(date[0]);
+                    this.date.setFullYear(date[0]);
                 if (typeof date[1] == 'number')
-                    this.date.setMinutes(date[1]);
+                    this.date.setMonth(date[1]);
                 if (typeof date[2] == 'number')
-                    this.date.setSeconds(date[2]);
+                    this.date.setDate(date[2]);
                 if (typeof date[3] == 'number')
-                    this.date.setMilliseconds(date[3]);
+                    this.date.setHours(date[3]);
+                if (typeof date[4] == 'number')
+                    this.date.setMinutes(date[4]);
+                if (typeof date[5] == 'number')
+                    this.date.setSeconds(date[5]);
+                if (typeof date[6] == 'number')
+                    this.date.setMilliseconds(date[6]);
             } else {
                 this.date = new Date;
             }
+
+            if (isNaN(this.date.getFullYear()))
+                this.date = new Date;
 
             if (!("shortWeekDays" in Calendar)) {
                 Calendar.shortWeekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

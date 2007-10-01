@@ -50,8 +50,15 @@ Object.extend(Object.extend(Tooltip, Widget), {
 	if (!this.element) return;
 	var pos = this.element.cumulativeOffset();
 	var scroll = this.element.cumulativeScrollOffset();
-	pos[0] -= scroll[0];
-	pos[1] -= scroll[1];
+        if (Prototype.Browser.Opera) {
+            if (scroll[0] != pos[0])
+                pos[0] -= scroll[0];
+            if (scroll[1] != pos[1])
+                pos[1] -= scroll[1];
+        } else {
+            pos[0] -= scroll[0];
+            pos[1] -= scroll[1];
+        }
 	pos[1] += this.element.getDimensions().height;
 
 	if (this.options.centerOnElement)
@@ -109,7 +116,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
 	return this;
     },
 
-    _preInit: function(id) {
+    _preInit: function(id, pivot) {
         this.options = Object.extend({
             width:      'auto',
             centerOnElement: true,
@@ -117,7 +124,7 @@ Object.extend(Object.extend(Tooltip, Widget), {
             followMouse: false
         }, arguments[1] || {})
         if (!id) id = 'tooltip' + Math.random();
-	this.__build(id);
+	this.__build(id, pivot);
 	return true;
     },
     _init: function() {
@@ -125,8 +132,17 @@ Object.extend(Object.extend(Tooltip, Widget), {
             this.options.width = parseInt(this.options.width) + 'px';
     },
 
-    __build: function(id) {
-        var container = new Element('div', {className: 'tooltip', id: id});
+    __build: function(id, pivot) {
+        var container;
+        if (container = $(id)) {
+            if (container.setContent)
+                this.current = container;
+            else
+                throw new Error('An element with id "' + id + '" already exists!');
+            return;
+        }
+        
+        container = new Element('div', {className: 'tooltip', id: id});
         var content = new Element('div', {className: 'tooltip_content'});
         var bubble1 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_1'});
         var bubble2 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_2'});
@@ -143,12 +159,17 @@ Object.extend(Object.extend(Tooltip, Widget), {
         content.setStyle({top: '-18px', width: this.options.width});
         container.setStyle({width: this.options.width, display: 'none'});
 
-        if (this.current && this.current.parentNode)
-            this.current.parentNode.appendChild(container);
+        var script = $(id + '_script');
+        pivot = $(pivot);
+        if (script)
+            script.parentNode.appendChild(container);
+        else if (pivot)
+            pivot.parentNode.appendChild(container);
         else
             document.body.appendChild(container);
         if (this.options.followMouse)
             Event.observe(document, 'mousemove', this.__move.bindAsEventListener(this), false);
+
         this.current = container;
         this.content = content;
     },

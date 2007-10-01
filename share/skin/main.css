@@ -1,3 +1,9 @@
+/*  Global  */
+body {
+    font-size: 12px;
+    font-family: Verdana, Arial, Helvetica, Sans-Serif;
+}
+
 /* Table */
 table.table {
     border:none;
