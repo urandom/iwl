@@ -810,6 +810,11 @@ ul.notebook_mainnav li.notebook_tab_selected a {
     background: url(/iwl/skin/default/images/notebook/activer.gif) no-repeat top right;
 }
 
+.notebook_clear {
+    font-size: 12px;
+    line-height: 12px;
+}
+
 div.notebook_navborder {
     border-top: 1px solid #999;
 }
