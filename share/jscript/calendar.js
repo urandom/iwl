@@ -712,15 +712,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             if (isNaN(this.date.getFullYear()))
                 this.date = new Date;
 
-            if (!("shortWeekDays" in Calendar)) {
-                Calendar.shortWeekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                Calendar.weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                Calendar.shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                Calendar.months =
-                    ['January', 'February', 'March', 'April',
-                    'May', 'June', 'July', 'August',
-                    'September', 'October', 'November', 'December'];
-            }
+            if (!("shortWeekDays" in Calendar))
+                Object.extend(Calendar, arguments[2]);
 
             if (!this.options.showWeekNumbers)
                 this.showWeekNumbers(false);

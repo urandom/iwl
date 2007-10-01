@@ -48,6 +48,7 @@
 ../lib/IWL/Comment.pm
 ../lib/IWL/Upload.pm
 ../lib/IWL/InputButton.pm
+../lib/IWL/Calendar.pm
 ../lib/IWL/Canvas.pm
 ../lib/IWL/Menu.pm
 ../lib/IWL/Style.pm
