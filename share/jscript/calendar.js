@@ -1,4 +1,8 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
+/**
+ * @class Calendar is a class for adding calendars
+ * @extends Widget
+ * */
 var Calendar = {};
 Object.extend(Object.extend(Calendar, Widget), (function() {
     var weeks_in_month = 6;
@@ -557,6 +561,11 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     });
 
     return {
+        /**
+         * Sets the calendar date
+         * @param {Date} date A date object
+         * @returns The object
+         * */
         setDate: function(date) {
             if (date instanceof Date && !isNaN(date.valueOf())) {
                 var old_date = this.date;
@@ -580,27 +589,51 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 return this;
             }
         },
+        /**
+         * @returns The current date of the calendar
+         * @type Date 
+         * */
         getDate: function() {
             return new Date(this.date.getTime());
         },
+        /**
+         * Sets whether the week numbers are visible
+         * @param {Boolean} show True, if the week numbers should be shown
+         * @returns The object
+         * */
         showWeekNumbers: function(show) {
             var cells = this.getElementsBySelector('.calendar_week_number_header').concat(
                 this.getElementsBySelector('.calendar_week_number'));
             cells.invoke(show ? 'show' : 'hide');
             return this;
         },
+        /**
+         * Sets whether the heading is visible
+         * @param {Boolean} show True, if the heading should be shown
+         * @returns The object
+         * */
         showHeading: function(show) {
             var row = this.getElementsBySelector('.calendar_heading')[0];
             if (show) row.show();
             else row.hide();
             return this;
         },
+        /**
+         * Sets whether the time is visible
+         * @param {Boolean} show True, if the time should be shown
+         * @returns The object
+         * */
         showTime: function(show) {
             var row = this.getElementsBySelector('.calendar_time')[0];
             if (show) row.show();
             else row.hide();
             return this;
         },
+        /**
+         * @param {Date} date The date for which to search
+         * @returns The date cell for the given date
+         * @type CalendarDate
+         * */
         getByDate: function(date) {
             var cell;
             this.dateCells.each(function(d) {
@@ -614,6 +647,13 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             });
             return cell;
         },
+        /**
+         * Updates the given element, when a calendar signal is emitted
+         * @param {String} signal The signal name for which to listen
+         * @param element The element which will be updated
+         * @param {String} format The format for the update. See strftime(3) for more details
+         * @returns The object
+         * */
         updateOnSignal: function(signal, element, format) {
             if (!(element = $(element)))
                 return;
@@ -624,6 +664,11 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             update_function.call(this, this.getDate(), this.currentDate);
             return this;
         },
+        /**
+         * Marks the given date as special
+         * @param {Date} date A date object
+         * @returns The object
+         * */
         markDate: function(date) {
             if (typeof date != 'object')
                 return;
@@ -645,6 +690,11 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
             return this;
         },
+        /**
+         * Unmarks the given date
+         * @param {Date} date A date object
+         * @returns The object
+         * */
         unmarkDate: function(date) {
             if (typeof date != 'object')
                 return;
@@ -669,6 +719,10 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
             return this;
         },
+        /**
+         * Clears all marked dates
+         * @returns The object
+         * */
         clearMarks: function() {
             this.options.markedDates = [];
             showMarkedDates.call(this);
@@ -748,6 +802,10 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
 })());
 
+/**
+ * @class CalendarDate is a class for dates which make up a calendar
+ * @extends Widget
+ * */
 var CalendarDate = {};
 Object.extend(Object.extend(CalendarDate, Widget), (function() {
     function dateClickEvent(event) {
