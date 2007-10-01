@@ -500,12 +500,13 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             var seconds = this.getSeconds();
             var time_string = this.toString();
             var zone_name = this.getTimezoneName();
+            var mday = day == 0 ? 7 : day;
 
             pmhour = pmhour == 0 ? 12 : pmhour;
 
             var format = {
-                a: Calendar.shortWeekDays[day],
-                A: Calendar.weekDays[day],
+                a: Calendar.shortWeekDays[mday - 1],
+                A: Calendar.weekDays[mday - 1],
                 b: Calendar.shortMonths[month - 1],
                 B: Calendar.months[month - 1],
                 C: this.getCentury(),
@@ -527,7 +528,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 s: this.getTime(),
                 S: seconds < 10 ? '0' + seconds : seconds,
                 t: '\t',
-                u: day + 1,
+                u: mday,
                 U: week < 10 ? '0' + week : week,
                 w: day,
                 y: syear,
