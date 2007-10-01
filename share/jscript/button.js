@@ -231,7 +231,7 @@ Object.extend(Object.extend(Button, Widget), {
 	    this.__buttonChangeBgImage(this.buttonParts[i], "disabled");
     },
     __clickImageChange: function() {
-	removeSelectionFromNode(this.id);
+	removeSelection();
 	for (var i = 0; i < this.buttonParts.length; i++)
 	    this.__buttonChangeBgImage(this.buttonParts[i], "click");
     },

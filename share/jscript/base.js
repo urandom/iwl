@@ -370,11 +370,10 @@ function exceptionHandler () {
     }
 }
 
-function removeSelectionFromNode(id) {
+function removeSelection() {
     if (window.getSelection) {
 	var sel = window.getSelection();
-	if (sel.containsNode($(id), true))
-	    sel.removeAllRanges();
+        sel.removeAllRanges();
     } else if (document.selection) {
 	try {
 	    document.selection.empty();
