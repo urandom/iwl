@@ -73,20 +73,22 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         if (y + tdims.height > vdims.height - margins)
             top = vdims.height - tdims.height - margins;
 
-        var offset_x = x - left;
+        var const_offset = bubbles[2].left + bubbles[2].width + compensation;
+        var offset_x = x - left - const_offset;
         if (offset_x > tdims.width) offset_x = tdims.width;
         var offset_ratio = offset_x / tdims.width;
-        var bubble0_x = (tdims.width - 2 * bubbles[0].left - bubbles[0].width) * offset_ratio + bubbles[0].left;
-        var bubble1_x = (tdims.width - 2 * bubbles[1].left - bubbles[1].width) * offset_ratio + bubbles[1].left;
-        var bubble2_x = (tdims.width - 2 * bubbles[2].left - bubbles[2].width) * offset_ratio + bubbles[2].left;
+        if (offset_ratio < 0) offset_ratio = 0;
+
+        var bubble0_x = (tdims.width - 2 * bubbles[0].left - bubbles[0].width + const_offset) * offset_ratio + bubbles[0].left;
+        var bubble1_x = (tdims.width - 2 * bubbles[1].left - bubbles[1].width + const_offset) * offset_ratio + bubbles[1].left;
+        var bubble2_x = (tdims.width - 2 * bubbles[2].left - bubbles[2].width + const_offset) * offset_ratio + bubbles[2].left;
 
         this.bubbles[0].style.left = bubble0_x + 'px';
         this.bubbles[1].style.left = bubble1_x + 'px';
         this.bubbles[2].style.left = bubble2_x + 'px';
 
-        var total_offset = bubbles[2].left + bubbles[2].width + compensation;
-        if (total_offset - offset_x > 0)
-            this.setStyle({left: left - total_offset + offset_x + 'px', top: top + 'px'});
+        if (offset_x < 0)
+            this.setStyle({left: left + offset_x + 'px', top: top + 'px'});
         else {
             this.setStyle({left: left + 'px', top: top + 'px'});
         }
