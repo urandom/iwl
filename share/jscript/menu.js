@@ -35,7 +35,7 @@ Object.extend(Object.extend(Menu, Widget), {
 	    }
 	    if (this.options.maxHeight)
 		this.__setupScrolling();
-	    if (ie4) {
+	    if (Prototype.Browser.IE) {
 		var dims = this.getDimensions();
 		this.setStyle({width: dims.width + 'px', height: dims.height + 'px'});
 	    }
@@ -186,11 +186,12 @@ Object.extend(Object.extend(Menu, Widget), {
 	    this.popDown();
 	else
 	    this.popUp();
+        Event.extend(event);
 	Event.stop(event);
 	return this;
     },
     __removeQuirks: function() {
-	if (!ie4 || ie7) return;
+	if (!Prototype.Browser.IE || Prototype.Browser.IE7) return;
 	if (this.__qframe) return;
 	var dims = Element.getDimensions(this);
 	var qframe = new Element('iframe', {
@@ -211,7 +212,7 @@ Object.extend(Object.extend(Menu, Widget), {
 	if (this.options.maxHeight > parseFloat(height)) return;
 	var new_width = parseInt(width) + 20;
 	this.addClassName('scrolling_menu');
-	if (opera)
+	if (Prototype.Browser.Opera)
 	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflow: 'auto'});
 	else
 	    this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflowY: 'scroll'});

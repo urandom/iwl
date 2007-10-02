@@ -423,7 +423,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 		width: page_dims.width + 'px'
 	    });
 	}.bind(this));
-	if (ie4 && !ie7) {
+	if (Prototype.Browser.IE && !Prototype.Browser.IE7) {
 	    if (this.options.modal) {
 		this.__qframe = new Element('iframe', {
 		    src: "javascript: false", className: "qframe",
@@ -451,7 +451,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
     },
     __removeQuirks: function() {
 	return;
-	if (!ie4 || ie7) return;
+	if (!Prototype.Browser.IE || Prototype.Browser.IE7) return;
 	if (this.options.modal) return;
 	if (this.__qframe) return;
 	var dims = this.getDimensions();
@@ -487,7 +487,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
         middle.style.height = (d.h - height) + 'px';
     },
     __hideQuirks: function() {
-	if (!ie4 || ie7) return;
+	if (!Prototype.Browser.IE || Prototype.Browser.IE7) return;
 	if (this.options.modal) return;
 	var problematic = ["applet", "select", "iframe"];
 	var dim = this.getDimensions();

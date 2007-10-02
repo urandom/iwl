@@ -1,11 +1,5 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
-// ie4 - defined if browser is IE4+ compatible
-// ns6 - defined if browser is Netscape 6/Gecko compatible
 var focused_widget = null;
-var ie4 = document.all && !window.opera ? true : false;
-var ie7 = ie4 && window.XMLHttpRequest ? true : false;
-var opera = !!window.opera;
-var ns6 = document.getElementById && !document.all ? true : false;
 
 var loaded = false;
 Event.signalConnect(window, "load", function () {
@@ -73,7 +67,7 @@ function createHtmlElement(obj, paren, before_el) {
 	    setTimeout(tryEval.bind(this, obj.text), 200);
 	    return true;
 	}
-	if (ie4) {
+	if (Prototype.Browser.IE) {
 	    if (paren.tagName.toLowerCase() == 'script') {
 		paren.text = obj.text;
 		return true;
@@ -106,12 +100,12 @@ function createHtmlElement(obj, paren, before_el) {
 	    if (!obj.attributes.style) obj.attributes.style = {};
 	    obj.attributes.style.display = 'none';
 	}
-	if ((ie4 && !obj.attributes) || !ie4)
+	if ((Prototype.Browser.IE && !obj.attributes) || !Prototype.Browser.IE)
 	    element = $(document.createElement(obj.tag));
     }
     // setAttribute in Internet Explorer doesn't set style, class or any of the events. What the hell were they thinking?
     if (obj.attributes) {
-	if (ie4) {
+	if (Prototype.Browser.IE) {
 	    var attributes = '';
 	    for (var i in obj.attributes) {
 		var attr = obj.attributes[i];
@@ -383,7 +377,7 @@ function removeSelection() {
 }
 
 function keyLogEvent(callback) {
-    if (ie4)
+    if (Prototype.Browser.IE)
 	Event.signalConnect(document.body, 'keydown', callback);
     else
 	Event.signalConnect(window, 'keypress', callback);

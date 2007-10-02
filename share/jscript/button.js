@@ -288,7 +288,7 @@ Object.extend(Object.extend(Button, Widget), {
     __visibilityToggle: function(state) {
 	if (!state) {
 	    var visible = this.visible();
-	    if (ns6 && !visible) {
+	    if (Prototype.Browser.Gecko && !visible) {
 		var els = this.style;
 		var originalVisibility = els.visibility;
 		var originalPosition = els.position;
@@ -299,7 +299,7 @@ Object.extend(Object.extend(Button, Widget), {
 		return {visibility: originalVisibility, position: originalPosition, display: originalDisplay};
 	    }
 	} else {
-	    if (ns6) {
+	    if (Prototype.Browser.Gecko) {
 		var els = this.style;
 		els.display = state.display;
 		els.position = state.position;

@@ -54,7 +54,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	    }.bind(this)
 	);
 	// FIXME: why does IE need this additional width?
-	if (ie4)
+	if (Prototype.Browser.IE)
 	    dims.width += 3;
 	return dims;
     },
