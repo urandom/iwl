@@ -31,14 +31,15 @@ Object.extend(Object.extend(Upload, Widget), {
 	    return;
 	}
 
-	Element.setStyle(this.file, {left: -1 * (file_width - button_width) + 'px'});
-	Element.setOpacity(this.file, 0.001);
+        if (!Prototype.Browser.WebKit)
+            Element.setStyle(this.file, {left: -1 * (file_width - button_width) + 'px'});
+        Element.setOpacity(this.file, 0.001);
 	this.file.onchange = this.__uploadFile.bindAsEventListener(this);
 	this.file.onkeypress = function() {return false;};
 	this.file.onpaste = function() {return false;};
-	if (ns6)
-	    this.file.onmousedown = function() {return false;};
-	this.file.onclick = function(evt) {if (evt) Event.stop(evt);};
+//        if (ns6)
+//            this.file.onmousedown = function() {return false;};
+//        this.file.onclick = function(evt) {if (evt) Event.stop(evt);};
     },
     __uploadFile: function() {
 	this.submit();
