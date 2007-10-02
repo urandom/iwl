@@ -25,6 +25,7 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         container.appendChild(bubble2);
         container.appendChild(bubble1);
         container.appendChild(content);
+        container.style.display = 'none';
 
         var script = $(id + '_script');
         pivot = $(this.options.pivot);
@@ -34,6 +35,7 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
             pivot.parentNode.appendChild(container);
         else
             document.body.appendChild(container);
+
         if (this.options.followMouse) {
             container.setStyle({marginTop: '5px'});
             Event.observe(document, 'mousemove', move.bindAsEventListener(container), false);
@@ -42,34 +44,64 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         this.current = container;
         this.content = content;
         this.bubbles = new Array(bubble1, bubble2, bubble3);
+
+        return this;
     }
 
     function draw(x, y) {
-        this.bubbles[2].setStyle({width: '7px', height: '7px', left: '14px'});
-        this.bubbles[1].setStyle({width: '10px', height: '10px', top: '-4px', left: '6px', 'z-index': 16});
-        this.bubbles[0].setStyle({width: '14px', height: '14px', top: '-10px', left: '10px', 'z-index': 17});
-        this.content.setStyle({top: '-18px', width: this.options.width});
-        this.setStyle({width: this.options.width, display: 'none'});
-    }
+        var bubbles = [{width: 14, left: 10}, {width: 10, left: 6}, {width: 7, left: 14}];
+        if (typeof x == 'undefined') {
+            this.bubbles[0].setStyle({width: bubbles[0].width + 'px', height: '14px', top: '-10px', left: bubbles[0].left + 'px', 'z-index': 17});
+            this.bubbles[1].setStyle({width: bubbles[1].width + 'px', height: '10px', top: '-4px', left: bubbles[1].left + 'px', 'z-index': 16});
+            this.bubbles[2].setStyle({width: bubbles[2].width + 'px', height: '7px', left: bubbles[2].left + 'px'});
+            this.content.setStyle({top: '-18px', width: this.options.width});
+            this.style.width = this.options.width;
 
-    function move(e) {
-        var l = Event.pointerX(e) - 16;
-        var t = Event.pointerY(e);
+            return this;
+        }
 
         var vdims = document.viewport.getDimensions();
         var tdims = this.getDimensions();
-        if (l < 5) l = 5;
-        if (l + tdims.width > vdims.width - 5)
-            l = vdims.width - tdims.width - 5;
-        if (t < 5) t = 5;
-        if (t + tdims.height > vdims.height - 5)
-            t = vdims.height - tdims.height - 5;
+        var compensation = this.options.followMouse ? 2.5 : 0;
+        var margins = 5;
+        var left = x;
+        var top = y;
+        if (x < margins) left = margins;
+        if (x + tdims.width > vdims.width - margins)
+            left = vdims.width - tdims.width - margins;
+        if (y < margins) top = margins;
+        if (y + tdims.height > vdims.height - margins)
+            top = vdims.height - tdims.height - margins;
 
-        return position.call(this, l, t);
+        var offset_x = x - left;
+        if (offset_x > tdims.width) offset_x = tdims.width;
+        var offset_ratio = offset_x / tdims.width;
+        var bubble0_x = (tdims.width - 2 * bubbles[0].left - bubbles[0].width) * offset_ratio + bubbles[0].left;
+        var bubble1_x = (tdims.width - 2 * bubbles[1].left - bubbles[1].width) * offset_ratio + bubbles[1].left;
+        var bubble2_x = (tdims.width - 2 * bubbles[2].left - bubbles[2].width) * offset_ratio + bubbles[2].left;
+
+        this.bubbles[0].style.left = bubble0_x + 'px';
+        this.bubbles[1].style.left = bubble1_x + 'px';
+        this.bubbles[2].style.left = bubble2_x + 'px';
+
+        var total_offset = bubbles[2].left + bubbles[2].width + compensation;
+        if (total_offset - offset_x > 0)
+            this.setStyle({left: left - total_offset + offset_x + 'px', top: top + 'px'});
+        else {
+            this.setStyle({left: left + 'px', top: top + 'px'});
+        }
+    }
+
+    function move(e) {
+//        var x = Event.pointerX(e) - 16;
+        var x = Event.pointerX(e);
+        var y = Event.pointerY(e);
+
+        return draw.call(this, x, y);
     }
 
     function position(x, y) {
-        if (x >= 24) x -= 16;
+//        if (x >= 24) x -= 16;
 	return this.setStyle({top: y + 'px', left: x + 'px'});
     }
 
@@ -132,7 +164,7 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
 
             if (this.options.centerOnElement)
                 pos[0] += this.element.getDimensions().width/2;
-            position.call(this, pos[0], pos[1]);
+            draw.call(this, pos[0], pos[1]);
 
             return this;
         },
