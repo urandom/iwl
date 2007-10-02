@@ -26,12 +26,6 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         container.appendChild(bubble1);
         container.appendChild(content);
 
-        bubble3.setStyle({width: '7px', height: '7px', left: '14px'});
-        bubble2.setStyle({width: '10px', height: '10px', top: '-4px', left: '6px', 'z-index': 16});
-        bubble1.setStyle({width: '14px', height: '14px', top: '-10px', left: '10px', 'z-index': 17});
-        content.setStyle({top: '-18px', width: this.options.width});
-        container.setStyle({width: this.options.width, display: 'none'});
-
         var script = $(id + '_script');
         pivot = $(this.options.pivot);
         if (script)
@@ -47,6 +41,15 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
 
         this.current = container;
         this.content = content;
+        this.bubbles = new Array(bubble1, bubble2, bubble3);
+    }
+
+    function draw(x, y) {
+        this.bubbles[2].setStyle({width: '7px', height: '7px', left: '14px'});
+        this.bubbles[1].setStyle({width: '10px', height: '10px', top: '-4px', left: '6px', 'z-index': 16});
+        this.bubbles[0].setStyle({width: '14px', height: '14px', top: '-10px', left: '10px', 'z-index': 17});
+        this.content.setStyle({top: '-18px', width: this.options.width});
+        this.setStyle({width: this.options.width, display: 'none'});
     }
 
     function move(e) {
@@ -197,9 +200,7 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         _init: function() {
             if (parseInt(this.options.width))
                 this.options.width = parseInt(this.options.width) + 'px';
+            draw.call(this);
         }
     }
 })());
-Object.extend(Object.extend(Tooltip, Widget), {
-
-});
