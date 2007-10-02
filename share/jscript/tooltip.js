@@ -95,16 +95,10 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
     }
 
     function move(e) {
-//        var x = Event.pointerX(e) - 16;
         var x = Event.pointerX(e);
         var y = Event.pointerY(e);
 
         return draw.call(this, x, y);
-    }
-
-    function position(x, y) {
-//        if (x >= 24) x -= 16;
-	return this.setStyle({top: y + 'px', left: x + 'px'});
     }
 
     return {
