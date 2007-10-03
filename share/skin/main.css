@@ -886,7 +886,7 @@ div#status_bar {
 /* Tooltip */
 div.tooltip {
     position: absolute;
-    z-index: 10;;
+    z-index: 10;
 }
 div.tooltip_bubble {
     position: relative;

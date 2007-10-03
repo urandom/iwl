@@ -49,12 +49,19 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
     }
 
     function draw(x, y) {
-        var bubbles = [{width: 14, left: 10}, {width: 10, left: 6}, {width: 7, left: 14}];
+        var bubbles = [{width: 14, height: 14, left: 10, top: -10}, {width: 10, height: 10, left: 6, top: -4}, {width: 7, height: 7, left: 14, top: 0}];
+        var content_top = -18;
         if (typeof x == 'undefined') {
-            this.bubbles[0].setStyle({width: bubbles[0].width + 'px', height: '14px', top: '-10px', left: bubbles[0].left + 'px', 'z-index': 17});
-            this.bubbles[1].setStyle({width: bubbles[1].width + 'px', height: '10px', top: '-4px', left: bubbles[1].left + 'px', 'z-index': 16});
-            this.bubbles[2].setStyle({width: bubbles[2].width + 'px', height: '7px', left: bubbles[2].left + 'px'});
-            this.content.setStyle({top: '-18px', width: this.options.width});
+            this.bubbles[0].setStyle({width: bubbles[0].width + 'px',
+                    height: bubbles[0].height + 'px',
+                    top: bubbles[0].top + 'px', left: bubbles[0].left + 'px', 'z-index': 17});
+            this.bubbles[1].setStyle({width: bubbles[1].width + 'px',
+                    height: bubbles[1].height + 'px',
+                    top: bubbles[1].top + 'px', left: bubbles[1].left + 'px', 'z-index': 16});
+            this.bubbles[2].setStyle({width: bubbles[2].width + 'px',
+                    height: bubbles[2].height + 'px',
+                    left: bubbles[2].left + 'px'});
+            this.content.setStyle({top: content_top + 'px', width: this.options.width});
             this.style.width = this.options.width;
 
             return this;
@@ -71,8 +78,32 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
             left = vdims.width - tdims.width - margins;
         if (y < margins) top = margins;
         if (y + tdims.height > vdims.height - margins)
-            top = vdims.height - tdims.height - margins;
+            top = y - tdims.height - margins * 2;
 
+        /* Vertical offset */
+        if (top < y) {
+            var old_visibility = this.style.visibility;
+            var old_display = this.style.display;
+            this.style.visibility = this.visible() ? '' : 'hidden';
+            this.style.display = '';
+
+            var cheight = this.content.getHeight();
+            var height  = cheight - 2 * content_top - bubbles[2].height;
+            this.bubbles[2].style.top = height + 'px';
+            height -= (bubbles[2].height + bubbles[1].height);
+            this.bubbles[1].style.top = height + 'px';
+            height -= (bubbles[1].height + bubbles[0].height);
+            this.bubbles[0].style.top = height + 'px';
+
+            this.style.display = old_display;
+            this.style.visibility = old_visibility;
+        } else {
+            this.bubbles[2].style.top = bubbles[2].top + 'px';
+            this.bubbles[1].style.top = bubbles[1].top + 'px';
+            this.bubbles[0].style.top = bubbles[0].top + 'px';
+        }
+
+        /* Horizontal offset */
         var const_offset = bubbles[2].left + bubbles[2].width + compensation;
         var offset_x = x - left - const_offset;
         if (offset_x > tdims.width) offset_x = tdims.width;
