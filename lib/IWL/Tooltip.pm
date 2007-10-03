@@ -107,12 +107,12 @@ Parameters: B<CONTENT> - text or widget to add as the content of the tooltip
 
 sub setContent {
     my ($self, $content) = @_;
-    if (UNIVERSAL::isa($content, 'IWL::Widget')) {
+    if (UNIVERSAL::isa($content, 'IWL::Object')) {
         if ($content->{_requiredJs}) {
             push @{$self->{_requiredJs}}, @{$content->{_requiredJs}};
             $content->{_requiredJs} = [];
         }
-	$self->{__content} = escape($content->getContent);
+	$self->{__contentObject} = $content;
     } else {
 	$self->{__content} = escape($content);
     }
@@ -151,6 +151,8 @@ sub _realize {
     my $self = shift;
     my $id   = $self->getId;
     my $options;
+
+    $self->{__content} = escape($self->{__contentObject}->getContent) if $self->{__contentObject};
 
     $self->{_options}{hidden} = 1;
 
