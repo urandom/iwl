@@ -58,22 +58,23 @@ sub new {
 
 =over 4
 
-=item B<bindToWidget> (B<WIDGET>, B<SIGNAL>)
+=item B<bindToWidget> (B<WIDGET>, B<SIGNAL>, B<TOGGLE>)
 
 Binds the tooltip to show when the specified widget emits the given signal.
 
-Parameters: B<WIDGET> - the widget to bind to, B<SIGNAL> - the signal the widget will emit to show the tooltip 
+Parameters: B<WIDGET> - the widget to bind to, B<SIGNAL> - the signal the widget will emit to show the tooltip, B<TOGGLE> - true, if the signal should toggle the visibility state of the tooltip
 
 Note: The tooltip and widget ids must not be changed after this method is called.
 
 =cut
 
 sub bindToWidget {
-    my ($self, $widget, $signal) = @_;
+    my ($self, $widget, $signal, $toggle) = @_;
     my $to = $widget->getId;
 
     $self->{__bound} = $to;
     $self->{__bindSignal} = $signal;
+    $self->{__boundToggle} = $toggle ? 'true' : 'false';
     return $self;
 }
 
@@ -118,6 +119,32 @@ sub setContent {
     return $self;
 }
 
+=item B<showingCallback>
+
+Generates javascript code to show the tooltip, which should be included as a callback to a signalConnect method
+
+=cut
+
+sub showingCallback {
+    my $self = shift;
+    my $id = $self->getId;
+
+    return "\$('$id').showTooltip()";
+}
+
+=item B<hidingCallback>
+
+Generates javascript code to hide the tooltip, which should be included as a callback to a signalConnect method
+
+=cut
+
+sub hidingCallback {
+    my $self = shift;
+    my $id = $self->getId;
+
+    return "\$('$id').hideTooltip()";
+}
+
 # Protected
 #
 sub _realize {
@@ -132,7 +159,7 @@ sub _realize {
     $self->SUPER::_realize;
     $self->setScript("Tooltip.create('$id', $options);");
     $self->appendScript("\$('$id').setContent('$self->{__content}')") if $self->{__content};
-    $self->appendScript("\$('$id').bindToWidget('$self->{__bound}', '$self->{__bindSignal}');")
+    $self->appendScript("\$('$id').bindToWidget('$self->{__bound}', '$self->{__bindSignal}', $self->{__boundToggle});")
       if $self->{__bound};
     $self->appendScript("\$('$id').bindHideToWidget('$self->{__boundHide}', '$self->{__bindHideSignal}');")
       if $self->{__boundHide};

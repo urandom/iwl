@@ -696,13 +696,14 @@ sub generate_tooltips {
     my $tip2 = IWL::Tooltip->new(followMouse => 1);
     my $calendar = IWL::Calendar->new(id => 'calendar', showTime => 0, showWeekNumbers => 0, noMonthChange => 1);
 
-    $tip1->bindToWidget($button, 'click');
-    $tip1->bindHideToWidget($button, 'click');
+    $tip1->bindToWidget($button, 'click', 1);
     $tip1->setContent($calendar);
     $tip2->bindToWidget($label, 'mouseover');
     $tip2->bindHideToWidget($label, 'mouseout');
     $tip2->setContent('Some text here. Кирилица.');
     $button->setLabel('Click for date');
+    $label->signalConnect(click => $tip1->showingCallback);
+    $calendar->signalConnect(activate_date => $tip1->hidingCallback);
     $label->setText('Hover over me');
     $container->appendChild($button, $label, $tip1, $tip2);
 
@@ -885,7 +886,7 @@ sub show_the_code_for {
     } elsif ($code_for eq 'notebook_container') {
 	$paragraph->appendTextType(read_code("generate_notebook", 15), 'pre');
     } elsif ($code_for eq 'tooltips_container') {
-	$paragraph->appendTextType(read_code("generate_tooltips", 20), 'pre');
+	$paragraph->appendTextType(read_code("generate_tooltips", 21), 'pre');
     } elsif ($code_for eq 'file_container') {
 	$paragraph->appendTextType(read_code("generate_file", 13), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {

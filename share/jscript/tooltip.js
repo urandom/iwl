@@ -139,8 +139,14 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
          * */
         showTooltip: function() {
             this.placeAtElement();
-            if (this.__fade) this.__fade.cancel();
-            this.__appear = Effect.Appear(this, {duration: 0.25});
+            if (this.__fade) {
+                this.__fade.cancel();
+                this.__fade = undefined;
+            }
+            this.__appear = Effect.Appear(this, {
+                    duration: 0.25,
+                    afterFinish: function() { this.__appear = undefined }.bind(this)
+            });
             return this;
         },
         /**
@@ -148,8 +154,14 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
          * @returns The object
          * */
         hideTooltip: function() {
-            if (this.__appear) this.__appear.cancel();
-            this._fade = Effect.Fade(this, {duration: 0.5});
+            if (this.__appear) {
+                this.__appear.cancel();
+                this.__appear = undefined;
+            }
+            this._fade = Effect.Fade(this, {
+                    duration: 0.5,
+                    afterFinish: function() { this.__fade = undefined }.bind(this)
+            });
             return this;
         },
         /**
@@ -209,16 +221,21 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
          * Binds the tooltip to an element. If the element emits the given signal, the tooltip will be shown
          * @param element The element to bind to
          * @param signal The signal name
+         * @param {Boolean} toggle True, if the signal should toggle the visibility state of the tooltip
          * @returns The object
          * */
-        bindToWidget: function(element, signal) {
+        bindToWidget: function(element, signal, toggle) {
             this.element = $(element);
             if (!this.element) return;
             this.element.signalConnect(signal, function (event) {
-                if (!this.visible()) {
+                if (!this.visible() || this.__fade) {
                     this.showTooltip();
-                    if (event.stop)
-                        event.stop();
+                    Event.extend(event);
+                    event.stop();
+                } else if (toggle && (this.visible() || this.__appear)) {
+                    this.hideTooltip();
+                    Event.extend(event);
+                    event.stop();
                 }
             }.bind(this));
             if (!this.options.hidden)
@@ -232,13 +249,12 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
          * @returns The object
          * */
         bindHideToWidget: function(element, signal) {
-            this.hideElement = $(element);
-            if (!this.hideElement) return;
-            this.hideElement.signalConnect(signal, function (event) {
-                if (this.visible()) {
+            if (!(element = $(element))) return;
+            element.signalConnect(signal, function (event) {
+                if (this.visible() || this.__appear) {
                     this.hideTooltip();
-                    if (event.stop)
-                        event.stop();
+                    Event.extend(event);
+                    event.stop();
                 }
             }.bind(this));
             return this;
