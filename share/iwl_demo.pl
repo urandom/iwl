@@ -26,6 +26,7 @@ $rpc->handleEvent(
     sub {
 	my $params = shift;
 
+        $ENV{LANG} = $params->{locale} || '';
 	my $func = $::{$params->{function}};
 	if (defined $func && defined *{$func}{CODE}) {
 	    return &{$func}
@@ -164,11 +165,12 @@ if (my $file = $form{upload_file}) {
     my $container = IWL::Container->new(id => 'content');
     my $style = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/demo.css');
     my @scripts = (qw(demo.js));
+    my $locale = IWL::Combo->new(id => 'locale');
 #    my @scripts = (qw(demo.js button.js iconbox.js tree.js contentbox.js druid.js notebook.js upload.js popup.js firebug/firebug.js));
 
     $page->appendChild($hbox);
     $page->appendHeader($style);
-    $hbox->packStart($tree);
+    $hbox->packStart($tree)->appendChild($locale);
     $hbox->packStart($notebook);
     $page->requiredJs(@scripts);
     $notebook->appendTab('Display', $container)->setId('display_tab');
@@ -181,6 +183,11 @@ EOF
 	    update => "source_page",
 	    disableView => {fullCover => 1},
     });
+
+    $locale->appendOption('Български', 'bg');
+    $locale->appendOption('Deutsch', 'de');
+    $locale->appendOption('Français', 'fr');
+    $locale->appendOption('English', 'en', 1);
 
     build_tree($tree);
     $page->setTitle('Widget Library');
@@ -776,6 +783,7 @@ sub register_row_event {
 	$row->registerEvent('IWL-Tree-Row-activate', 'iwl_demo.pl', {
 		function => $function,
         }, {
+                onStart => q|params.locale = $('locale').value|,
 		onComplete => 'activate_widgets_response(json)',
 		disableView => 1,
 	});
