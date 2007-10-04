@@ -386,7 +386,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 if (this.currentDate)
                     this.currentDate.activate();
             } else if (key_code == Event.KEY_ESC) {
-                this.setDate(new Date);
+                this.setDate(this.startDate);
             }
         }
 
@@ -749,9 +749,9 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 markedDates: []
             }, arguments[1] || {});
             if (this.options.startDate instanceof Date)
-                this.date = this.options.startDate;
+                this.startDate = this.date = this.options.startDate;
             else if (typeof this.options.startDate == 'number')
-                this.date = new Date(this.options.startDate)
+                this.startDate = this.date = new Date(this.options.startDate)
             else if (this.options.startDate.join) {
                 var date = this.options.startDate;
                 this.date = new Date();
@@ -769,12 +769,13 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                     this.date.setSeconds(date[5]);
                 if (typeof date[6] == 'number')
                     this.date.setMilliseconds(date[6]);
+                this.startDate = this.date;
             } else {
-                this.date = new Date;
+                this.startDate = this.date = new Date;
             }
 
             if (isNaN(this.date.getFullYear()))
-                this.date = new Date;
+                this.startDate = this.date = new Date;
 
             Object.extend(Calendar, arguments[2]);
 
