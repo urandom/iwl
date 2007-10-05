@@ -28,12 +28,12 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
         if (this._startDayChanged) {
             if (start_day == 0) {
-                var sunday = Element.extend(week_days.cells[1]).update(Calendar.shortWeekDays[6]);
+                var sunday = Element.extend(week_days.cells[1]).update(Calendar.abbreviatedWeekDays[6]);
                 if (this.options.markWeekends)
                     sunday.addClassName('calendar_weekend_header');
                 for (day = 0; day < 6; day++) {
                     var cell = Element.extend(week_days.cells[day + 2]);
-                    cell.innerHTML = Calendar.shortWeekDays[day];
+                    cell.innerHTML = Calendar.abbreviatedWeekDays[day];
                     if (this.options.markWeekends) {
                         if (day == 5)
                             cell.addClassName('calendar_weekend_header');
@@ -44,7 +44,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             } else {
                 for (day = 0; day < 7; day++) {
                     var cell = Element.extend(week_days.cells[day + 1]);
-                    cell.innerHTML = Calendar.shortWeekDays[day];
+                    cell.innerHTML = Calendar.abbreviatedWeekDays[day];
                     if (this.options.markWeekends) {
                         if (day == 5 || day == 6)
                             cell.addClassName('calendar_weekend_header');
@@ -505,16 +505,16 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             pmhour = pmhour == 0 ? 12 : pmhour;
 
             var format = {
-                a: Calendar.shortWeekDays[mday - 1],
+                a: Calendar.abbreviatedWeekDays[mday - 1],
                 A: Calendar.weekDays[mday - 1],
-                b: Calendar.shortMonths[month - 1],
+                b: Calendar.abbreviatedMonths[month - 1],
                 B: Calendar.months[month - 1],
                 C: this.getCentury(),
                 d: padded_date,
                 D: month + '/' + date + '/' + syear,
                 e: date < 10 ? ' ' + date : date,
                 F: year + '-' + padded_month + '-' + padded_date,
-                h: Calendar.shortMonths[month - 1],
+                h: Calendar.abbreviatedMonths[month - 1],
                 H: hour < 10 ? '0' + hour : hour,
                 I: pmhour < 10 ? '0' + pmhour : pmhour,
                 j: day_of_year < 10 ? '00' + day_of_year : day_of_year < 100 ? '0' + day_of_year : day_of_year,

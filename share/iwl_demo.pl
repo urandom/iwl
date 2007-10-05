@@ -409,7 +409,7 @@ sub generate_calendars {
     $tip1->bindToWidget($icon, 'click');
     $tip1->bindHideToWidget($calendar2, 'activate_date');
     $calendar1->setCaption("This calendar has a lower boundary at 1989/3, and an upper one at 2010/8. It also has 2 marked dates.");
-    $calendar1->updateOnSignal(change => $entry1, "%a, %B %d, %Y");
+    $calendar1->updateOnSignal(change => $entry1, "%A, %b %d, %Y");
     $calendar2->updateOnSignal(activate_date => $entry2, "%F - %T");
     $tip1->setContent($calendar2);
     $container->appendChild($calendar1, $entry1, IWL::Break->new, $label, $icon, $tip1, IWL::Break->new, $entry2);

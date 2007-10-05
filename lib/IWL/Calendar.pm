@@ -17,15 +17,18 @@ use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
 
 my $strings = {
-    # TRANSLATORS: week day abbreviations
-    shortWeekDays => [N__"Mon", N__"Tue", N__"Wed", N__"Thu", N__"Fri", N__"Sat", N__"Sun"],
-    weekDays      => [N__"Monday", N__"Tuesday", N__"Wednesday", N__"Thursday", N__"Friday", N__"Saturday", N__"Sunday"],
-    # TRANSLATORS: month abbreviations
-    shortMonths   => [N__"Jan", N__"Feb", N__"Mar", N__"Apr", N__"May", N__"Jun", N__"Jul", N__"Aug", N__"Sep", N__"Oct", N__"Nov", N__"Dec"],
-    months        =>
-        [N__"January", N__"February", N__"March", N__"April",
-        N__"May", N__"June", N__"July", N__"August",
-        N__"September", N__"October", N__"November", N__"December"],
+    # TRANSLATORS: week day abbreviations, {ABBR} is a placeholder
+    abbreviatedWeekDays => [N__"{ABBR}Mon", N__"{ABBR}Tue", N__"{ABBR}Wed",
+                            N__"{ABBR}Thu", N__"{ABBR}Fri", N__"{ABBR}Sat", N__"{ABBR}Sun"],
+    weekDays            => [N__"Monday", N__"Tuesday", N__"Wednesday",
+                            N__"Thursday", N__"Friday", N__"Saturday", N__"Sunday"],
+    # TRANSLATORS: month abbreviations, {ABBR} is a placeholder
+    abbreviatedMonths   => [N__"{ABBR}Jan", N__"{ABBR}Feb", N__"{ABBR}Mar", N__"{ABBR}Apr",
+                            N__"{ABBR}May", N__"{ABBR}Jun", N__"{ABBR}Jul", N__"{ABBR}Aug",
+                            N__"{ABBR}Sep", N__"{ABBR}Oct", N__"{ABBR}Nov", N__"{ABBR}Dec"],
+    months              => [N__"January", N__"February", N__"March", N__"April",
+                            N__"May", N__"June", N__"July", N__"August",
+                            N__"September", N__"October", N__"November", N__"December"],
 };
 
 =head1 NAME
@@ -364,7 +367,11 @@ sub _realize {
     foreach my $key (keys %$strings) {
         $translations->{$key} = [];
         foreach my $value (@{$strings->{$key}}) {
-            push @{$translations->{$key}}, __ $value;
+            if ((index $key, 'abbreviated') == 0) {
+                push @{$translations->{$key}}, substr __($value), 6;
+            } else {
+                push @{$translations->{$key}}, __ $value;
+            }
         }
     }
     $translations = objToJson($translations);

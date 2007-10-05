@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-10-01 13:53+0300\n"
+"POT-Creation-Date: 2007-10-05 12:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -218,152 +218,175 @@ msgstr ""
 msgid "The icon '{TITLE}' was removed."
 msgstr ""
 
-#. TRANSLATORS: week day abbreviations
+#. TRANSLATORS: week day abbreviations, {ABBR} is a placeholder
 #: ../lib/IWL/Calendar.pm:21
-msgid "Mon"
+#, perl-brace-format
+msgid "{ABBR}Mon"
 msgstr ""
 
 #: ../lib/IWL/Calendar.pm:21
-msgid "Tue"
+#, perl-brace-format
+msgid "{ABBR}Tue"
 msgstr ""
 
 #: ../lib/IWL/Calendar.pm:21
-msgid "Wed"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:21
-msgid "Thu"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:21
-msgid "Fri"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:21
-msgid "Sat"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:21
-msgid "Sun"
+#, perl-brace-format
+msgid "{ABBR}Wed"
 msgstr ""
 
 #: ../lib/IWL/Calendar.pm:22
+#, perl-brace-format
+msgid "{ABBR}Thu"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+#, perl-brace-format
+msgid "{ABBR}Fri"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+#, perl-brace-format
+msgid "{ABBR}Sat"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:22
+#, perl-brace-format
+msgid "{ABBR}Sun"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:23
 msgid "Monday"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:22
+#: ../lib/IWL/Calendar.pm:23
 msgid "Tuesday"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:22
+#: ../lib/IWL/Calendar.pm:23
 msgid "Wednesday"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:22
+#: ../lib/IWL/Calendar.pm:24
 msgid "Thursday"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:22
+#: ../lib/IWL/Calendar.pm:24
 msgid "Friday"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:22
+#: ../lib/IWL/Calendar.pm:24
 msgid "Saturday"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:22
+#: ../lib/IWL/Calendar.pm:24
 msgid "Sunday"
 msgstr ""
 
-#. TRANSLATORS: month abbreviations
-#: ../lib/IWL/Calendar.pm:24
-msgid "Jan"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Feb"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Mar"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Apr"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24 ../lib/IWL/Calendar.pm:27
-msgid "May"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Jun"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Jul"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Aug"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Sep"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Oct"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Nov"
-msgstr ""
-
-#: ../lib/IWL/Calendar.pm:24
-msgid "Dec"
+#. TRANSLATORS: month abbreviations, {ABBR} is a placeholder
+#: ../lib/IWL/Calendar.pm:26
+#, perl-brace-format
+msgid "{ABBR}Jan"
 msgstr ""
 
 #: ../lib/IWL/Calendar.pm:26
+#, perl-brace-format
+msgid "{ABBR}Feb"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:26
+#, perl-brace-format
+msgid "{ABBR}Mar"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:26
+#, perl-brace-format
+msgid "{ABBR}Apr"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:27
+#, perl-brace-format
+msgid "{ABBR}May"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:27
+#, perl-brace-format
+msgid "{ABBR}Jun"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:27
+#, perl-brace-format
+msgid "{ABBR}Jul"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:27
+#, perl-brace-format
+msgid "{ABBR}Aug"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+#, perl-brace-format
+msgid "{ABBR}Sep"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+#, perl-brace-format
+msgid "{ABBR}Oct"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+#, perl-brace-format
+msgid "{ABBR}Nov"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:28
+#, perl-brace-format
+msgid "{ABBR}Dec"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:29
 msgid "January"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:26
+#: ../lib/IWL/Calendar.pm:29
 msgid "February"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:26
+#: ../lib/IWL/Calendar.pm:29
 msgid "March"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:26
+#: ../lib/IWL/Calendar.pm:29
 msgid "April"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:27
+#: ../lib/IWL/Calendar.pm:30
+msgid "May"
+msgstr ""
+
+#: ../lib/IWL/Calendar.pm:30
 msgid "June"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:27
+#: ../lib/IWL/Calendar.pm:30
 msgid "July"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:27
+#: ../lib/IWL/Calendar.pm:30
 msgid "August"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:28
+#: ../lib/IWL/Calendar.pm:31
 msgid "September"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:28
+#: ../lib/IWL/Calendar.pm:31
 msgid "October"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:28
+#: ../lib/IWL/Calendar.pm:31
 msgid "November"
 msgstr ""
 
-#: ../lib/IWL/Calendar.pm:28
+#: ../lib/IWL/Calendar.pm:31
 msgid "December"
 msgstr ""
