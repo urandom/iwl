@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
 "POT-Creation-Date: 2007-10-08 12:22+0300\n"
-"PO-Revision-Date: 2007-10-05 12:33+0300\n"
+"PO-Revision-Date: 2007-10-06 00:21+0300\n"
 "Last-Translator: Guido Flohr <viktor@imperia.net>\n"
 "Language-Team: French <guido@imperia.net>\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr ""
 
 #: ../lib/IWL/Stock.pm:28
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 #: ../lib/IWL/Stock.pm:32
 msgid "Apply"
@@ -83,7 +83,7 @@ msgstr "Exporter"
 
 #: ../lib/IWL/Stock.pm:68
 msgid "Fullscreen"
-msgstr ""
+msgstr "Plein écran"
 
 #: ../lib/IWL/Stock.pm:72
 msgid "Go"
@@ -91,30 +91,27 @@ msgstr ""
 
 #: ../lib/IWL/Stock.pm:76
 msgid "Go back"
-msgstr ""
+msgstr "Précédent"
 
 #: ../lib/IWL/Stock.pm:80
 msgid "Go forward"
-msgstr ""
+msgstr "Suivant"
 
 #: ../lib/IWL/Stock.pm:84
-#, fuzzy
 msgid "Go to first"
-msgstr "Aller au thème"
+msgstr "Premier"
 
 #: ../lib/IWL/Stock.pm:88
-#, fuzzy
 msgid "Go to last"
-msgstr "Aller au thème"
+msgstr "Dernier"
 
 #: ../lib/IWL/Stock.pm:92
 msgid "Help"
 msgstr "Aide"
 
 #: ../lib/IWL/Stock.pm:96
-#, fuzzy
 msgid "Information"
-msgstr "Méta-informations"
+msgstr "Information"
 
 #: ../lib/IWL/Stock.pm:100
 #, fuzzy
@@ -139,18 +136,16 @@ msgid "OK"
 msgstr "OK"
 
 #: ../lib/IWL/Stock.pm:120
-#, fuzzy
 msgid "Preferences"
-msgstr "Différences"
+msgstr "Préférences"
 
 #: ../lib/IWL/Stock.pm:124
 msgid "Preview"
 msgstr "Aperçu avant impression"
 
 #: ../lib/IWL/Stock.pm:128
-#, fuzzy
 msgid "Refresh"
-msgstr "Références"
+msgstr "Actualiser"
 
 #: ../lib/IWL/Stock.pm:132
 msgid "Remove"
