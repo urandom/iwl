@@ -31,6 +31,16 @@ IWL::Menu->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<menu_item_activate>
+
+Fires when a menu item has been activated, via double clicking. Receives the activated item as a parameter
+
+=back
+
 =cut
 
 sub new {
@@ -145,9 +155,9 @@ sub setMaxHeight {
     my ($self, $height) = @_;
 
     if ($height > 0) {
-	$self->{__options}{maxHeight} = $height;
+	$self->{_options}{maxHeight} = $height;
     } else {
-	$self->{__options}{maxHeight} = 0;
+	$self->{_options}{maxHeight} = 0;
     }
     return $self;
 }
@@ -159,7 +169,7 @@ Returns the max height of the menu
 =cut
 
 sub getMaxHeight {
-    return shift->{__options}{maxHeight};
+    return shift->{_options}{maxHeight};
 }
 
 # Protected
@@ -168,7 +178,7 @@ sub _realize {
     my $self = shift;
     my $script = IWL::Script->new;
     my $id = $self->getId;
-    my $options = objToJson($self->{__options});
+    my $options = objToJson($self->{_options});
 
     $self->SUPER::_realize;
     $script->setScript("var menu = Menu.create('$id', $options);");
@@ -187,7 +197,8 @@ sub __init {
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'menu.js');
-    $self->{__options} = {maxHeight => 0};
+    $self->{_customSignals} = {menu_item_activate => []};
+    $self->{_options} = {maxHeight => 0};
     $self->{__bindWidgets} = [];
 }
 

@@ -47,6 +47,10 @@ Object.extend(Object.extend(Menu, Widget), (function () {
             this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflowY: 'scroll'});
     }
 
+    function focus(id) {
+        return (function() {focused_widget = id}).defer();
+    }
+
     function keyEventsCB(event) {
         var key_code = Event.getKeyCode(event);
         var shift = event.shiftKey;
@@ -63,17 +67,17 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                     if (this.parentMenu.hasClassName('menubar'))
                         this.parentMenu.selectItem(
                             this.parentMenu.getPrevMenuItem() || this.parentMenu.menuItems.last());
-                    focused_widget = this.parentMenu.id;
+                    focus(this.parentMenu.id)
                 }
             }
         } else if (key_code == Event.KEY_UP)  {
             Event.stop(event);
 
-            if (this.hasClassName('menubar')) {
+            if (this.hasClassName('menubar') && this.currentItem) {
                 var submenu = this.currentItem.submenu;
                 if (!submenu) return;
                 submenu.selectItem(submenu.menuItems.last());
-                focused_widget = submenu.id;
+                focus(submenu.id)
             } else {
                 this.selectItem(this.getPrevMenuItem() || this.menuItems.last());
             }
@@ -83,36 +87,44 @@ Object.extend(Object.extend(Menu, Widget), (function () {
             if (this.hasClassName('menubar')) {
                 this.selectItem(this.getNextMenuItem() || this.menuItems[0]);
             } else {
-                if (this.currentItem.submenu) {
+                if (this.currentItem && this.currentItem.submenu) {
                     var submenu = this.currentItem.submenu;
                     submenu.selectItem(submenu.menuItems[0]);
-                    focused_widget = submenu.id;
+                    focus(submenu.id)
                 } else if (this.parentMenu && this.parentMenu.hasClassName('menubar')) {
                     this.parentMenu.selectItem(
                         this.parentMenu.getNextMenuItem() || this.parentMenu.menuItems[0]);
-                    focused_widget = this.parentMenu.id;
+                    focus(this.parentMenu.id)
                 }
             }
         } else if (key_code == Event.KEY_DOWN) {
             Event.stop(event);
 
-            if (this.hasClassName('menubar')) {
+            if (this.hasClassName('menubar') && this.currentItem) {
                 var submenu = this.currentItem.submenu;
                 if (!submenu) return;
                 submenu.selectItem(submenu.menuItems[0]);
-                focused_widget = submenu.id;
+                focus(submenu.id)
             } else {
                 this.selectItem(this.getNextMenuItem() || this.menuItems[0]);
             }
         } else if (key_code == Event.KEY_RETURN) {
             Event.stop(event);
 
-            this.currentItem.activate();
+            if (this.currentItem) {
+                this.currentItem.toggle();
+                this.currentItem.activate();
+            }
             this.popDownRecursive();
         } else if (key_code == Event.KEY_ESC) {
             Event.stop(event);
 
             this.popDownRecursive();
+        } else if (key_code = Event.KEY_SPACE) {
+            if (this.currentItem) {
+                Event.stop(event);
+                this.currentItem.toggle();
+            } 
         }
     }
 
@@ -269,8 +281,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
          * @returns The object
          * */
         toggleItem: function(item) {
-            var item = $(item);
-            if (!item) return;
+            if (!(item = $(item))) return;
             item.toggle();
             return this;
         },
@@ -413,6 +424,7 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
 	    this.menu.popDownRecursive();
 	    Event.stop(event);
 	}.bind(this));
+        this.observe('dblclick', this.activate.bind(this));
         this.observe('mouseover', this.setSelected.bind(this, true));
 	if (this.hasClassName('menu_check_item'))
 	    this.observe('click', toggleCheckItem.bind(this));

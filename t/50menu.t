@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use IWL::Menu;
 
@@ -8,7 +8,8 @@ isa_ok($m->appendMenuItem('Some text'), 'IWL::Menu::Item');
 isa_ok($m->prependMenuItem('First item', 'IWL_STOCK_SAVE'), 'IWL::Menu::Item');
 ok($m->appendMenuSeparator);
 ok($m->prependMenuSeparator);
-is($m->bindToWidget(IWL::Widget->new, 'click'), $m);
+ok(!$m->bindToWidget(IWL::Widget->new, 'click'));
+is($m->bindToWidget(IWL::Widget->new(id => 'foo'), 'click'), $m);
 is($m->setMaxHeight(450), $m);
 is($m->getMaxHeight, 450);
 like($m->getContent, qr(^<script.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*menu.js.*?</script>

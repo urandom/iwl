@@ -53,6 +53,10 @@ Fires when the item is unselected
 
 Fires when the item's state has been changed. Only menu radio and check menu items fire this signal
 
+=item B<activate>
+
+Fires when this item has been activated, via double clicking
+
 =back
 
 =cut
@@ -269,7 +273,7 @@ sub __init {
     $self->{__type} = 'none';
     $self->{__parentType} = $parentType;
     $label->{_defaultClass} = $parentType eq 'menubar' ? 'menubar_item_label' : 'menu_item_label';
-    $self->{_customSignals} = {change => [], select => [], unselect => []};
+    $self->{_customSignals} = {change => [], select => [], unselect => [], activate => []};
 }
 
 1;

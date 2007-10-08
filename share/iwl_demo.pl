@@ -496,7 +496,7 @@ sub generate_menus {
     $menubar->appendMenuItem('Edit', undef, id => 'edit_mi')->setSubmenu($edit_menu);
     $menubar->appendMenuSeparator;
     $menubar->appendMenuItem('Help', undef, id => 'help_mi', class => 'demo')->
-      signalConnect('click' => q|displayStatus('Don\\'t panic!')|);
+      signalConnect('activate' => q|displayStatus('Don\\'t panic!')|);
 
     $file_menu->appendMenuItem('Open')->setClass('demo');
     $file_menu->appendMenuItem('Save', 'IWL_STOCK_SAVE');
@@ -515,7 +515,9 @@ sub generate_menus {
     $button_menu->appendMenuItem("Radio item 3", undef)->setType('radio');
     $button_menu->appendMenuItem("Submenu")->setSubmenu($submenu);
 
-    $submenu->setMaxHeight(200);
+    $submenu->setMaxHeight(200)->signalConnect(menu_item_activate => q{
+        displayStatus('Received item ' + arguments[0].id);
+    });
     $submenu->appendMenuItem("Submenu item $_")->setType('check') foreach (1 .. 20);
 
     return $container->getObject;
