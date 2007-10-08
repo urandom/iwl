@@ -1,3 +1,10 @@
+Release: 0.50 - 08/10/07
+        Improvements to the Contentbox, Tooltip and Druid
+        New widgets: Accordion and Calendar
+        Improved IWL::RPC, with API changes for event registration
+        Various fixes and improvements
+        Fix the typo of Test::Weaken to Task::Weaken
+
 Release: 0.47 - 03/07/07
 	Speedups in Internet Explorer. Internally escape every string that is
 	passed to the browser using an 'escape' compatible function.
