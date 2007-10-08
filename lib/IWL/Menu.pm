@@ -7,9 +7,11 @@ use strict;
 
 use base 'IWL::List';
 
-use IWL::Menu::Item;
-use JSON;
 use IWL::String qw(randomize);
+use IWL::Menu::Item;
+
+use JSON;
+use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 
@@ -118,15 +120,16 @@ Binds the menu to pop up when the specified widget emits the given signal
 
 Parameters: B<WIDGET> - the widget to bind to, B<SIGNAL> - the signal the widget will emit to pop up the menu
 
-Note: The menu id must not be changed after this method is called.
+Note: The widget ID must not be changed after this method is called.
 
 =cut
 
 sub bindToWidget {
     my ($self, $widget, $signal) = @_;
-    my $id = $self->getId;
+    my $id = $widget->getId;
+    return $self->_pushError(__x("Invalid id: '{ID}'", ID => $id)) unless $id;
+    push @{$self->{__bindWidgets}}, [$id => $signal];
 
-    $widget->signalConnect($signal => "\$('$id')._bindPop(event, this)");
     return $self;
 }
 
@@ -168,7 +171,10 @@ sub _realize {
     my $options = objToJson($self->{__options});
 
     $self->SUPER::_realize;
-    $script->appendScript("Menu.create('$id', $options);");
+    $script->setScript("var menu = Menu.create('$id', $options);");
+    foreach my $bind (@{$self->{__bindWidgets}}) {
+        $script->appendScript(qq{menu.bindToWidget('$bind->[0]', '$bind->[1]')});
+    }
     return $self->_appendAfter($script);
 }
 
@@ -182,6 +188,7 @@ sub __init {
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'menu.js');
     $self->{__options} = {maxHeight => 0};
+    $self->{__bindWidgets} = [];
 }
 
 sub __setup_menu_separator {

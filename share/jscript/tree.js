@@ -351,7 +351,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	setTimeout(this.__initNavRebuild.bind(this, this.body.rows.length), 100);
 
         registerFocus(this);
-	keyLogEvent(this.__keyEventsCB.bindAsEventListener(this));
+	keyLogEvent(this, this.__keyEventsCB.bindAsEventListener(this));
     },
     _bodySort: function(dir, col_num) {
 	this.__sorted_rows = [];
@@ -470,8 +470,6 @@ Object.extend(Object.extend(Tree, Widget), {
     __keyEventsCB: function(event) {
 	var keyCode = Event.getKeyCode(event);
 	var row;
-	if (focused_widget != this.id)
-	    return;
 
 	if (keyCode == 38)  { 		// Up-arrow
 	    if (row = this.getPrevRow())

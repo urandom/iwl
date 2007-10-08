@@ -356,8 +356,6 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var date = this.getDate();
         var change = false;
         var date_index = this.dateCells.indexOf(this.currentDate);
-        if (focused_widget != this.id)
-            return;
 
         if (ctrl) {
             if (key_code == Event.KEY_LEFT) {
@@ -796,7 +794,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
             connectHeadingSignals.call(this);
             connectTimeSignals.call(this);
-            keyLogEvent(keyEventsCB.bindAsEventListener(this));
+            keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
             registerFocus(this);
 
             this.emitSignal('load');

@@ -376,11 +376,19 @@ function removeSelection() {
     }
 }
 
-function keyLogEvent(callback) {
+function keyLogEvent(element, callback) {
     if (Prototype.Browser.IE)
-	Event.signalConnect(document.body, 'keydown', callback);
+        Event.signalConnect(document.body, 'keydown', function (event) {
+            if (focused_widget != element.id)
+                return;
+            callback(event);
+        });
     else
-	Event.signalConnect(window, 'keypress', callback);
+	Event.signalConnect(window, 'keypress', function (event) {
+            if (focused_widget != element.id)
+                return;
+            callback(event);
+        });
 }
 
 function registerFocus(element) {

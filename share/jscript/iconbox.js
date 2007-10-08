@@ -193,7 +193,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	Event.observe(window, 'resize', 
 		this._resizeEvent.bindAsEventListener(this));
         registerFocus(this);
-	keyLogEvent(this.__keyEventsCB.bindAsEventListener(this));
+	keyLogEvent(this, this.__keyEventsCB.bindAsEventListener(this));
     },
     _resizeEvent: function(event) {
 	var dims = this.getDimensions();
@@ -291,8 +291,6 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	var keyCode = Event.getKeyCode(event);
 	var shift = event.shiftKey;
 	var icon;
-	if (focused_widget != this.id)
-	    return;
 
 	if (keyCode == 37) {		// Left-arrow
 	    if (icon = this.getPrevIcon())
