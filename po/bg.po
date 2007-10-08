@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-10-05 12:38+0300\n"
-"PO-Revision-Date: 2007-10-05 12:10+0300\n"
+"POT-Creation-Date: 2007-10-08 12:22+0300\n"
+"PO-Revision-Date: 2007-10-08 12:23+0300\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net,"
 "viktor@imperia.net>\n"
@@ -28,6 +28,11 @@ msgid ""
 msgstr ""
 "Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ от "
 "Google."
+
+#: ../lib/IWL/Tooltip.pm:76 ../lib/IWL/Tooltip.pm:97
+#, perl-brace-format
+msgid "Invalid id: '{ID}'"
+msgstr "Невалидно ИД: '{ID}'"
 
 #: ../lib/IWL/Druid.pm:173
 msgid "Finish"
