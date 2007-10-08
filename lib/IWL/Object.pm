@@ -384,6 +384,8 @@ sub getContent {
     my $self    = shift;
     my $content = '';
 
+    return '' if $self->{__objectErrorBad};
+
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
@@ -491,6 +493,8 @@ sub getObject {
     my $js       = [];
     my $objects  = [];
     my $scripts  = [];
+
+    return {} if $self->{__objectErrorBad};
 
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
