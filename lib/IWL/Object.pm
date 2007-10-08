@@ -384,12 +384,12 @@ sub getContent {
     my $self    = shift;
     my $content = '';
 
-    return '' if $self->{__objectErrorBad};
-
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
     }
+
+    return '' if $self->{__objectErrorBad};
 
     return ''
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
@@ -494,12 +494,12 @@ sub getObject {
     my $objects  = [];
     my $scripts  = [];
 
-    return {} if $self->{__objectErrorBad};
-
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
     }
+
+    return {} if $self->{__objectErrorBad};
 
     return
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
@@ -946,12 +946,40 @@ sub errors {
     return scalar @{$self->{__objectErrorList}};
 }
 
-# Protected
-#
-sub _appendAfter {
-    my ($self, @objects) = @_;
+=item B<getState>
 
-    unshift @{$self->{_tailObjects}}, @objects;
+Returns the current state of the form as an IWL::Stash(3pm) object.
+The form state reflects the state of all of its children of
+type IWL::Input(3pm).
+
+=cut
+
+sub getState {
+    my ($self) = @_;
+
+    require IWL::Stash;
+    my $state = IWL::Stash->new;
+
+    $self->__iterateForm ($self, $state, 'extractState');
+
+    $state->setDirty (0);
+
+    return $state;
+}
+
+=item B<applyState> (B<STATE>)
+
+Returns the current state of the form to B<STATE>, an IWL::Stash(3pm) object.
+The form state reflects the state of all of its children of
+type IWL::Input(3pm).
+
+=cut
+
+sub applyState {
+    my ($self, $state) = @_;
+
+    $self->__iterateForm ($self, $state, 'applyState');
+
     return $self;
 }
 
@@ -1002,41 +1030,27 @@ sub _setBad {
     $self->{__objectErrorBad} = $newstate;
 }
 
-=item B<getState>
+sub _appendAfter {
+    my ($self, @objects) = @_;
 
-Returns the current state of the form as an IWL::Stash(3pm) object.
-The form state reflects the state of all of its children of
-type IWL::Input(3pm).
-
-=cut
-
-sub getState {
-    my ($self) = @_;
-
-    require IWL::Stash;
-    my $state = IWL::Stash->new;
-
-    $self->__iterateForm ($self, $state, 'extractState');
-
-    $state->setDirty (0);
-
-    return $state;
+    unshift @{$self->{_tailObjects}}, @objects;
+    return $self;
 }
 
-=item B<applyState> (B<STATE>)
+sub _realize {
+# called when the object is realized
+}
 
-Returns the current state of the form to B<STATE>, an IWL::Stash(3pm) object.
-The form state reflects the state of all of its children of
-type IWL::Input(3pm).
+# Internal
+#
+# Convert control characters, so that error messages cannot be tainted
+# in logs or on the console.
+sub __safeErrorFormat {
+    my (undef, $string) = @_;
 
-=cut
+    return '' unless defined $string;
 
-sub applyState {
-    my ($self, $state) = @_;
-
-    $self->__iterateForm ($self, $state, 'applyState');
-
-    return $self;
+    $string =~ s/([\000-\037])/'<' . unpack ('H2', $1) . '>'/eg;
 }
 
 sub __iterateForm {
@@ -1058,22 +1072,6 @@ sub __iterateForm {
     }
 
     return $self;
-}
-
-sub _realize {
-# called when the object is realized
-}
-
-# Internal
-#
-# Convert control characters, so that error messages cannot be tainted
-# in logs or on the console.
-sub __safeErrorFormat {
-    my (undef, $string) = @_;
-
-    return '' unless defined $string;
-
-    $string =~ s/([\000-\037])/'<' . unpack ('H2', $1) . '>'/eg;
 }
 
 1;

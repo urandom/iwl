@@ -312,6 +312,7 @@ t/30page_body.t
 t/30parser.t
 t/30table_cell.t
 t/30table_container.t
+t/30tooltip.t
 t/31button.t
 t/31page.t
 t/31table_row.t

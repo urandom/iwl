@@ -8,7 +8,9 @@ use strict;
 use base qw(IWL::Script IWL::Widget);
 
 use IWL::String qw(escape randomize);
+
 use JSON;
+use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 
@@ -71,6 +73,7 @@ Note: The tooltip and widget ids must not be changed after this method is called
 sub bindToWidget {
     my ($self, $widget, $signal, $toggle) = @_;
     my $to = $widget->getId;
+    return $self->_pushError(__x("Invalid id: '{ID}'", ID => $to)) unless $to;
 
     $self->{__bound} = $to;
     $self->{__bindSignal} = $signal;
@@ -91,6 +94,7 @@ Note: The tooltip and widget ids must not be changed after this method is called
 sub bindHideToWidget {
     my ($self, $widget, $signal) = @_;
     my $to = $widget->getId;
+    return $self->_pushError(__x("Invalid id: '{ID}'", ID => $to)) unless $to;
 
     $self->{__boundHide} = $to;
     $self->{__bindHideSignal} = $signal;
