@@ -1,3 +1,4 @@
+// vim: set autoindent shiftwidth=2 tabstop=8:
 Object.extend(Effect, {
   Bounce: function(element) {
     element = $(element);
@@ -100,3 +101,34 @@ Object.extend(Ajax.Autocompleter.prototype, {
     Element.show(this.iefix);
   }
 });
+
+Effect.ScrollElement = function(element, parent_element) {
+  if (!(element = $(element)))
+    return;
+  if (!(parent_element = $(parent_element)) && !(parent_element = element.getScrollableParent()))
+    return;
+
+  var options = arguments[2] || {},
+    parentHeight = parent_element.getHeight(),
+    elementHeight = element.getHeight(),
+    scrollOffsets = Element._returnOffset(parent_element.scrollLeft, parent_element.scrollTop),
+    elementOffsets = Element._returnOffset(element.offsetLeft, element.offsetTop),
+    elementTop = elementOffsets.top + elementHeight,
+    to = elementTop > parentHeight + scrollOffsets.top ?
+      elementTop - parentHeight : elementOffsets.top < scrollOffsets.top ?
+      elementOffsets.top : scrollOffsets.top;
+
+  if (options.offset) elementOffsets[1] += options.offset;
+  if (scrollOffsets.top == to || 
+      (scrollOffsets.top < elementOffsets.top
+        && elementOffsets.top + elementHeight < scrollOffsets.top + parentHeight))
+    return;
+
+  return new Effect.Tween(null,
+    scrollOffsets.top,
+    to,
+    options,
+    function(p){ parent_element.scrollLeft = scrollOffsets.left, parent_element.scrollTop = p.round() }
+  );
+};
+

@@ -79,7 +79,10 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 submenu.selectItem(submenu.menuItems.last());
                 focus(submenu.id)
             } else {
-                this.selectItem(this.getPrevMenuItem() || this.menuItems.last());
+                var select = this.getPrevMenuItem() || this.menuItems.last();
+                this.selectItem(select);
+                if (this.options.maxHeight)
+                    new Effect.ScrollElement(select, this, {duration: 0.3});
             }
         } else if (key_code == Event.KEY_RIGHT) {
             Event.stop(event);
@@ -106,7 +109,10 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 submenu.selectItem(submenu.menuItems[0]);
                 focus(submenu.id)
             } else {
-                this.selectItem(this.getNextMenuItem() || this.menuItems[0]);
+                var select = this.getNextMenuItem() || this.menuItems[0];
+                this.selectItem(select);
+                if (this.options.maxHeight)
+                    new Effect.ScrollElement(select, this, {duration: 0.3});
             }
         } else if (key_code == Event.KEY_RETURN) {
             Event.stop(event);
