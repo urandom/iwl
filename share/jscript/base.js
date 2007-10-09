@@ -392,7 +392,7 @@ function keyLogEvent(element, callback) {
 }
 
 function registerFocus(element) {
-    Event.signalConnect(element, 'mouseover', function() {
+    Event.signalConnect(element, 'mouseenter', function() {
         focused_widget = element.id});
     Event.signalConnect(element, 'click', function() {
         focused_widget = element.id});

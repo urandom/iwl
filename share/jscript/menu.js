@@ -186,8 +186,10 @@ Object.extend(Object.extend(Menu, Widget), (function () {
             if (this.hasClassName('menubar')) return;
             if (this.__qframe) this.__qframe.hide();
             this.style.display = 'none';
-            if (this.parentMenu)
+            if (this.parentMenu) {
                 this.parentMenu.poppedChild = null;
+                focus(this.parentMenu.id);
+            }
             this.popped = false;
             return this;
         },
