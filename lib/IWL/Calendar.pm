@@ -339,7 +339,8 @@ Parameters: B<SIGNAL> - the signal to which to connect. B<ELEMENT> - the element
 sub updateOnSignal {
     my ($self, $signal, $element, $format) = @_;
 
-    my $id = UNIVERSAL::isa($element, 'IWL::Widget') ? $element->getId : $element;
+    my $id = UNIVERSAL::isa($element, 'IWL::Entry') ? $element->{text}->getId : 
+      UNIVERSAL::isa($element, 'IWL::Widget') ? $element->getId : $element;
     push @{$self->{__updates}}, [$signal, $id, $format];
     return $self;
 }

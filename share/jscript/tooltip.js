@@ -231,11 +231,13 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
                 if (!this.visible() || this.__fade) {
                     this.showTooltip();
                     Event.extend(event);
-                    event.stop();
+                    if (event.stop)
+                        event.stop();
                 } else if (toggle && (this.visible() || this.__appear)) {
                     this.hideTooltip();
                     Event.extend(event);
-                    event.stop();
+                    if ('stop' in event)
+                        event.stop();
                 }
             }.bind(this));
             if (!this.options.hidden)
@@ -254,7 +256,8 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
                 if (this.visible() || this.__appear) {
                     this.hideTooltip();
                     Event.extend(event);
-                    event.stop();
+                    if ('stop' in event)
+                        event.stop();
                 }
             }.bind(this));
             return this;
