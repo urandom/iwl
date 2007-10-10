@@ -199,9 +199,9 @@ sub __init {
     $self->{__icons}       = [];
     $self->{_defaultClass} = 'iconbox';
 
-    $self->{_options} = {multipleSelect => 'false', clickToSelect => 'false'};
-    $self->{_options}{multipleSelect} = 'true' if $args{multipleSelect};
-    $self->{_options}{clickToSelect}  = 'true' if $args{clickToSelect};
+    $self->{_options} = {multipleSelect => 0, clickToSelect => 0};
+    $self->{_options}{multipleSelect} = 1 if $args{multipleSelect};
+    $self->{_options}{clickToSelect}  = 1 if $args{clickToSelect};
     $self->appendChild($icon_con);
     if (!$args{withoutStatusBar}) {
         my $status_label = IWL::Container->new;

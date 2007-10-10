@@ -288,10 +288,10 @@ sub _realize {
 
     $self->prependClass('list') if $self->{_options}{list};
     $self->SUPER::_realize;
-    $options->{multipleSelect} = "true" if $self->{_options}{multipleSelect};
-    $options->{isAlternating} = "true" if $self->{_options}{alternate};
-    $options->{animate} = "true" if $self->{_options}{animate};
-    $options->{scrollToSelection} = "true" if $self->{_options}{scrollToSelection};
+    $options->{multipleSelect}    = 1 if $self->{_options}{multipleSelect};
+    $options->{isAlternating}     = 1 if $self->{_options}{alternate};
+    $options->{animate}           = 1 if $self->{_options}{animate};
+    $options->{scrollToSelection} = 1 if $self->{_options}{scrollToSelection};
     $options = objToJson($options);
 
     $self->_set_alternate if $self->{_options}{alternate};

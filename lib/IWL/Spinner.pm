@@ -248,7 +248,7 @@ Parameters: B<BOOL> - true, if the spinner should wrap
 sub setWrap {
     my ($self, $bool) = @_;
 
-    $self->{_options}{wrap} = $bool ? 'true' : 'false';
+    $self->{_options}{wrap} = $bool ? 1 : 0;
     return $self;
 }
 
@@ -259,7 +259,7 @@ Returns true if the spinner wraps
 =cut
 
 sub isWrapping {
-    return shift->{_options}{wrap} eq 'true' ? 1 : '';
+    return shift->{_options}{wrap} eq 1 ? 1 : '';
 }
 
 =item B<setSnap> (B<BOOL>)
@@ -273,7 +273,7 @@ Parameters: B<BOOL> - true, if the spinner should snap
 sub setSnap {
     my ($self, $bool) = @_;
 
-    $self->{_options}{snap} = $bool? 'true' : 'false';
+    $self->{_options}{snap} = $bool? 1 : 0;
     return $self;
 }
 
@@ -284,7 +284,7 @@ Returns true if the spinner snaps
 =cut
 
 sub isSnapping {
-    return shift->{_options}{snap} eq 'true' ? 1 : '';
+    return shift->{_options}{snap} eq 1 ? 1 : '';
 }
 
 =item B<setMask> (B<MASK>)
@@ -413,7 +413,7 @@ sub __init {
 
     $self->{_options} = {value => 0, from => 0, to => 100,
         stepIncrement => 1.0, pageIncrement => 10.0,
-        acceleration => 0.1, snap => 'false', wrap => 'false'};
+        acceleration => 0.1, snap => 0, wrap => 0};
 
     $self->{_options}{value}         = $args{value}         if defined $args{value};
     $self->{_options}{to}            = $args{to}            if defined $args{to};
@@ -424,11 +424,11 @@ sub __init {
     $self->{_options}{precision}     = $args{precision}     if defined $args{precision};
     $self->{_options}{mask}          = $args{mask}          if defined $args{mask};
 
-    $self->{_options}{snap} = 'true' if $args{snap};
-    $self->{_options}{wrap} = 'true' if $args{wrap};
+    $self->{_options}{snap} = 1 if $args{snap};
+    $self->{_options}{wrap} = 1 if $args{wrap};
 
 
-    $entry->setAttribute(readonly => 'true') if $args{readonly};
+    $entry->setAttribute(readonly => 1) if $args{readonly};
     $entry->setAttribute(maxlength => $args{maxlength}) if $args{maxlength};
 
     delete @args{qw(readonly maxlength password id class value to from

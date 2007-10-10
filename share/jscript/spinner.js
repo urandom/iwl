@@ -184,6 +184,7 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
     function documentMouseUp(event) {
         this.dragging = false;
         this.dragStartPosition = 0;
+        this.input.blur();
     }
 
     return {

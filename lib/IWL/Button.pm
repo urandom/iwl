@@ -247,7 +247,7 @@ Returns true if the button is disabled
 =cut
 
 sub isDisabled {
-    return shift->{_options}{disabled} eq 'true' ? 1 : '';
+    return !(!shift->{_options}{disabled});
 }
 
 # Overrides

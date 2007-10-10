@@ -336,11 +336,7 @@ Parameters: B<BOOL> - boolean value, true if the contentbox should have shadows
 sub setShadows {
     my ($self, $bool) = @_;
     
-    if ($bool) {
-	$self->{_options}{hasShadows} = 'true';
-    } else {
-	$self->{_options}{hasShadows} = 'false';
-    }
+    $self->{_options}{hasShadows} = $bool ? 1 : 0;
     return $self;
 }
 
@@ -355,11 +351,7 @@ Parameters: B<BOOL> - true if the contentbox should try to set it's width accord
 sub setAutoWidth {
     my ($self, $bool) = @_;
 
-    if ($bool) {
-	$self->{_options}{auto} = 'true';
-    } else {
-	$self->{_options}{auto} = 'false';
-    }
+    $self->{_options}{auto} = $bool ? 1 : 0;
 
     return $self;
 }
@@ -410,7 +402,7 @@ sub _realize {
     my $self = shift;
     my $options = objToJson($self->{_options});
     my $id = $self->getId;
-    $self->prependClass('shadowbox') if $self->{_options}{hasShadows} eq 'true';
+    $self->prependClass('shadowbox') if $self->{_options}{hasShadows};
     $self->SUPER::_realize;
     $self->{__titler}->prependChild($self->{__titleImage});
     $self->__set_type;
@@ -470,7 +462,7 @@ sub __init {
     my $bottomr = IWL::Container->new;
 
     $self->{_defaultClass} = 'contentbox';
-    $self->{_options} = {auto => 'false', modal => 'false'};
+    $self->{_options} = {auto => 0, modal => 0};
 
     $self->{__top}     = $top;
     $self->{__topr}    = $topr;
@@ -502,12 +494,12 @@ sub __init {
     $footer->{_ignore} = 1;
 
     if ($args{autoWidth}) {
-	$self->{_options}{auto} = 'true';
+	$self->{_options}{auto} = 1;
     }
     if ($args{modal}) {
-	$self->{_options}{modal} = 'true';
+	$self->{_options}{modal} = 1;
 	if ($args{closeModalOnClick}) {
-	    $self->{_options}{closeModalOnClick} = 'true';
+	    $self->{_options}{closeModalOnClick} = 1;
 	}
     }
 
