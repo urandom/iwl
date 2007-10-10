@@ -390,6 +390,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    for (var i = 0; i < this.body.rows.length; i++)
 		this.body.rows[i]._rebuildNav();
 	    this._setAlternate(this.body);
+            this.__initNavRebuild(this.body.rows.length);
 	}
     },
     // On the same level
