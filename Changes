@@ -1,3 +1,8 @@
+Release: 0.51 - 10/10/07
+        Menu keyboard navigation
+        New spinner widget
+        Workaround for nasty JSON bug, which caused tests (and unexpected behavior) to fail with newer versions of JSON
+
 Release: 0.50 - 08/10/07
         Improvements to the Contentbox, Tooltip and Druid
         New widgets: Accordion and Calendar
