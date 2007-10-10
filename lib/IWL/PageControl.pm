@@ -100,9 +100,7 @@ Returns whether the page control is bound to a widget
 =cut
 
 sub isBound {
-    my $self = shift;
-
-    return !(!$self->{__options}{bound});
+    return !(!shift->{__options}{bound});
 }
 
 # Overrides

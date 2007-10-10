@@ -102,7 +102,7 @@ sub isSelected {
 
     my $selected = $self->getAttribute('selected', 1);
 
-    return !!$selected;
+    return !(!$selected);
 }
 
 =item B<setValue>

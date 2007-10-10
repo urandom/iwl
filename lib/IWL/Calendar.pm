@@ -219,7 +219,7 @@ Parameters: B<BOOL> - true if the week numbers should be shown
 sub showWeekNumbers {
     my ($self, $bool) = @_;
 
-    $self->{_options}{showWeekNumbers} = !(!$bool);
+    $self->{_options}{showWeekNumbers} = $bool ? 1 : 0;
 
     return $self;
 }
@@ -235,7 +235,7 @@ Parameters: B<BOOL> - true if the heading should be shown
 sub showHeading {
     my ($self, $bool) = @_;
 
-    $self->{_options}{showHeading} = !(!$bool);
+    $self->{_options}{showHeading} = $bool ? 1 : 0;
 
     return $self;
 }
@@ -251,7 +251,7 @@ Parameters: B<BOOL> - true if the time should be shown
 sub showTime {
     my ($self, $bool) = @_;
 
-    $self->{_options}{showTime} = !(!$bool);
+    $self->{_options}{showTime} = $bool ? 1 : 0;
 
     return $self;
 }
@@ -397,14 +397,14 @@ sub __init {
     $options->{toYear}    = $args{toYear}    if defined $args{toYear};
     $options->{toMonth}   = $args{toMonth}   if defined $args{toMonth};
 
-    $options->{showWeekNumbers}    = !(!$args{showWeekNumbers})    if defined $args{showWeekNumbers};
-    $options->{showHeading}        = !(!$args{showHeading})        if defined $args{showHeading};
-    $options->{showTime}           = !(!$args{showTime})           if defined $args{showTime};
-    $options->{showAdjacentMonths} = !(!$args{showAdjacentMonths}) if defined $args{showAdjacentMonths};
-    $options->{noMonthChange}      = !(!$args{noMonthChange})      if defined $args{noMonthChange};
-    $options->{startOnMonday}      = !(!$args{startOnMonday})      if defined $args{startOnMonday};
-    $options->{markWeekends}       = !(!$args{markWeekends})       if defined $args{markWeekends};
-    $options->{astronomicalTime}   = !(!$args{astronomicalTime})   if defined $args{astronomicalTime};
+    $options->{showWeekNumbers}    = $args{showWeekNumbers}    ? 1 : 0 if defined $args{showWeekNumbers};
+    $options->{showHeading}        = $args{showHeading}        ? 1 : 0 if defined $args{showHeading};
+    $options->{showTime}           = $args{showTime}           ? 1 : 0 if defined $args{showTime};
+    $options->{showAdjacentMonths} = $args{showAdjacentMonths} ? 1 : 0 if defined $args{showAdjacentMonths};
+    $options->{noMonthChange}      = $args{noMonthChange}      ? 1 : 0 if defined $args{noMonthChange};
+    $options->{startOnMonday}      = $args{startOnMonday}      ? 1 : 0 if defined $args{startOnMonday};
+    $options->{markWeekends}       = $args{markWeekends}       ? 1 : 0 if defined $args{markWeekends};
+    $options->{astronomicalTime}   = $args{astronomicalTime}   ? 1 : 0 if defined $args{astronomicalTime};
 
     $options->{markedDates} = [];
 

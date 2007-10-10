@@ -178,8 +178,8 @@ sub __init {
     $self->{_defaultClass} = 'tooltip';
 
     $self->{_options} = {};
-    $self->{_options}{centerOnElement} = !(!$args{centerOnElement}) if defined $args{centerOnElement};
-    $self->{_options}{followMouse}     = !(!$args{followMouse})     if defined $args{followMouse};
+    $self->{_options}{centerOnElement} = $args{centerOnElement} ? 1 : 0 if defined $args{centerOnElement};
+    $self->{_options}{followMouse}     = $args{followMouse}     ? 1 : 0 if defined $args{followMouse};
 
     $args{id} ||= randomize($self->{_defaultClass});
     $self->{_tag} = "script";

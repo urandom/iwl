@@ -136,8 +136,11 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
         var new_value = this.input.value - 0;
         new_value = this.spinDirection == 'left' ? new_value - this.speed : new_value + this.speed;
         new_value = wrapValue.call(this, new_value);
-        if (!isNaN(new_value))
+        if (!isNaN(new_value)) {
+            if (!isNaN(this.options.precision))
+                new_value = new_value.toFixed(this.options.precision);
             this.input.value = new_value;
+        }
     }
 
     function wrapValue(number) {

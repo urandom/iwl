@@ -130,7 +130,7 @@ Parameters: B<BOOL> - true if the submenus should pop up on mouse over
 sub setMouseOverActivation {
     my ($self, $bool) = @_;
 
-    $self->{__mouseOverActivation} = !(!$bool);
+    $self->{__mouseOverActivation} = $bool ? 1 : 0;
     return $self;
 }
 

@@ -111,7 +111,7 @@ Parameters: B<BOOL> - true if the page should be the currently selected one
 sub setSelected {
     my ($self, $bool) = @_;
 
-	$self->{__selected} = !(!$bool);
+    $self->{__selected} = $bool ? 1 : 0;
     return $self;
 }
 
@@ -122,7 +122,7 @@ Returns true if the page is the currently selected one
 =cut
 
 sub isSelected {
-	return !(!shift->{__selected});
+    return !(!shift->{__selected});
 }
 
 # Overrides

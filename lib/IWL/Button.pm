@@ -236,7 +236,7 @@ Parameters: B<BOOL> - true if the button should be disabled (i.e. will not react
 sub setDisabled {
     my ($self, $bool) = @_;
 
-    $self->{_options}{disabled} = !(!$bool) ? 'true' : 'false';
+    $self->{_options}{disabled} = $bool ? 1 : 0;
     return $self;
 }
 
@@ -456,7 +456,7 @@ sub __init {
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
-    $self->{_options}{disabled} = !(!$args{disabled}) ? 'true' : 'false';
+    $self->{_options}{disabled} = $args{disabled} ? 1 : 0;
     $self->{_options}{submit} = 0;
 
     delete @args{qw(size id)};
