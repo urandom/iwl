@@ -393,6 +393,44 @@ Object.extend(String.prototype, {
   }
 });
 
+var PeriodicalAccelerator = Class.create((function () {
+  function onTimerEvent() {
+    this.callback(this);
+    if (this.frequency > this.options.border) {
+      this.frequency /= this.acceleration;
+      if (this.frequency < this.options.border)
+        this.frequency = this.options.border;
+    }
+    this.timer = setTimeout(onTimerEvent.bind(this), this.frequency * 1000);
+  }
+
+  return {
+    initialize: function(callback, frequency, acceleration) {
+      this.options = Object.extend({
+        frequency: 1,
+        acceleration: 0.1,
+        border: 0.01
+      }, arguments[1] || {});
+      this.callback = callback;
+      this.frequency = this.options.frequency;
+      this.acceleration = this.options.acceleration + 1;
+      if (this.acceleration <= 0)
+        this.acceleration = 1;
+      this.registerCallback();
+    },
+
+    registerCallback: function() {
+      this.timer = setTimeout(onTimerEvent.bind(this), this.frequency * 1000);
+    },
+
+    stop: function() {
+      if (!this.timer) return;
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+  }
+})());
+
 function $(element) {
   if (arguments.length > 1) {
     for (var i = 0, elements = [], length = arguments.length; i < length; i++)

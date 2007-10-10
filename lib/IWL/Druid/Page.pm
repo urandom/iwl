@@ -129,7 +129,7 @@ sub setCheckCB {
     return unless $callback;
     $self->setAttribute('iwl:druidCheckCallback' => "$callback", 'none');
     if ($param) {
-        $param = objToJson([$param, !(!$collect)]);
+        $param = objToJson([$param, $collect ? 'true' : 'false']);
 	$self->setAttribute('iwl:druidCheckParam' => $param, 'escape');
     }
 

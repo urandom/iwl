@@ -48,6 +48,7 @@ use IWL::RadioButton;
 use IWL::RPC;
 use IWL::Script;
 use IWL::Slider;
+use IWL::Spinner;
 use IWL::Stash;
 use IWL::Style;
 use IWL::SubmitImage;
@@ -64,7 +65,7 @@ use IWL::Upload;
 
 use vars qw($VERSION);
 
-$VERSION = '0.50';
+$VERSION = '0.51';
 
 1;
 
@@ -74,7 +75,7 @@ IWL - A widget library for the web
 
 =head1 VERSION
 
-This documentation refers to B<IWL> version 0.50
+This documentation refers to B<IWL> version 0.51
 
 =head1 SYNOPSIS
 

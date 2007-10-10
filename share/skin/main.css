@@ -207,34 +207,42 @@ button.button, input.inputbutton {
     text-align: center;
 }
 
-span.entry {
+.spinner_text {
+    text-align: center;
+}
+
+span.entry, .spinner {
     border: 1px solid #7F9DB9;
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
     font-size: 16px;
     line-height: 16px;
 }
 
-input.entry_text, input.entry_text_default {
+input.entry_text, input.entry_text_default, .spinner_text {
     color: #525C65;
     border: none;
     background: none;
     vertical-align: middle;
+    padding: 0px;
+    margin: -2px 0px 2px 0px;
 }
 
 input.entry_text_default {
     color: #9aadbe;
 }
 
-img.entry_image1, img.entry_image2 {
+img.entry_image1, img.entry_image2,
+.spinner_left, .spinner_right {
     border: none;
     background: none;
     vertical-align: middle;
+    margin-bottom: 2px;
 }
-img.entry_image1 {
+img.entry_image1, .spinner_left {
     padding-left: 3px; /* do NOT use margin*/
     padding-right: 1px;
 }
-img.entry_image2 {
+img.entry_image2, .spinner_right {
     padding-left: 1px;
     padding-right: 2px; /* do NOT use margin*/
 }

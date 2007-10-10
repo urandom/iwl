@@ -68,6 +68,7 @@ lib/IWL/RPC/Request.pm
 lib/IWL/RadioButton.pm
 lib/IWL/Script.pm
 lib/IWL/Slider.pm
+lib/IWL/Spinner.pm
 lib/IWL/Stash.pm
 lib/IWL/Stock.pm
 lib/IWL/String.pm
@@ -276,6 +277,7 @@ share/jscript/pagecontrol.js
 share/jscript/prototype_extensions.js
 share/jscript/resizer.js
 share/jscript/scriptaculous_extensions.js
+share/jscript/spinner.js
 share/jscript/tags
 share/jscript/tooltip.js
 share/jscript/tree.js
@@ -348,5 +350,6 @@ t/50accordion.t
 t/50menu.t
 t/50menubar.t
 t/50radiobutton.t
+t/50spinner.t
 t/iwl.conf
 t/test.html

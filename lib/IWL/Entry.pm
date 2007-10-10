@@ -58,6 +58,10 @@ Since the Entry is a compound object, settings the class and the id will also se
 
 =over 4
 
+=item B<text>
+
+The input text of the entry
+
 =item B<image1>
 
 The left icon of the entry
@@ -454,7 +458,6 @@ sub __init {
     my $entry  = IWL::Input->new;
     my $image1 = IWL::Image->new;
     my $image2 = IWL::Image->new;
-    my $span   = IWL::Container->new;
     my $completion = IWL::Script->new;
     my $receiver   = IWL::Container->new;
 

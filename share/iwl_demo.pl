@@ -229,6 +229,7 @@ sub build_basic_widgets {
     my $row = shift;
     my $buttons = IWL::Tree::Row->new(id => 'buttons_row');
     my $entries = IWL::Tree::Row->new(id => 'entries_row');
+    my $spinners = IWL::Tree::Row->new(id => 'spinners_row');
     my $images = IWL::Tree::Row->new(id => 'images_row');
     my $labels = IWL::Tree::Row->new(id => 'labels_row');
 
@@ -236,12 +237,14 @@ sub build_basic_widgets {
     $row->appendRow($buttons);
     $entries->appendTextCell('Entries');
     $row->appendRow($entries);
+    $spinners->appendTextCell('Spinners');
+    $row->appendRow($spinners);
     $images->appendTextCell('Images');
     $row->appendRow($images);
     $labels->appendTextCell('Labels');
     $row->appendRow($labels);
 
-    register_row_event($buttons, $entries, $images, $labels);
+    register_row_event($buttons, $entries, $spinners, $images, $labels);
 }
 
 sub build_advanced_widgets {
@@ -358,6 +361,16 @@ sub generate_entries {
 	    insertion => 'bottom',
 	    onComplete => q|displayStatus.bind(this, 'Completed')|,
     ));
+    return $container->getObject;
+}
+
+sub generate_spinners {
+    my $container = IWL::Container->new(id => 'spinners_container');
+    my $spinner = IWL::Spinner->new(id => 'normal_spinner');
+    my $mask_spinner = IWL::Spinner->new(id => 'masked_spinner', acceleration => 0.5, precision => 2);
+
+    $mask_spinner->setRange(-250, 1000)->setWrap(1)->setMask("Цена: #{number} лв")->setIncrements(0.2, 7.6);
+    $container->appendChild($spinner, IWL::Break->new, $mask_spinner);
     return $container->getObject;
 }
 
@@ -864,6 +877,8 @@ sub show_the_code_for {
 	$paragraph->appendTextType(read_code("generate_buttons", 27), 'pre');
     } elsif ($code_for eq 'entries_container') {
 	$paragraph->appendTextType(read_code("generate_entries", 24), 'pre');
+    } elsif ($code_for eq 'spinners_container') {
+	$paragraph->appendTextType(read_code("generate_spinners", 9), 'pre');
     } elsif ($code_for eq 'images_container') {
 	$paragraph->appendTextType(read_code("generate_images", 17), 'pre');
     } elsif ($code_for eq 'labels_container') {
@@ -883,7 +898,7 @@ sub show_the_code_for {
     } elsif ($code_for eq 'table_container') {
 	$paragraph->appendTextType(read_code("generate_table", 41), 'pre');
     } elsif ($code_for eq 'tree_container') {
-	$paragraph->appendTextType(read_code("sub build_tree", 116), 'pre');
+	$paragraph->appendTextType(read_code("sub build_tree", 119), 'pre');
         $paragraph->appendTextType(read_code("Tree row handlers", 21), 'pre');
         $paragraph->appendTextType(read_code('^\);', 1), 'pre');
     } elsif ($code_for eq 'contentbox_container') {
