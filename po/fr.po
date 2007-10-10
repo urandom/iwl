@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-10-08 12:22+0300\n"
-"PO-Revision-Date: 2007-10-06 00:21+0300\n"
+"POT-Creation-Date: 2007-10-10 23:06+0300\n"
+"PO-Revision-Date: 2007-10-10 22:11+0300\n"
 "Last-Translator: Guido Flohr <viktor@imperia.net>\n"
 "Language-Team: French <guido@imperia.net>\n"
 "MIME-Version: 1.0\n"
@@ -15,9 +15,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../lib/IWL/GoogleMap.pm:159
-#, fuzzy
 msgid "Container has no id"
-msgstr "Le document ne contient pas de données"
+msgstr "Le conteneur n'a aucune ID"
 
 #: ../lib/IWL/GoogleMap.pm:271
 msgid ""
@@ -25,18 +24,17 @@ msgid ""
 "Google."
 msgstr ""
 
-#: ../lib/IWL/Tooltip.pm:76 ../lib/IWL/Tooltip.pm:97
+#: ../lib/IWL/Tooltip.pm:76 ../lib/IWL/Tooltip.pm:97 ../lib/IWL/Menu.pm:140
 #, perl-brace-format
 msgid "Invalid id: '{ID}'"
 msgstr ""
 
 #: ../lib/IWL/Druid.pm:173
-#, fuzzy
 msgid "Finish"
-msgstr "Terminé"
+msgstr "Terminer"
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:167
+#: ../lib/IWL/PageControl.pm:165
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr ""
@@ -87,7 +85,7 @@ msgstr "Plein écran"
 
 #: ../lib/IWL/Stock.pm:72
 msgid "Go"
-msgstr ""
+msgstr "Aller"
 
 #: ../lib/IWL/Stock.pm:76
 msgid "Go back"
@@ -114,14 +112,12 @@ msgid "Information"
 msgstr "Information"
 
 #: ../lib/IWL/Stock.pm:100
-#, fuzzy
 msgid "Lock"
-msgstr "Blocages"
+msgstr "Cadenas"
 
 #: ../lib/IWL/Stock.pm:104
-#, fuzzy
 msgid "Minimize"
-msgstr "Menu principal"
+msgstr "Réduire"
 
 #: ../lib/IWL/Stock.pm:108
 msgid "New"
@@ -156,9 +152,8 @@ msgid "Save"
 msgstr "Enregistrer"
 
 #: ../lib/IWL/Stock.pm:140
-#, fuzzy
 msgid "Save and close"
-msgstr "Enregistrer sous"
+msgstr "Enregistrer et fermer"
 
 #: ../lib/IWL/Stock.pm:144
 msgid "Upload"
@@ -177,9 +172,8 @@ msgid "Delete directory"
 msgstr "Supprimer un répertoire"
 
 #: ../lib/IWL/Stock.pm:161
-#, fuzzy
 msgid "Edit directory"
-msgstr "Éditer le répertoire"
+msgstr "Éditer dossier"
 
 #: ../lib/IWL/Stock.pm:165
 msgid "Create directory"
@@ -190,7 +184,6 @@ msgid "Bottom"
 msgstr "Bas"
 
 #: ../lib/IWL/Stock.pm:174 ../lib/IWL/Stock.pm:186
-#, fuzzy
 msgid "Main menu"
 msgstr "Menu principal"
 
@@ -199,16 +192,14 @@ msgid "Info"
 msgstr "Info"
 
 #: ../lib/IWL/Stock.pm:182
-#, fuzzy
 msgid "Mail"
-msgstr "Mails"
+msgstr "Courrier"
 
 #: ../lib/IWL/Stock.pm:190
 msgid "Quit"
 msgstr "Quitter"
 
 #: ../lib/IWL/Stock.pm:194
-#, fuzzy
 msgid "Available roles"
 msgstr "Rôles disponibles"
 
@@ -217,13 +208,12 @@ msgid "Top"
 msgstr "Haut"
 
 #: ../lib/IWL/Stock.pm:203
-#, fuzzy
 msgid "Calendar"
-msgstr "Effacer"
+msgstr "Calendrier"
 
 #: ../lib/IWL/Stock.pm:208 ../lib/IWL/Stock.pm:212
 msgid "Generic Text"
-msgstr ""
+msgstr "Text générique"
 
 #. TRANSLATORS: {TITLE} is a placeholder
 #: ../lib/IWL/Iconbox.pm:140

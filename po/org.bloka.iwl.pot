@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-10-08 12:22+0300\n"
+"POT-Creation-Date: 2007-10-10 23:06+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgid ""
 "Google."
 msgstr ""
 
-#: ../lib/IWL/Tooltip.pm:76 ../lib/IWL/Tooltip.pm:97
+#: ../lib/IWL/Tooltip.pm:76 ../lib/IWL/Tooltip.pm:97 ../lib/IWL/Menu.pm:140
 #, perl-brace-format
 msgid "Invalid id: '{ID}'"
 msgstr ""
@@ -36,7 +36,7 @@ msgid "Finish"
 msgstr ""
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:167
+#: ../lib/IWL/PageControl.pm:165
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr ""
