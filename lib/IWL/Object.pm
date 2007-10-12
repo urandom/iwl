@@ -563,7 +563,7 @@ If the html looks like this:
 
 The corresponding JSON object will look like this:
 
-{"div":{"attributes":{"attr1":1,"attr2":2,"style":{"display":"none"}},"children":["child1", "child2":{"attributes":{"attr3":3}}]}}
+{"div": {"attributes": {"attr1": 1, "attr2": 2, "style": {"display": "none"}}, "children": ["child1", "child2": {"attributes": {"attr3": 3}}]}}
 
 =cut
 
