@@ -8,7 +8,6 @@ use strict;
 use base qw(IWL::Object IWL::RPC::Request);
 use IWL::Config qw(%IWLConfig);
 use IWL::Script;
-use JSON;
 
 =head1 NAME
 

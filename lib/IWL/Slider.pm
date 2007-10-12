@@ -7,8 +7,7 @@ use strict;
 
 use base 'IWL::Input';
 
-use JSON;
-
+use IWL::JSON qw(toJSON);
 use IWL::String qw(randomize);
 
 
@@ -246,7 +245,7 @@ sub _realize {
     } else {
 	$callbacks = $range if $range;
     }
-    $options = objToJson($self->{_options});
+    $options = toJSON($self->{_options});
     if ($options =~ /^{}$/) {
 	$options = "{$callbacks}";
     } else {

@@ -7,7 +7,6 @@ use strict;
 
 use base qw (IWL::Widget);
 
-use JSON;
 use IWL::Anchor;
 
 use Locale::TextDomain qw(org.bloka.iwl);

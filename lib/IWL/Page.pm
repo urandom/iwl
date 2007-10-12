@@ -13,10 +13,9 @@ use IWL::Page::Link;
 use IWL::Page::Meta;
 use IWL::Page::Title;
 use IWL::Script;
-use IWL::Config qw(%IWLConfig);
 use IWL::Comment;
-
-use JSON;
+use IWL::Config qw(%IWLConfig);
+use IWL::JSON qw(toJSON);
 
 use constant DOCTYPES => {
     html401 => <<DECL,
@@ -284,7 +283,7 @@ sub __init {
     $self->requiredJs('dist/prototype.js', 'dist/scriptaculous.js', 'base.js');
 
     my $script = IWL::Script->new;
-    $script->appendScript("window.IWLConfig = " . objToJson(\%IWLConfig) . ";");
+    $script->appendScript("window.IWLConfig = " . toJSON(\%IWLConfig) . ";");
     $head->appendChild($script);
 
     $head->appendChild($skin);

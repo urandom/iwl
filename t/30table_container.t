@@ -11,7 +11,7 @@ use IWL::Table::Container;
 {
 	my $c = IWL::Table::Container->new(type => 'body');
 	$c->appendChild(IWL::Widget->new);
-	like($c->getJSON, qr(^{(?:(?:"tag":"tbody"|"children":\[\{\}\]),?){2}}$));
+    like($c->getJSON, qr(^{(?:(?:"tag": "tbody"|"children": \[\{\}\])(?:, )?){2}}$));
 }
 
 {

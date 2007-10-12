@@ -9,8 +9,7 @@ use base 'IWL::Entry';
 
 use IWL::Script;
 use IWL::String qw(randomize);
-
-use JSON;
+use IWL::JSON qw(toJSON);
 
 =head1 NAME
 
@@ -382,7 +381,7 @@ sub _realize {
     my $id      = $self->getId;
 
     $self->SUPER::_realize;
-    my $options = objToJson($self->{_options});
+    my $options = toJSON($self->{_options});
 
     $script->setScript("Spinner.create('$id', $options);");
     $self->_appendAfter($script);

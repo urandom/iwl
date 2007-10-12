@@ -7,12 +7,13 @@ use strict;
 
 use base 'IWL::Container';
 
-use Locale::TextDomain qw(org.bloka.iwl);
 use IWL::String qw(randomize);
 use IWL::Label;
 use IWL::Entry;
 use IWL::Button;
-use JSON;
+use IWL::JSON qw(toJSON);
+
+use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 
@@ -125,7 +126,7 @@ sub _realize {
     my $self = shift;
     my $script = IWL::Script->new;
     my $id = $self->getId;
-    my $options = objToJson($self->{__options});
+    my $options = toJSON($self->{__options});
 
     $self->setStyle(display => 'none');
     $self->SUPER::_realize;

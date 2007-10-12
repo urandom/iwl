@@ -13,8 +13,7 @@ use IWL::Anchor;
 use IWL::Image;
 use IWL::Container;
 use IWL::String qw(randomize escape);
-
-use JSON;
+use IWL::JSON qw(toJSON);
 
 =head1 NAME
 
@@ -414,7 +413,7 @@ sub _realize {
     my $json      =
       qq|{container:$container,image:"$image",label:"$label"}|;
 
-    $options = objToJson($self->{_options});
+    $options = toJSON($self->{_options});
     $script->setScript("Button.create('$id', $json, $options);");
     $script->appendScript($self->{__button}{_customSignalScript}->getScript)
       if $self->{__button}{_customSignalScript};

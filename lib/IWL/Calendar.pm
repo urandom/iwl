@@ -6,14 +6,14 @@ package IWL::Calendar;
 use strict;
 
 use IWL::Script;
-use IWL::String qw(randomize escape);
 use IWL::Table::Row;
 use IWL::Table::Cell;
 use IWL::Input;
+use IWL::String qw(randomize escape);
+use IWL::JSON qw(toJSON);
 
 use base qw(IWL::Table);
 
-use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
 
 my $strings = {
@@ -363,7 +363,7 @@ sub _realize {
     my $id      = $self->getId;
 
     $self->SUPER::_realize;
-    my $options = objToJson($self->{_options});
+    my $options = toJSON($self->{_options});
     my $translations = {};
     foreach my $key (keys %$strings) {
         $translations->{$key} = [];
@@ -375,7 +375,7 @@ sub _realize {
             }
         }
     }
-    $translations = objToJson($translations);
+    $translations = toJSON($translations);
 
     $script->setScript("Calendar.create('$id', $options, $translations);");
     foreach my $update (@{$self->{__updates}}) {

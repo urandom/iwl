@@ -8,8 +8,8 @@ use strict;
 use base qw(IWL::Script IWL::Widget);
 
 use IWL::String qw(escape randomize);
+use IWL::JSON qw(toJSON);
 
-use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
@@ -160,7 +160,7 @@ sub _realize {
 
     $self->{_options}{hidden} = 1;
 
-    $options = objToJson($self->{_options});
+    $options = toJSON($self->{_options});
     $self->setId($id . '_script');
     $self->SUPER::_realize;
     $self->setScript("Tooltip.create('$id', $options);");

@@ -8,9 +8,9 @@ use strict;
 use base 'IWL::List';
 
 use IWL::String qw(randomize);
+use IWL::JSON qw(toJSON);
 use IWL::Menu::Item;
 
-use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
@@ -178,7 +178,7 @@ sub _realize {
     my $self = shift;
     my $script = IWL::Script->new;
     my $id = $self->getId;
-    my $options = objToJson($self->{_options});
+    my $options = toJSON($self->{_options});
 
     $self->SUPER::_realize;
     $script->setScript("var menu = Menu.create('$id', $options);");

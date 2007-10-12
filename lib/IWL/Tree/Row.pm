@@ -10,9 +10,9 @@ use base qw(IWL::Table::Row);
 use IWL::Tree::Cell;
 use IWL::Container;
 use IWL::String qw(randomize);
+use IWL::JSON qw(toJSON);
 
 use Scalar::Util qw(weaken);
-use JSON;
 
 =head1 NAME
 
@@ -442,7 +442,7 @@ sub _realize {
     $data->{isParent}   = $self->{_isParent};
     $data->{collapsed}  = $self->{_collapsed};
 
-    $self->setAttribute('iwl:treeRowData' => objToJson($data), 'uri');
+    $self->setAttribute('iwl:treeRowData' => toJSON($data), 'uri');
 
     if ($self->{_parentRow} && $self->{_parentRow}{_collapsed}) {
         $self->setStyle(display => 'none');

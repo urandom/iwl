@@ -6,7 +6,7 @@ package IWL::RPC;
 use strict;
 
 use IWL::Object;
-use JSON;
+use IWL::JSON qw(toJSON evalJSON);
 
 =head1 NAME
 
@@ -181,7 +181,7 @@ sub handleEvent {
     my $self = shift;
     my %form = $self->getParams;
     return if !$form{IWLEvent};
-    $form{IWLEvent} = jsonToObj($form{IWLEvent});
+    $form{IWLEvent} = evalJSON($form{IWLEvent}, 1);
     while (my $name = shift) {
 	my $handler = shift;
 	if ($name eq $form{IWLEvent}{eventName}) {
@@ -213,7 +213,7 @@ sub __defaultEvent {
         $event->{options}{collectData} ? $event->{options}{elementData} : undef)
       if 'CODE' eq ref $handler;
     if (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
-	$data = objToJson($data);
+	$data = toJSON($data);
     } else {
         $data = qq|"$data"| unless $event->{options}{update};
     }
@@ -227,7 +227,7 @@ sub __defaultEvent {
 	}
     } else {
 	IWL::Object::printJSONHeader;
-	print '{data: ' . $data . ', extras: ' . (objToJson($extras) || 'null') . '}';
+	print '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}';
     }
 }
 

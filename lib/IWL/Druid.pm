@@ -13,7 +13,6 @@ use IWL::Script;
 use IWL::Break;
 use IWL::Druid::Page;
 
-use JSON;
 use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME

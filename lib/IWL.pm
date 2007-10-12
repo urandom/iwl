@@ -125,6 +125,7 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::Anchor - An anchor widget ("<a>")
  IWL::Break - A break widget ("<br>")
  IWL::Button - A graphic button widget
+ IWL::Calendar - a calendar widget
  IWL::Canvas - The html5 canvas element ("<canvas>")
  IWL::Checkbox - A checkbox widget (checkbox + text)
  IWL::Combo - A combobox widget ("<select>")
@@ -161,6 +162,7 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::RPC - A helper class for ajax connections and cgi parameters
  IWL::Script - A script object ("<script>")
  IWL::Slider - A slider widget
+ IWL::Spinner-  A spinner widget
  IWL::Stash - A stash class for form information encapsulation
  IWL::Stock - A stock object, for buttons and images
  IWL::Style - A style object ("<style>")
@@ -185,7 +187,6 @@ In order to actually use the library, the javascript and css files will also hav
 
 =head1 DEPENDENCIES
 
-  JSON
   Scalar::Util
   Locale::Messages
   Locale::TextDomain

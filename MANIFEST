@@ -45,6 +45,7 @@ lib/IWL/Iconbox/Icon.pm
 lib/IWL/Image.pm
 lib/IWL/Input.pm
 lib/IWL/InputButton.pm
+lib/IWL/JSON.pm
 lib/IWL/Label.pm
 lib/IWL/List.pm
 lib/IWL/List/Definition.pm
@@ -288,6 +289,7 @@ share/skin/ie6.css
 share/skin/main.css
 t/01use.t
 t/02config.t
+t/02json.t
 t/02string.t
 t/03stock.t
 t/10object.t

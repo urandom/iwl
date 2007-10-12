@@ -7,11 +7,11 @@ use strict;
 
 use IWL::Script;
 use IWL::String qw(randomize escape);
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::JSON qw(toJSON);
 
 use base qw(IWL::Container);
 
-use JSON;
+use Locale::TextDomain qw(org.bloka.iwl);
 use Scalar::Util qw(weaken);
 
 =head1 NAME
@@ -134,7 +134,7 @@ sub _realize {
     my $self    = shift;
     my $script  = IWL::Script->new;
     my $id      = $self->getId;
-    my $options = objToJson($self->{_options});
+    my $options = toJSON($self->{_options});
 
     # TRANSLATORS: {TITLE} is a placeholder
     my $delete  = escape(__"The icon '{TITLE}' was removed.");
@@ -185,7 +185,7 @@ sub _refreshEvent {
 
     print '{icons: ['
            . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
-           . '], extras: ' . (objToJson($extras) || 'null'). '}';
+           . '], extras: ' . (toJSON($extras) || 'null'). '}';
 }
 
 # Internal

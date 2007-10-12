@@ -7,11 +7,11 @@ use strict;
 
 use IWL::Script;
 use IWL::String qw(randomize escape);
+use IWL::JSON qw(toJSON);
 
 use base qw(IWL::Table);
 
 use Scalar::Util qw(weaken);
-use JSON;
 
 =head1 NAME
 
@@ -292,7 +292,7 @@ sub _realize {
     $options->{isAlternating}     = 1 if $self->{_options}{alternate};
     $options->{animate}           = 1 if $self->{_options}{animate};
     $options->{scrollToSelection} = 1 if $self->{_options}{scrollToSelection};
-    $options = objToJson($options);
+    $options = toJSON($options);
 
     $self->_set_alternate if $self->{_options}{alternate};
 
@@ -327,7 +327,7 @@ sub _refreshEvent {
 
     print '{rows: ['
            . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
-           . '], extras: ' . (objToJson($extras) || 'null'). '}';
+           . '], extras: ' . (toJSON($extras) || 'null'). '}';
 }
 
 # Internal

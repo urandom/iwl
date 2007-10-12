@@ -27,7 +27,6 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  JSON
   Scalar::Util
   Locale::Messages
   Locale::TextDomain

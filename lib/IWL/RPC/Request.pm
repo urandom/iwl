@@ -5,7 +5,7 @@ package IWL::RPC::Request;
 
 use strict;
 
-use JSON;
+use IWL::JSON qw(toJSON);
 
 =head1 NAME
 
@@ -116,7 +116,7 @@ sub registerEvent {
 sub _realizeEvents {
     my $self = shift;
 
-    $self->setAttribute('iwl:RPCEvents', objToJson($self->{_handlers}), 'escape')
+    $self->setAttribute('iwl:RPCEvents', toJSON($self->{_handlers}), 'escape')
         if $self->{_handlers};
 }
 

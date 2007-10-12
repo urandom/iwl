@@ -195,16 +195,16 @@ Object.extend(Object.extend(Button, Widget), {
     },
 
     _preInit: function(id, json) {
-	var script = $(id + '_noscript');
-	if (!script) {
-	    setTimeout(function () {this.create(id, json)}.bind(this), 500);
-	    return false;
-	}
-	var container = createHtmlElement(json.container, script.parentNode, script);
-	script.parentNode.removeChild(script);
-	if (!container) return;
-	this.current = $(container);
-	return true;
+        var script = $(id + '_noscript');
+        if (!script) {
+            setTimeout(function () {this.create(id, json)}.bind(this), 500);
+            return false;
+        }
+        var container = createHtmlElement(json.container, script.parentNode, script);
+        script.remove();
+        if (!container) return;
+        this.current = $(container);
+        return true;
     },
     _init: function(id, json) {
 	this.buttonParts = new Array;

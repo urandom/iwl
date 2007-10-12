@@ -9,7 +9,8 @@ use base 'IWL::Container';
 
 use IWL::Accordion::Page;
 use IWL::String qw(randomize);
-use JSON;
+use IWL::JSON qw(toJSON);
+
 use Scalar::Util qw(weaken);
 
 =head1 NAME
@@ -224,7 +225,7 @@ sub _realize {
 	toggleActive => $self->{_defaultClass} . '_page_title_selected',
 	content      => $self->{_defaultClass} . '_page_content'
     };
-    my $options  = objToJson($self->{_options});
+    my $options  = toJSON($self->{_options});
     my $text = <<EOF;
 var accordion_widget = \$('$id');
 accordion_widget.control = new accordion('#$id', $options);

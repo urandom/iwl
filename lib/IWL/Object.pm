@@ -8,10 +8,10 @@ use constant JSON_HEADER => "Content-type: application/json\nX-IWL: 1\n\n";
 use constant HTML_HEADER => "Content-type: text/html; charset=utf-8\n\n";
 
 use IWL::Config qw(%IWLConfig);
-
-use JSON;
-use Scalar::Util qw(weaken isweak);
+use IWL::JSON qw(toJSON);
 use IWL::String qw(encodeURI escapeHTML escape);
+
+use Scalar::Util qw(weaken isweak);
 
 # Used to detect looped networks and avoid infinite recursion.
 use vars qw(%cloneCache);
@@ -569,7 +569,7 @@ The corresponding JSON object will look like this:
 
 sub getJSON {
     my $self = shift;
-    my $json = objToJson($self->getObject);
+    my $json = toJSON($self->getObject);
 
     return $json;
 }

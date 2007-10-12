@@ -13,5 +13,5 @@ use IWL::Container;
 				id => 'foo'
 			}
 	});
-	is($span->getJSON, '{"tag":"span","attributes":{"class":"bar"}}');
+	is($span->getJSON, '{"tag": "span", "attributes": {"class": "bar"}}');
 }

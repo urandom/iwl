@@ -11,8 +11,6 @@ use IWL::Image;
 use IWL::Label;
 use IWL::String qw(randomize);
 
-use JSON;
-
 =head1 NAME
 
 IWL::Iconbox::Icon - an icon widget for the iconbox 
