@@ -42,6 +42,7 @@ lib/IWL/HBox.pm
 lib/IWL/Hidden.pm
 lib/IWL/Iconbox.pm
 lib/IWL/Iconbox/Icon.pm
+lib/IWL/IFrame.pm
 lib/IWL/Image.pm
 lib/IWL/Input.pm
 lib/IWL/InputButton.pm
@@ -308,6 +309,7 @@ t/30anchor.t
 t/30break.t
 t/30container.t
 t/30form.t
+t/30iframe.t
 t/30image.t
 t/30input.t
 t/30label.t

@@ -28,6 +28,7 @@ use IWL::Hidden;
 use IWL::HBox;
 use IWL::Iconbox::Icon;
 use IWL::Iconbox;
+use IWL::IFrame;
 use IWL::Image;
 use IWL::Input;
 use IWL::InputButton;

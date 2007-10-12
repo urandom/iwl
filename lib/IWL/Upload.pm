@@ -7,6 +7,7 @@ use strict;
 
 use IWL::Button;
 use IWL::File;
+use IWL::IFrame;
 use IWL::String qw(randomize);
 
 use base 'IWL::Form';
@@ -183,7 +184,7 @@ sub _setupDefaultClass {
 #
 sub __init {
     my ($self, %args) = @_;
-    my $frame  = IWL::Widget->new;
+    my $frame  = IWL::IFrame->new;
     my $file   = IWL::File->new;
     my $button = IWL::Button->new(size => 'medium');
     my $init   = IWL::Script->new;
@@ -202,7 +203,6 @@ sub __init {
     delete @args{qw(id)};
 
     $button->setLabel('Browse ...');
-    $frame->{_tag} = 'iframe';
     $file->_constructorArguments(%args);
     $self->requiredJs('base.js', 'upload.js', 'tooltip.js');
 
