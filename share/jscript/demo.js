@@ -198,11 +198,11 @@ function run_prototype_tests() {
         testPeriodicalAccelerator: function() { with(this) {
             var paEventCount = 0;
             function paEventFired(pa) {
-                if (++paEventCount > 5) pa.stop();
+                if (++paEventCount > 2) pa.stop();
             }
             var pa = new PeriodicalAccelerator(paEventFired, {frequency: 0.1, border: 0.001});
             wait(600, function() {
-                assertEqual(6, paEventCount);
+                assertEqual(3, paEventCount);
                 assert(pa.frequency < pa.options.frequency);
             });
         }},
