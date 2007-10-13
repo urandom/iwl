@@ -147,7 +147,7 @@ Object.extend(IWLRPC, (function() {
   }
 
   return {
-    registerEvent: function(element, eventName, url, params, options) {
+    registerEvent: function(element, eventName, url, originalParams, originalOptions) {
       if (!(element = $(element))) return;
       if (!('handlers' in element)) element['handlers'] = {};
       if (element['handlers'][eventName]) return;
@@ -159,14 +159,15 @@ Object.extend(IWLRPC, (function() {
           element['handlers'][eventName].ajaxRequest = null;
         }
 
-        params = Object.extend(params || {}, arguments[0]);
-        options = Object.extend(options || {}, arguments[1]);
+        var params = Object.extend(Object.extend({}, originalParams), arguments[0]);
+        var options = Object.extend(Object.extend({}, originalOptions), arguments[1]);
         if (options.onStart)
           eventStart(options.onStart).call(element, params);
         var disable = options.disableView ? disableView.bind(element, options.disableView) : Prototype.emptyFunction;
 
         if ('update' in options) {
           var updatee = $(options.update) || document.body;
+          options.update = true;
           options.evalScripts = !!options.evalScripts;
         }
         if (options.collectData) {
@@ -263,16 +264,32 @@ var ElementMethods = {
       element.style.top = (page_dim.height - dims.height)/2 + 'px';
     return element;
   },
-  changeClassName: function(element, oldClassName, newClassName) {
-    if (!(element = $(element))) return;
-    Element.classNames(element).change(oldClassName, newClassName);
-    return element;
+  getScrollDimensions: function(element) {
+    element = $(element);
+    var display = $(element).getStyle('display');
+    if (display != 'none' && display != null)
+      return {width: element.scrollWidth, height: element.scrollHeight};
+
+    var els = element.style;
+    var originalVisibility = els.visibility;
+    var originalPosition = els.position;
+    var originalDisplay = els.display;
+    els.visibility = 'hidden';
+    els.position = 'absolute';
+    els.display = 'block';
+    var originalWidth = element.scrollWidth;
+    var originalHeight = element.scrollHeight;
+    els.display = originalDisplay;
+    els.position = originalPosition;
+    els.visibility = originalVisibility;
+    return {width: originalWidth, height: originalHeight};
   },
+
   getScrollableParent: function(element) {
     if (!(element = $(element))) return;
     do {
+      var scroll = element.getScrollDimensions();
       var dims = element.getDimensions();
-      var scroll = {width: element.scrollWidth, height: element.scrollHeight};
       if (dims.width != scroll.width || dims.height != scroll.height)
 	break;
       element = element.up();
@@ -291,6 +308,8 @@ var ElementMethods = {
       return e.hasAttribute('name') ? e.readAttribute('name') : e.readAttribute('id');
     };
     var push_values = function(name, value) {
+      if (name === null || name == undefined)
+        return;
       if (params.keys().include(name))
 	params[name] = [params[name], value].flatten();
       else
@@ -298,7 +317,8 @@ var ElementMethods = {
     };
 
     sliders.each(function(s) {
-	push_values(valid_name(s), s.control.value);
+        if ('control' in s)
+          push_values(valid_name(s), s.control.value);
       });
     selects.each(function(s) {
 	push_values(valid_name(s), s.value);
@@ -364,13 +384,6 @@ var ElementMethods = {
 Element.addMethods(ElementMethods);
 Object.extend(Element, ElementMethods);
 
-Object.extend(Element.ClassNames.prototype, {
-  change: function(oldClassName, newClassName) {
-    this.set($A(this).map(function($_) {
-      return oldClassName === $_ ? newClassName : $_;
-    }).join(' '));
-  }
-});
 Object.extend(String.prototype, {
   createTextNode: function() {
     if (this == "")
@@ -395,6 +408,7 @@ Object.extend(String.prototype, {
 
 var PeriodicalAccelerator = Class.create((function () {
   function onTimerEvent() {
+    if (!this.callback) return;
     this.callback(this);
     if (this.frequency > this.options.border) {
       this.frequency /= this.acceleration;
@@ -405,7 +419,7 @@ var PeriodicalAccelerator = Class.create((function () {
   }
 
   return {
-    initialize: function(callback, frequency, acceleration) {
+    initialize: function(callback) {
       this.options = Object.extend({
         frequency: 1,
         acceleration: 0.1,
@@ -424,9 +438,10 @@ var PeriodicalAccelerator = Class.create((function () {
     },
 
     stop: function() {
-      if (!this.timer) return;
+      if (typeof this.timer != 'number') return;
       clearTimeout(this.timer);
       this.timer = null;
+      this.callback = null;
     }
   }
 })());
@@ -520,15 +535,15 @@ Object.extend(Date.prototype, {
     this.setTime(ret.getTime());
     return this;
   },
-  incrementMiliseconds: function(amount) {
+  incrementMilliseconds: function(amount) {
     var ret = new Date(this.getTime());
-    ret.setMiliseconds(ret.getMiliseconds() + (amount || 1));
+    ret.setMilliseconds(ret.getMilliseconds() + (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },
-  decrementMiliseconds: function(amount) {
+  decrementMilliseconds: function(amount) {
     var ret = new Date(this.getTime());
-    ret.setMiliseconds(ret.getMiliseconds() - (amount || 1));
+    ret.setMilliseconds(ret.getMilliseconds() - (amount || 1));
     this.setTime(ret.getTime());
     return this;
   },

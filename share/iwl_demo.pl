@@ -148,6 +148,21 @@ EOF
     }
 );
 
+# IWL RPC JavaScript unit tests
+$rpc->handleEvent(
+    'IWL-Object-testEvent',
+    sub {
+        my ($params, $id, $data) = @_;
+        if ($params->{foo}) {
+            return "\$('test_span').update('Test: $params->{test}, Foo: $params->{foo}')";
+        } elsif ($params->{text}) {
+            return "$params->{text}"
+        } elsif ($data && $data->{hidden} == 'foo') {
+            return "true";
+        }
+    }
+);
+
 if (my $file = $form{upload_file}) {
     my $name = $file->[1];
     IWL::Upload::printMessage("$name uploaded.");
@@ -164,7 +179,7 @@ if (my $file = $form{upload_file}) {
     my $notebook = IWL::Notebook->new(id => 'main_notebook');
     my $container = IWL::Container->new(id => 'content');
     my $style = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/demo.css');
-    my @scripts = (qw(demo.js));
+    my @scripts = (qw(demo.js dist/unittest.js));
     my $locale = IWL::Combo->new(id => 'locale');
 #    my @scripts = (qw(demo.js button.js iconbox.js tree.js contentbox.js druid.js notebook.js upload.js popup.js firebug/firebug.js));
 
@@ -202,6 +217,7 @@ sub build_tree {
     my $containers = IWL::Tree::Row->new(id => 'containers_row');
     my $misc = IWL::Tree::Row->new(id => 'misc_row');
     my $event = IWL::Tree::Row->new(id => 'event_row');
+    my $tests = IWL::Tree::Row->new(id => 'tests_row');
 
     $tree->appendHeader($header);
     $header->appendTextHeaderCell('Widgets');
@@ -218,11 +234,14 @@ sub build_tree {
     $tree->appendBody($event);
     $event->appendTextCell('IWL Events');
     $event->registerEvent('IWL-Tree-Row-expand', 'iwl_demo.pl');
+    $tree->appendBody($tests);
+    $tests->appendTextCell('JavaScript Unit tests');
 
     build_basic_widgets($basic_widgets);
     build_advanced_widgets($advanced_widgets);
     build_containers($containers);
     build_misc($misc);
+    build_tests($tests);
 }
 
 sub build_basic_widgets {
@@ -311,6 +330,16 @@ sub build_misc {
     $row->appendRow($file);
 
     register_row_event($file);
+}
+
+sub build_tests {
+    my $row       = shift;
+    my $prototype = IWL::Tree::Row->new(id => 'prototype_row');
+
+    $prototype->appendTextCell('Prototype extesions');
+    $row->appendRow($prototype);
+
+    register_row_event($prototype);
 }
 
 sub generate_buttons {
@@ -787,6 +816,16 @@ sub generate_rpc_pagecontrol {
     $content->appendChild(IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif'));
     $container->appendChild($content, $pager);
 
+    return $container->getObject;
+}
+
+sub generate_prototype {
+    my $container = IWL::Container->new(id => 'prototype_container');
+    my $testlog = IWL::Container->new(id => 'testlog');
+    my $script = IWL::Script->new;
+
+    $script->setScript("run_prototype_tests()");
+    $container->appendChild($testlog, $script);
     return $container->getObject;
 }
 
