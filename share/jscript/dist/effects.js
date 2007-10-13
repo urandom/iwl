@@ -1,4 +1,4 @@
-// script.aculo.us effects.js v1.8.0_pre1, Tue Sep 18 11:46:02 +0300 2007
+// script.aculo.us effects.js v1.8.0_pre1, Fri Oct 12 21:34:51 +0200 2007
 
 // Copyright (c) 2005-2007 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
 // Contributors:
@@ -167,7 +167,7 @@ Effect.DefaultOptions.transition = Effect.Transitions.sinoidal;
 
 /* ------------- core effects ------------- */
 
-Effect.ScopedQueue = Class.create({
+Effect.ScopedQueue = Class.create(Enumerable, {
   initialize: function() {
     this.effects  = [];
     this.interval = null;    
@@ -220,7 +220,6 @@ Effect.ScopedQueue = Class.create({
       this.effects[i] && this.effects[i].loop(timePos);
   }
 });
-Class.mixin(Effect.ScopedQueue, Enumerable);
 
 Effect.Queues = {
   instances: $H(),
@@ -708,13 +707,15 @@ Effect.SlideDown = function(element) {
 Effect.SlideUp = function(element) {
   element = $(element).cleanWhitespace();
   var oldInnerBottom = element.down().getStyle('bottom');
+  var elementDimensions = element.getDimensions();
   return new Effect.Scale(element, window.opera ? 0 : 1,
    Object.extend({ scaleContent: false, 
     scaleX: false, 
     scaleMode: 'box',
     scaleFrom: 100,
+    scaleMode: {originalHeight: elementDimensions.height, originalWidth: elementDimensions.width},
     restoreAfterFinish: true,
-    beforeStartInternal: function(effect) {
+    afterSetup: function(effect) {
       effect.element.makePositioned();
       effect.element.down().makePositioned();
       if (window.opera) effect.element.setStyle({top: ''});
@@ -725,8 +726,8 @@ Effect.SlideUp = function(element) {
         (effect.dims[0] - effect.element.clientHeight) + 'px' });
     },
     afterFinishInternal: function(effect) {
-      effect.element.hide().undoClipping().undoPositioned().setStyle({bottom: oldInnerBottom});
-      effect.element.down().undoPositioned();
+      effect.element.hide().undoClipping().undoPositioned();
+      effect.element.down().undoPositioned().setStyle({bottom: oldInnerBottom});
     }
    }, arguments[1] || { })
   );

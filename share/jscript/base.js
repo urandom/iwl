@@ -289,10 +289,10 @@ function displayStatusRemove() {
         status_bar.removeChild(status_bar.firstChild);
     }
     if (display_status_cnt-- <= 1) {
-        Effect.Fade(status_bar, {duration: 2,
-            queue: {position: 'start', scope: 'status_queue'}});
-        new Effect.Remove(status_bar, {
-            queue: {position: 'end', scope: 'status_queue'}});
+        Effect.Fade(status_bar, {duration: 2, afterFinish: function() {
+                if (status_bar.parentNode)
+                    status_bar.remove();
+            }});
     }
 }
 

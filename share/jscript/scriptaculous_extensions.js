@@ -48,35 +48,6 @@ Object.extend(Effect, {
   }
 });
 
-Effect.Remove = Class.create();
-Object.extend(Object.extend(Effect.Remove.prototype, Effect.Base.prototype), {
-  initialize: function(element) {
-    this.element = $(element);
-    if(!this.element) throw(Effect._elementDoesNotExistError);
-    var options = Object.extend({}, arguments[1] || {});
-    this.start(options);
-  },
-  finish: function() {
-    if (this.element.parentNode)
-      this.element.parentNode.removeChild(this.element);
-  }
-});
-
-if ('Resizer' in window) {
-    Object.extend(Resizer.prototype, {
-      eventDown: function(event) {
-	if (this.options.contentbox) {
-	  if (this.options.contentbox.current_pointe_position)
-	    this.resize = true;
-	  else
-	    this.resize = false;
-	} else {
-	  this.resize = true;
-	}
-      }
-    });
-}
-
 function $s(style) {
   var cssText = '', selector = style;
   $A(document.styleSheets).reverse().each(function(styleSheet) {
