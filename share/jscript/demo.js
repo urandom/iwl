@@ -125,9 +125,9 @@ function run_prototype_tests() {
             assertIdentical(document.body.parentNode, test_span.getScrollableParent());
 
             test_span.update();
-            test_span.appendChild(new Element('div', {style: 'width: 50px; height: 50px; overflow: auto;'}));
-            test_span.firstChild.appendChild(new Element('div', {style: 'width: 150px; height: 100px'}));
-            test_span.firstChild.firstChild.appendChild(new Element('div', {style: 'width: 10px; height: 5px'}));
+            test_span.appendChild(new Element('div', {style: 'width: 50px; height: 50px; overflow: auto;', id: 'first'}));
+            test_span.firstChild.appendChild(new Element('div', {style: 'width: 150px; height: 100px', id: 'second'}));
+            test_span.down(1).appendChild(new Element('div', {style: 'width: 10px; height: 5px', id: 'third'}));
             test_span.setStyle({visibility: 'hidden', display: 'block', position: 'absolute'});
             assertEqual(150, test_span.firstChild.getScrollDimensions().width);
             assertEqual(100, test_span.firstChild.getScrollDimensions().height);
@@ -138,11 +138,11 @@ function run_prototype_tests() {
             test_span.firstChild.appendChild(new Element('select', {name: 'select'})).appendChild(new Element('option', {value: 'foo'}));
             test_span.down(1).appendChild(new Element('input', {type: 'text', value: 'bar'}));
             test_span.down(2).appendChild(new Element('div', {className: 'slider', name: 'slider'})).control = {value: 'alpha'};
-            test_span.firstChild.appendChild(new Element('textarea', {id: 'textarea'})).value = 'Some\ntext';
+            test_span.firstChild.appendChild(new Element('textarea', {id: 'textarea'})).value = 'Some text';
             var params = test_span.getControlElementParams();
             assertInstanceOf(Hash, params);
             assert(!params.values().include('bar'));
-            assertEqual('Some\ntext', params['textarea']);
+            assertEqual('Some text', params['textarea']);
             assertEqual('foo', params['select']);
             assertEqual('alpha', params['slider']);
 
@@ -276,6 +276,26 @@ function run_prototype_tests() {
             assertEqual(35, date.getDayOfYear());
             assert(date.getTimezoneName().length > 0);
         }}
+    }, 'testlog');
+    tests.runTests.bind(tests).defer();
+}
+
+function run_scriptaculous_tests() {
+    var tests = new Test.Unit.Runner({
+        testEffects: function() { with(this) {
+            Effect.SmoothScroll();
+            assert(window.smoothScroll);
+
+            var paren = new Element('div', {style: 'width: 10px;height: 10px;position: absolute, visibility: hidden; overflow: auto;'});
+            var child = new Element('div', {style: 'top: 40px; width: 5px; height: 5px; position: relative;'});
+            paren.appendChild(child);
+            document.body.appendChild(paren);
+            assert(new Effect.ScrollElement(child, paren, {duration: 0.1}));
+
+            wait(250, function() {
+                assertEqual(35, paren.scrollTop);
+            });
+        }},
     }, 'testlog');
     tests.runTests.bind(tests).defer();
 }
