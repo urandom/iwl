@@ -56,9 +56,7 @@ function createHtmlElement(obj, paren, before_el) {
     if (obj.scripts) {
 	while (obj.scripts.length) {
 	    var script = obj.scripts.shift();
-	    if (!checkForExistingScript(script.attributes.src))
-		createHtmlElement(script,
-			document.getElementsByTagName('head')[0]);
+            document.insertScript(script.attributes.src);
 	}
     }
     if (!obj.tag) {
@@ -165,20 +163,6 @@ function createHtmlElement(obj, paren, before_el) {
     }
 
     return element;
-}
-
-/**
- * Used for checking whether a script tag with the same source already exists
- * @param src The source of the script
- * @returns True if such a script exists
- * */
-function checkForExistingScript(src) {
-    var scripts = document.getElementsByTagName('script');
-    for (var i = 0; i < scripts.length; i++) {
-	if (scripts[i].src.match(src + "$"))
-	    return true;
-    }
-    return false;
 }
 
 /* "Loading" message if there is object with id "disabled_view" in the page */

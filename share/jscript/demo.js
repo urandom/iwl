@@ -49,9 +49,6 @@ function run_prototype_tests() {
             });
             var trues = results[0], falses = results[1];
           
-            assert(trues.size() == 0 || trues.size() == 1, 
-                'There should be only one or no browser detected.');
-
             // we should have definite trues or falses here
             trues.each(function(result){
                     assert(result[1] === true);
@@ -275,6 +272,17 @@ function run_prototype_tests() {
             assertEqual(5, date.getWeek());
             assertEqual(35, date.getDayOfYear());
             assert(date.getTimezoneName().length > 0);
+        }},
+        testInsertScript: function() { with(this) {
+            var loaded = false;
+            var script = IWLConfig.JS_DIR + '/calendar.js';
+            document.insertScript(script,
+                {onComplete: function(url) { loaded = url; }});
+            wait(2000, function() {
+                assertEqual(script, loaded);
+                assertEqual('object', typeof window.Calendar);
+                window.Calendar = null;
+            });
         }}
     }, 'testlog');
     tests.runTests.bind(tests).defer();
@@ -295,7 +303,7 @@ function run_scriptaculous_tests() {
             wait(250, function() {
                 assertEqual(35, paren.scrollTop);
             });
-        }},
+        }}
     }, 'testlog');
     tests.runTests.bind(tests).defer();
 }

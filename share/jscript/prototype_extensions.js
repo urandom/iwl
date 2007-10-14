@@ -581,6 +581,55 @@ Object.extend(Date.prototype, {
   }
 });
 
+document.insertScript = (function () {
+  var scripts = $$('script').pluck('src');
+
+  return function(url) {
+    var options = Object.extend({
+      onComplete: Prototype.emptyFunction,
+      skipCache: false
+    }, arguments[1]);
+    if (options.skipCache) {
+      var query = $H({_: Math.random()});
+      var index = url.indexOf('?');
+      if (index != -1) {
+        query.merge(url.substr(index).toQueryParams());
+        url = url.substr(0, index);
+      }
+      url += '?' + query.toQueryString();
+    }
+    if (scripts.grep(url + "$").length) return;
+
+    var script = new Element('script', {type: 'text/javascript', charset: 'utf-8', defer: true});
+    var alreadyFired = false;
+    var stateChangedCallback = function() {
+      if (script.readyState && script.readyState != 'loaded' &&
+        script.readyState != 'complete')
+      return;
+      if (alreadyFired) return;
+      script.onreadystatechange = script.onload = null;
+      if (options.onComplete) options.onComplete(url);
+      $(script).remove();
+      alreadyFired = true;
+    };
+
+    script.onload = script.onreadystatechange = stateChangedCallback;
+    script.src = url;
+
+    document.getElementsByTagName('head').item(0).appendChild(script);
+
+    if (Prototype.Browser.WebKit && options.onComplete) {
+      var iframe = new Element('iframe', {style: "width: 0p;, height: 0px;", src: url});
+      document.getElementsByTagName('body').item(0).appendChild(iframe);
+
+      iframe.onload = function() {
+        stateChangedCallback();
+        $(iframe).remove();
+      }
+    }
+  }
+})();
+
 /* Abort works correctly in 1.6
 // Overload this, for aborting the request
 Object.extend(Ajax.Request.prototype, {
