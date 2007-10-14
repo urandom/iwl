@@ -162,7 +162,7 @@ function run_prototype_tests() {
                     {responseCallback: function(json) { eval(json.data) }}));
 
             wait(2000, function() {
-                assertEqual("Test: 1, Foo: bar", res1.innerHTML); 
+                assertEqual("Test: 1, Foo: bar", res1.innerHTML, "NOTE: Response might be slower than actual test run time"); 
                 assert(!cancelled.innerHTML);
 
                 test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
@@ -180,7 +180,7 @@ function run_prototype_tests() {
                     {text: 'Някакъв текст.'}, {update: res2}));
 
             wait(2000, function() {
-                assertEqual('Някакъв текст.', res2.innerHTML);
+                assertEqual('Някакъв текст.', res2.innerHTML, "NOTE: Response might be slower than actual test run time");
             });
         }},
         testIWLRPCEventCollect: function() { with(this) {
@@ -193,7 +193,7 @@ function run_prototype_tests() {
                     {}, {update: res3, collectData: true}));
 
             wait(2000, function() {
-                assertEqual('true', res3.innerHTML);
+                assertEqual('true', res3.innerHTML, "NOTE: Response might be slower than actual test run time");
             });
         }},
         testStrings: function() { with(this) {
@@ -215,7 +215,7 @@ function run_prototype_tests() {
             window.Menu = undefined;
             assertEqual("SCRIPT",
                 (('foo <script src="' + IWLConfig.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts())[1][0].tagName);
-            wait(2000, function() { assertEqual('object', typeof Menu); });
+            wait(2000, function() { assertEqual('object', typeof Menu, "NOTE: Response might be slower than actual test run time"); });
             window.evalScriptsCounter = undefined;
         }},
         testPeriodicalAccelerator: function() { with(this) {
@@ -225,7 +225,7 @@ function run_prototype_tests() {
             }
             var pa = new PeriodicalAccelerator(paEventFired, {frequency: 0.1, border: 0.001});
             wait(1000, function() {
-                assertEqual(3, paEventCount);
+                assertEqual(3, paEventCount, "NOTE: Response might be slower than actual test run time");
                 assert(pa.frequency < pa.options.frequency);
             });
         }},
@@ -279,9 +279,8 @@ function run_prototype_tests() {
             document.insertScript(script,
                 {onComplete: function(url) { loaded = url; }});
             wait(2000, function() {
-                assertEqual(script, loaded);
-                assertEqual('object', typeof window.Calendar);
-                window.Calendar = null;
+                assertEqual(script, loaded, "NOTE: Response might be slower than actual test run time");
+                assertEqual('object', typeof window.Calendar, "NOTE: Response might be slower than actual test run time");
             });
         }}
     }, 'testlog');
