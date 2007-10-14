@@ -55,14 +55,19 @@ function createHtmlElement(obj, paren, before_el) {
     if (!paren) return;
     if (obj.scripts) {
 	while (obj.scripts.length) {
-	    var script = obj.scripts.shift();
-            document.insertScript(script.attributes.src);
+	    var url = obj.scripts.shift().attributes.src;
+            if (!($$('script').pluck('src').grep(url + "$").length))
+                ++createHtmlElement.scriptURLs;
+            document.insertScript(url, {onComplete: createHtmlElement.addScript});
 	}
     }
     if (!obj.tag) {
 	if (obj.text === undefined || obj.text === null) return false;
 	if (paren.tagName.toLowerCase() == 'script') {
-	    setTimeout(tryEval.bind(this, obj.text), 200);
+            if (createHtmlElement.scriptURLs)
+                createHtmlElement.scripts.push(obj.text);
+            else
+                eval(obj.text);
 	    return true;
 	}
 	if (Prototype.Browser.IE) {
@@ -164,6 +169,15 @@ function createHtmlElement(obj, paren, before_el) {
 
     return element;
 }
+createHtmlElement.scriptURLs = 0;
+createHtmlElement.scripts = [];
+createHtmlElement.addScript = function() {
+    if (--createHtmlElement.scriptURLs > 0) return;
+    createHtmlElement.scripts.each(function(s) {
+        eval(s);
+    });
+    createHtmlElement.scripts = [];
+};
 
 /* "Loading" message if there is object with id "disabled_view" in the page */
 
@@ -385,15 +399,6 @@ function registerFocus(element) {
 function loseFocus(e) {
     if (!Event.checkElement(e, focused_widget))
 	focused_widget = null;
-}
-
-function tryEval(text, total) {
-    if (!total || total < 0) total = 0;
-    try {
-	eval(text);
-    } catch (e) {
-	setTimeout(function () {if (++total < 20) tryEval(text, total)}, 500);
-    }
 }
 
 var browser_css = function() {

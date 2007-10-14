@@ -582,7 +582,7 @@ Object.extend(Date.prototype, {
 });
 
 document.insertScript = (function () {
-  var scripts = $$('script').pluck('src');
+  var scripts = null;
 
   return function(url) {
     var options = Object.extend({
@@ -598,18 +598,19 @@ document.insertScript = (function () {
       }
       url += '?' + query.toQueryString();
     }
+    if (!scripts) scripts = $$('script').pluck('src');
     if (scripts.grep(url + "$").length) return;
+    scripts.push(url);
 
     var script = new Element('script', {type: 'text/javascript', charset: 'utf-8', defer: true});
     var alreadyFired = false;
     var stateChangedCallback = function() {
       if (script.readyState && script.readyState != 'loaded' &&
-        script.readyState != 'complete')
-      return;
+          script.readyState != 'complete')
+        return;
       if (alreadyFired) return;
       script.onreadystatechange = script.onload = null;
       if (options.onComplete) options.onComplete(url);
-      $(script).remove();
       alreadyFired = true;
     };
 
@@ -619,12 +620,14 @@ document.insertScript = (function () {
     document.getElementsByTagName('head').item(0).appendChild(script);
 
     if (Prototype.Browser.WebKit && options.onComplete) {
-      var iframe = new Element('iframe', {style: "width: 0p;, height: 0px;", src: url});
+      var version = navigator.appVersion.match(/Version\/(\d+)(?:[\d\.]*)/);
+      if (version[1] >= 3) return;
+      var iframe = new Element('iframe', {style: "display: none;", src: url});
       document.getElementsByTagName('body').item(0).appendChild(iframe);
 
       iframe.onload = function() {
         stateChangedCallback();
-        $(iframe).remove();
+        iframe.remove();
       }
     }
   }
