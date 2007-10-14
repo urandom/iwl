@@ -1,4 +1,4 @@
-use Test::More tests => 25;
+use Test::More tests => 28;
 
 use IWL::JSON ':all';
 
@@ -20,6 +20,7 @@ use IWL::JSON ':all';
     ok(isJSON('[1,2,"asd", "basd", 6123, {}]'));
     ok(isJSON('{"a": 1, "b": "foo", "c": [1,2,3], "d": {"A": 1, "B": 2}}'));
     ok(isJSON('{"foo": [1,2, true], "bar": {"1": null, "2": true, "3": false}}'));
+    ok(!isJSON("{}); fail 'malicious attack;';("));
 }
 
 {
@@ -71,4 +72,6 @@ use IWL::JSON ':all';
     is_deeply(evalJSON('{"a": "$a = 1"}', 1), {a => '$a = 1'});
 
     is_deeply(evalJSON('[eval("16"), 2]'), [16, 2]);
+    is('malicious attack;', evalJSON('); return "malicious attack;";('));
+    is('', evalJSON('); return "malicious attack;";(', 1));
 }

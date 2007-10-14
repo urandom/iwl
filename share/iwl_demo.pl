@@ -154,11 +154,14 @@ $rpc->handleEvent(
     sub {
         my ($params, $id, $data) = @_;
         if ($params->{foo}) {
-            return "\$('test_span').update('Test: $params->{test}, Foo: $params->{foo}')";
+            return "\$('res1').update('Test: $params->{test}, Foo: $params->{foo}')";
         } elsif ($params->{text}) {
             return "$params->{text}"
         } elsif ($data && $data->{hidden} == 'foo') {
             return "true";
+        } elsif ($params->{cancel}) {
+            sleep 1;
+            return "Yes, I am cancelled";
         }
     }
 );

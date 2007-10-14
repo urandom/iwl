@@ -194,21 +194,18 @@ Object.extend(IWLRPC, (function() {
             parameters: {IWLEvent: Object.toJSON({eventName: eventName, params: params, options: options})}
           });
         } else {
-          var onComplete = options.onComplete ? function(or) {
-            if (options.responseCallback && typeof options.responseCallback === 'function') 
-              options.responseCallback.call(element, {}, params, options);
-            var callback = eventCompletion(options.onComplete);
-            callback.call(element, {}, params, options);
-            eventFinalize(element, eventName, options);
-          } : function() {
-            if (options.responseCallback && typeof options.responseCallback === 'function') 
-              options.responseCallback.call(element, {}, params, options);
-            eventFinalize(element, eventName, options);
-          };
           element['handlers'][eventName].ajaxRequest = new Ajax.Updater(updatee, url, {
             onException: exceptionHandler,
             onLoading: disable,
-            onComplete: onComplete,
+            onComplete: function(or) {
+              if (options.responseCallback && typeof options.responseCallback === 'function') 
+                options.responseCallback.call(element, {}, params, options);
+              if (options.onComplete) {
+                var callback = eventCompletion(options.onComplete);
+                callback.call(element, {}, params, options);
+              }
+              eventFinalize(element, eventName, options);
+            },
             insertion: options.insertion || false,
             evalScripts: options.evalScripts || false,
             parameters: {IWLEvent: Object.toJSON({eventName: eventName, params: params, options: options})}

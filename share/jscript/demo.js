@@ -38,7 +38,7 @@ function run_prototype_tests() {
 
         },
         teardown: function() {
-            $('test_span').remove();
+            test_span.remove();
         },
 
         testBrowserDetection: function() { with(this) {
@@ -151,27 +151,53 @@ function run_prototype_tests() {
             test_span.appendChild(new Element('div', {id: 15}));
             assert($(15));
         }},
-        testIWLRPC: function() { with(this) {
+        testIWLRPCEventCancel: function() { with(this) {
+            var res1 = new Element('div', {id: 'res1'}), cancelled = new Element('div', {id: 'cancelled'});
+            test_span.appendChild(res1);
+            test_span.appendChild(cancelled);
+
             assertIdentical(test_span, test_span.registerEvent('IWL-Object-testEvent',
                     'iwl_demo.pl', {test: 1}));
             assert(test_span.hasEvent('IWL-Object-testEvent'));
-            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent', {foo: 'bar'},
-                    {responseCallback: function(json) {eval(json.data)}}));
-            wait(1500, function() { assertEqual("Test: 1, Foo: bar", test_span.innerHTML); });
-
             assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {text: 'Някакъв текст.'}, {update: test_span}));
-            wait(1500, function() { assertEqual('Някакъв текст.', test_span.innerHTML); });
+                    {cancel: 'Am I cancelled?'}, {update: cancelled}));
+            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent', {foo: 'bar'},
+                    {responseCallback: function(json) { eval(json.data) }}));
+
+            wait(2000, function() {
+                assertEqual("Test: 1, Foo: bar", res1.innerHTML); 
+                assert(!cancelled.innerHTML);
+
+                test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
+                assertIdentical(test_span, test_span.prepareEvents());
+                assert(test_span.hasEvent('IWL-Object-testEvent2'));
+                assert(test_span.preparedEvents);
+            });
+        }},
+        testIWLRPCEventUpdate: function() { with(this) {
+            var res2 = new Element('div', {id: 'res2'});
+            test_span.appendChild(res2);
+
+            test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
+            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
+                    {text: 'Някакъв текст.'}, {update: res2}));
+
+            wait(2000, function() {
+                assertEqual('Някакъв текст.', res2.innerHTML);
+            });
+        }},
+        testIWLRPCEventCollect: function() { with(this) {
+            var res3 = new Element('div', {id: 'res3'});
+            test_span.appendChild(res3);
 
             test_span.appendChild(new Element('input', {type: 'hidden', name: 'hidden', value: 'foo'}));
+            test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
             assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {}, {update: test_span, collectData: true}));
-            wait(1500, function() { assertEqual('true', test_span.innerHTML); });
+                    {}, {update: res3, collectData: true}));
 
-            test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
-            assertIdentical(test_span, test_span.prepareEvents());
-            assert(test_span.hasEvent('IWL-Object-testEvent2'));
-            assert(test_span.preparedEvents);
+            wait(2000, function() {
+                assertEqual('true', res3.innerHTML);
+            });
         }},
         testStrings: function() { with(this) {
             var text_node = "".createTextNode();
@@ -192,7 +218,7 @@ function run_prototype_tests() {
             window.Menu = undefined;
             assertEqual("SCRIPT",
                 (('foo <script src="' + IWLConfig.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts())[1][0].tagName);
-            wait(1500, function() { assertEqual('object', typeof Menu); });
+            wait(2000, function() { assertEqual('object', typeof Menu); });
             window.evalScriptsCounter = undefined;
         }},
         testPeriodicalAccelerator: function() { with(this) {
@@ -201,7 +227,7 @@ function run_prototype_tests() {
                 if (++paEventCount > 2) pa.stop();
             }
             var pa = new PeriodicalAccelerator(paEventFired, {frequency: 0.1, border: 0.001});
-            wait(600, function() {
+            wait(1000, function() {
                 assertEqual(3, paEventCount);
                 assert(pa.frequency < pa.options.frequency);
             });
