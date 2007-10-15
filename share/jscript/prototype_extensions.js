@@ -305,7 +305,7 @@ var ElementMethods = {
       return e.hasAttribute('name') ? e.readAttribute('name') : e.readAttribute('id');
     };
     var push_values = function(name, value) {
-      if (name === null || name == undefined)
+      if (name === null || name == undefined || name == '')
         return;
       if (params.keys().include(name))
 	params[name] = [params[name], value].flatten();
