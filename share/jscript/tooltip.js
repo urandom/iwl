@@ -27,15 +27,6 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         container.appendChild(content);
         container.style.display = 'none';
 
-        var script = $(id + '_script');
-        pivot = $(this.options.pivot);
-        if (script)
-            script.parentNode.appendChild(container);
-        else if (pivot)
-            pivot.parentNode.appendChild(container);
-        else
-            document.body.appendChild(container);
-
         if (this.options.followMouse) {
             container.setStyle({marginTop: '5px'});
             Event.observe(document, 'mousemove', move.bindAsEventListener(container), false);
@@ -46,6 +37,25 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         this.bubbles = new Array(bubble1, bubble2, bubble3);
 
         return this;
+    }
+
+    function append() {
+        var script = $(this.id + '_script');
+        pivot = $(this.options.pivot);
+        if (pivot)
+            var parent_node = pivot.parentNode;
+        else if (script)
+            var parent_node = script.parentNode;
+        else
+            var parent_node = document.body;
+
+        parent_node.appendChild(this);
+        if (this.options.content)
+            this.setContent(this.options.content);
+        if (this.options.bind)
+            this.bindToWidget.apply(this, this.options.bind);
+        if (this.options.bindHide)
+            this.bindHideToWidget.apply(this, this.options.bindHide);
     }
 
     function draw(x, y) {
@@ -269,7 +279,10 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
                 centerOnElement: true,
                 hidden: false,
                 pivot: false,
-                followMouse: false
+                followMouse: false,
+                content: false,
+                bind: false,
+                bindHide: false
             }, arguments[1] || {})
             if (!id) id = 'tooltip' + Math.random();
             build.call(this, id);
@@ -278,6 +291,12 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         _init: function() {
             if (parseInt(this.options.width))
                 this.options.width = parseInt(this.options.width) + 'px';
+
+            if (window.loaded)
+                append.call(this);
+            else
+                Event.signalConnect(window, 'load', append.bind(this));
+
             draw.call(this);
         }
     }

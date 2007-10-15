@@ -159,16 +159,16 @@ sub _realize {
     $self->{__content} = escape($self->{__contentObject}->getContent) if $self->{__contentObject};
 
     $self->{_options}{hidden} = 1;
+    $self->{_options}{content} = $self->{__content} if $self->{__content};
+    $self->{_options}{bind} =
+      [$self->{__bound}, $self->{__bindSignal}, $self->{__boundToggle}] if $self->{__bound};
+    $self->{_options}{bindHide} =
+      [$self->{__boundHide}, $self->{__bindHideSignal}] if $self->{__boundHide};
 
     $options = toJSON($self->{_options});
     $self->setId($id . '_script');
     $self->SUPER::_realize;
     $self->setScript("Tooltip.create('$id', $options);");
-    $self->appendScript("\$('$id').setContent('$self->{__content}')") if $self->{__content};
-    $self->appendScript("\$('$id').bindToWidget('$self->{__bound}', '$self->{__bindSignal}', $self->{__boundToggle});")
-      if $self->{__bound};
-    $self->appendScript("\$('$id').bindHideToWidget('$self->{__boundHide}', '$self->{__bindHideSignal}');")
-      if $self->{__boundHide};
 }
 
 # Internal
