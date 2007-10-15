@@ -7,6 +7,9 @@ Event.signalConnect(window, "load", function () {
 	Event.signalConnect(document.body, "click", loseFocus);
 });
 
+if (!window.IWL)
+    var IWL = {};
+
 /**
  * @class Widget is the base class for all IWL widgets
  *
@@ -14,8 +17,7 @@ Event.signalConnect(window, "load", function () {
  * @param id The element to transform into a widget
  * @returns The created widget
  * */
-var Widget = {};
-Widget = {
+IWL.Widget = {
     create: function(id) {
 	this.current = $(id);
 	if (this._preInit)
@@ -48,7 +50,7 @@ Widget = {
  *
  * @returns The created element or 'true', if the element is a text node
  * */
-function createHtmlElement(obj, paren, before_el) {
+IWL.createHtmlElement = function(obj, paren, before_el) {
     var element;
     var flags = {disabled: true, multiple: true};
     if (!obj) return;
@@ -57,15 +59,15 @@ function createHtmlElement(obj, paren, before_el) {
 	while (obj.scripts.length) {
 	    var url = obj.scripts.shift().attributes.src;
             if (!($$('script').pluck('src').grep(url + "$").length))
-                ++createHtmlElement.scriptURLs;
-            document.insertScript(url, {onComplete: createHtmlElement.addScript});
+                ++IWL.createHtmlElement.scriptURLs;
+            document.insertScript(url, {onComplete: IWL.createHtmlElement.addScript});
 	}
     }
     if (!obj.tag) {
 	if (obj.text === undefined || obj.text === null) return false;
 	if (paren.tagName.toLowerCase() == 'script') {
-            if (createHtmlElement.scriptURLs)
-                createHtmlElement.scripts.push(obj.text);
+            if (IWL.createHtmlElement.scriptURLs)
+                IWL.createHtmlElement.scripts.push(obj.text);
             else
                 eval(obj.text);
 	    return true;
@@ -151,32 +153,26 @@ function createHtmlElement(obj, paren, before_el) {
     }
     if (obj.children) {
 	for (var i = 0; i < obj.children.length; i++) {
-	    createHtmlElement(obj.children[i], element);
+	    IWL.createHtmlElement(obj.children[i], element);
 	}
     }
 
-    if (obj.after_objects) {
-	for (var i = 0; i < obj.after_objects.length; i++) {
-	    createHtmlElement(obj.after_objects[i], paren);
-	}
-    }
-
-    if (obj.js_exec) {
-	for (var i = 0; i < obj.js_exec.length; i++) {
-	    createHtmlElement(obj.js_exec[i], document.body);
+    if (obj.tailObjects) {
+	for (var i = 0; i < obj.tailObjects.length; i++) {
+	    IWL.createHtmlElement(obj.tailObjects[i], paren);
 	}
     }
 
     return element;
 }
-createHtmlElement.scriptURLs = 0;
-createHtmlElement.scripts = [];
-createHtmlElement.addScript = function() {
-    if (--createHtmlElement.scriptURLs > 0) return;
-    createHtmlElement.scripts.each(function(s) {
+IWL.createHtmlElement.scriptURLs = 0;
+IWL.createHtmlElement.scripts = [];
+IWL.createHtmlElement.addScript = function() {
+    if (--IWL.createHtmlElement.scriptURLs > 0) return;
+    IWL.createHtmlElement.scripts.each(function(s) {
         eval(s);
     });
-    createHtmlElement.scripts = [];
+    IWL.createHtmlElement.scripts = [];
 };
 
 /* "Loading" message if there is object with id "disabled_view" in the page */
@@ -412,3 +408,7 @@ var browser_css = function() {
     var h = $(document.getElementsByTagName('html')[0]);
     h.addClassName(class_name);
 }();
+
+/* Deprecated */
+var Widget = IWL.Widget;
+var createHtmlElement = IWL.createHtmlElement;

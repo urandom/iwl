@@ -31,7 +31,7 @@ function sortTheMoney(col_index) {
 
 function run_prototype_tests() {
     var test_span;
-    var tests = new Test.Unit.Runner({
+    new Test.Unit.Runner({
         setup: function() {
             test_span = new Element('span', {style: "display: none", id: 'test_span'});
             $('testlog').parentNode.appendChild(test_span);
@@ -297,7 +297,7 @@ function run_prototype_tests() {
 }
 
 function run_scriptaculous_tests() {
-    var tests = new Test.Unit.Runner({
+    new Test.Unit.Runner({
         testDelayTest: function() { with(this) {
             delay(function() { assert(true) });
             setTimeout(function() {this.proceed()}.bind(this), 1000);
@@ -315,6 +315,57 @@ function run_scriptaculous_tests() {
             wait(250, function() {
                 assertEqual(35, paren.scrollTop);
                 paren.remove();
+            });
+        }}
+    }, 'testlog');
+}
+
+function run_base_tests() {
+    new Test.Unit.Runner({
+        testIWLConfig: function() { with(this) {
+            assert(IWL.Config);
+            assert(Object.isString(IWL.Config.SKIN) && IWL.Config.SKIN);
+            assert(Object.isString(IWL.Config.SKIN_DIR) && IWL.Config.SKIN_DIR);
+            assert(Object.isString(IWL.Config.IMAGE_DIR) && IWL.Config.IMAGE_DIR);
+            assert(Object.isString(IWL.Config.ICON_DIR) && IWL.Config.ICON_DIR);
+            assert(Object.isString(IWL.Config.ICON_EXT) && IWL.Config.ICON_EXT);
+            assert(Object.isString(IWL.Config.JS_DIR) && IWL.Config.JS_DIR);
+            assert(Object.isNumber(IWL.Config.STRICT_LEVEL) && IWL.Config.STRICT_LEVEL >= 1);
+        }},
+        testIWLcreateHTMLElement: function() { with(this) {
+            var obj = {
+                scripts: [{
+                    tag: 'script', attributes: {
+                        src: '/js/iconbox.js', type: 'text/javascript'
+                    }
+                }],
+                tailObjects: [{tag: 'span', children: [{text: 'foo'}]}],
+                text:'bar', tag:'div', children: [{
+                    tag: 'p', text: 'Lorem ipsum', attributes: {
+                        style: {'text-align': 'center', 'font-weight': 'bold'}
+                    }
+                }],
+                attributes: {class: 'foo', id: 'bar', 'iwl:fooBar': 'alpha'}
+            };
+            var element = IWL.createHtmlElement(obj, $('testlog'));
+
+            assert(Object.isElement(element));
+            assertEqual('DIV', element.tagName);
+            assertEqual('barLorem ipsum', element.getText());
+            assertEqual('foo', element.className);
+            assertEqual('bar', element.id);
+            assertEqual('alpha', element.readAttribute('iwl:fooBar'));
+            assertEqual('P', element.down().tagName);
+            assertEqual('Lorem ipsum', element.down().getText());
+            assertEqual('center', element.down().getStyle('text-align'));
+            assertEqual('bold', element.down().getStyle('font-weight'));
+            assertEqual('SPAN', element.next().tagName);
+            assertEqual('foo', element.next().getText());
+
+            wait(1000, function() {
+                assert(Iconbox);
+                element.next().remove();
+                element.remove();
             });
         }}
     }, 'testlog');

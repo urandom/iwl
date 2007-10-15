@@ -338,13 +338,16 @@ sub build_tests {
     my $row           = shift;
     my $prototype     = IWL::Tree::Row->new(id => 'prototype_row');
     my $scriptaculous = IWL::Tree::Row->new(id => 'scriptaculous_row');
+    my $base = IWL::Tree::Row->new(id => 'base_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
     $scriptaculous->appendTextCell('Scriptaculous extesions');
     $row->appendRow($scriptaculous);
+    $base->appendTextCell('Base');
+    $row->appendRow($base);
 
-    register_row_event($prototype, $scriptaculous);
+    register_row_event($prototype, $scriptaculous, $base);
 }
 
 sub generate_buttons {
@@ -840,6 +843,16 @@ sub generate_scriptaculous {
     my $script = IWL::Script->new;
 
     $script->setScript("run_scriptaculous_tests()");
+    $container->appendChild($testlog, $script);
+    return $container->getObject;
+}
+
+sub generate_base {
+    my $container = IWL::Container->new(id => 'base_container');
+    my $testlog = IWL::Container->new(id => 'testlog');
+    my $script = IWL::Script->new;
+
+    $script->setScript("run_base_tests()");
     $container->appendChild($testlog, $script);
     return $container->getObject;
 }

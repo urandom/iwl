@@ -283,7 +283,8 @@ sub __init {
     $self->requiredJs('dist/prototype.js', 'dist/scriptaculous.js', 'base.js');
 
     my $script = IWL::Script->new;
-    $script->appendScript("window.IWLConfig = " . toJSON(\%IWLConfig) . ";");
+    $script->appendScript("if (!window.IWL) window.IWL = {};" .
+                          "window.IWLConfig = IWL.Config = " . toJSON(\%IWLConfig) . ";");
     $head->appendChild($script);
 
     $head->appendChild($skin);

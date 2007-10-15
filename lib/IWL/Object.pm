@@ -505,7 +505,6 @@ sub getObject {
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
 	  || $self->{_ignore});
 
-      # can't add scripts on the fly with dom. buggy browser
     foreach (@{$self->{_requiredJs}}) {
 	next if exists $initialized_js{$_->[0]};
 	$initialized_js{$_->[0]} = 1;
@@ -545,7 +544,7 @@ sub getObject {
     $json->{children} = $children if @$children;
     $json->{tag} = $self->{_tag} if $self->{_tag};
     $json->{text} = $self->{_textContent} if defined $self->{_textContent};
-    $json->{after_objects} = $objects if @$objects;
+    $json->{tailObjects} = $objects if @$objects;
     $json->{scripts} = $scripts if @$scripts;
 
     return $json;
