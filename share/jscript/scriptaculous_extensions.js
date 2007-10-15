@@ -63,4 +63,3 @@ Object.extend(Ajax.Autocompleter.prototype, {
     Element.show(this.iefix);
   }
 });
-

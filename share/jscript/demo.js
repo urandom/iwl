@@ -159,9 +159,9 @@ function run_prototype_tests() {
             assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
                     {cancel: 'Am I cancelled?'}, {update: cancelled}));
             assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent', {foo: 'bar'},
-                    {responseCallback: function(json) { eval(json.data) }}));
+                    {responseCallback: function(json) { eval(json.data); this.proceed() }.bind(this)}));
 
-            wait(2000, function() {
+            delay(function() {
                 assertEqual("Test: 1, Foo: bar", res1.innerHTML, "NOTE: Response might be slower than actual test run time"); 
                 assert(!cancelled.innerHTML);
 
@@ -177,10 +177,13 @@ function run_prototype_tests() {
 
             test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
             assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {text: 'Някакъв текст.'}, {update: res2}));
+                    {text: 'Някакъв текст.'}, {
+                        update: res2,
+                        responseCallback: function() {this.proceed()}.bind(this)
+                    }));
 
-            wait(2000, function() {
-                assertEqual('Някакъв текст.', res2.innerHTML, "NOTE: Response might be slower than actual test run time");
+            delay(function() {
+                assertEqual('Някакъв текст.', res2.innerHTML);
             });
         }},
         testIWLRPCEventCollect: function() { with(this) {
@@ -190,10 +193,14 @@ function run_prototype_tests() {
             test_span.appendChild(new Element('input', {type: 'hidden', name: 'hidden', value: 'foo'}));
             test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
             assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {}, {update: res3, collectData: true}));
+                    {}, {
+                        update: res3,
+                        collectData: true,
+                        responseCallback: function() {this.proceed()}.bind(this)
+                    }));
 
-            wait(2000, function() {
-                assertEqual('true', res3.innerHTML, "NOTE: Response might be slower than actual test run time");
+            delay(function() {
+                assertEqual('true', res3.innerHTML);
             });
         }},
         testStrings: function() { with(this) {
@@ -215,17 +222,20 @@ function run_prototype_tests() {
             window.Menu = undefined;
             assertEqual("SCRIPT",
                 (('foo <script src="' + IWLConfig.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts())[1][0].tagName);
-            wait(2000, function() { assertEqual('object', typeof Menu, "NOTE: Response might be slower than actual test run time"); });
+            wait(2000, function() { assertEqual('object', typeof Menu); });
             window.evalScriptsCounter = undefined;
         }},
         testPeriodicalAccelerator: function() { with(this) {
             var paEventCount = 0;
-            function paEventFired(pa) {
-                if (++paEventCount > 2) pa.stop();
-            }
+            paEventFired = function(pa) {
+                if (++paEventCount > 2) {
+                    pa.stop();
+                    this.proceed();
+                }
+            }.bind(this);
             var pa = new PeriodicalAccelerator(paEventFired, {frequency: 0.1, border: 0.001});
-            wait(1000, function() {
-                assertEqual(3, paEventCount, "NOTE: Response might be slower than actual test run time");
+            delay(function() {
+                assertEqual(3, paEventCount);
                 assert(pa.frequency < pa.options.frequency);
             });
         }},
@@ -277,23 +287,26 @@ function run_prototype_tests() {
             var loaded = false;
             var script = IWLConfig.JS_DIR + '/calendar.js';
             document.insertScript(script,
-                {onComplete: function(url) { loaded = url; }});
-            wait(2000, function() {
+                {onComplete: function(url) { loaded = url; this.proceed()}.bind(this)});
+            delay(function() {
                 assertEqual(script, loaded, "NOTE: Response might be slower than actual test run time");
                 assertEqual('object', typeof window.Calendar, "NOTE: Response might be slower than actual test run time");
             });
         }}
     }, 'testlog');
-    tests.runTests.bind(tests).defer();
 }
 
 function run_scriptaculous_tests() {
     var tests = new Test.Unit.Runner({
+        testDelayTest: function() { with(this) {
+            delay(function() { assert(true) });
+            setTimeout(function() {this.proceed()}.bind(this), 1000);
+        }},
         testEffects: function() { with(this) {
             Effect.SmoothScroll();
             assert(window.smoothScroll);
 
-            var paren = new Element('div', {style: 'width: 10px;height: 10px;position: absolute, visibility: hidden; overflow: auto;'});
+            var paren = new Element('div', {style: 'width: 10px;height: 10px;position: absolute; visibility: hidden; overflow: auto;'});
             var child = new Element('div', {style: 'top: 40px; width: 5px; height: 5px; position: relative;'});
             paren.appendChild(child);
             document.body.appendChild(paren);
@@ -301,8 +314,8 @@ function run_scriptaculous_tests() {
 
             wait(250, function() {
                 assertEqual(35, paren.scrollTop);
+                paren.remove();
             });
         }}
     }, 'testlog');
-    tests.runTests.bind(tests).defer();
 }

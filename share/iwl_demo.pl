@@ -182,9 +182,8 @@ if (my $file = $form{upload_file}) {
     my $notebook = IWL::Notebook->new(id => 'main_notebook');
     my $container = IWL::Container->new(id => 'content');
     my $style = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/demo.css');
-    my @scripts = (qw(demo.js dist/unittest.js));
+    my @scripts = (qw(demo.js dist/unittest.js unittest_extensions.js));
     my $locale = IWL::Combo->new(id => 'locale');
-#    my @scripts = (qw(demo.js button.js iconbox.js tree.js contentbox.js druid.js notebook.js upload.js popup.js firebug/firebug.js));
 
     $page->appendChild($hbox);
     $page->appendHeader($style);

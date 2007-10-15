@@ -283,6 +283,7 @@ share/jscript/spinner.js
 share/jscript/tags
 share/jscript/tooltip.js
 share/jscript/tree.js
+share/jscript/unittest_extensions.js
 share/jscript/upload.js
 share/skin/demo.css
 share/skin/ie.css
