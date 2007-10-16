@@ -437,6 +437,29 @@ function run_base_tests() {
                     assert(!$('status_bar'), 'Removed duration status');
                 });
             });
+        }},
+        testExceptionHandler: function() { with(this) {
+            var console = Object.extend({}, window.console);
+            window.console = null;
+
+            IWL.exceptionHandler(null, new Error('Some error'));
+            assert($('status_bar'));
+            assertEqual('Error message: Some error', $('status_bar').firstChild.nodeValue);
+            [1,2,3].each(function() {
+                IWL.removeStatus();
+            });
+            window.console = console;
+        }},
+        testBrowserCss: function() { with(this) {
+            var html = $$('html')[0];
+            var b = Prototype.Browser;
+            var class_name = b.IE7    ? 'ie7' :
+                             b.IE     ? 'ie' :
+                             b.Opera  ? 'opera' :
+                             b.WebKit ? 'webkit' :
+                             b.KHTML  ? 'khtml' :
+                             b.Gecko  ? 'gecko' : 'other';
+            assert(html.hasClassName(class_name));
         }}
     }, 'testlog');
 }

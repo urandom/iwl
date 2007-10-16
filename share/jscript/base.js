@@ -59,7 +59,7 @@ Object.extend(IWL, {RPC: (function() {
 
               if (typeof options.update === 'undefined') {
                   element['handlers'][eventName].ajaxRequest = new Ajax.Request(url, {
-                      onException: exceptionHandler,
+                      onException: IWL.exceptionHandler,
                       onLoading: disable,
                       onComplete: function(or) {
                           var json = or.responseJSON;
@@ -78,7 +78,7 @@ Object.extend(IWL, {RPC: (function() {
                   });
               } else {
                   element['handlers'][eventName].ajaxRequest = new Ajax.Updater(updatee, url, {
-                      onException: exceptionHandler,
+                      onException: IWL.exceptionHandler,
                       onLoading: disable,
                       onComplete: function(or) {
                           if (options.responseCallback && typeof options.responseCallback === 'function') 
@@ -403,6 +403,7 @@ Object.extend(IWL, (function() {
             var options = Object.extend({
                 duration: 10
             }, arguments[1]);
+            text = text.toString();
             if (display_status_cnt++) {
                 var status_bar = $('status_bar');
                 if (!status_bar) {
@@ -445,11 +446,11 @@ Object.extend(IWL, (function() {
 })());
 
 /**
- * The exceptionHandler used when AJAX calls throw an error
+ * The IWL.exceptionHandler used when AJAX calls throw an error
  * @param 0 unused
  * @param error The error being thrown
  * */
-function exceptionHandler () {
+IWL.exceptionHandler = function() {
     IWL.enableView();
     if (window.console) {
 	console.dir(arguments[1]);
@@ -499,17 +500,17 @@ function loseFocus(e) {
 	focused_widget = null;
 }
 
-var browser_css = function() {
+(function() {
     var b = Prototype.Browser;
-    var class_name = b.IE7 ? 'ie7' :
-		  b.IE     ? 'ie' :
-		  b.Opera  ? 'opera' :
-		  b.KHTML  ? 'khtml' :
-		  b.WebKit ? 'webkit' :
-		  b.Gecko  ? 'gecko' : 'other';
+    var class_name = b.IE7    ? 'ie7' :
+		     b.IE     ? 'ie' :
+		     b.Opera  ? 'opera' :
+		     b.WebKit ? 'webkit' :
+		     b.KHTML  ? 'khtml' :
+		     b.Gecko  ? 'gecko' : 'other';
     var h = $(document.getElementsByTagName('html')[0]);
     h.addClassName(class_name);
-}();
+})();
 
 /* Deprecated */
 var Widget = IWL.Widget;
@@ -521,3 +522,4 @@ var displayStatusRemove = IWL.removeStatus;
 var checkElementValue = Element.checkElementValue;
 var IWLRPC = IWL.RPC;
 var IWLConfig = IWL.Config;
+var exceptionHandler = IWL.exceptionHandler;
