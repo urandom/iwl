@@ -1,7 +1,7 @@
 document.observe('contentloaded', demo_init);
 
 function demo_init () {
-    displayStatus('To display a widget demo, double click its row');
+    IWL.displayStatus('To display a widget demo, double click its row');
 }
 
 function activate_widgets_response(json) {
@@ -133,20 +133,30 @@ function run_prototype_tests() {
             assertEqual((document.viewport.getWidth() - test_span.getWidth()) / 2 + 'px', test_span.getStyle('left'));
 
             test_span.firstChild.appendChild(new Element('select', {name: 'select'})).appendChild(new Element('option', {value: 'foo'}));
-            test_span.down(1).appendChild(new Element('input', {type: 'text', value: 'bar'}));
-            test_span.down(2).appendChild(new Element('div', {className: 'slider', name: 'slider'})).control = {value: 'alpha'};
+            test_span.down(1).appendChild(new Element('input', {type: 'text', value: 0.17}));
+            test_span.down(2).appendChild(new Element('div', {className: 'slider', name: 'slider'})).control = {value: 0.26};
             test_span.firstChild.appendChild(new Element('textarea', {id: 'textarea'})).value = 'Some text';
             var params = test_span.getControlElementParams();
             assertInstanceOf(Hash, params, 'Params hash');
-            assert(!params.values().include('bar'), 'Doesn\'t have unnamed elements');
+            assert(!params.values().include(0.17), 'Doesn\'t have unnamed elements');
             assertEqual('Some text', params['textarea'], 'Textarea param');
             assertEqual('foo', params['select'], 'Select param');
-            assertEqual('alpha', params['slider'], 'Slider param');
+            assertEqual(0.26, params['slider'], 'Slider param');
 
-            test_span.setStyle({visibility: '', display: 'none', position: ''});
+            assert(test_span.down().childElements()[1].checkElementValue({reg: /^(?:foo|bar)$/}), 'Regular expression');
+            assert(test_span.down(1).childElements()[1].checkElementValue({range: $R(0,1)}), 'Range');
+            assert(!test_span.down(1).childElements()[1].checkElementValue({range: $R(-1,0), deleteValue: true}), 'Delete value');
+            wait(550, function() {
+                assert(!test_span.down(1).childElements()[1].value, 'No value');
+                assert(test_span.down().childElements()[1].checkElementValue({passEmpty: true}), 'Pass empty');
+                assert(!test_span.down().childElements()[2].checkElementValue({reg: /^(?:foo|bar)$/, errorString: 'Invalid value'}), 'Error string');
+                assertEqual('Invalid value', test_span.down().childElements()[2].value);
 
-            test_span.appendChild(new Element('div', {id: 15}));
-            assert($(15), 'Numeric div');
+                test_span.setStyle({visibility: '', display: 'none', position: ''});
+
+                test_span.appendChild(new Element('div', {id: 15}));
+                assert($(15), 'Numeric div');
+            });
         }},
         testIWLRPCEventCancel: function() { with(this) {
             var res1 = new Element('div', {id: 'res1'}), cancelled = new Element('div', {id: 'cancelled'});
@@ -162,7 +172,7 @@ function run_prototype_tests() {
                     {responseCallback: function(json) { eval(json.data); this.proceed() }.bind(this)}));
 
             delay(function() {
-                assertEqual("Test: 1, Foo: bar", res1.innerHTML, "NOTE: Response might be slower than actual test run time"); 
+                assertEqual("Test: 1, Foo: bar", res1.innerHTML); 
                 assert(!cancelled.innerHTML);
 
                 test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
@@ -289,8 +299,8 @@ function run_prototype_tests() {
             document.insertScript(script,
                 {onComplete: function(url) { loaded = url; this.proceed()}.bind(this)});
             delay(function() {
-                assertEqual(script, loaded, "NOTE: Response might be slower than actual test run time");
-                assertEqual('object', typeof window.Calendar, "NOTE: Response might be slower than actual test run time");
+                assertEqual(script, loaded);
+                assertEqual('object', typeof window.Calendar);
             });
         }}
     }, 'testlog');
@@ -321,6 +331,9 @@ function run_scriptaculous_tests() {
 }
 
 function run_base_tests() {
+    if (!!$('status_bar'))
+        $('status_bar').remove();
+
     new Test.Unit.Runner({
         testIWLConfig: function() { with(this) {
             assert(IWL.Config);
@@ -336,29 +349,29 @@ function run_base_tests() {
             var obj = {
                 scripts: [{
                     tag: 'script', attributes: {
-                        src: '/js/iconbox.js', type: 'text/javascript'
+                        src: IWL.Config.JS_DIR + '/iconbox.js', type: 'text/javascript'
                     }
                 }],
                 tailObjects: [{tag: 'span', children: [{text: 'foo'}]}],
                 text:'bar', tag:'div', children: [{
-                    tag: 'p', text: 'Lorem ipsum', attributes: {
-                        style: {'text-align': 'center', 'font-weight': 'bold'}
+                    tag: 'p', text: 'Lorem ipsum, Нещо', attributes: {
+                        style: {'text-align': 'center', 'font-size': '16px'}
                     }
                 }],
-                attributes: {class: 'foo', id: 'bar', 'iwl:fooBar': 'alpha'}
+                attributes: {'class': 'foo', id: 'bar', 'iwl:fooBar': 'alpha'}
             };
             var element = IWL.createHtmlElement(obj, $('testlog'));
 
             assert(Object.isElement(element));
             assertEqual('DIV', element.tagName);
-            assertEqual('barLorem ipsum', element.getText());
+            assert(/bar[\r\n]*Lorem ipsum, Нещо/.test(element.getText()));
             assertEqual('foo', element.className);
             assertEqual('bar', element.id);
             assertEqual('alpha', element.readAttribute('iwl:fooBar'));
             assertEqual('P', element.down().tagName);
-            assertEqual('Lorem ipsum', element.down().getText());
+            assertEqual('Lorem ipsum, Нещо', element.down().getText());
             assertEqual('center', element.down().getStyle('text-align'));
-            assertEqual('bold', element.down().getStyle('font-weight'));
+            assertEqual('16px', element.down().style.fontSize);
             assertEqual('SPAN', element.next().tagName);
             assertEqual('foo', element.next().getText());
 
@@ -366,6 +379,50 @@ function run_base_tests() {
                 assert(Iconbox);
                 element.next().remove();
                 element.remove();
+                benchmark(function () {
+                    var element = IWL.createHtmlElement(obj, $('testlog'));
+                    element.next().remove();
+                    element.remove();
+                }, 100);
+            });
+        }},
+        testView: function() { with(this) {
+            IWL.disableView({opacity: 0.9});
+            assert($('disabled_view_rail'));
+            assertEqual(0.9, $('disabled_view_rail').getOpacity());
+            IWL.enableView();
+            assert(!$('disabled_view_rail'));
+
+            IWL.disableView({noCover: true});
+            assert(!$('disabled_view_rail'));
+            assertEqual('wait', document.body.style.cursor);
+            IWL.enableView();
+            assertEqual('', document.body.style.cursor);
+
+            IWL.disableView({fullCover: true, opacity: 0.3});
+            assert($('disabled_view_rail'));
+            assert($('disabled_view'));
+            assertEqual(0.3, $('disabled_view').getOpacity());
+            assertEqual(1, $('disabled_view_rail').getOpacity());
+            IWL.enableView();
+            assert(!$('disabled_view'));
+            assert(!$('disabled_view_rail'));
+        }},
+        testStatus: function() { with(this) {
+            IWL.displayStatus('foo');
+            assert($('status_bar'), 'First status');
+            assertEqual('foo', $('status_bar').getText(), 'It has text');
+            displayStatus('bar');
+            assert(/foo[\r\n]*bar/.test($('status_bar').getText()), 'Another text added');
+            IWL.removeStatus();
+            IWL.removeStatus();
+            wait(1050, function() {
+                assert(!$('status_bar'), 'First removed status');
+                IWL.displayStatus('alpha', {duration:0.2});
+                assert($('status_bar'), 'Duration status');
+                wait(1500, function() {
+                    assert(!$('status_bar'), 'Removed duration status');
+                });
             });
         }}
     }, 'testlog');

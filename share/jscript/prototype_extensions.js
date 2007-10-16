@@ -4,27 +4,29 @@ Object.extend(Prototype.Browser, {
   IE7: !!(Prototype.Browser.IE && window.XMLHttpRequest)
 });
 
-var EventMethods = {
-  // Checks if the element is in the current event stack
-  checkElement: function(event, element) {
-    element = $(element);
-    var target = Event.element(event);
-    try {
-      while (target) {
-	if (target == element)
-	  return true;
-	target = target.parentNode;
-      }
-    } catch (e) {return false;}
-    return false;
-  },
-  getKeyCode: function(event) {
-    return event.keyCode ? event.keyCode : event.which ? event.which : 0;
-  }
-};
-Object.extend(Event.Methods, EventMethods);
-Event.extend();
-Object.extend(Event, EventMethods);
+(function() {
+  var EventMethods = {
+    // Checks if the element is in the current event stack
+    checkElement: function(event, element) {
+      element = $(element);
+      var target = Event.element(event);
+      try {
+        while (target) {
+          if (target == element)
+            return true;
+          target = target.parentNode;
+        }
+      } catch (e) {return false;}
+      return false;
+    },
+    getKeyCode: function(event) {
+      return event.keyCode ? event.keyCode : event.which ? event.which : 0;
+    }
+  };
+  Object.extend(Event.Methods, EventMethods);
+  Event.extend();
+  Object.extend(Event, EventMethods);
+})();
 
 Object.extend(Event, (function() {
   Event.DOMEvents.push((Prototype.Browser.Gecko) ? 'DOMMouseScroll' : 'mousewheel');
@@ -124,8 +126,8 @@ Object.extend(Event, (function() {
   };
 })());
 
-if (!window.IWLRPC) var IWLRPC = {};
-Object.extend(IWLRPC, (function() {
+if (!window.IWL) var IWL = {};
+Object.extend(IWL, {RPC: (function() {
   function eventStart(str) {
       return function(params) {
           eval(str);
@@ -163,7 +165,7 @@ Object.extend(IWLRPC, (function() {
         var options = Object.extend(Object.extend({}, originalOptions), arguments[1]);
         if (options.onStart)
           eventStart(options.onStart).call(element, params);
-        var disable = options.disableView ? disableView.bind(element, options.disableView) : Prototype.emptyFunction;
+        var disable = options.disableView ? IWL.disableView.bind(element, options.disableView) : Prototype.emptyFunction;
 
         if ('update' in options) {
           var updatee = $(options.update) || document.body;
@@ -221,7 +223,7 @@ Object.extend(IWLRPC, (function() {
       if (events) {
         events = unescape(events).evalJSON();
         for (var name in events)
-          IWLRPC.registerEvent(element, name, events[name][0], events[name][1], events[name][2]);
+          IWL.RPC.registerEvent(element, name, events[name][0], events[name][1], events[name][2]);
         element.preparedEvents = true;
         return element;
       }
@@ -238,148 +240,204 @@ Object.extend(IWLRPC, (function() {
       return element['handlers'][eventName];
     }
   };
-})());
+})()});
 
-var ElementMethods = {
-  getText: function(element) {
-    element = $(element);
-    if (element.textContent)
-	return element.textContent;
-    else if (element.innerText)
-	return element.innerText;
-  },
-  positionAtCenter: function(element, relative) {
-    element = $(element);
-    var dims = element.getDimensions();
-    var page_dim = document.viewport.getDimensions();
-    if (!relative)
-      element.style.position = "absolute";
-    element.style.left = (page_dim.width - dims.width)/2 + 'px';
-    if ((page_dim.height - dims.height) < 0)
-      element.style.top = '10px';
-    else
-      element.style.top = (page_dim.height - dims.height)/2 + 'px';
-    return element;
-  },
-  getScrollDimensions: function(element) {
-    element = $(element);
-    var display = $(element).getStyle('display');
-    if (display != 'none' && display != null)
-      return {width: element.scrollWidth, height: element.scrollHeight};
-
-    var els = element.style;
-    var originalVisibility = els.visibility;
-    var originalPosition = els.position;
-    var originalDisplay = els.display;
-    els.visibility = 'hidden';
-    els.position = 'absolute';
-    els.display = 'block';
-    var originalWidth = element.scrollWidth;
-    var originalHeight = element.scrollHeight;
-    els.display = originalDisplay;
-    els.position = originalPosition;
-    els.visibility = originalVisibility;
-    return {width: originalWidth, height: originalHeight};
-  },
-
-  getScrollableParent: function(element) {
-    if (!(element = $(element))) return;
-    do {
-      var scroll = element.getScrollDimensions();
+(function() {
+  var ElementMethods = {
+    getText: function(element) {
+      element = $(element);
+      if (element.textContent)
+          return element.textContent;
+      else if (element.innerText)
+          return element.innerText;
+    },
+    positionAtCenter: function(element, relative) {
+      element = $(element);
       var dims = element.getDimensions();
-      if (dims.width != scroll.width || dims.height != scroll.height)
-	break;
-      element = element.up();
-    } while (element);
-    return element;
-  },
-  getControlElementParams: function(element) {
-    if (!(element = $(element))) return;
-    var params = new Hash;
-    var sliders = element.getElementsBySelector('.slider');
-    var selects = element.getElementsBySelector('select');
-    var textareas = element.getElementsBySelector('textarea');
-    var inputs = element.getElementsBySelector('input');
-
-    var valid_name = function(e) {
-      return e.hasAttribute('name') ? e.readAttribute('name') : e.readAttribute('id');
-    };
-    var push_values = function(name, value) {
-      if (name === null || name == undefined || name == '')
-        return;
-      if (params.keys().include(name))
-	params[name] = [params[name], value].flatten();
+      var page_dim = document.viewport.getDimensions();
+      if (!relative)
+        element.style.position = "absolute";
+      element.style.left = (page_dim.width - dims.width)/2 + 'px';
+      if ((page_dim.height - dims.height) < 0)
+        element.style.top = '10px';
       else
-	params[name] = value;
-    };
+        element.style.top = (page_dim.height - dims.height)/2 + 'px';
+      return element;
+    },
+    getScrollDimensions: function(element) {
+      element = $(element);
+      var display = $(element).getStyle('display');
+      if (display != 'none' && display != null)
+        return {width: element.scrollWidth, height: element.scrollHeight};
 
-    sliders.each(function(s) {
-        if ('control' in s)
-          push_values(valid_name(s), s.control.value);
-      });
-    selects.each(function(s) {
-	push_values(valid_name(s), s.value);
-      });
-    textareas.each(function(t) {
-	push_values(valid_name(t), t.value);
-      });
-    inputs.each(function(i) {
-	switch(i.type) {
-	case 'text':
-	case 'password':
-	case 'hidden':
-	  push_values(valid_name(i), i.value);
-	  break;
-	case 'checkbox':
-	case 'radio':
-	  if (i.checked)
-	    push_values(valid_name(i), i.value);
-	  break;
-	}
-      });
+      var els = element.style;
+      var originalVisibility = els.visibility;
+      var originalPosition = els.position;
+      var originalDisplay = els.display;
+      els.visibility = 'hidden';
+      els.position = 'absolute';
+      els.display = 'block';
+      var originalWidth = element.scrollWidth;
+      var originalHeight = element.scrollHeight;
+      els.display = originalDisplay;
+      els.position = originalPosition;
+      els.visibility = originalVisibility;
+      return {width: originalWidth, height: originalHeight};
+    },
 
-    if (!params.keys().length && (element.value || element.hasAttribute('value')))
-      push_values(valid_name(element), element.value || element.readAttribute('value'));
+    getScrollableParent: function(element) {
+      if (!(element = $(element))) return;
+      do {
+        var scroll = element.getScrollDimensions();
+        var dims = element.getDimensions();
+        if (dims.width != scroll.width || dims.height != scroll.height)
+          break;
+        element = element.up();
+      } while (element);
+      return element;
+    },
+    getControlElementParams: function(element) {
+      if (!(element = $(element))) return;
+      var params = new Hash;
+      var sliders = element.getElementsBySelector('.slider');
+      var selects = element.getElementsBySelector('select');
+      var textareas = element.getElementsBySelector('textarea');
+      var inputs = element.getElementsBySelector('input');
 
-    return params;
-  },
-  /* = IWL RPC ======================================*/
-  registerEvent: function(element, eventName, url, params, options) {
-    IWLRPC.registerEvent.apply(Event, arguments);
-    return $A(arguments).first();        
-  },
-  prepareEvents: function(element) {
-    IWLRPC.prepareEvents.apply(Event, arguments);
-    return $A(arguments).first();       
-  },
-  emitEvent: function(element, eventName, params, options) {
-    IWLRPC.emitEvent.apply(Event, arguments);
-    return $A(arguments).first();  
-  },
-  hasEvent: function(element, eventName) {
-    return IWLRPC.hasEvent.apply(Event, arguments);
-  },
-  /*==================================================*/
+      var valid_name = function(e) {
+        return e.hasAttribute('name') ? e.readAttribute('name') : e.readAttribute('id');
+      };
+      var push_values = function(name, value) {
+        if (name === null || name == undefined || name == '')
+          return;
+        if (params.keys().include(name))
+          params[name] = [params[name], value].flatten();
+        else
+          params[name] = value;
+      };
 
-  signalConnect: function() {
-    Event.signalConnect.apply(Event, arguments);
-    return $A(arguments).first();
-  },
-  signalDisconnect: function() {
-    Event.signalDisconnect.apply(Event, arguments);
-    return $A(arguments).first();
-  },
-  signalDisconnectAll: function() {
-    Event.signalDisconnectAll.apply(Event, arguments);
-    return $A(arguments).first();
-  },
-  emitSignal: function() {
-    Event.emitSignal.apply(Event, arguments);
-    return $A(arguments).first();
-  }
-};
-Element.addMethods(ElementMethods);
-Object.extend(Element, ElementMethods);
+      sliders.each(function(s) {
+          if ('control' in s)
+            push_values(valid_name(s), s.control.value);
+        });
+      selects.each(function(s) {
+          push_values(valid_name(s), s.value);
+        });
+      textareas.each(function(t) {
+          push_values(valid_name(t), t.value);
+        });
+      inputs.each(function(i) {
+          switch(i.type) {
+          case 'text':
+          case 'password':
+          case 'hidden':
+            push_values(valid_name(i), i.value);
+            break;
+          case 'checkbox':
+          case 'radio':
+            if (i.checked)
+              push_values(valid_name(i), i.value);
+            break;
+          }
+        });
+
+      if (!params.keys().length && (element.value || element.hasAttribute('value')))
+        push_values(valid_name(element), element.value || element.readAttribute('value'));
+
+      return params;
+    },
+    /**
+     * Checks whether the value of an element passes certain conditions
+     * @param element The element, whose value will be checked.
+     * @param options. An options hash. The following keys are recognised:
+     * 	reg: regular expression. The value will be tried for a match.
+     * 	range: An ObjectRange. The method will return true if the value of the element is within the range
+     * 	passEmpty: boolean (default: false). If true, an empty value will return true
+     * 	errorString: string. The value will be tried against this string
+     * 	startColor: color string (default: #ff0000). The starting color of the blink
+     * 	endColor: color string (default: #ffffff). The ending color of the blink
+     * 	finishColor: color string (default: transparent). The color that will stay as a background of the element
+     * 	deleteValue: boolean (default: false). Whether the value of the element should be deleted, if it doesn't pass the condition.
+     * 	duration: number (0.5). The duration of the blink
+     * 	flash: if true, the element flashes, without being otherwise checked
+     * */
+    checkElementValue: function(element) {
+      if (!(element = $(element))) return false;
+      var options = Object.extend({
+        reg: false,
+        range: false,
+        errorString: false,
+        passEmpty: false, 
+        startColor: '#ff0000',
+        endColor: '#ffffff',
+        finishColor: 'transparent',
+        deleteValue: false,
+        duration: 0.5,
+        flash: false
+      }, arguments[1] || {});
+    if ((options.reg.test && !options.reg.test(element.value))
+        || (options.range.include && !options.range.include(element.value))
+        || (!options.passEmpty && element.value == "")
+        || (options.errorString && element.value == options.errorString)
+        || (options.flash)
+      ) {
+        new Effect.Highlight(element, {
+          startcolor: options.startColor,
+          endcolor: options.endColor,
+          beforeStart: options.errorString ? function(effect) {
+            effect.element.value = options.errorString;
+          } : null,
+          afterFinish: function(effect) {
+            if (options.deleteValue)
+              effect.element.value = '';
+            Element.setStyle(effect.element, {
+              backgroundColor: options.finishColor});
+            try { effect.element.focus(); } catch(e) {};
+          },
+          duration: options.duration
+        });
+        return false;
+      }
+      return true;
+    },
+    /* = IWL RPC ======================================*/
+    registerEvent: function(element, eventName, url, params, options) {
+      IWL.RPC.registerEvent.apply(Event, arguments);
+      return $A(arguments).first();        
+    },
+    prepareEvents: function(element) {
+      IWL.RPC.prepareEvents.apply(Event, arguments);
+      return $A(arguments).first();       
+    },
+    emitEvent: function(element, eventName, params, options) {
+      IWL.RPC.emitEvent.apply(Event, arguments);
+      return $A(arguments).first();  
+    },
+    hasEvent: function(element, eventName) {
+      return IWL.RPC.hasEvent.apply(Event, arguments);
+    },
+    /*==================================================*/
+
+    signalConnect: function() {
+      Event.signalConnect.apply(Event, arguments);
+      return $A(arguments).first();
+    },
+    signalDisconnect: function() {
+      Event.signalDisconnect.apply(Event, arguments);
+      return $A(arguments).first();
+    },
+    signalDisconnectAll: function() {
+      Event.signalDisconnectAll.apply(Event, arguments);
+      return $A(arguments).first();
+    },
+    emitSignal: function() {
+      Event.emitSignal.apply(Event, arguments);
+      return $A(arguments).first();
+    }
+  };
+  Element.addMethods(ElementMethods);
+  Object.extend(Element, ElementMethods);
+})();
 
 Object.extend(String.prototype, {
   createTextNode: function() {

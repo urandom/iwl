@@ -157,7 +157,7 @@ $rpc->handleEvent(
             return "\$('res1').update('Test: $params->{test}, Foo: $params->{foo}')";
         } elsif ($params->{text}) {
             return "$params->{text}"
-        } elsif ($data && $data->{hidden} == 'foo') {
+        } elsif ($data && $data->{hidden} eq 'foo') {
             return "true";
         } elsif ($params->{cancel}) {
             sleep 1;

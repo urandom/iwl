@@ -280,11 +280,11 @@ sub __init {
     my $ie          = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie.css');
     my $ie6         = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
     my $conditional = IWL::Comment->new;
-    $self->requiredJs('dist/prototype.js', 'dist/scriptaculous.js', 'base.js');
+    $self->requiredJs('base.js');
 
     my $script = IWL::Script->new;
-    $script->appendScript("if (!window.IWL) window.IWL = {};" .
-                          "window.IWLConfig = IWL.Config = " . toJSON(\%IWLConfig) . ";");
+    $script->appendScript("if (!window.IWL) var IWL = {};" .
+                          "IWL.Config = " . toJSON(\%IWLConfig) . ";");
     $head->appendChild($script);
 
     $head->appendChild($skin);
