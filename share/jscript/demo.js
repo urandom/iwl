@@ -158,61 +158,6 @@ function run_prototype_tests() {
                 assert($(15), 'Numeric div');
             });
         }},
-        testIWLRPCEventCancel: function() { with(this) {
-            var res1 = new Element('div', {id: 'res1'}), cancelled = new Element('div', {id: 'cancelled'});
-            test_span.appendChild(res1);
-            test_span.appendChild(cancelled);
-
-            assertIdentical(test_span, test_span.registerEvent('IWL-Object-testEvent',
-                    'iwl_demo.pl', {test: 1}));
-            assert(test_span.hasEvent('IWL-Object-testEvent'));
-            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {cancel: 'Am I cancelled?'}, {update: cancelled}));
-            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent', {foo: 'bar'},
-                    {responseCallback: function(json) { eval(json.data); this.proceed() }.bind(this)}));
-
-            delay(function() {
-                assertEqual("Test: 1, Foo: bar", res1.innerHTML); 
-                assert(!cancelled.innerHTML);
-
-                test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
-                assertIdentical(test_span, test_span.prepareEvents());
-                assert(test_span.hasEvent('IWL-Object-testEvent2'));
-                assert(test_span.preparedEvents);
-            });
-        }},
-        testIWLRPCEventUpdate: function() { with(this) {
-            var res2 = new Element('div', {id: 'res2'});
-            test_span.appendChild(res2);
-
-            test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
-            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {text: 'Някакъв текст.'}, {
-                        update: res2,
-                        responseCallback: function() {this.proceed()}.bind(this)
-                    }));
-
-            delay(function() {
-                assertEqual('Някакъв текст.', res2.innerHTML);
-            });
-        }},
-        testIWLRPCEventCollect: function() { with(this) {
-            var res3 = new Element('div', {id: 'res3'});
-            test_span.appendChild(res3);
-
-            test_span.appendChild(new Element('input', {type: 'hidden', name: 'hidden', value: 'foo'}));
-            test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
-            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
-                    {}, {
-                        update: res3,
-                        collectData: true,
-                        responseCallback: function() {this.proceed()}.bind(this)
-                    }));
-
-            delay(function() {
-                assertEqual('true', res3.innerHTML);
-            });
-        }},
         testStrings: function() { with(this) {
             var text_node = "".createTextNode();
             assertEqual(3, text_node.nodeType);
@@ -344,6 +289,74 @@ function run_base_tests() {
             assert(Object.isString(IWL.Config.ICON_EXT) && IWL.Config.ICON_EXT);
             assert(Object.isString(IWL.Config.JS_DIR) && IWL.Config.JS_DIR);
             assert(Object.isNumber(IWL.Config.STRICT_LEVEL) && IWL.Config.STRICT_LEVEL >= 1);
+        }},
+        testIWLRPCEventCancel: function() { with(this) {
+            var test_span = new Element('span', {style: "display: none", id: 'test_span'});
+            $('testlog').parentNode.appendChild(test_span);
+
+            var res1 = new Element('div', {id: 'res1'}), cancelled = new Element('div', {id: 'cancelled'});
+            test_span.appendChild(res1);
+            test_span.appendChild(cancelled);
+
+            assertIdentical(test_span, test_span.registerEvent('IWL-Object-testEvent',
+                    'iwl_demo.pl', {test: 1}));
+            assert(test_span.hasEvent('IWL-Object-testEvent'));
+            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
+                    {cancel: 'Am I cancelled?'}, {update: cancelled}));
+            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent', {foo: 'bar'},
+                    {responseCallback: function(json) { eval(json.data); this.proceed() }.bind(this)}));
+
+            delay(function() {
+                assertEqual("Test: 1, Foo: bar", res1.innerHTML); 
+                assert(!cancelled.innerHTML);
+
+                test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
+                assertIdentical(test_span, test_span.prepareEvents());
+                assert(test_span.hasEvent('IWL-Object-testEvent2'));
+                assert(test_span.preparedEvents);
+
+                test_span.remove();
+            });
+        }},
+        testIWLRPCEventUpdate: function() { with(this) {
+            var test_span = new Element('span', {style: "display: none", id: 'test_span'});
+            $('testlog').parentNode.appendChild(test_span);
+
+            var res2 = new Element('div', {id: 'res2'});
+            test_span.appendChild(res2);
+
+            test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
+            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
+                    {text: 'Някакъв текст.'}, {
+                        update: res2,
+                        responseCallback: function() {this.proceed()}.bind(this)
+                    }));
+
+            delay(function() {
+                assertEqual('Някакъв текст.', res2.innerHTML);
+                test_span.remove();
+            });
+        }},
+        testIWLRPCEventCollect: function() { with(this) {
+            var test_span = new Element('span', {style: "display: none", id: 'test_span'});
+            $('testlog').parentNode.appendChild(test_span);
+
+            var res3 = new Element('div', {id: 'res3'});
+            test_span.appendChild(res3);
+
+            test_span.appendChild(new Element('input', {type: 'hidden', name: 'hidden', value: 'foo'}));
+            test_span.registerEvent('IWL-Object-testEvent', 'iwl_demo.pl', {});
+            assertIdentical(test_span, test_span.emitEvent('IWL-Object-testEvent',
+                    {}, {
+                        update: res3,
+                        collectData: true,
+                        responseCallback: function() {this.proceed()}.bind(this)
+                    }));
+
+            delay(function() {
+                assertEqual('true', res3.innerHTML);
+                test_span.remove();
+            });
         }},
         testIWLcreateHTMLElement: function() { with(this) {
             var obj = {
