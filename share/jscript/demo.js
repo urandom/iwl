@@ -358,6 +358,14 @@ function run_base_tests() {
                 test_span.remove();
             });
         }},
+        testWidget: function() { with(this) {
+            var test_span = new Element('span', {style: "display: none", id: 'test_span'});
+            $('testlog').parentNode.appendChild(test_span);
+
+            IWL.Widget.create(test_span);
+            assertRespondsTo('create', test_span);
+            assertRespondsTo('_abortEvent', test_span);
+        }},
         testIWLcreateHTMLElement: function() { with(this) {
             var obj = {
                 scripts: [{
@@ -365,7 +373,19 @@ function run_base_tests() {
                         src: IWL.Config.JS_DIR + '/iconbox.js', type: 'text/javascript'
                     }
                 }],
-                tailObjects: [{tag: 'span', children: [{text: 'foo'}]}],
+                tailObjects: [
+                    {tag: 'span', children: [{text: 'foo'}]},
+                    {tag: 'table', attributes: {id: 'test_table'}, children: [
+                        {tag: 'tbody', children: [
+                            {tag: 'tr', children: [
+                                {tag: 'td', text: 'foo'},
+                                {tag: 'script', attributes: {type: 'text/javascript'}, children: [
+                                    {text: "$('test_table').select('td')[0].update('beta')"}
+                                ]}
+                            ]}
+                        ]}
+                    ]}
+                ],
                 text:'bar', tag:'div', children: [{
                     tag: 'p', text: 'Lorem ipsum, Нещо', attributes: {
                         style: {'text-align': 'center', 'font-size': '16px'}
@@ -387,13 +407,18 @@ function run_base_tests() {
             assertEqual('16px', element.down().style.fontSize);
             assertEqual('SPAN', element.next().tagName);
             assertEqual('foo', element.next().getText());
+            assertEqual('TABLE', element.next(1).tagName);
+            assert($('test_table'));
 
             wait(1000, function() {
+                assertEqual('beta', $('test_table').select('td')[0].getText());
                 assert(Iconbox);
+                element.next().remove();
                 element.next().remove();
                 element.remove();
                 benchmark(function () {
                     var element = IWL.createHtmlElement(obj, $('testlog'));
+                    element.next().remove();
                     element.next().remove();
                     element.remove();
                 }, 100);
@@ -429,11 +454,11 @@ function run_base_tests() {
             assert(/foo[\r\n]*bar/.test($('status_bar').getText()), 'Another text added');
             IWL.removeStatus();
             IWL.removeStatus();
-            wait(1050, function() {
+            wait(1150, function() {
                 assert(!$('status_bar'), 'First removed status');
                 IWL.displayStatus('alpha', {duration:0.2});
                 assert($('status_bar'), 'Duration status');
-                wait(1500, function() {
+                wait(1600, function() {
                     assert(!$('status_bar'), 'Removed duration status');
                 });
             });
@@ -449,6 +474,17 @@ function run_base_tests() {
                 IWL.removeStatus();
             });
             window.console = console;
+        }},
+        testFocus: function() { with(this) {
+            if (!Prototype.Browser.Gecko) return;
+            var test_span = new Element('span', {style: "display: none", id: 'test_span'});
+            $('testlog').parentNode.appendChild(test_span);
+
+            IWL.Focus.register(test_span);
+            Event.simulateMouse(test_span, 'click');
+            wait(1000, function() {
+                assertEqual(test_span, IWL.Focus.current);
+            });
         }},
         testBrowserCss: function() { with(this) {
             var html = $$('html')[0];

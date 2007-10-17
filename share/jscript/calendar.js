@@ -11,9 +11,9 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         var start_day = this.options.startOnMonday ? 1 : 0;
         var year = this.date.getFullYear();
         var month = this.date.getMonth();
-        var month_input = this.getElementsBySelector('.calendar_month')[0];
-        var year_input = this.getElementsBySelector('.calendar_year')[0];
-        var week_days = this.getElementsBySelector('.calendar_week_days')[0];
+        var month_input = this.select('.calendar_month')[0];
+        var year_input = this.select('.calendar_year')[0];
+        var week_days = this.select('.calendar_week_days')[0];
         var date = this.getDate();
 
         date.setFullYear(year);
@@ -57,7 +57,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             this._startDayChanged = false;
         }
 
-        var week_rows = this.getElementsBySelector('.calendar_week');
+        var week_rows = this.select('.calendar_week');
         for (week = 0; week < weeks_in_month; week++) {
             var row = week_rows[week];
             Element.extend(row.cells[0]).innerHTML = date.getWeek();
@@ -102,10 +102,10 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
 
     function fillTime() {
-        var hours = this.getElementsBySelector('.calendar_hours')[0];
-        var minutes = this.getElementsBySelector('.calendar_minutes')[0];
-        var seconds = this.getElementsBySelector('.calendar_seconds')[0];
-        var notation = this.getElementsBySelector('.calendar_hours_notation')[0];
+        var hours = this.select('.calendar_hours')[0];
+        var minutes = this.select('.calendar_minutes')[0];
+        var seconds = this.select('.calendar_seconds')[0];
+        var notation = this.select('.calendar_hours_notation')[0];
 
         var hour = this.date.getHours();
         if (!this.options.astronomicalTime) {
@@ -133,12 +133,12 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
 
     function connectHeadingSignals() {
-        var month_prev = this.getElementsBySelector('.calendar_month_prev')[0];
-        var month_next = this.getElementsBySelector('.calendar_month_next')[0];
-        var year_prev = this.getElementsBySelector('.calendar_year_prev')[0];
-        var year_next = this.getElementsBySelector('.calendar_year_next')[0];
-        var month = this.getElementsBySelector('.calendar_month')[0];
-        var year = this.getElementsBySelector('.calendar_year')[0];
+        var month_prev = this.select('.calendar_month_prev')[0];
+        var month_next = this.select('.calendar_month_next')[0];
+        var year_prev = this.select('.calendar_year_prev')[0];
+        var year_next = this.select('.calendar_year_next')[0];
+        var month = this.select('.calendar_month')[0];
+        var year = this.select('.calendar_year')[0];
 
         var prev_month = previousMonthEvent.bindAsEventListener(this);
         var next_month = nextMonthEvent.bindAsEventListener(this);
@@ -231,10 +231,10 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
 
     function connectTimeSignals(event) {
-        var hours = this.getElementsBySelector('.calendar_hours')[0];
-        var minutes = this.getElementsBySelector('.calendar_minutes')[0];
-        var seconds = this.getElementsBySelector('.calendar_seconds')[0];
-        var notation = this.getElementsBySelector('.calendar_hours_notation')[0];
+        var hours = this.select('.calendar_hours')[0];
+        var minutes = this.select('.calendar_minutes')[0];
+        var seconds = this.select('.calendar_seconds')[0];
+        var notation = this.select('.calendar_hours_notation')[0];
 
         var hours_focus = hoursFocusEvent.bindAsEventListener(this);
         var hours_key = hoursKeyEvent.bindAsEventListener(this);
@@ -450,7 +450,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
     function showMarkedDates() {
         if (!this.options.markedDates.length) {
-            this.getElementsBySelector('.calendar_week_day_special').each(function(d) {
+            this.select('.calendar_week_day_special').each(function(d) {
                 d.removeClassName('calendar_week_day_special');
                 d.removeClassName('calendar_week_day_special_disabled');
             });
@@ -588,8 +588,8 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
          * @returns The object
          * */
         showWeekNumbers: function(show) {
-            var cells = this.getElementsBySelector('.calendar_week_number_header').concat(
-                this.getElementsBySelector('.calendar_week_number'));
+            var cells = this.select('.calendar_week_number_header').concat(
+                this.select('.calendar_week_number'));
             cells.invoke(show ? 'show' : 'hide');
             return this;
         },
@@ -599,7 +599,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
          * @returns The object
          * */
         showHeading: function(show) {
-            var row = this.getElementsBySelector('.calendar_heading')[0];
+            var row = this.select('.calendar_heading')[0];
             if (show) row.show();
             else row.hide();
             return this;
@@ -610,7 +610,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
          * @returns The object
          * */
         showTime: function(show) {
-            var row = this.getElementsBySelector('.calendar_time')[0];
+            var row = this.select('.calendar_time')[0];
             if (show) row.show();
             else row.hide();
             return this;
@@ -771,7 +771,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             if (!this.options.showTime)
                 this.showTime(false);
 
-            this.dateCells = this.getElementsBySelector('.calendar_week_day');
+            this.dateCells = this.select('.calendar_week_day');
             this.dateCells.each(function(d) { CalendarDate.create(d, this) }.bind(this));
             this._startDayChanged = true;
             fillTime.call(this);
@@ -782,7 +782,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             connectHeadingSignals.call(this);
             connectTimeSignals.call(this);
             keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
-            registerFocus(this);
+            IWL.Focus.register(this);
 
             this.emitSignal('load');
         }

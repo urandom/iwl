@@ -1,10 +1,8 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
-var focused_widget = null;
-
 var loaded = false;
 Event.signalConnect(window, "load", function () {
 	loaded = true;
-	Event.signalConnect(document.body, "click", loseFocus);
+	Event.signalConnect(document.body, "click", IWL.Focus.loseFocusCallback);
 });
 
 if (!window.IWL) var IWL = {};
@@ -393,6 +391,11 @@ Object.extend(IWL, (function() {
 Object.extend(IWL, (function() {
     var display_status_cnt = 0;
     var appear;
+    
+    function hideStatus(options) {
+        if (options.duration)
+            IWL.removeStatus.delay(options.duration);
+    }
 
     return {
         /**
@@ -413,16 +416,16 @@ Object.extend(IWL, (function() {
                 }
                 status_bar.appendChild(new Element('br'));
                 status_bar.appendChild(text.createTextNode());
+                hideStatus(options);
             } else {
                 var status_bar = new Element('div', {id: 'status_bar'});
                 Element.hide(status_bar);
                 status_bar.appendChild(text.createTextNode());
-                appear = Effect.Appear(status_bar, {duration: 0.2});
+                appear = Effect.Appear(status_bar,
+                    {duration: 0.2, afterFinish: hideStatus.bind(this, options)});
                 document.body.appendChild(status_bar);
                 status_bar.signalConnect('click', IWL.removeStatus);
             }
-            if (options.duration)
-                IWL.removeStatus.delay(options.duration);
         },
         removeStatus: function() {
             var status_bar = $('status_bar');
@@ -459,9 +462,9 @@ IWL.exceptionHandler = function() {
 	IWL.displayStatus(arguments[1].number & 0xFFFF);
 	IWL.displayStatus(arguments[1].name);
     }
-}
+};
 
-function removeSelection() {
+IWL.removeSelection = function() {
     if (window.getSelection) {
 	var sel = window.getSelection();
         sel.removeAllRanges();
@@ -471,34 +474,36 @@ function removeSelection() {
 	} catch(e) {
 	}
     }
-}
+};
 
-function keyLogEvent(element, callback) {
+Object.extend(IWL, {Focus: {
+    current: null,
+    register: function(element) {
+        if (!(element = $(element))) return;
+        Event.signalConnect(element, 'mouseenter', function() {
+            IWL.Focus.current = element});
+        Event.signalConnect(element, 'click', function() {
+            IWL.Focus.current = element});
+    },
+    loseFocusCallback: function(event) {
+        if (!Event.checkElement(event, IWL.Focus.current))
+            IWL.Focus.current = null;
+    }
+}});
+
+IWL.keyLogger = function(element, callback) {
+    if (!(element = $(element))) return Prototype.emptyFunction;
+    var callbackWrapper = function(event) {
+        if (IWL.Focus.current != element)
+            return;
+        callback(event);
+    };
+
     if (Prototype.Browser.IE)
-        Event.signalConnect(document.body, 'keydown', function (event) {
-            if (focused_widget != element.id)
-                return;
-            callback(event);
-        });
+        Event.signalConnect(document.body, 'keydown', callbackWrapper);
     else
-	Event.signalConnect(window, 'keypress', function (event) {
-            if (focused_widget != element.id)
-                return;
-            callback(event);
-        });
-}
-
-function registerFocus(element) {
-    Event.signalConnect(element, 'mouseenter', function() {
-        focused_widget = element.id});
-    Event.signalConnect(element, 'click', function() {
-        focused_widget = element.id});
-}
-
-function loseFocus(e) {
-    if (!Event.checkElement(e, focused_widget))
-	focused_widget = null;
-}
+        Event.signalConnect(window, 'keypress', callbackWrapper);
+};
 
 (function() {
     var b = Prototype.Browser;
@@ -523,3 +528,8 @@ var checkElementValue = Element.checkElementValue;
 var IWLRPC = IWL.RPC;
 var IWLConfig = IWL.Config;
 var exceptionHandler = IWL.exceptionHandler;
+var removeSelection = IWL.removeSelection;
+var keyLogEvent = IWL.keyLogger;
+var registerFocus = IWL.Focus.register;
+var loseFocus = IWL.Focus.loseFocusCallback;
+var focused_widget = IWL.Focus.current;

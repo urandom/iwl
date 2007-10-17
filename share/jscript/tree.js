@@ -350,7 +350,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	this.nav_images['span'] = '<span class="tree_nav_con"></span>';
 	setTimeout(this.__initNavRebuild.bind(this, this.body.rows.length), 100);
 
-        registerFocus(this);
+        IWL.Focus.register(this);
 	keyLogEvent(this, this.__keyEventsCB.bindAsEventListener(this));
     },
     _bodySort: function(dir, col_num) {
@@ -840,7 +840,7 @@ Object.extend(Object.extend(Row, Widget), {
 
     __initEvents: function() {
 	this.observe('click', function(event) {
-	    focused_widget = this.tree.id;
+	    IWL.Focus.current = this.tree;
 	    if (this.tree.options.multipleSelect) {
 		if (event.ctrlKey) {
 		    if (this.isSelected())
@@ -866,7 +866,7 @@ Object.extend(Object.extend(Row, Widget), {
 	    }
 	}.bind(this));
 	this.observe('dblclick', function(event) {
-	    focused_widget = this.tree.id;
+	    IWL.Focus.current = this.tree;
 	    this.__removeSelection();
 	    this.activate();
 	}.bind(this));

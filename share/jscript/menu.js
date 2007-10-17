@@ -12,7 +12,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
             this.popDown();
         else
             this.popUp();
-        focused_widget = this.id;
+        IWL.Focus.current = this;
         Event.extend(event);
         Event.stop(event);
         return this;
@@ -47,8 +47,9 @@ Object.extend(Object.extend(Menu, Widget), (function () {
             this.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflowY: 'scroll'});
     }
 
-    function focus(id) {
-        return (function() {focused_widget = id}).defer();
+    function focus(element) {
+        if (!(element = $(element))) return;
+        return (function() {IWL.Focus.current = element}).defer();
     }
 
     function keyEventsCB(event) {
@@ -67,7 +68,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                     if (this.parentMenu.hasClassName('menubar'))
                         this.parentMenu.selectItem(
                             this.parentMenu.getPrevMenuItem() || this.parentMenu.menuItems.last());
-                    focus(this.parentMenu.id)
+                    focus(this.parentMenu)
                 }
             }
         } else if (key_code == Event.KEY_UP)  {
@@ -77,7 +78,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 var submenu = this.currentItem.submenu;
                 if (!submenu) return;
                 submenu.selectItem(submenu.menuItems.last());
-                focus(submenu.id)
+                focus(submenu)
             } else {
                 var select = this.getPrevMenuItem() || this.menuItems.last();
                 this.selectItem(select);
@@ -93,11 +94,11 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 if (this.currentItem && this.currentItem.submenu) {
                     var submenu = this.currentItem.submenu;
                     submenu.selectItem(submenu.menuItems[0]);
-                    focus(submenu.id)
+                    focus(submenu)
                 } else if (this.parentMenu && this.parentMenu.hasClassName('menubar')) {
                     this.parentMenu.selectItem(
                         this.parentMenu.getNextMenuItem() || this.parentMenu.menuItems[0]);
-                    focus(this.parentMenu.id)
+                    focus(this.parentMenu)
                 }
             }
         } else if (key_code == Event.KEY_DOWN) {
@@ -107,7 +108,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 var submenu = this.currentItem.submenu;
                 if (!submenu) return;
                 submenu.selectItem(submenu.menuItems[0]);
-                focus(submenu.id)
+                focus(submenu)
             } else {
                 var select = this.getNextMenuItem() || this.menuItems[0];
                 this.selectItem(select);
@@ -188,7 +189,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
             this.style.display = 'none';
             if (this.parentMenu) {
                 this.parentMenu.poppedChild = null;
-                focus(this.parentMenu.id);
+                focus(this.parentMenu);
             }
             this.popped = false;
             return this;
@@ -335,7 +336,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 if (paren === document) break;
                 paren = paren.up();
             }
-            registerFocus(this);
+            IWL.Focus.register(this);
             Event.observe(window, 'click', function(event) {
                 if (!Event.checkElement(event, this))
                     this.popDown();

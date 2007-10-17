@@ -183,10 +183,10 @@ Object.extend(Event, (function() {
     getControlElementParams: function(element) {
       if (!(element = $(element))) return;
       var params = new Hash;
-      var sliders = element.getElementsBySelector('.slider');
-      var selects = element.getElementsBySelector('select');
-      var textareas = element.getElementsBySelector('textarea');
-      var inputs = element.getElementsBySelector('input');
+      var sliders = element.select('.slider');
+      var selects = element.select('select');
+      var textareas = element.select('textarea');
+      var inputs = element.select('input');
 
       var valid_name = function(e) {
         return e.hasAttribute('name') ? e.readAttribute('name') : e.readAttribute('id');

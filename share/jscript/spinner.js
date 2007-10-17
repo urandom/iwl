@@ -223,9 +223,9 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
                 precision: false,
                 mask: null
             }, arguments[1] || {});
-            this.input = this.getElementsBySelector('.spinner_text')[0];
-            this.leftSpinner = this.getElementsBySelector('.spinner_left')[0];
-            this.rightSpinner = this.getElementsBySelector('.spinner_right')[0];
+            this.input = this.select('.spinner_text')[0];
+            this.leftSpinner = this.select('.spinner_left')[0];
+            this.rightSpinner = this.select('.spinner_right')[0];
             this.range = $R(parseFloat(this.options.from) || 0, parseFloat(this.options.to) || 100);
             this.speed = this.options.stepIncrement;
             this.mask = null;
@@ -237,7 +237,7 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
 
             connectSpinnerSignals.call(this);
             keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
-            registerFocus(this);
+            IWL.Focus.register(this);
 
             this.emitSignal('load');
         }

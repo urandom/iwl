@@ -192,7 +192,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 
 	Event.observe(window, 'resize', 
 		this._resizeEvent.bindAsEventListener(this));
-        registerFocus(this);
+        IWL.Focus.register(this);
 	keyLogEvent(this, this.__keyEventsCB.bindAsEventListener(this));
     },
     _resizeEvent: function(event) {
@@ -424,7 +424,7 @@ Object.extend(Object.extend(Icon, Widget), {
 
     _init: function(id, iconbox) {
 	this.iconbox = iconbox;
-	this.label = this.getElementsBySelector('.icon_label')[0];
+	this.label = this.select('.icon_label')[0];
 	this.__initEvents();
 	if (this._loaded)
 	    this.iconbox._iconCountdown();

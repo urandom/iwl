@@ -159,7 +159,7 @@ Object.extend(Object.extend(Druid, Widget), {
 	}
         this.okButton 
 	this.pageContainer = this.down();
-	this.currentPage = this.pageContainer.getElementsBySelector('.' +
+	this.currentPage = this.pageContainer.select('.' +
 		$A(this.classNames()).first() + '_page_selected')[0];
         this.finishText = unescape(text);
         this.nextText = this.nextButton.getLabel();
