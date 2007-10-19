@@ -138,7 +138,7 @@ sub bindToWidget {
     my ($self, $widget, $signal) = @_;
     my $id = $widget->getId;
     return $self->_pushError(__x("Invalid id: '{ID}'", ID => $id)) unless $id;
-    push @{$self->{__bindWidgets}}, [$id => $signal];
+    push @{$self->{__bindWidgets}}, [$id => $widget->_namespacedSignalName($signal)];
 
     return $self;
 }

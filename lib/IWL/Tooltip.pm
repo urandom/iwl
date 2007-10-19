@@ -76,7 +76,7 @@ sub bindToWidget {
     return $self->_pushError(__x("Invalid id: '{ID}'", ID => $to)) unless $to;
 
     $self->{__bound}       = $to;
-    $self->{__bindSignal}  = $signal;
+    $self->{__bindSignal}  = $widget->_namespacedSignalName($signal);
     $self->{__boundToggle} = $toggle ? 1 : 0;
     return $self;
 }
@@ -97,7 +97,7 @@ sub bindHideToWidget {
     return $self->_pushError(__x("Invalid id: '{ID}'", ID => $to)) unless $to;
 
     $self->{__boundHide} = $to;
-    $self->{__bindHideSignal} = $signal;
+    $self->{__bindHideSignal} = $widget->_namespacedSignalName($signal);
     return $self;
 }
 

@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Calendar is a class for adding calendars
+ * @class IWL.Calendar is a class for adding calendars
  * @extends Widget
  * */
-var Calendar = {};
-Object.extend(Object.extend(Calendar, Widget), (function() {
+IWL.Calendar = Object.extend(Object.extend({}, Widget), (function() {
     var weeks_in_month = 6;
 
     function fillMonth() {
@@ -20,7 +19,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         date.setMonth(month);
         date.setDate(1);
 
-        month_input.value = Calendar.months[month];
+        month_input.value = IWL.Calendar.months[month];
         year_input.value = year;
 
         while (date.getDay() != start_day)
@@ -28,12 +27,12 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 
         if (this._startDayChanged) {
             if (start_day == 0) {
-                var sunday = Element.extend(week_days.cells[1]).update(Calendar.abbreviatedWeekDays[6]);
+                var sunday = Element.extend(week_days.cells[1]).update(IWL.Calendar.abbreviatedWeekDays[6]);
                 if (this.options.markWeekends)
                     sunday.addClassName('calendar_weekend_header');
                 for (day = 0; day < 6; day++) {
                     var cell = Element.extend(week_days.cells[day + 2]);
-                    cell.innerHTML = Calendar.abbreviatedWeekDays[day];
+                    cell.innerHTML = IWL.Calendar.abbreviatedWeekDays[day];
                     if (this.options.markWeekends) {
                         if (day == 5)
                             cell.addClassName('calendar_weekend_header');
@@ -44,7 +43,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             } else {
                 for (day = 0; day < 7; day++) {
                     var cell = Element.extend(week_days.cells[day + 1]);
-                    cell.innerHTML = Calendar.abbreviatedWeekDays[day];
+                    cell.innerHTML = IWL.Calendar.abbreviatedWeekDays[day];
                     if (this.options.markWeekends) {
                         if (day == 5 || day == 6)
                             cell.addClassName('calendar_weekend_header');
@@ -205,7 +204,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
     }
     function monthBlurEvent(event) {
         var element = event.element();
-        element.value = Calendar.months[this.date.getMonth()];
+        element.value = IWL.Calendar.months[this.date.getMonth()];
         element.removeClassName('calendar_month_selected');
     }
 
@@ -410,6 +409,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             element.value = date.sprintf(format);
             if (typeof element.onchange == 'function')
                 element.onchange.call(element);
+            element.emitSignal('change');
             element.emitSignal('iwl:change');
         } else {
             element.innerHTML = date.sprintf(format);
@@ -503,16 +503,16 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             pmhour = pmhour == 0 ? 12 : pmhour;
 
             var format = {
-                a: Calendar.abbreviatedWeekDays[mday - 1],
-                A: Calendar.weekDays[mday - 1],
-                b: Calendar.abbreviatedMonths[month - 1],
-                B: Calendar.months[month - 1],
+                a: IWL.Calendar.abbreviatedWeekDays[mday - 1],
+                A: IWL.Calendar.weekDays[mday - 1],
+                b: IWL.Calendar.abbreviatedMonths[month - 1],
+                B: IWL.Calendar.months[month - 1],
                 C: this.getCentury(),
                 d: padded_date,
                 D: month + '/' + date + '/' + syear,
                 e: date < 10 ? ' ' + date : date,
                 F: year + '-' + padded_month + '-' + padded_date,
-                h: Calendar.abbreviatedMonths[month - 1],
+                h: IWL.Calendar.abbreviatedMonths[month - 1],
                 H: hour < 10 ? '0' + hour : hour,
                 I: pmhour < 10 ? '0' + pmhour : pmhour,
                 j: day_of_year < 10 ? '00' + day_of_year : day_of_year < 100 ? '0' + day_of_year : day_of_year,
@@ -618,7 +618,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
         /**
          * @param {Date} date The date for which to search
          * @returns The date cell for the given date
-         * @type CalendarDate
+         * @type IWL.Calendar.Date
          * */
         getByDate: function(date) {
             var cell;
@@ -762,7 +762,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
             if (isNaN(this.date.getFullYear()))
                 this.startDate = this.date = new Date;
 
-            Object.extend(Calendar, arguments[2]);
+            Object.extend(IWL.Calendar, arguments[2]);
 
             if (!this.options.showWeekNumbers)
                 this.showWeekNumbers(false);
@@ -772,7 +772,7 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
                 this.showTime(false);
 
             this.dateCells = this.select('.calendar_week_day');
-            this.dateCells.each(function(d) { CalendarDate.create(d, this) }.bind(this));
+            this.dateCells.each(function(d) { IWL.Calendar.Date.create(d, this) }.bind(this));
             this._startDayChanged = true;
             fillTime.call(this);
             fillMonth.call(this);
@@ -790,11 +790,10 @@ Object.extend(Object.extend(Calendar, Widget), (function() {
 })());
 
 /**
- * @class CalendarDate is a class for dates which make up a calendar
+ * @class IWL.Calendar.Date is a class for dates which make up a calendar
  * @extends Widget
  * */
-var CalendarDate = {};
-Object.extend(Object.extend(CalendarDate, Widget), (function() {
+IWL.Calendar.Date = Object.extend(Object.extend({}, Widget), (function() {
     function dateClickEvent(event) {
         var date = this.getDate();
         this.calendar.setDate(date);
@@ -869,3 +868,7 @@ Object.extend(Object.extend(CalendarDate, Widget), (function() {
         }
     }
 })());
+
+/* Deprecated */
+var Calendar = IWL.Calendar;
+var CalendarDate = IWL.Calendar.Date;

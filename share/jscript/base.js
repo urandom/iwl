@@ -146,7 +146,7 @@ Object.extend(IWL, {RPC: (function() {
 })();
 
 /**
- * @class Widget is the base class for all IWL widgets
+ * @class IWL.Widget is the base class for all IWL widgets
  *
  * @method create The 'constructor' method
  * @param id The element to transform into a widget
@@ -483,7 +483,6 @@ IWL.keyLogger = function(element, callback) {
 })();
 
 /* Deprecated */
-var Widget = IWL.Widget;
 var createHtmlElement = IWL.createHtmlElement;
 var disableView = IWL.disableView;
 var enableView = IWL.enableView;
@@ -498,3 +497,4 @@ var keyLogEvent = IWL.keyLogger;
 var registerFocus = IWL.Focus.register;
 var loseFocus = IWL.Focus.loseFocusCallback;
 var focused_widget = IWL.Focus.current;
+var Widget = IWL.Widget;

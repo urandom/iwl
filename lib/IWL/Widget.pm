@@ -482,8 +482,7 @@ sub _realize {
 		my $expr = '';
 		$expr .= ($_ || '') . ';' foreach (@{$self->{_customSignals}{$signal}});
 		if ($expr) {
-                    $signal = ($signal eq 'mouseenter' || $signal eq 'mouseleave' || $signal eq 'mousewheel')
-                      ? 'dom:' . $signal : 'iwl:' . $signal;
+                    $signal = $self->_namespacedSignalName($signal);
 		    $parent->{_customSignalScript} = IWL::Script->new
 		      unless $parent->{_customSignalScript};
 		    $parent->{_customSignalScript}->appendScript(<<EOF);
@@ -545,6 +544,15 @@ sub _registerEvent {
 
     $self->signalConnect($signal => "this.emitEvent('$event', {}, {id: this.id})");
     return $options;
+}
+
+sub _namespacedSignalName {
+    my ($self, $signal) = @_;
+    return 'iwl:' . $signal
+      if exists $self->{_customSignals}{$signal};
+    return 'dom:' . $signal
+      if $signal =~ /mouse(?:enter|leave|wheel)/;
+    return $signal;
 }
 
 # Internal

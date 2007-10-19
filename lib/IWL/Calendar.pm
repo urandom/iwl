@@ -341,6 +341,7 @@ sub updateOnSignal {
 
     my $id = UNIVERSAL::isa($element, 'IWL::Entry') ? $element->{text}->getId : 
       UNIVERSAL::isa($element, 'IWL::Widget') ? $element->getId : $element;
+    $signal = $self->_namespacedSignalName($signal);
     push @{$self->{__updates}}, [$signal, $id, $format];
     return $self;
 }
@@ -377,7 +378,7 @@ sub _realize {
     }
     $translations = toJSON($translations);
 
-    $script->setScript("Calendar.create('$id', $options, $translations);");
+    $script->setScript("IWL.Calendar.create('$id', $options, $translations);");
     foreach my $update (@{$self->{__updates}}) {
         $script->appendScript(qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]')|);
     }
