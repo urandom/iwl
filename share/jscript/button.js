@@ -120,7 +120,7 @@ Object.extend(Object.extend(Button, Widget), {
 	    button.style.width = 2 * corner_size + width + 'px';
 	    button.style.height = 2 * square + height + 'px';
 	}
-	this.emitSignal('load');
+	this.emitSignal('iwl:load');
         this.__loaded = true;
 
 	return this;

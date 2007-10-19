@@ -482,6 +482,8 @@ sub _realize {
 		my $expr = '';
 		$expr .= ($_ || '') . ';' foreach (@{$self->{_customSignals}{$signal}});
 		if ($expr) {
+                    $signal = ($signal eq 'mouseenter' || $signal eq 'mouseleave' || $signal eq 'mousewheel')
+                      ? 'dom:' . $signal : 'iwl:' . $signal;
 		    $parent->{_customSignalScript} = IWL::Script->new
 		      unless $parent->{_customSignalScript};
 		    $parent->{_customSignalScript}->appendScript(<<EOF);

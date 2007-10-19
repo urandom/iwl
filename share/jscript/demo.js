@@ -1,4 +1,4 @@
-document.observe('contentloaded', demo_init);
+document.observe('dom:loaded', demo_init);
 
 function demo_init () {
     IWL.displayStatus('To display a widget demo, double click its row');
@@ -92,7 +92,7 @@ function run_prototype_tests() {
         }},
         testEventSignals: function() { with(this) {
             var fired1 = false, fired2 = false,
-                callback1 = function(event) { fired1 = true }, callback2 = function(e) { fired2 = true; };
+                callback1 = function(e) { fired1 = true }, callback2 = function(e) { fired2 = true; };
             assertIdentical(test_span, test_span.signalConnect('test:event', callback1));
             test_span.signalConnect('test:event', callback2);
             assertIdentical(test_span, test_span.emitSignal('test:event'));
@@ -130,7 +130,7 @@ function run_prototype_tests() {
 //            assertEqual(100, test_span.firstChild.getScrollDimensions().height, 'Scroll height');
 //            assertIdentical(test_span.firstChild, test_span.down(2).getScrollableParent(), 'Scrollable parent');
             assertIdentical(test_span, test_span.positionAtCenter());
-            assertEqual((document.viewport.getWidth() - test_span.getWidth()) / 2 + 'px', test_span.getStyle('left'));
+            assertEqual(Math.floor((document.viewport.getWidth() - test_span.getWidth()) / 2), parseInt(test_span.getStyle('left')));
 
             test_span.firstChild.appendChild(new Element('select', {name: 'select'})).appendChild(new Element('option', {value: 'foo'}));
             test_span.down(1).appendChild(new Element('input', {type: 'text', value: 0.17}));
@@ -139,9 +139,9 @@ function run_prototype_tests() {
             var params = test_span.getControlElementParams();
             assertInstanceOf(Hash, params, 'Params hash');
             assert(!params.values().include(0.17), 'Doesn\'t have unnamed elements');
-            assertEqual('Some text', params['textarea'], 'Textarea param');
-            assertEqual('foo', params['select'], 'Select param');
-            assertEqual(0.26, params['slider'], 'Slider param');
+            assertEqual('Some text', params.get('textarea'), 'Textarea param');
+            assertEqual('foo', params.get('select'), 'Select param');
+            assertEqual(0.26, params.get('slider'), 'Slider param');
 
             assert(test_span.down().childElements()[1].checkElementValue({reg: /^(?:foo|bar)$/}), 'Regular expression');
             assert(test_span.down(1).childElements()[1].checkElementValue({range: $R(0,1)}), 'Range');
@@ -157,6 +157,23 @@ function run_prototype_tests() {
                 test_span.appendChild(new Element('div', {id: 15}));
                 assert($(15), 'Numeric div');
             });
+        }},
+        testFunctionMethods: function() { with(this) {
+            var func = function(event, arg1, arg2, arg3, arg4) {
+                assertEqual('test:event3', event.eventName);
+                assertEqual(1, arg1);
+                assertEqual(2, arg2);
+                assertEqual(3, arg3);
+                assertEqual(4, arg4);
+            }.bindAsEventListener(this, 1, 2);
+            var func2 = function(arg1, arg2) {
+                assertEqual(1, arg1);
+                assertEqual(2, arg2);
+            }.bind(this, 1, 2);
+            test_span.signalConnect('test:event3', func);
+            test_span.signalConnect('test:event4', func2);
+            test_span.emitSignal('test:event3', 3, 4);
+            test_span.emitSignal('test:event4', 3, 4);
         }},
         testStrings: function() { with(this) {
             var text_node = "".createTextNode();

@@ -39,7 +39,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    this.selectedRows.push(row);
 	}.bind(this));
 	this.currentRow = this.selectedRows[this.selectedRows.length - 1];
-	this.emitSignal('select_all');
+	this.emitSignal('iwl:select_all');
 	return this;
     },
     /**
@@ -51,7 +51,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	    row.removeClassName('row_selected');
 	}.bind(this));
 	this.selectedRows = [];
-	this.emitSignal('unselect_all');
+	this.emitSignal('iwl:unselect_all');
 	return this;
     },
     /**
@@ -557,7 +557,7 @@ Object.extend(Object.extend(Row, Widget), {
 
 	    if (this.tree.options.multipleSelect)
 		this.tree.selectedRows.push(this);
-	    this.emitSignal('select');
+	    this.emitSignal('iwl:select');
 	} else {
 	    if (!this.isSelected()) return;
 	    this.removeClassName('row_selected');
@@ -566,7 +566,7 @@ Object.extend(Object.extend(Row, Widget), {
 	    }
 	    if (this.tree.options.multipleSelect)
 		this.tree.selectedRows = this.tree.selectedRows.without(this);
-	    this.emitSignal('unselect');
+	    this.emitSignal('iwl:unselect');
 	}
 	return this;
     },
@@ -591,8 +591,8 @@ Object.extend(Object.extend(Row, Widget), {
      * @returns The object
      * */
     activate: function() {
-	this.tree.emitSignal('row_activate', this);
-	this.emitSignal('activate');
+	this.tree.emitSignal('iwl:row_activate', this);
+	this.emitSignal('iwl:activate');
 	this._abortEvent($A(this.tree.body.rows), 'IWL-Tree-Row-activate', this);
     },
     /**
@@ -651,8 +651,8 @@ Object.extend(Object.extend(Row, Widget), {
 	});
 	this.collapsed = true;
 	this._rebuildNav();
-	this.emitSignal('collapse');
-	this.tree.emitSignal('row_collapse', this);
+	this.emitSignal('iwl:collapse');
+	this.tree.emitSignal('iwl:row_collapse', this);
     },
     /**
      * Expands the row
@@ -669,8 +669,8 @@ Object.extend(Object.extend(Row, Widget), {
 	    });
 	    this.collapsed = false;
 	    this._rebuildNav();
-	    this.emitSignal('expand');
-	    this.tree.emitSignal('row_expand', this);
+	    this.emitSignal('iwl:expand');
+	    this.tree.emitSignal('iwl:row_expand', this);
 	} else {
 	    if (this._expanding) return;
 	    this._expanding = true;
@@ -711,7 +711,7 @@ Object.extend(Object.extend(Row, Widget), {
 	    if (prev_children)
 		prev_children.invoke('_rebuildNav');
 	}
-	this.emitSignal('remove');
+	this.emitSignal('iwl:remove');
 	return this;
     },
     /**

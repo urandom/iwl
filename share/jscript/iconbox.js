@@ -39,7 +39,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	    this.selectedIcons.push(icon);
 	}.bind(this));
 	this.currentIcon = this.selectedIcons[this.selectedIcons.length - 1];
-	this.emitSignal('select_all');
+	this.emitSignal('iwl:select_all');
 	return this;
     },
     /**
@@ -51,7 +51,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	    icon.removeClassName("icon_selected");
 	});
 	this.selectedIcons = [];
-	this.emitSignal('unselect_all');
+	this.emitSignal('iwl:unselect_all');
 	return this;
     },
     /**
@@ -283,7 +283,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 
 	if (this._iconCount == 0) {
 	    this._alignIconsVertically();
-	    setTimeout(this.emitSignal.bind(this, 'load'), 100);
+	    setTimeout(this.emitSignal.bind(this, 'iwl:load'), 100);
 	}
     },
 
@@ -342,7 +342,7 @@ Object.extend(Object.extend(Icon, Widget), {
 
 	    if (this.iconbox.options.multipleSelect)
 		this.iconbox.selectedIcons.push(this);
-	    this.emitSignal('select');
+	    this.emitSignal('iwl:select');
 	    this.iconbox.statusbarPush(this.getLabel());
 	} else {
 	    if (!this.isSelected()) return;
@@ -351,7 +351,7 @@ Object.extend(Object.extend(Icon, Widget), {
 		this.iconbox.currentIcon = null;
 	    if (this.iconbox.options.multipleSelect)
 		this.iconbox.selectedIcons = this.iconbox.selectedIcons.without(this);
-	    this.emitSignal('unselect');
+	    this.emitSignal('iwl:unselect');
 	}
 	return this;
     },
@@ -375,7 +375,7 @@ Object.extend(Object.extend(Icon, Widget), {
      * @returns The object
      * */
     activate: function() {
-	this.emitSignal('activate');
+	this.emitSignal('iwl:activate');
 	return this;
     },
     /**
@@ -418,7 +418,7 @@ Object.extend(Object.extend(Icon, Widget), {
 	var message = unescape(this.iconbox.messages['delete']).replace(/{TITLE}/, title);
 	this.iconbox.statusbarPush(message);
 	this.iconbox._alignIconsVertically();
-	this.emitSignal('remove');
+	this.emitSignal('iwl:remove');
 	return this;
     },
 

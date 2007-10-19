@@ -96,7 +96,7 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
         switch (Event.getKeyCode(event)) {
             case Event.KEY_RETURN:
                 this.setValue(value);
-                this.emitSignal("change");
+                this.emitSignal("iwl:change");
             case Event.KEY_ESC:
                 this.input.blur();
                 break;
@@ -239,7 +239,7 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
             keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
             IWL.Focus.register(this);
 
-            this.emitSignal('load');
+            this.emitSignal('iwl:load');
         }
     }
 })());

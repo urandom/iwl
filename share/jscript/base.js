@@ -1,8 +1,11 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 var loaded = false;
-Event.signalConnect(window, "load", function () {
-	loaded = true;
-	Event.signalConnect(document.body, "click", IWL.Focus.loseFocusCallback);
+document.loaded = false;
+
+Event.signalConnect(window, "load", function () { loaded = true; });
+Event.signalConnect(document, "dom:loaded", function() {
+    document.loaded = true;
+    Event.signalConnect(document.body, "click", IWL.Focus.loseFocusCallback.bindAsEventListener(this));
 });
 
 if (!window.IWL) var IWL = {};
@@ -218,10 +221,7 @@ Object.extend(IWL, (function() {
                     return true;
                 }
                 if (Prototype.Browser.IE) {
-                    if (paren.tagName.toLowerCase() == 'script') {
-                        paren.text = obj.text;
-                        return true;
-                    } else if (paren.tagName.toLowerCase() == 'style') {
+                    if (paren.tagName.toLowerCase() == 'style') {
                         paren.styleSheet.cssText = obj.text;
                         return true;
                     } else {
@@ -243,70 +243,34 @@ Object.extend(IWL, (function() {
                     return true;
                 }
             } else {
-                /* We don't need a noscript when it's obvious that we have js enabled */
-                if (obj.tag == 'noscript') {
-                    obj.tag = 'span';
-                    if (!obj.attributes) obj.attributes = {};
-                    if (!obj.attributes.style) obj.attributes.style = {};
-                    obj.attributes.style.display = 'none';
+                var attributes = Object.extend({}, obj.attributes);
+                if (attributes.style) {
+                    var time = new Date;
+                    var style = $H(attributes.style);
+                    attributes.style = style.keys().map(function(key) {
+                        return [key, style.get(key)].join(": ");
+                    }).join('; ');
                 }
-                if ((Prototype.Browser.IE && !obj.attributes) || !Prototype.Browser.IE)
-                    element = $(document.createElement(obj.tag));
-            }
-            // setAttribute in Internet Explorer doesn't set style, class or any of the events. What the hell were they thinking?
-            if (obj.attributes) {
-                if (Prototype.Browser.IE) {
-                    var attributes = '';
-                    for (var i in obj.attributes) {
-                        var attr = obj.attributes[i];
-                        if (i == 'style') {
-                            var style = '';
-                            for (var j in attr) {
-                                style += j + ": " + attr[j] + "; ";
-                            }
-                            attributes += ' ' + i + '="' + style + '"';
-                        } else if (i in flags) {
-                            attributes += ' ' + i;
-                        } else {
-                            if (i == 'value' && attr == null) attr = '';
-                            attributes += ' ' + i + '="' + attr + '"';
-                        }
-                    }
-                    element = $(document.createElement("<" + obj.tag + attributes + ">"));
-                } else {
-                    for (var i in obj.attributes) {
-                        var attr = obj.attributes[i];
-                        if (i == 'style') {
-                            var style = '';
-                            for (var j in attr) {
-                                style += j + ": " + attr[j] + "; ";
-                            }
-                            element.setAttribute(i, style);
-                        } else {
-                            element.setAttribute(i, attr);
-                        }
-                    }
-                }
-            }
-            if (obj.text) {
-                element.appendChild(obj.text.createTextNode());
-            }
-            if (before_el) {
-                paren.insertBefore(element, before_el);
-            } else {
-                paren.appendChild(element);
-            }
-            if (obj.children) {
-                for (var i = 0; i < obj.children.length; i++) {
-                    IWL.createHtmlElement(obj.children[i], element);
-                }
+                element = new Element(obj.tag, attributes);
             }
 
-            if (obj.tailObjects) {
-                for (var i = 0; i < obj.tailObjects.length; i++) {
-                    IWL.createHtmlElement(obj.tailObjects[i], paren);
-                }
-            }
+            if (obj.text)
+                element.appendChild(obj.text.createTextNode());
+
+            if (before_el)
+                paren.insertBefore(element, before_el);
+            else
+                paren.appendChild(element);
+
+            if (obj.children)
+                obj.children.each(function(c) {
+                    IWL.createHtmlElement(c, element);
+                });
+
+            if (obj.tailObjects)
+                obj.tailObjects.each(function(t) {
+                    IWL.createHtmlElement(t, paren);
+                });
 
             return element;
         }
@@ -347,9 +311,9 @@ Object.extend(IWL, (function() {
                         height: page_dims.height + 'px',
                         width: page_dims.width + 'px'
                     });
+                    document.body.appendChild(container);
                     if (options.opacity < 1.0)
                         container.setOpacity(options.opacity);
-                    document.body.appendChild(container);
                     container.setStyle({visibility: 'visible'});
                     Event.signalConnect(window, 'resize', function() {
                         var page_dims = document.viewport.getDimensions();
@@ -358,11 +322,10 @@ Object.extend(IWL, (function() {
                             width: page_dims.width + 'px'
                         });
                     }.bind(this));
-                } else {
-                    if (options.opacity < 1.0)
-                        rail.setOpacity(options.opacity);
                 }
                 document.body.appendChild(rail);
+                if (!options.fullCover && options.opacity < 1.0)
+                    rail.setOpacity(options.opacity);
                 rail.positionAtCenter();
                 rail.setStyle({visibility: 'visible'});
             }
@@ -480,9 +443,9 @@ Object.extend(IWL, {Focus: {
     current: null,
     register: function(element) {
         if (!(element = $(element))) return;
-        Event.signalConnect(element, 'mouseenter', function() {
+        element.signalConnect('mouseenter', function() {
             IWL.Focus.current = element});
-        Event.signalConnect(element, 'click', function() {
+        element.signalConnect('click', function() {
             IWL.Focus.current = element});
     },
     loseFocusCallback: function(event) {

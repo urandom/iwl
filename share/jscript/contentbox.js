@@ -26,7 +26,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	$A(this.hiddenQuirks).each(function(el) {
 	    el.style.visibility = el._originalVisibility;
 	});
-	return this.emitSignal('close');
+	return this.emitSignal('iwl:close');
     },
     /**
      * Sets the type of the contentbox
@@ -37,7 +37,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
      * 		window - enables dragging, resizing and closing
      * 		noresize - enables dragging and closing
      * 		none - disables everything
-     * @param {Hash} options Options for the selected type
+     * @param {Object} options Options for the selected type
      *          outline - turns on outline moving/resizing
      * @returns The object
      * */

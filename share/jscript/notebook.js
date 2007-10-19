@@ -125,8 +125,8 @@ Object.extend(Object.extend(Tab, Widget), {
 		if (anchor && anchor.onclick) anchor.onclick();
 	    }
 
-	    this.notebook.emitSignal('current_tab_change', this);
-	    this.emitSignal('select');
+	    this.notebook.emitSignal('iwl:current_tab_change', this);
+	    this.emitSignal('iwl:select');
 	} else {
 	    if (!this.isSelected() || this.notebook.tabs.length == 1) return;
 	    this.removeClassName(base_class + '_tab_selected');
@@ -138,7 +138,7 @@ Object.extend(Object.extend(Tab, Widget), {
 		var prev = this.prevTab() || this.nextTab();
 		if (prev) prev.setSelected(true);
 	    }
-	    this.emitSignal('unselect');
+	    this.emitSignal('iwl:unselect');
 	}
 	return this;
     },
@@ -159,7 +159,7 @@ Object.extend(Object.extend(Tab, Widget), {
 	this.parentNode.removeChild(this);
 	this.page.parentNode.removeChild(this.page);
 	this.notebook.tabs = this.notebook.tabs.without(this);
-	this.emitSignal('remove');
+	this.emitSignal('iwl:remove');
     },
     /**
      * @returns The previous tab

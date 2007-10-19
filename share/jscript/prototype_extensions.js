@@ -29,99 +29,132 @@ Object.extend(Prototype.Browser, {
 })();
 
 Object.extend(Event, (function() {
-  Event.DOMEvents.push((Prototype.Browser.Gecko) ? 'DOMMouseScroll' : 'mousewheel');
+  function callbackWrapper(observer) {
+    return function(event) {
+      var args = event.memo
+        ? [event].concat(Object.isArray(event.memo) ? event.memo : [event.memo])
+        : [event];
+      observer.apply(this, args);
+    }
+  }
+
+  function getEventID(element) {
+    if (element._eventID) return element._eventID;
+    arguments.callee.id = arguments.callee.id || 1;
+    return element._eventID = ++arguments.callee.id;
+  }
+
+  function registerCallback(element, name, callback, observer) {
+    var c = getCacheForName(element, name);
+    if (c.indexOf(callback) > -1) return callback;
+
+    c.push(callback);
+    callback.observer = observer;
+    return false;
+  }
+
+  function getCacheForName(element, name) {
+    var id = getEventID(element);
+    cache[id] = cache[id] || {};
+    return cache[id][name] = cache[id][name] || [];
+  }
+
+  function destroyCache() {
+    for (var id in cache)
+      for (var eventName in cache[id])
+        cache[id][eventName] = null;
+  }
+
+  var cache = {};
+
+  var customEvents = {
+    'dom:mouseenter': {
+      real: 'mouseover',
+      callback: function(event, element, callback) {
+        var target = event.relatedTarget || Event.relatedTarget(event);
+        try { target.parentNode } catch(e) { target = null }
+        if (!target || target == element || Element.descendantOf(target, element)) return;
+        callback.call(target, event)
+      }
+    },
+    'dom:mouseleave': {
+      real: 'mouseout',
+      callback: function(event, element, callback) {
+        var target = event.relatedTarget || Event.relatedTarget(event);
+        try { target.parentNode } catch(e) { target = null }
+        if (!target || target == element || Element.descendantOf(target, element)) return;
+        callback.call(target, event)
+      }
+    },
+    'dom:mousewheel': {
+      real: (Prototype.Browser.Gecko) ? 'DOMMouseScroll' : 'mousewheel',
+      callback: function(event, element, callback) {
+        if (event.detail)
+          event.scrollDirection = event.detail;
+        else if (event.wheelDelta)
+          event.scrollDirection = event.wheelDelta / -40;
+        callback.call(target, event)
+      }
+    }
+  };
+
+  if (window.attachEvent) {
+    window.attachEvent("onunload", destroyCache);
+  }
+
   return {
     KEY_SPACE: 32,
     signalConnect: function(element, name, observer) {
-      if (!element || !name || !observer) return;
-      if (!element.signals) element.signals = {};
-      if (!element.signals[name])
-        element.signals[name] = {observers: [], callbacks: []};
-      if (element.signals[name].observers.indexOf(observer) > -1) return Event;
+      if (!(element = $(element)) || !name || !observer) return;
 
-      var custom = Event.custom[name];
+      var callback = callbackWrapper(observer);
+      var custom = customEvents[name];
       if (custom) {
         var real = custom.real;
-        var callback = custom.callback ? custom.callback.bindAsEventListener(Event, element) : null;
-        if (custom.connect) custom.connect.call(Event, element, observer);
+        callback = custom.callback ? custom.callback.bindAsEventListener(Event, element, callback) : null;
       }
+      if (registerCallback(element, real || name, callback, observer))
+        return element;
 
-      element.signals[name].observers.push(observer);
-      element.signals[name].callbacks.push(callback || observer);
-      if ((real || name) != 'activate')
-        Event.observe.call(Event, element, real || name, callback || observer);
-      return Event;
+      return Event.observe(element, real || name, callback);
     },
     signalDisconnect: function(element, name, observer) {
-      if (!element || !element.signals || !element.signals[name]) return;
-      var index = element.signals[name].observers.indexOf(observer);
-      if (index == -1) return;
+      if (!(element = $(element))) return;
 
-      var custom = Event.custom[name];
-      if (custom && custom.real)
-        var real = custom.real;
+      if (!observer && name) {
+        var custom = customEvents[name];
+        if (custom && custom.real)
+          name = custom.real;
 
-      element.signals[name].observers.splice(index, 1);
-      var callback = element.signals[name].callbacks.splice(index, 1)[0];
-      Event.stopObserving.call(Event, element, real || name, callback);
-      return Event;
+        var id = getEventID(element);
+        cache[id] = cache[id] || {};
+        cache[id][name] = [];
+        return Event.stopObserving(element, name);
+      } else if (!name) {
+        var id = getEventID(element);
+        cache[id] = {};
+        return Event.stopObserving(element);
+      }
+
+      var custom = customEvents[name];
+      var real = custom && custom.real ? custom.real : name;
+      var c = getCacheForName(element, real);
+      var index;
+      if ((index = c.pluck('observer').indexOf(observer)) == -1) return element;
+      var callback = c[index];
+      c = c.without(callback);
+      return Event.stopObserving(element, real, callback);
     },
     signalDisconnectAll: function(element, name) {
-      if (!element || !element.signals || !element.signals[name]) return;
-      var custom = Event.custom[name];
-      if (custom)
-        var real = custom.real;
-
-      for (var i = 0, length = element.signals[name].observers.length; i < length; i++) {
-        Event.stopObserving.call(this, element, real || name, element.signals[name].callbacks[i]);
-      }
-      element.signals[name] = {observers: [], callbacks: []};
-      return Event;
+      return Event.signalDisconnect(element, name);
     },
     emitSignal: function(element, name) {
+      if (!(element = $(element)) || !name) return;
+
       var args = $A(arguments);
       var element = args.shift();
       var name = args.shift();
-      if (!element || !element.signals || !element.signals[name]) return;
-      element.signals[name].observers.each(function ($_) {
-        if (args)
-          $_.apply(element, args);
-        else
-          $_.call(element);
-      });
-      return Event;
-    },
-
-    // This is more or less copied from mootools, changed to use prototype's functions, and with a few additions
-    custom: {
-      mouseenter: {
-        real: 'mouseover',
-        callback: function(event, element) {
-          var target = event.relatedTarget || Event.relatedTarget(event);
-          try { target.parentNode } catch(e) { target = null }
-          if (!target || target == element || Element.descendantOf(target, element)) return;
-          Event.emitSignal(element, 'mouseenter', event);
-        }
-      },
-      mouseleave: {
-        real: 'mouseout',
-        callback: function(event, element) {
-          var target = event.relatedTarget || Event.relatedTarget(event);
-          try { target.parentNode } catch(e) { target = null }
-          if (!target || target == element || Element.descendantOf(target, element)) return;
-          Event.emitSignal(element, 'mouseleave', event);
-        }
-      },
-      mousewheel: {
-        real: (Prototype.Browser.Gecko) ? 'DOMMouseScroll' : 'mousewheel',
-        callback: function(event, element) {
-          if (event.detail)
-            event.scrollDirection = event.detail;
-          else if (event.wheelDelta)
-            event.scrollDirection = event.wheelDelta / -40;
-          Event.emitSignal(element, 'mousewheel', event);
-        }
-      }
+      return Event.fire(element, name, args);
     }
   };
 })());
@@ -195,9 +228,9 @@ Object.extend(Event, (function() {
         if (name === null || name == undefined || name == '')
           return;
         if (params.keys().include(name))
-          params[name] = [params[name], value].flatten();
+          params.set(name, [params[name], value].flatten());
         else
-          params[name] = value;
+          params.set(name, value);
       };
 
       sliders.each(function(s) {
@@ -304,6 +337,17 @@ Object.extend(Event, (function() {
   Element.addMethods(ElementMethods);
   Object.extend(Element, ElementMethods);
 })();
+
+Object.extend(Function.prototype, {
+  bindAsEventListener: function() {
+    var __method = this, args = $A(arguments), object = args.shift();
+    return function(event) {
+      var inner_args = $A(arguments);
+      inner_args.shift();
+      return __method.apply(object, [event || window.event].concat(args, inner_args));
+    }
+  }
+});
 
 Object.extend(String.prototype, {
   createTextNode: function() {

@@ -264,8 +264,8 @@ Object.extend(Object.extend(Page, Widget), {
 	    this.druid.currentPage = this;
 	    this.druid._refreshButtons();
 
-	    this.druid.emitSignal('current_page_change', this);
-	    this.emitSignal('select');
+	    this.druid.emitSignal('iwl:current_page_change', this);
+	    this.emitSignal('iwl:select');
 	} else {
 	    if (!this.isSelected()) return;
 	    var callback;
@@ -287,7 +287,7 @@ Object.extend(Object.extend(Page, Widget), {
 		var prev = this.prevPage() || this.nextPage();
 		if (prev) prev.setSelected(true);
 	    }
-	    this.emitSignal('unselect');
+	    this.emitSignal('iwl:unselect');
 	}
 	return this;
     },
@@ -329,7 +329,7 @@ Object.extend(Object.extend(Page, Widget), {
 	this.parentNode.removeChild(this);
 	this.druid.pages = this.druid.pages.without(this);
 	this.druid._refreshButtons();
-	this.emitSignal('remove');
+	this.emitSignal('iwl:remove');
 	return this;
     },
 

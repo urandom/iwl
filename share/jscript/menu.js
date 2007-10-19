@@ -365,7 +365,7 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
 	    this.checked = true;
 	    this.addClassName('menu_check_item_checked');
 	}
-	this.emitSignal('change');
+	this.emitSignal('iwl:change');
 	return this;
     }
 
@@ -391,7 +391,7 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
 	}.bind(this));
 	this.checked = true;
 	this.addClassName('menu_radio_item_checked');
-	this.emitSignal('change');
+	this.emitSignal('iwl:change');
 	return this;
     }
 
@@ -468,7 +468,7 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
                 if (this.submenu)
                     this.submenu.popUp();
 
-                this.emitSignal('select');
+                this.emitSignal('iwl:select');
             } else {
                 if (!this.isSelected()) return;
                 if (this.menu.currentItem == this)
@@ -477,7 +477,7 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
                 if (this.submenu)
                     this.submenu.popDown();
 
-                this.emitSignal('unselect');
+                this.emitSignal('iwl:unselect');
             }
             return this;
         },
@@ -543,8 +543,8 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
          * @returns The object
          * */
         activate: function() {
-            this.menu.emitSignal('menu_item_activate', this);
-            this.emitSignal('activate');
+            this.menu.emitSignal('iwl:menu_item_activate', this);
+            this.emitSignal('iwl:activate');
         },
 
         _init: function(id, menu) {

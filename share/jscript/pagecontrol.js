@@ -66,7 +66,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	    if (--this._buttonCount === 0) {
 		this.loaded = true;
 		this.__refresh();
-		this.emitSignal('load');
+		this.emitSignal('iwl:load');
 	    }
 	};
 	this.firstButton = $(this.id + '_first').signalConnect('load', buttonLoad.bind(this));
@@ -88,7 +88,7 @@ Object.extend(Object.extend(PageControl, Widget), {
     __initEvents: function() {
 	this.firstButton.signalConnect('click', function() {
 	    if (!this.element) return;
-	    this.emitSignal('current_page_is_changing', {type: 'first'});
+	    this.emitSignal('iwl:current_page_is_changing', {type: 'first'});
 	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'first',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
@@ -96,7 +96,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	}.bind(this));
 	this.prevButton.signalConnect('click', function() {
 	    if (!this.element) return;
-	    this.emitSignal('current_page_is_changing', {type: 'prev'});
+	    this.emitSignal('iwl:current_page_is_changing', {type: 'prev'});
 	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'prev',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
@@ -104,7 +104,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	}.bind(this));
 	this.nextButton.signalConnect('click', function() {
 	    if (!this.element) return;
-	    this.emitSignal('current_page_is_changing', {type: 'next'});
+	    this.emitSignal('iwl:current_page_is_changing', {type: 'next'});
 	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'next',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
@@ -112,7 +112,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	}.bind(this));
 	this.lastButton.signalConnect('click', function() {
 	    if (!this.element) return;
-	    this.emitSignal('current_page_is_changing', {type: 'last'});
+	    this.emitSignal('iwl:current_page_is_changing', {type: 'last'});
 	    this.element.emitEvent(this.eventName, {
 		page: this.currentPage, type: 'last',
 		pageSize: this.options.pageSize, pageCount: this.options.pageCount
@@ -122,7 +122,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	    if (!this.element) return;
 	    if (event.keyCode == 13 && this.input.value != this.currentPage) {
 		if (!checkElementValue(this.input, {reg:/^\d*$/})) return;
-		this.emitSignal('current_page_is_changing', {type: 'input', value: this.input.value});
+		this.emitSignal('iwl:current_page_is_changing', {type: 'input', value: this.input.value});
 		this.element.emitEvent(this.eventName, {
 		    page: this.currentPage, type: 'input',
 		    value: this.input.value, pageSize: this.options.pageSize, pageCount: this.options.pageCount
@@ -173,7 +173,7 @@ Object.extend(Object.extend(PageControl, Widget), {
 	} else {
 	    this.__refresh();
 	}
-	this.emitSignal('current_page_change');
+	this.emitSignal('iwl:current_page_change');
     },
     __toggleButtons: function() {
 	var visible = {visibility: 'visible'};
