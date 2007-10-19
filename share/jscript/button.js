@@ -335,9 +335,7 @@ Object.extend(Object.extend(Button, Widget), {
                 left: position[0] - marginLeft + 'px',
                 top: position[1] - marginTop + 'px'
             });
-        this.disabledLayer.signalConnect('click', function(evt) {
-                evt.stop();
-            });
+        this.disabledLayer.signalConnect('click', function(event) {event.stop()});
         this.parentNode.appendChild(this.disabledLayer);
 
         return this;

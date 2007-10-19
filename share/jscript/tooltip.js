@@ -240,14 +240,10 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
             this.element.signalConnect(signal, function (event) {
                 if (!this.visible() || this.__fade) {
                     this.showTooltip();
-                    Event.extend(event);
-                    if (event.stop)
-                        event.stop();
+                    Event.stop(event);
                 } else if (toggle && (this.visible() || this.__appear)) {
                     this.hideTooltip();
-                    Event.extend(event);
-                    if ('stop' in event)
-                        event.stop();
+                    Event.stop(event);
                 }
             }.bind(this));
             if (!this.options.hidden)
@@ -265,9 +261,7 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
             element.signalConnect(signal, function (event) {
                 if (this.visible() || this.__appear) {
                     this.hideTooltip();
-                    Event.extend(event);
-                    if ('stop' in event)
-                        event.stop();
+                    Event.stop(event);
                 }
             }.bind(this));
             return this;
@@ -292,10 +286,10 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
             if (parseInt(this.options.width))
                 this.options.width = parseInt(this.options.width) + 'px';
 
-            if (window.loaded)
+            if (document.loaded)
                 append.call(this);
             else
-                Event.signalConnect(window, 'load', append.bind(this));
+                Event.signalConnect(document, 'dom:loaded', append.bind(this));
 
             draw.call(this);
         }

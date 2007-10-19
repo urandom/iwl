@@ -13,7 +13,6 @@ Object.extend(Object.extend(Menu, Widget), (function () {
         else
             this.popUp();
         IWL.Focus.current = this;
-        Event.extend(event);
         Event.stop(event);
         return this;
     }
