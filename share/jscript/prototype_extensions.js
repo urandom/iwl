@@ -613,8 +613,10 @@ if (Prototype.Browser.IE)
         if (conflicts.length) {
           var attributeString = '';
           conflicts.each(function (tuple) {
-              delete attributes[tuple[0]];
-              attributeString += tuple[0] + '="' + tuple[1] + '"';
+              if (typeof tuple[1] == 'string') {
+                delete attributes[tuple[0]];
+                attributeString += tuple[0] + '="' + tuple[1] + '"';
+              }
             });
           tagName = '<' + tagName + ' ' + attributeString + '>';
           return Element.writeAttribute(document.createElement(tagName), attributes);
