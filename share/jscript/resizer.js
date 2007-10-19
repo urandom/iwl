@@ -26,11 +26,11 @@ var Resizer = Class.create((function() {
       this.handlerHolder = new Element('div',
         {className: this.options.className + '_handler_holder'});
 
-      this.outline.setStyle({opacity: this.options.outlineOpacity, visibility: 'hidden'});
-      this.handlerHolder.setStyle({backgroundColor: 'transparent', visibility: 'hidden'});
-
       this.element.appendChild(this.outline);
       this.element.appendChild(this.handlerHolder);
+
+      this.outline.setStyle({opacity: this.options.outlineOpacity, visibility: 'hidden'});
+      this.handlerHolder.setStyle({backgroundColor: 'transparent', visibility: 'hidden'});
     }
 
     this.handlers = {};

@@ -37,9 +37,6 @@ Object.extend(Object.extend(Upload, Widget), {
 	this.file.onchange = this.__uploadFile.bindAsEventListener(this);
 	this.file.onkeypress = function() {return false;};
 	this.file.onpaste = function() {return false;};
-//        if (Prototype.Browser.Gecko)
-//            this.file.onmousedown = function() {return false;};
-//        this.file.onclick = function(evt) {if (evt) Event.stop(evt);};
     },
     __uploadFile: function() {
 	this.submit();

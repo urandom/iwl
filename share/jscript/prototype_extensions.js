@@ -601,6 +601,31 @@ document.insertScript = (function () {
   }
 })();
 
+if (Prototype.Browser.IE)
+  (function() {
+    var element = this.Element;
+    this.Element = function(tagName, attributes) {
+      attributes = attributes || { };
+      tagName = tagName.toLowerCase();
+      var cache = Element.cache;
+      if (Prototype.Browser.IE) {
+        var conflicts = $H(attributes).grep(/(?:name|on\w+)/);
+        if (conflicts.length) {
+          var attributeString = '';
+          conflicts.each(function (tuple) {
+              delete attributes[tuple[0]];
+              attributeString += tuple[0] + '="' + tuple[1] + '"';
+            });
+          tagName = '<' + tagName + ' ' + attributeString + '>';
+          return Element.writeAttribute(document.createElement(tagName), attributes);
+        }
+      }
+      if (!cache[tagName]) cache[tagName] = Element.extend(document.createElement(tagName));
+      return Element.writeAttribute(cache[tagName].cloneNode(false), attributes);
+    };
+    Object.extend(this.Element, element || { });
+  }).call(window);
+
 /* Abort works correctly in 1.6
 // Overload this, for aborting the request
 Object.extend(Ajax.Request.prototype, {

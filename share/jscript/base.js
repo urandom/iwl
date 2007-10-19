@@ -262,7 +262,8 @@ Object.extend(IWL, (function() {
             else
                 paren.appendChild(element);
 
-            if (obj.children)
+            // Internet explorer throws an error if an element is appended to a noscript element
+            if (obj.children && obj.tag != 'noscript')
                 obj.children.each(function(c) {
                     IWL.createHtmlElement(c, element);
                 });
@@ -421,6 +422,7 @@ IWL.exceptionHandler = function() {
     if (window.console) {
 	console.dir(arguments[1]);
     } else {
+        debugger;
 	IWL.displayStatus("Error message: " + arguments[1].message);
 	IWL.displayStatus(arguments[1].number & 0xFFFF);
 	IWL.displayStatus(arguments[1].name);

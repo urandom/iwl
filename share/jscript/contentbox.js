@@ -405,6 +405,7 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	this.modalElement = new Element('div', {
 	    id: this.id + '_modal', className: 'modal_view'
 	});
+	paren.insertBefore(this.modalElement, this);
 	if (this.options.closeModalOnClick)
 	    this.modalElement.observe('click', this.close.bind(this));
 	this.modalElement.setOpacity(this.options.modalOpacity);
@@ -414,7 +415,6 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	    height: page_dims.height + 'px',
 	    width: page_dims.width + 'px'
 	});
-	paren.insertBefore(this.modalElement, this);
 	Event.observe(window, 'resize', function() {
 	    if (!this.modalElement) return;
 	    var page_dims = document.viewport.getDimensions();

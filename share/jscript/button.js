@@ -327,6 +327,7 @@ Object.extend(Object.extend(Button, Widget), {
         this.disabledLayer = new Element('div', {
                 className: $A(this.classNames()).first() + '_disabled_layer'
             });
+        this.parentNode.appendChild(this.disabledLayer);
         this.disabledLayer.setStyle({
                 opacity: 0.01, position: 'absolute',
                 width: dims.width + marginRight + marginLeft + 'px',
@@ -336,7 +337,6 @@ Object.extend(Object.extend(Button, Widget), {
                 top: position[1] - marginTop + 'px'
             });
         this.disabledLayer.signalConnect('click', function(event) {event.stop()});
-        this.parentNode.appendChild(this.disabledLayer);
 
         return this;
     },
