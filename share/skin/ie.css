@@ -18,3 +18,7 @@ div.notebook_content {
 div.shadowbox div.contentbox_footerr {
     padding-bottom: 1px;
 }
+
+div.iconbox_status_label, .icon_label {
+    text-overflow:ellipsis;
+}

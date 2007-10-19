@@ -154,7 +154,6 @@ div.iconbox_status_label {
     border: 1px solid #6A81A3;
     padding: 2px;
     overflow: hidden;
-    text-overflow:ellipsis;
     vertical-align: middle;
     height: 1.5em;
 }
@@ -178,7 +177,6 @@ div.icon_selected {
 
 .icon_label {
     overflow: hidden;
-    text-overflow:ellipsis;
     margin: 0;
     vertical-align: middle;
     font-size: 8pt;
