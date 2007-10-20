@@ -6,6 +6,138 @@
 IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var loaded = false;
 
+    function disabledImageChange() {
+        for (var i = 0; i < this.buttonParts.length; i++)
+            changeBackground.call(this, this.buttonParts[i], "disabled");
+    }
+
+    function clickImageChange() {
+        IWL.removeSelection();
+        for (var i = 0; i < this.buttonParts.length; i++)
+            changeBackground.call(this, this.buttonParts[i], "click");
+    }
+
+    function defaultImageChange(id) {
+        for (var i = 0; i < this.buttonParts.length; i++)
+            changeBackground.call(this, this.buttonParts[i], "default")
+    }
+
+    function createElements(image, label) {
+        var id = this.id;
+        var className = $A(this.classNames()).first();
+
+        this.update(
+            '<div id="' + id + '_tl" class="'      + className + '_tl"></div>'      + 
+            '<div id="' + id + '_top" class="'     + className + '_top"></div>'     + 
+            '<div id="' + id + '_tr" class="'      + className + '_tr"></div>'      + 
+            '<div id="' + id + '_l" class="'       + className + '_l"></div>'       + 
+            '<div id="' + id + '_content" class="' + className + '_content"></div>' + 
+            '<div id="' + id + '_r" class="'       + className + '_r"></div>'       + 
+            '<div id="' + id + '_bl" class="'      + className + '_bl"></div>'      + 
+            '<div id="' + id + '_bottom" class="'  + className + '_bottom"></div>'  + 
+            '<div id="' + id + '_br" class="'      + className + '_br"></div>'
+        );
+
+        this.buttonParts = this.childElements();
+        this.buttonContent = $(id + '_content');
+
+        image = image ? unescape(image) : '';
+        var classNames = className + '_label ' + className + '_label_' + this.options.size;
+        this.buttonContent.update(
+            image + '<span id="' + id + '_label" class="' + classNames + '">' +
+                unescape(label) + '</span>'
+        );
+        this.buttonImage = $(id + '_image');
+        this.buttonLabel = $(id + '_label');
+    }
+
+    function checkComplete() {
+        if (!this.buttonImage) {
+            if (!this.buttonLabel.childNodes.length)
+                this.buttonLabel.appendChild('&nbsp;'.createTextNode());
+
+            if (this.buttonLabel.firstChild.nodeValue 
+                    && !this.buttonContent.clientWidth)
+                setTimeout(checkComplete.bind(this), 100);
+            else
+                this.adjust();
+        }
+    }
+
+    function changeBackground(part, stat) {
+        if (!part) return;
+        var url = IWL.Config.IMAGE_DIR + "/button/" + stat + part.id.substr(part.id.lastIndexOf("_"))
+            + ".gif";
+        part.style.backgroundImage = "url(" + url + ")";
+    }
+
+    function visibilityToggle(state) {
+        if (!state) {
+            var visible = this.visible();
+            if (Prototype.Browser.Gecko && !visible) {
+                var els = this.style;
+                var originalVisibility = els.visibility;
+                var originalPosition = els.position;
+                var originalDisplay = els.display;
+                els.visibility = 'hidden';
+                els.position = 'absolute';
+                els.display = 'block';
+                return {visibility: originalVisibility, position: originalPosition, display: originalDisplay};
+            }
+        } else {
+            if (Prototype.Browser.Gecko) {
+                var els = this.style;
+                els.display = state.display;
+                els.position = state.position;
+                els.visibility = state.visibility;
+                return false;
+            }
+        }
+    }
+
+    function createDisabledLayer() {
+        if (!this.parentNode)
+            return;
+
+        var position     = this.cumulativeOffset();
+        var dims         = this.getDimensions();
+        var marginTop    = parseInt(this.getStyle('margin-top'));
+        var marginRight  = parseInt(this.getStyle('margin-right'));
+        var marginBottom = parseInt(this.getStyle('margin-bottom'));
+        var marginLeft   = parseInt(this.getStyle('margin-left'));
+        var zIndex       = parseInt(this.getStyle('z-index'));
+        if (isNaN(marginTop))    marginTop    = 0;
+        if (isNaN(marginRight))  marginRight  = 0;
+        if (isNaN(marginBottom)) marginBottom = 0;
+        if (isNaN(marginLeft))   marginLeft   = 0;
+        if (isNaN(zIndex))       zIndex       = 0;
+
+        this.disabledLayer = new Element('div', {
+                className: $A(this.classNames()).first() + '_disabled_layer'
+            });
+        this.parentNode.appendChild(this.disabledLayer);
+        this.disabledLayer.setStyle({
+                opacity: 0.01, position: 'absolute',
+                width: dims.width + marginRight + marginLeft + 'px',
+                height: dims.height + marginTop + marginBottom + 'px',
+                zIndex: zIndex + 1, backgroundColor: 'white',
+                left: position[0] - marginLeft + 'px',
+                top: position[1] - marginTop + 'px'
+            });
+        this.disabledLayer.signalConnect('click', function(event) {event.stop()});
+
+        return this;
+    }
+
+    function removeDisabledLayer() {
+        if (!this.disabledLayer)
+            return;
+
+        this.disabledLayer.remove();
+        this.disabledLayer = undefined;
+        return this;
+    }
+
     return {
         /**
          * Adjusts the button. Should be called if the button was hidden when created
@@ -14,7 +146,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         adjust: function() {
             var square = 6;
             var corner_size = 6;
-            var button = this;
             var image = this.buttonImage;
             var label = this.buttonLabel;
             var topleft = this.buttonParts[0];
@@ -26,7 +157,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var bottomleft = this.buttonParts[6];
             var bottom = this.buttonParts[7];
             var bottomright = this.buttonParts[8];
-            var state = this.__visibilityToggle();
+            var state = visibilityToggle.call(this);
 
             if (!content) return;
             loaded = false;
@@ -78,7 +209,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var width = dims.width;
             height = height || dims.height;
 
-            if (state) this.__visibilityToggle(state);
+            if (state) visibilityToggle.call(this, state);
             if (!width || !height) {
                 setTimeout(this.adjust.bind(this), 500);
                 return;
@@ -118,10 +249,8 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 bottomright.style.left = corner_size + width + 'px';
                 bottomright.style.top = 2 * square + height - corner_size + 'px';
             }
-            if (button) {
-                button.style.width = 2 * corner_size + width + 'px';
-                button.style.height = 2 * square + height + 'px';
-            }
+            this.style.width = 2 * corner_size + width + 'px';
+            this.style.height = 2 * square + height + 'px';
             this.emitSignal('iwl:load');
             loaded = true;
 
@@ -172,16 +301,16 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (disabled) {
                 this.addClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = true;
-                this.__disabledImageChange();
+                disabledImageChange.call(this);
                 setTimeout(function() {
-                    this.__createDisabledLayer();
+                    createDisabledLayer.call(this);
                 }.bind(this), 500);
                 this.adjust();
             } else {
                 this.removeClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = false;
-                this.__defaultImageChange();
-                this.__deleteDisabledLayer();
+                defaultImageChange.call(this);
+                removeDisabledLayer.call(this);
                 this.adjust();
             }
             return this;
@@ -220,135 +349,12 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }, arguments[2] || {});
             this.button_submit = this.options.submit ? this.next() : null;
             loaded = false;
-            this.__createElements(json.image, json.label);
-            this.__checkComplete();
-            this.observe('mousedown', this.__clickImageChange.bindAsEventListener(this));
-            this.observe('mouseup', this.__defaultImageChange.bindAsEventListener(this));
+            createElements.call(this, json.image, json.label);
+            checkComplete.call(this);
+            this.observe('mousedown', clickImageChange.bindAsEventListener(this));
+            this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
             if (this.options.disabled)
                 this.setDisabled(true);
-        },
-
-        __disabledImageChange: function() {
-            for (var i = 0; i < this.buttonParts.length; i++)
-                this.__buttonChangeBgImage(this.buttonParts[i], "disabled");
-        },
-        __clickImageChange: function() {
-            IWL.removeSelection();
-            for (var i = 0; i < this.buttonParts.length; i++)
-                this.__buttonChangeBgImage(this.buttonParts[i], "click");
-        },
-        __defaultImageChange: function(id) {
-            for (var i = 0; i < this.buttonParts.length; i++)
-                this.__buttonChangeBgImage(this.buttonParts[i], "default")
-        },
-        __createElements: function(image, label) {
-            var id = this.id;
-            var className = $A(this.classNames()).first();
-
-            this.update(
-                '<div id="' + id + '_tl" class="' + className + '_tl"></div>' +
-                '<div id="' + id + '_top" class="' + className + '_top"></div>' +
-                '<div id="' + id + '_tr" class="' + className + '_tr"></div>' +
-                '<div id="' + id + '_l" class="' + className + '_l"></div>' +
-                '<div id="' + id + '_content" class="' + className + '_content"></div>' +
-                '<div id="' + id + '_r" class="' + className + '_r"></div>' +
-                '<div id="' + id + '_bl" class="' + className + '_bl"></div>' +
-                '<div id="' + id + '_bottom" class="' + className + '_bottom"></div>' +
-                '<div id="' + id + '_br" class="' + className + '_br"></div>'
-            );
-
-            this.buttonParts = this.childElements();
-            this.buttonContent = $(id + '_content');
-
-            image = image ? unescape(image) : '';
-            var classNames = className + '_label ' + className + '_label_' + this.options.size;
-            this.buttonContent.update(
-                image + '<span id="' + id + '_label" class="' + classNames + '">' +
-                    unescape(label) + '</span>'
-            );
-            this.buttonImage = $(id + '_image');
-            this.buttonLabel = $(id + '_label');
-        },
-        __checkComplete: function() {
-            if (!this.buttonImage) {
-                if (!this.buttonLabel.childNodes.length)
-                    this.buttonLabel.appendChild('&nbsp;'.createTextNode());
-
-                if (this.buttonLabel.firstChild.nodeValue 
-                        && !this.buttonContent.clientWidth)
-                    setTimeout(this.__checkComplete.bind(this), 100);
-                else
-                    this.adjust();
-            }
-        },
-        __buttonChangeBgImage: function(part, stat) {
-            if (!part) return;
-            var url = IWL.Config.IMAGE_DIR + "/button/" + stat + part.id.substr(part.id.lastIndexOf("_"))
-                + ".gif";
-            part.style.backgroundImage = "url(" + url + ")";
-        },
-        __visibilityToggle: function(state) {
-            if (!state) {
-                var visible = this.visible();
-                if (Prototype.Browser.Gecko && !visible) {
-                    var els = this.style;
-                    var originalVisibility = els.visibility;
-                    var originalPosition = els.position;
-                    var originalDisplay = els.display;
-                    els.visibility = 'hidden';
-                    els.position = 'absolute';
-                    els.display = 'block';
-                    return {visibility: originalVisibility, position: originalPosition, display: originalDisplay};
-                }
-            } else {
-                if (Prototype.Browser.Gecko) {
-                    var els = this.style;
-                    els.display = state.display;
-                    els.position = state.position;
-                    els.visibility = state.visibility;
-                }
-            }
-        },
-        __createDisabledLayer: function() {
-            if (!this.parentNode)
-                return;
-
-            var position     = this.cumulativeOffset();
-            var dims         = this.getDimensions();
-            var marginTop    = parseInt(this.getStyle('margin-top'));
-            var marginRight  = parseInt(this.getStyle('margin-right'));
-            var marginBottom = parseInt(this.getStyle('margin-bottom'));
-            var marginLeft   = parseInt(this.getStyle('margin-left'));
-            var zIndex       = parseInt(this.getStyle('z-index'));
-            if (isNaN(marginTop))    marginTop    = 0;
-            if (isNaN(marginRight))  marginRight  = 0;
-            if (isNaN(marginBottom)) marginBottom = 0;
-            if (isNaN(marginLeft))   marginLeft   = 0;
-            if (isNaN(zIndex))       zIndex       = 0;
-
-            this.disabledLayer = new Element('div', {
-                    className: $A(this.classNames()).first() + '_disabled_layer'
-                });
-            this.parentNode.appendChild(this.disabledLayer);
-            this.disabledLayer.setStyle({
-                    opacity: 0.01, position: 'absolute',
-                    width: dims.width + marginRight + marginLeft + 'px',
-                    height: dims.height + marginTop + marginBottom + 'px',
-                    zIndex: zIndex + 1, backgroundColor: 'white',
-                    left: position[0] - marginLeft + 'px',
-                    top: position[1] - marginTop + 'px'
-                });
-            this.disabledLayer.signalConnect('click', function(event) {event.stop()});
-
-            return this;
-        },
-        __deleteDisabledLayer: function() {
-            if (!this.disabledLayer)
-                return;
-
-            this.disabledLayer.remove();
-            this.disabledLayer = undefined;
-            return this;
         }
     }
 })());

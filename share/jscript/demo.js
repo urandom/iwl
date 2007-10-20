@@ -9,7 +9,6 @@ function activate_widgets_response(json) {
     IWL.enableView();
     if (!json.data) return;
     var content = $('content');
-    $('display_tab').setSelected(true);
     content.update();
     IWL.createHtmlElement(json.data, content);
     content.setStyle({display: 'block'});
