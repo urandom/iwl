@@ -53,9 +53,9 @@ accordion.prototype = {
 			accordion.onclick = function() {return false;};
 			
 			if (this.options.direction == 'horizontal') {
-				var options = $H({width: '0px'});
+				var options = {width: '0px'};
 			} else {
-				var options = $H({height: '0px'});			
+				var options = {height: '0px'};			
 			}			
 			this.currentAccordion = $(accordion.next(0)).setStyle(options);			
 			
@@ -79,18 +79,18 @@ accordion.prototype = {
 		this.currentAccordion.previous(0).addClassName(this.options.classNames.toggleActive);
 
 		if (this.options.direction == 'horizontal') {
-			var adjustments = $H({
+			var adjustments = {
 				scaleX: true,
 				scaleY: false
-			});
+			};
 		} else {
-			var adjustments = $H({
+			var adjustments = {
 				scaleX: false,
 				scaleY: true
-			});			
+			};
 		}
 			
-		var options = $H({
+                var options = Object.extend({
 			sync: true,
 			scaleFrom: 0,
 			scaleContent: false,
@@ -99,8 +99,7 @@ accordion.prototype = {
 				originalHeight: this.options.defaultSize.height ? this.options.defaultSize.height : this.currentAccordion.scrollHeight,
 				originalWidth: this.options.defaultSize.width ? this.options.defaultSize.width : this.currentAccordion.scrollWidth
 			}
-		});
-		options.merge(adjustments);
+		}, adjustments);
 		
 		this.effects.push(
 			new Effect.Scale(this.currentAccordion, 100, options)
@@ -109,12 +108,11 @@ accordion.prototype = {
 		if (this.showAccordion) {
 			this.showAccordion.previous(0).removeClassName(this.options.classNames.toggleActive);
 			
-			options = $H({
+			options = Object.extend({
 				sync: true,
 				scaleContent: false,
 				transition: Effect.Transitions.sinoidal
-			});
-			options.merge(adjustments);
+			}, adjustments);
 			
 			this.effects.push(
 				new Effect.Scale(this.showAccordion, 0, options)
