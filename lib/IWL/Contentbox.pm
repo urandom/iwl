@@ -65,6 +65,14 @@ Makes the window close when the user clicks outside of it
 
 =over 4
 
+=item B<show>
+
+Fires when the contentbox has been shown
+
+=item B<hide>
+
+Fires when the contentbox has been hidden
+
 =item B<close>
 
 Fires when the contentbox has closed
@@ -522,7 +530,7 @@ sub __init {
     $self->_appendAfter($self->{__init});
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'dist/dragdrop.js', 'resizer.js', 'contentbox.js');
-    $self->{_customSignals} = {close => []};
+    $self->{_customSignals} = {close => [], hide => [], show => []};
 
     # Callbacks
     return $self;
