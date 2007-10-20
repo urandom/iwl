@@ -4,8 +4,6 @@
  * @extends IWL.Widget
  * */
 IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
-    var loaded = false;
-
     function disabledImageChange() {
         for (var i = 0; i < this.buttonParts.length; i++)
             changeBackground.call(this, this.buttonParts[i], "disabled");
@@ -160,7 +158,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var state = visibilityToggle.call(this);
 
             if (!content) return;
-            loaded = false;
+            this.loaded = false;
             if (!label.getText()) {
                 var ml = parseInt(image.getStyle('margin-left')) || 0;
                 var mr = parseInt(image.getStyle('margin-right')) || 0;
@@ -252,7 +250,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.style.width = 2 * corner_size + width + 'px';
             this.style.height = 2 * square + height + 'px';
             this.emitSignal('iwl:load');
-            loaded = true;
+            this.loaded = true;
 
             return this;
         },
@@ -296,7 +294,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setDisabled: function(disabled) {
             if (disabled == this._disabled)
                 return;
-            if (!loaded)
+            if (!this.loaded)
                 this.signalConnect('load', this.setDisabled.bind(this, disabled));
             if (disabled) {
                 this.addClassName($A(this.classNames()).first() + '_disabled');
@@ -348,7 +346,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 submit: false 
             }, arguments[2] || {});
             this.button_submit = this.options.submit ? this.next() : null;
-            loaded = false;
+            this.loaded = false;
             createElements.call(this, json.image, json.label);
             checkComplete.call(this);
             this.observe('mousedown', clickImageChange.bindAsEventListener(this));
