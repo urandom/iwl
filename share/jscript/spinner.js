@@ -1,9 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
  * @class IWL.Spinner is a class for adding entry spinners 
- * @extends Widget
+ * @extends IWL.Widget
  * */
-IWL.Spinner = Object.extend(Object.extend({}, Widget), (function() {
+IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
     var periodical_options = {border: 0.005, frequency: 0.5};
 
     function keyEventsCB(event) {
@@ -229,7 +229,7 @@ IWL.Spinner = Object.extend(Object.extend({}, Widget), (function() {
             this.setValue(this.options.value);
 
             connectSpinnerSignals.call(this);
-            keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
+            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
             IWL.Focus.register(this);
 
             this.emitSignal('iwl:load');

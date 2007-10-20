@@ -406,7 +406,7 @@ sub _realize {
     $self->SUPER::_realize;
     $self->{__titler}->prependChild($self->{__titleImage});
     $self->__set_type;
-    $self->{__init}->setScript("Contentbox.create('$id', $options);");
+    $self->{__init}->setScript("IWL.Contentbox.create('$id', $options);");
 }
 
 sub _setupDefaultClass {

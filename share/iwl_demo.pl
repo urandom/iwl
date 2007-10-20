@@ -566,9 +566,9 @@ sub generate_menus {
     $button_menu->appendMenuItem("Submenu")->setSubmenu($submenu);
 
     $submenu->setMaxHeight(200)->signalConnect(menu_item_activate => q{
-        displayStatus('Received item ' + arguments[0].id);
+        displayStatus('Received item ' + arguments[1].id);
     });
-    $submenu->appendMenuItem("Submenu item $_")->setType('check') foreach (1 .. 20);
+    $submenu->appendMenuItem("Submenu item $_")->setType('check')->setId($_) foreach (1 .. 20);
 
     return $container->getObject;
 }

@@ -6,12 +6,12 @@ function demo_init () {
 
 function activate_widgets_response(json) {
     if (!json) return;
-    enableView();
+    IWL.enableView();
     if (!json.data) return;
     var content = $('content');
     $('display_tab').setSelected(true);
     content.update();
-    createHtmlElement(json.data, content);
+    IWL.createHtmlElement(json.data, content);
     content.setStyle({display: 'block'});
 }
 
@@ -191,10 +191,10 @@ function run_prototype_tests() {
             stringWithScripts.evalScripts();
             assertEqual(4, evalScriptsCounter);
 
-            window.Menu = undefined;
+            IWL.Menu = undefined;
             assertEqual("SCRIPT",
-                (('foo <script src="' + IWLConfig.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts())[1][0].tagName);
-            wait(2000, function() { assertEqual('object', typeof Menu); });
+                (('foo <script src="' + IWL.Config.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts())[1][0].tagName);
+            wait(2000, function() { assertEqual('object', typeof IWL.Menu); });
             window.evalScriptsCounter = undefined;
         }},
         testPeriodicalAccelerator: function() { with(this) {
@@ -257,12 +257,12 @@ function run_prototype_tests() {
         }},
         testInsertScript: function() { with(this) {
             var loaded = false;
-            var script = IWLConfig.JS_DIR + '/calendar.js';
+            var script = IWL.Config.JS_DIR + '/calendar.js';
             document.insertScript(script,
                 {onComplete: function(url) { loaded = url; this.proceed()}.bind(this)});
             delay(function() {
                 assertEqual(script, loaded);
-                assertEqual('object', typeof window.Calendar);
+                assertEqual('object', typeof IWL.Calendar);
             });
         }}
     }, 'testlog');
@@ -429,7 +429,7 @@ function run_base_tests() {
 
             wait(1000, function() {
                 assertEqual('beta', $('test_table').select('td')[0].getText());
-                assert(Iconbox);
+                assert(IWL.Iconbox);
                 element.next().remove();
                 element.next().remove();
                 element.remove();
@@ -467,7 +467,7 @@ function run_base_tests() {
             IWL.displayStatus('foo');
             assert($('status_bar'), 'First status');
             assertEqual('foo', $('status_bar').getText(), 'It has text');
-            displayStatus('bar');
+            IWL.displayStatus('bar');
             assert(/foo[\r\n]*bar/.test($('status_bar').getText()), 'Another text added');
             IWL.removeStatus();
             IWL.removeStatus();

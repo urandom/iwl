@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Tree is a class for adding tree widgets
- * @extends Widget
+ * @class IWL.Tree is a class for adding tree widgets
+ * @extends IWL.Widget
  * */
-var Tree = {};
-Object.extend(Object.extend(Tree, Widget), {
+IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Selects the given row 
      * @param row The row to select. If none is given, the current one is used.
@@ -240,13 +239,13 @@ Object.extend(Object.extend(Tree, Widget), {
 		if (reference)
 		    this.body.insertBefore(row, reference);
 	    } else {
-		row = createHtmlElement(row_data, this.body, reference);
+		row = IWL.createHtmlElement(row_data, this.body, reference);
 	    }
 	    row = $(row);
 	    if (!row) return;
 	    if (parentRow && parentRow !== this.body && parentRow.childList)
 		parentRow.childList.push(row);
-	    new_rows.push(Row.create(row, this));
+	    new_rows.push(IWL.Tree.Row.create(row, this));
 	}
         if (this.loadComplete) {
             this._rebuildPath(parentRow);
@@ -261,10 +260,10 @@ Object.extend(Object.extend(Tree, Widget), {
     },
     ajaxSort: function(cell, url) {
 	new Ajax.Updater(this.body, url, {
-	    onLoading:  disableView.bind(this, {noCover: true}),
-	    onComplete: enableView,
+	    onLoading:  IWL.disableView.bind(this, {noCover: true}),
+	    onComplete: IWL.enableView,
 	    parameters: {cell_id: cell.id},
-	    onException: exceptionHandler
+	    onException: IWL.exceptionHandler
 	});
     },
     /**
@@ -298,11 +297,11 @@ Object.extend(Object.extend(Tree, Widget), {
 		    (this.sortImage);
 	    this.sortImage = new Element('img', {
 		className: 'sort_column_image',
-		src: window.IWLConfig.ICON_DIR + icon
+		src: IWL.Config.ICON_DIR + icon
 	    });
 	    cell.insertBefore(this.sortImage, cell.firstChild);
 	} else {
-	    cell.lastChild.src = window.IWLConfig.ICON_DIR + icon;
+	    cell.lastChild.src = IWL.Config.ICON_DIR + icon;
 	}
 	cell.setAttribute("iwl:treeCellDescSort", dir);
 	return this;
@@ -342,7 +341,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	this.body.cleanWhitespace();
 	this.body.childList = [];
 	$A(this.body.rows).each(function($_) {
-	    Row.create($_, this);
+	    IWL.Tree.Row.create($_, this);
 	}.bind(this));
 	this.nav_images = {};
 	for (var i in images)
@@ -351,7 +350,7 @@ Object.extend(Object.extend(Tree, Widget), {
 	setTimeout(this.__initNavRebuild.bind(this, this.body.rows.length), 100);
 
         IWL.Focus.register(this);
-	keyLogEvent(this, this.__keyEventsCB.bindAsEventListener(this));
+	IWL.keyLogger(this, this.__keyEventsCB.bindAsEventListener(this));
     },
     _bodySort: function(dir, col_num) {
 	this.__sorted_rows = [];
@@ -535,11 +534,10 @@ Object.extend(Object.extend(Tree, Widget), {
 });
 
 /**
- * @class Row is a class for tree rows
- * @extends Widget
+ * @class IWL.Tree.Row is a class for tree rows
+ * @extends IWL.Widget
  * */
-var Row = {};
-Object.extend(Object.extend(Row, Widget), {
+IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Sets whether the row is selected
      * @param {Boolean} selected True if the row should be selected
@@ -867,27 +865,12 @@ Object.extend(Object.extend(Row, Widget), {
 	}.bind(this));
 	this.observe('dblclick', function(event) {
 	    IWL.Focus.current = this.tree;
-	    this.__removeSelection();
+            IWL.removeSelection();
 	    this.activate();
 	}.bind(this));
-    },
-    // Remove text selection
-    __removeSelection: function() {
-	if (window.getSelection) {
-	    var sel = window.getSelection();
-	    var node = sel.anchorNode;
-	    var is_in = false;
-	    while (node) {
-		if (node.className && this.hasClassName(node.className)) {
-		    is_in = true;
-		    break;
-		}
-		node = node.parentNode;
-	    }
-	    if (is_in)
-		sel.removeAllRanges();
-	} else if (document.selection) {
-	    document.selection.empty();
-	}
     }
 });
+
+/* Deprecated */
+var Tree = IWL.Tree;
+var Row = IWL.Tree.Row;

@@ -168,7 +168,7 @@ sub _realize {
 
     my $file = $self->{__file}->getJSON;
     my $arg = $self->{__uploadCallback} || 0;
-    $self->{__init}->setScript("Upload.create('$id', $file, {uploadCallback: window[$arg]})");
+    $self->{__init}->setScript("IWL.Upload.create('$id', $file, {uploadCallback: window[$arg]})");
 }
 
 sub _setupDefaultClass {

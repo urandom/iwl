@@ -130,7 +130,7 @@ sub _realize {
 
     $self->setStyle(display => 'none');
     $self->SUPER::_realize;
-    $script->appendScript("PageControl.create('$id', $options);");
+    $script->appendScript("IWL.PageControl.create('$id', $options);");
     $script->appendScript("\$('$id').bindToWidget('$self->{__bind}{widgetId}', '$self->{__bind}{eventName}');")
 	if $self->{__options}{bound};
     return $self->_appendAfter($script);

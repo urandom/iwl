@@ -181,7 +181,7 @@ sub _realize {
     my $options = toJSON($self->{_options});
 
     $self->SUPER::_realize;
-    $script->setScript("var menu = Menu.create('$id', $options);");
+    $script->setScript("var menu = IWL.Menu.create('$id', $options);");
     foreach my $bind (@{$self->{__bindWidgets}}) {
         $script->appendScript(qq{menu.bindToWidget('$bind->[0]', '$bind->[1]')});
     }

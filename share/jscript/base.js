@@ -5,7 +5,7 @@ document.loaded = false;
 Event.signalConnect(window, "load", function () { loaded = true; });
 Event.signalConnect(document, "dom:loaded", function() {
     document.loaded = true;
-    Event.signalConnect(document.body, "click", IWL.Focus.loseFocusCallback.bindAsEventListener(this));
+    Event.signalConnect(document.body, "click", IWL.Focus.loseFocusCallback);
 });
 
 if (!window.IWL) var IWL = {};
@@ -24,7 +24,7 @@ Object.extend(IWL, {RPC: (function() {
 
   function eventFinalize (element, eventName, options) {
       if (options.disableView)
-          enableView();
+          IWL.enableView();
       element['handlers'][eventName].ajaxRequest = null
       if (options.emitOnce)
           delete element['handlers'][eventName];
@@ -445,7 +445,7 @@ Object.extend(IWL, {Focus: {
     current: null,
     register: function(element) {
         if (!(element = $(element))) return;
-        element.signalConnect('mouseenter', function() {
+        element.signalConnect('dom:mouseenter', function() {
             IWL.Focus.current = element});
         element.signalConnect('click', function() {
             IWL.Focus.current = element});

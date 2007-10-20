@@ -141,7 +141,7 @@ sub _realize {
 
     $self->SUPER::_realize;
 
-    $script->setScript("Iconbox.create('$id', $options, {'delete': '$delete'});");
+    $script->setScript("IWL.Iconbox.create('$id', $options, {'delete': '$delete'});");
     foreach my $icon (@{$self->{__icons}}) {
 	my $icon_id = $icon->getId;
         $script->appendScript("\$('$id').selectIcon('$icon_id');")

@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Druid is a class for adding step-separated widgets
- * @extends Widget
+ * @class IWL.Druid is a class for adding step-separated widgets
+ * @extends IWL.Widget
  * */
-var Druid = {};
-Object.extend(Object.extend(Druid, Widget), {
+IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Selects the given page
      * @param page The page to select
@@ -168,7 +167,7 @@ Object.extend(Object.extend(Druid, Widget), {
 	this.pages = [];
 	this.pageContainer.childElements().each(function($_) {
 	    if ($_.hasClassName('druid_page'))
-		this.pages.push(Page.create($_, this));
+		this.pages.push(IWL.Druid.Page.create($_, this));
 	}.bind(this));
 	
     	this._refreshButtons();
@@ -234,16 +233,15 @@ Object.extend(Object.extend(Druid, Widget), {
         if (final)
             page.setAttribute('iwl:druidFinalPage', 1);
 
-        return Page.create(page, this);
+        return IWL.Druid.Page.create(page, this);
     }
 });
 
 /**
- * @class Page is a class for creating druid pages
- * @extends Widget
+ * @class IWL.Druid.Page is a class for creating druid pages
+ * @extends IWL.Widget
  * */
-var Page = {};
-Object.extend(Object.extend(Page, Widget), {
+IWL.Druid.Page = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Sets whether the page is selected
      * @param {Boolean} select True if the page should be selected
@@ -432,3 +430,7 @@ Object.extend(Object.extend(Page, Widget), {
         this.__showPage(this.druid.errorPage);
     }
 });
+
+/* Deprecated */
+var Druid = IWL.Druid;
+var Page = IWL.Druid.Page;

@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Upload is a class for adding custom styled file upload widgets
- * @extends Widget
+ * @class IWL.Upload is a class for adding custom styled file upload widgets
+ * @extends IWL.Widget
  * */
-var Upload = {};
-Object.extend(Object.extend(Upload, Widget), {
+IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), {
     _init: function(id, form) {
 	var button = $(id + '_button');
 	if (!button) {
@@ -15,7 +14,7 @@ Object.extend(Object.extend(Upload, Widget), {
 	this.options = Object.extend({
 	    uploadCallback: Prototype.emptyFunction
 	}, arguments[2] || {});
-	createHtmlElement(form, button);
+	IWL.createHtmlElement(form, button);
 	this.file = $(id + '_file');
 	this.button = button;
 	this.frame = $(id + '_frame');
@@ -40,7 +39,7 @@ Object.extend(Object.extend(Upload, Widget), {
     },
     __uploadFile: function() {
 	this.submit();
-	this.tooltip = Tooltip.create(this.id + '_tooltip', {centerOnElement: false, pivot: this});
+	this.tooltip = IWL.Tooltip.create(this.id + '_tooltip', {centerOnElement: false, pivot: this});
 	this.tooltip.bindToWidget(this.button);
 	this.tooltip.setContent('Uploading ...');
 
@@ -79,3 +78,6 @@ Object.extend(Object.extend(Upload, Widget), {
 	}
     }
 });
+
+/* Deprecated */
+var Upload = IWL.Upload;

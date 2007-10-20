@@ -158,7 +158,7 @@ sub _realize {
     } else {
 	$options .= "mouseOverActivation: false";
     }
-    $script->appendScript("Menu.create('$id', {$options});");
+    $script->appendScript("IWL.Menu.create('$id', {$options});");
     return $self->_appendAfter($script);
 }
 

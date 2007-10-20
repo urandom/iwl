@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Menu is a class for adding menus
- * @extends Widget
+ * @class IWL.Menu is a class for adding menus
+ * @extends IWL.Widget
  * */
-var Menu = {};
-Object.extend(Object.extend(Menu, Widget), (function () {
+IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function bindPop(event, parentItem) {
         if (parentItem)
             this.parentItem = $(parentItem);
@@ -253,7 +252,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
         },
         /**
          * Returns the previous menu item
-         * @param {MenuItem} item The reference menu item. If none is given, the current one is used.
+         * @param {IWL.Menu.Item} item The reference menu item. If none is given, the current one is used.
          * @returns The previous menu item
          * */
         getPrevMenuItem: function(item) {
@@ -269,7 +268,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
         },
         /**
          * Returns the next menu item
-         * @param {MenuItem} item The reference menu item. If none is given, the current one is used.
+         * @param {IWL.Menu.Item} item The reference menu item. If none is given, the current one is used.
          * @returns The next menu item
          * */
         getNextMenuItem: function(item) {
@@ -311,7 +310,7 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 if ($_.tagName == 'LI'
                     && ($_.hasClassName('menubar_item')
                         || $_.hasClassName('menu_item')))
-                    this.menuItems.push(MenuItem.create($_, this));
+                    this.menuItems.push(IWL.Menu.Item.create($_, this));
             }.bind(this));
 
             var paren = this.up();
@@ -344,17 +343,16 @@ Object.extend(Object.extend(Menu, Widget), (function () {
                 if (!Event.checkElement(event, this))
                     this.popDown();
             }.bind(this));
-            keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
+            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
         }
     }
 })());
 
 /**
- * @class MenuItem is a class for menu items
- * @extends Widget
+ * @class IWL.Menu.Item is a class for menu items
+ * @extends IWL.Widget
  * */
-var MenuItem = {};
-Object.extend(Object.extend(MenuItem, Widget), (function () {
+IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function toggleCheckItem() {
 	if (!this.hasClassName('menu_check_item')) return;
 	if (this.hasClassName('menu_check_item_checked')) {
@@ -561,3 +559,7 @@ Object.extend(Object.extend(MenuItem, Widget), (function () {
         }
     }
 })());
+
+/* Deprecated */
+var Menu = IWL.Menu;
+var MenuItem = IWL.Menu.Item;

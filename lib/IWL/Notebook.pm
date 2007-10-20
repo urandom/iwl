@@ -120,7 +120,7 @@ sub _realize {
         last if $selected = $tab->isSelected;
     }
     $self->{__tabs}[0]->setSelected(1) if !$selected;
-    $script->setScript("Notebook.create('$id');");
+    $script->setScript("IWL.Notebook.create('$id');");
     $self->_appendAfter($script);
 }
 

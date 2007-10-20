@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Notebook is a class for creating notebook tab containers
- * @extends Widget
+ * @class IWL.Notebook is a class for creating notebook tab containers
+ * @extends IWL.Widget
  * */
-var Notebook = {};
-Object.extend(Object.extend(Notebook, Widget), {
+IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Selects the given tab
      * @param tab The tab to select
@@ -70,7 +69,7 @@ Object.extend(Object.extend(Notebook, Widget), {
 
 	this.tabContainer.childElements().each(function($_, $i) {
 	    if ($_.hasClassName('notebook_tab'))
-		this.tabs.push(Tab.create($_, this, pages[$i]));
+		this.tabs.push(IWL.Notebook.Tab.create($_, this, pages[$i]));
 	}.bind(this));
     },
 
@@ -88,22 +87,21 @@ Object.extend(Object.extend(Notebook, Widget), {
 
 	var anchor = new Element('a', text);
 	tab.appendChild(anchor);
-	Tab.create(tab, this, page);
+	IWL.Notebook.Tab.create(tab, this, page);
 	this.tabs.push(tab);
 	if (typeof data === 'string')
 	    page.update(data);
 	else if (typeof data === 'object')
-	    createHtmlElement(data, page);
+	    IWL.createHtmlElement(data, page);
 	return tab;
     }
 });
 
 /**
- * @class Tab is a class for creating notebook tabs
- * @extends Widget
+ * @class IWL.Notebook.Tab is a class for creating notebook tabs
+ * @extends IWL.Widget
  * */
-var Tab = {};
-Object.extend(Object.extend(Tab, Widget), {
+IWL.Notebook.Tab = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Sets whether the tab is selected
      * @param {Boolean} select True if the tab should be selected
@@ -204,3 +202,7 @@ Object.extend(Object.extend(Tab, Widget), {
 	}.bind(this));
     }
 });
+
+/* Deprecated */
+var Notebook = IWL.Notebook;
+var Tab = IWL.Notebook.Tab;

@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Tooltip is a class for creating information tooltips
- * @extends Widget
+ * @class IWL.Tooltip is a class for creating information tooltips
+ * @extends IWL.Widget
  * */
-var Tooltip = {};
-Object.extend(Object.extend(Tooltip, Widget), (function() {
+IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
     function build(id) {
         var container;
         if (container = $(id)) {
@@ -295,3 +294,6 @@ Object.extend(Object.extend(Tooltip, Widget), (function() {
         }
     }
 })());
+
+/* Deprecated */
+var Tooltip = IWL.Tooltip;

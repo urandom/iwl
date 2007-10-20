@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Contentbox is a class for adding window-like containers
- * @extends Widget
+ * @class IWL.Contentbox is a class for adding window-like containers
+ * @extends IWL.Widget
  * */
-var Contentbox = {};
-Object.extend(Object.extend(Contentbox, Widget), {
+IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Shows the contentbox
      * @returns The object
@@ -518,3 +517,6 @@ Object.extend(Object.extend(Contentbox, Widget), {
 	this.__hideQuirks();
     }
 });
+
+/* Deprecated */
+var Contentbox = IWL.Contentbox;

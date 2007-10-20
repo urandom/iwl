@@ -297,7 +297,7 @@ sub _realize {
     $self->_set_alternate if $self->{_options}{alternate};
 
     my $images = qq({b:"$b",i:"$i",l:"$l",l_e:"$l_e",l_c:"$l_c",t:"$t",t_e:"$t_e",t_c:"$t_c"});
-    $script->prependScript("Tree.create('$id', $images, $options);");
+    $script->prependScript("IWL.Tree.create('$id', $images, $options);");
     foreach my $sortable (@{$self->{__sortables}}) {
 	$script->appendScript("\$('$id').setCustomSortable($sortable->[0], $sortable->[1])");
     }

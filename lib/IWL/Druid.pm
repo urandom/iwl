@@ -136,7 +136,7 @@ sub _realize {
     }
     $self->{__pages}[0]->setSelected(1) if !$selected;
     $script->setScript(
-        "Druid.create('$id', '" . escape($self->{__finishText}) . "')");
+        "IWL.Druid.create('$id', '" . escape($self->{__finishText}) . "')");
     $self->_appendAfter($script);
 }
 

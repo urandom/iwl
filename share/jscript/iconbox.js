@@ -1,10 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Iconbox is a class for creating a container with icons
- * @extends Widget
+ * @class IWL.Iconbox is a class for creating a container with icons
+ * @extends IWL.Widget
  * */
-var Iconbox = {};
-Object.extend(Object.extend(Iconbox, Widget), {
+IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Selects the given icon 
      * @param icon The icon to select. If none is given, the current one is used.
@@ -152,7 +151,7 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	    } else {
 		icon = createHtmlElement(icon_data, this.iconsContainer, reference);
             }
-	    this.icons.push(Icon.create(icon, this));
+	    this.icons.push(IWL.Iconbox.Icon.create(icon, this));
 	}
 	return this;
     },
@@ -187,13 +186,13 @@ Object.extend(Object.extend(Iconbox, Widget), {
 	});
 	this._iconCount = childElements.length;
 	childElements.each(function(e) {
-	    this.icons.push(Icon.create(e, this));
+	    this.icons.push(IWL.Iconbox.Icon.create(e, this));
 	}.bind(this));
 
 	Event.observe(window, 'resize', 
 		this._resizeEvent.bindAsEventListener(this));
         IWL.Focus.register(this);
-	keyLogEvent(this, this.__keyEventsCB.bindAsEventListener(this));
+	IWL.keyLogger(this, this.__keyEventsCB.bindAsEventListener(this));
     },
     _resizeEvent: function(event) {
 	var dims = this.getDimensions();
@@ -316,11 +315,10 @@ Object.extend(Object.extend(Iconbox, Widget), {
 });
 
 /**
- * @class Icon is a class for iconbox icons
- * @extends Widget
+ * @class IWL.Iconbox.Icon is a class for iconbox icons
+ * @extends IWL.Widget
  * */
-var Icon = {};
-Object.extend(Object.extend(Icon, Widget), {
+IWL.Iconbox.Icon = Object.extend(Object.extend({}, IWL.Widget), {
     /**
      * Sets whether the icon is selected
      * @param {Boolean} selected True if the icon should be selected
@@ -457,3 +455,7 @@ Object.extend(Object.extend(Icon, Widget), {
 	}.bind(this));
     }
 });
+
+/* Deprecated */
+var Iconbox = IWL.Iconbox;
+var Icon = IWL.Iconbox.Icon;

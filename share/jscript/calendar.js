@@ -1,9 +1,9 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
  * @class IWL.Calendar is a class for adding calendars
- * @extends Widget
+ * @extends IWL.Widget
  * */
-IWL.Calendar = Object.extend(Object.extend({}, Widget), (function() {
+IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
     var weeks_in_month = 6;
 
     function fillMonth() {
@@ -781,7 +781,7 @@ IWL.Calendar = Object.extend(Object.extend({}, Widget), (function() {
 
             connectHeadingSignals.call(this);
             connectTimeSignals.call(this);
-            keyLogEvent(this, keyEventsCB.bindAsEventListener(this));
+            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
             IWL.Focus.register(this);
 
             this.emitSignal('iwl:load');
@@ -791,9 +791,9 @@ IWL.Calendar = Object.extend(Object.extend({}, Widget), (function() {
 
 /**
  * @class IWL.Calendar.Date is a class for dates which make up a calendar
- * @extends Widget
+ * @extends IWL.Widget
  * */
-IWL.Calendar.Date = Object.extend(Object.extend({}, Widget), (function() {
+IWL.Calendar.Date = Object.extend(Object.extend({}, IWL.Widget), (function() {
     function dateClickEvent(event) {
         var date = this.getDate();
         this.calendar.setDate(date);
