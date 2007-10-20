@@ -146,8 +146,9 @@ table.list thead.tree_header th, table.list thead.tree_header td {
 }
   
 /* Iconbox */
-div.iconbox_icons_container {
-    border: 2px inset white;
+div.iconbox_icon_container {
+    border: 1px solid #6A81A3;
+    position: relative;
 }
 
 div.iconbox_status_label {

@@ -76,23 +76,31 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var shift = event.shiftKey;
         var icon;
 
-        if (keyCode == 37) {		// Left-arrow
-            if (icon = this.getPrevIcon())
+        if (keyCode == Event.KEY_LEFT) {
+            if (icon = this.getPrevIcon()) {
                 icon.setSelected(true, shift);
-            Event.stop(event);
-        } else if (keyCode == 38)  {	// Up-arrow
-            if (icon = this.getUpperIcon())
+                new Effect.ScrollElement(icon, this.iconsContainer, {duration: 0.3});
+                Event.stop(event);
+            }
+        } else if (keyCode == Event.KEY_RIGHT) {
+            if (icon = this.getNextIcon()) {
                 icon.setSelected(true, shift);
-            Event.stop(event);
-        } else if (keyCode == 39) {	// Right-arrow
-            if (icon = this.getNextIcon())
+                new Effect.ScrollElement(icon, this.iconsContainer, {duration: 0.3});
+                Event.stop(event);
+            }
+        } else if (keyCode == Event.KEY_UP)  {
+            if (icon = this.getUpperIcon()) {
                 icon.setSelected(true, shift);
-            Event.stop(event);
-        } else if (keyCode == 40) {	// Down-arrow
-            if (icon = this.getLowerIcon())
+                new Effect.ScrollElement(icon, this.iconsContainer, {duration: 0.3});
+                Event.stop(event);
+            }
+        } else if (keyCode == Event.KEY_DOWN) {
+            if (icon = this.getLowerIcon()) {
                 icon.setSelected(true, shift);
-            Event.stop(event);
-        } else if (keyCode == 13) { 	// Enter
+                new Effect.ScrollElement(icon, this.iconsContainer, {duration: 0.3});
+                Event.stop(event);
+            }
+        } else if (keyCode == Event.KEY_RETURN) {
             if (this.currentIcon)
                 this.currentIcon.activate();
         }

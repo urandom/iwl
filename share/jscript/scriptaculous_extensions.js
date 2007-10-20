@@ -16,7 +16,7 @@ Object.extend(Effect, {
       window.smoothScroll = true;
     } else {
       Event.observe(window, "load", function () {
-	Effect.SmoothScroll();
+        Effect.SmoothScroll();
       });
     }
   },
