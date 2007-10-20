@@ -252,7 +252,7 @@ sub _realize {
 	$options =~ s/^{/{$callbacks, /;
     }
     $script->setScript("\$('$id').control = new Control.Slider('$handle', '$id', $options)");
-    $script->appendScript("\$('$id').signalConnect('mousewheel', function(event) {
+    $script->appendScript("\$('$id').signalConnect('dom:mousewheel', function(event) {
 	var control = \$('$id').control;
 	if (control.options.values) {
 	    var index = control.options.values.indexOf(control.value);

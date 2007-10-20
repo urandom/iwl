@@ -1,11 +1,10 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 /**
- * @class Spinner is a class for adding entry spinners 
+ * @class IWL.Spinner is a class for adding entry spinners 
  * @extends Widget
  * */
-var Spinner = {};
-Object.extend(Object.extend(Spinner, Widget), (function() {
-    var periodical_options = $H({border: 0.005, frequency: 0.5});
+IWL.Spinner = Object.extend(Object.extend({}, Widget), (function() {
+    var periodical_options = {border: 0.005, frequency: 0.5};
 
     function keyEventsCB(event) {
         var key_code = Event.getKeyCode(event);
@@ -36,19 +35,17 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
         }
 
         this.spinDirection = 'left';
-        this.startSpinTime = new Date;
         this.speed = event.isLeftClick() ? event.shiftKey ?
             this.options.pageIncrement : this.options.stepIncrement : this.options.pageIncrement;
-        spinnerPeriodical.call(this);
         this.periodical = new PeriodicalAccelerator(spinnerPeriodical.bind(this),
-            periodical_options.merge({acceleration: this.options.acceleration}));
+            Object.extend(periodical_options, {acceleration: this.options.acceleration}));
+        spinnerPeriodical.call(this);
     }
     function leftSpinnerMouseUp(event) {
         if (this.periodical) {
             this.periodical.stop();
             this.periodical = null;
         }
-        this.startSpinTime = null;
     }
 
     function rightSpinnerMouseDown(event) {
@@ -58,19 +55,17 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
         }
 
         this.spinDirection = 'right';
-        this.startSpinTime = new Date;
         this.speed = event.isLeftClick() ? event.shiftKey ?
             this.options.pageIncrement : this.options.stepIncrement : this.options.pageIncrement;
-        spinnerPeriodical.call(this);
         this.periodical = new PeriodicalAccelerator(spinnerPeriodical.bind(this),
-            periodical_options.merge({acceleration: this.options.acceleration}));
+            Object.extend(periodical_options, {acceleration: this.options.acceleration}));
+        spinnerPeriodical.call(this);
     }
     function rightSpinnerMouseUp(event) {
         if (this.periodical) {
             this.periodical.stop();
             this.periodical = null;
         }
-        this.startSpinTime = null;
     }
 
     function spinnerPeriodical(pe) {
@@ -113,12 +108,11 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
             }
 
             this.spinDirection = key_code == Event.KEY_DOWN ? 'left' : 'right';
-            this.startSpinTime = new Date;
             this.speed = event.shiftKey
                 ? this.options.pageIncrement : this.options.stepIncrement;
-            inputPeriodical.call(this);
             this.periodical = new PeriodicalAccelerator(inputPeriodical.bind(this),
-                periodical_options.merge({acceleration: this.options.acceleration}));
+                Object.extend(periodical_options, {acceleration: this.options.acceleration}));
+            inputPeriodical.call(this);
         }
     }
     function inputKeyUp(event) {
@@ -128,7 +122,6 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
                 this.periodical.stop();
                 this.periodical = null;
             }
-            this.startSpinTime = null;
         }
     }
 
@@ -217,7 +210,7 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
                 to: 100,
                 stepIncrement: 1.0,
                 pageIncrement: 10.0,
-                acceleration: 0.1,
+                acceleration: 0.2,
                 snap: false,
                 wrap: false,
                 precision: false,
@@ -243,3 +236,6 @@ Object.extend(Object.extend(Spinner, Widget), (function() {
         }
     }
 })());
+
+/* Deprecated */
+var Spinner = IWL.Spinner;

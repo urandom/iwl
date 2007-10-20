@@ -93,7 +93,7 @@ Object.extend(Event, (function() {
           event.scrollDirection = event.detail;
         else if (event.wheelDelta)
           event.scrollDirection = event.wheelDelta / -40;
-        callback.call(target, event)
+        callback.call(element, event)
       }
     }
   };
@@ -383,6 +383,10 @@ var PeriodicalAccelerator = Class.create((function () {
     this.timer = setTimeout(onTimerEvent.bind(this), this.frequency * 1000);
   }
 
+  function registerCallback() {
+    this.timer = setTimeout(onTimerEvent.bind(this), this.frequency * 1000);
+  }
+
   return {
     initialize: function(callback) {
       this.options = Object.extend({
@@ -395,11 +399,7 @@ var PeriodicalAccelerator = Class.create((function () {
       this.acceleration = this.options.acceleration + 1;
       if (this.acceleration <= 0)
         this.acceleration = 1;
-      this.registerCallback();
-    },
-
-    registerCallback: function() {
-      this.timer = setTimeout(onTimerEvent.bind(this), this.frequency * 1000);
+      registerCallback.call(this);
     },
 
     stop: function() {

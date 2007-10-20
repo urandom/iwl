@@ -383,7 +383,7 @@ sub _realize {
     $self->SUPER::_realize;
     my $options = toJSON($self->{_options});
 
-    $script->setScript("Spinner.create('$id', $options);");
+    $script->setScript("IWL.Spinner.create('$id', $options);");
     $self->_appendAfter($script);
 }
 
@@ -412,7 +412,7 @@ sub __init {
 
     $self->{_options} = {value => 0, from => 0, to => 100,
         stepIncrement => 1.0, pageIncrement => 10.0,
-        acceleration => 0.1, snap => 0, wrap => 0};
+        acceleration => 0.2, snap => 0, wrap => 0};
 
     $self->{_options}{value}         = $args{value}         if defined $args{value};
     $self->{_options}{to}            = $args{to}            if defined $args{to};
