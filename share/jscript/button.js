@@ -295,14 +295,12 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (disabled == this._disabled)
                 return;
             if (!this.loaded)
-                this.signalConnect('load', this.setDisabled.bind(this, disabled));
+                return this.signalConnect('iwl:load', this.setDisabled.bind(this, disabled));
             if (disabled) {
                 this.addClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = true;
                 disabledImageChange.call(this);
-                setTimeout(function() {
-                    createDisabledLayer.call(this);
-                }.bind(this), 500);
+                createDisabledLayer.bind(this).delay(0.5);
                 this.adjust();
             } else {
                 this.removeClassName($A(this.classNames()).first() + '_disabled');
