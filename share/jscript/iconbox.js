@@ -320,7 +320,7 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             if (this._iconCount == 0) {
                 this._alignIconsVertically();
-                setTimeout(this.emitSignal.bind(this, 'iwl:load'), 100);
+                this.emitSignal.bind(this, 'iwl:load').delay(0.1);
             }
         }
     }

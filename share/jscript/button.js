@@ -56,7 +56,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             if (this.buttonLabel.firstChild.nodeValue 
                     && !this.buttonContent.clientWidth)
-                setTimeout(checkComplete.bind(this), 100);
+                checkComplete.bind(this).delay(0.1);
             else
                 this.adjust();
         }
@@ -209,7 +209,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             if (state) visibilityToggle.call(this, state);
             if (!width || !height) {
-                setTimeout(this.adjust.bind(this), 500);
+                this.adjust.bind(this).delay(0.5);
                 return;
             }
 
@@ -324,7 +324,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         _preInit: function(id, json) {
             var script = $(id + '_noscript');
             if (!script) {
-                setTimeout(function () {this.create(id, json)}.bind(this), 500);
+                this.create.bind(this, id, json, arguments[2]).delay(0.5);
                 return false;
             }
             var container = IWL.createHtmlElement(json.container, script.parentNode, script);

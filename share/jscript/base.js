@@ -422,7 +422,6 @@ IWL.exceptionHandler = function() {
     if (window.console) {
 	console.dir(arguments[1]);
     } else {
-        debugger;
 	IWL.displayStatus("Error message: " + arguments[1].message);
 	IWL.displayStatus(arguments[1].number & 0xFFFF);
 	IWL.displayStatus(arguments[1].name);

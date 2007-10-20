@@ -271,7 +271,7 @@ function run_scriptaculous_tests() {
     new Test.Unit.Runner({
         testDelayTest: function() { with(this) {
             delay(function() { assert(true) });
-            setTimeout(function() {this.proceed()}.bind(this), 1000);
+            this.proceed.bind(this).delay(1);
         }},
         testEffects: function() { with(this) {
             Effect.SmoothScroll();

@@ -167,7 +167,7 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.backButton = $(this.id + '_back_button');
             this.nextButton = $(this.id + '_next_button');
             if (!this.nextButton) {
-                this.__timeout = setTimeout(this._init.apply.bind(this, arguments), 500);
+                setTimeout(this._init.apply.bind(this, arguments), 500);
                 return;
             }
             this.okButton 

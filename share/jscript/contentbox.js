@@ -474,9 +474,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         flush: function() {
             var w = this.getDimensions().width;
             this.setStyle({width: w + 1 + 'px'});
-            setTimeout(function() {
-                    this.setStyle({width: w + 'px'});
-            }.bind(this), 10);
+            this.setStyle.bind(this, {width: w + 'px'}).defer();
         },
 
         _preInit: function() {
