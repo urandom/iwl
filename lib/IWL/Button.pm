@@ -407,19 +407,14 @@ sub _realize {
 
     $self->{__button}{image}->signalConnect(load => "\$('$id').adjust()");
     $self->{__button}{_handlers} = $self->{_handlers};
-    my $container = $self->{__button}->getObject;
-    delete $container->{tailObjects};
-    $container = toJSON($container);
 
+    my $container = $self->{__button}->getJSON;
     my $image     = escape($self->{__button}{image}->getContent);
     my $label     = escape($self->{__button}{label});
-    my $json      =
-      qq|{container:$container,image:"$image",label:"$label"}|;
+    my $json      = qq|{container:$container,image:"$image",label:"$label"}|;
 
     $options = toJSON($self->{_options});
     $script->setScript("IWL.Button.create('$id', $json, $options);");
-    $script->appendScript($self->{__button}{_customSignalScript}->getScript)
-      if $self->{__button}{_customSignalScript};
     $self->_appendAfter($script);
     $self->_appendAfter($self->{__hidden}) if $self->{_options}{submit};
 }

@@ -19,6 +19,6 @@ ok($mi->isDisabled);
 like($mi->getContent, qr(^<li (?:(?:class="(menu_item) \1_disabled menu_check_item menu_check_item_checked"|id="\1_\d+"|style="background-image: url.'/my/skin/darkness/tiny/save.gif'.; ")\s*){3}><span (?:(?:class="menu_item_label menu_item_label_parent"|id="menu_item_\d+_label")\s*){2}>Some text</span>
 <script.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*menu.js.*?</script>
 <ul (?:(?:class="menu submenu"|id="(menu_\d+)")\s*){2}></ul>
-<script.*?Menu.create.'\2'.*?</script>
+<script.*?IWL.Menu.create.'\2'.*?</script>
 </li>
 $)s);

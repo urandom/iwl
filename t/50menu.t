@@ -20,5 +20,5 @@ like($m->getContent, qr(^<script.*dist/prototype.js.*prototype_extensions.js.*di
 </li>
 <li (?:(?:class="\1_separator"|id="\1_item_\d+")\s*){2}>&nbsp;</li>
 </ul>
-<script.*?Menu.create.'\2'.*?</script>
+<script.*?IWL.Menu.create.'\2'.*?</script>
 $)s);

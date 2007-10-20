@@ -36,6 +36,7 @@ sub new {
     my $self = $class->SUPER::new();
 
     $self->{_tag} = "script";
+    $self->{__scripts} = [];
     $self->setAttribute(type => 'text/javascript');
     $self->setAttribute($_ => $args{$_}) foreach (keys %args);
 
@@ -71,8 +72,8 @@ Parameter: B<STRING> - the js string
 sub appendScript {
     my ($self, $string) = @_;
 
-    $string =~ s/(?<!;)\s*$/;/;
-    return $self->setScript($self->getScript() . $string);
+    push @{$self->{__scripts}}, $string;
+    return $self;
 }
 
 =item B<prependScript> (B<STRING>)
@@ -86,8 +87,8 @@ Parameter: B<STRING> - the js string
 sub prependScript {
     my ($self, $string) = @_;
 
-    $string =~ s/(?<!;)\s*$/;/;
-    return $self->setScript($string . $self->getScript());
+    unshift @{$self->{__scripts}}, $string;
+    return $self;
 }
 
 =item B<setScript> (B<STRING>)
@@ -101,9 +102,8 @@ Parameter: B<STRING> - the js string
 sub setScript {
     my ($self, $string) = @_;
 
-    $string =~ s/(?<!;)\s*$/;/;
-    my $text = IWL::Text->new($string);
-    return $self->setChild($text);
+    $self->{__scripts} = [$string];
+    return $self;
 }
 
 =item B<getScript>
@@ -114,13 +114,17 @@ Returns the script string from the object
 
 sub getScript {
     my $self = shift;
-    my $content = '';
+    my $string = join '; ', @{$self->{__scripts}};
+    $string .= ';' if $string && $string !~ /;\s*$/;
 
-    foreach my $child (@{$self->{childNodes}}) {
-	$content .= $child->getContent;
-    }
+    return $string;
+}
 
-    return $content;
+# Protected
+#
+sub _realize {
+    my $self = shift;
+    $self->appendChild(IWL::Text->new($self->getScript));
 }
 
 1;

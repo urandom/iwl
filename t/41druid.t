@@ -19,11 +19,11 @@ like($druid->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/e
 </div>
 <div (?:(?:class="\1_button_container"|id="\1_\d+_button_container")\s*){2}><script .*button.js.*?</script>
 <noscript.*?</noscript>
-<script.*?Button.create.*?</script>
+<script.*?IWL.Button.create.*?</script>
 <noscript.*?</noscript>
-<script.*?Button.create.*?</script>
+<script.*?IWL.Button.create.*?</script>
 </div>
 <br style="clear: both; " />
 </div>
-<script.*?Druid.create.*?</script>
+<script.*?IWL.Druid.create.*?</script>
 $)s);

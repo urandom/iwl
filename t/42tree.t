@@ -34,5 +34,5 @@ Bar</td>
 <tr (?:(?:iwl:treeRowData=".*?"|id="footer2"|class="\1_row \1_footer_row")\s*){3}></tr>
 </tfoot>
 </table>
-<script.*?Tree.create.'\2', {.*?</script>
+<script.*?IWL.Tree.create.'\2', {.*?</script>
 $)s);

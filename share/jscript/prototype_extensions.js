@@ -45,8 +45,9 @@ Object.extend(Event, (function() {
   }
 
   function registerCallback(element, name, callback, observer) {
+    var index;
     var c = getCacheForName(element, name);
-    if (c.indexOf(callback) > -1) return callback;
+    if ((index = c.pluck('observer').indexOf(observer)) > -1) return c[index];
 
     c.push(callback);
     callback.observer = observer;

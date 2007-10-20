@@ -167,8 +167,9 @@ sub _realize {
 
     $options = toJSON($self->{_options});
     $self->setId($id . '_script');
-    $self->SUPER::_realize;
+    $self->IWL::Widget::_realize;
     $self->setScript("IWL.Tooltip.create('$id', $options);");
+    $self->IWL::Script::_realize;
 }
 
 # Internal

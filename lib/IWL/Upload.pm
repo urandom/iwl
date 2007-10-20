@@ -161,14 +161,15 @@ sub setId {
 # Protected
 #
 sub _realize {
-    my $self = shift;
-    my $id   = $self->getId;
+    my $self   = shift;
+    my $id     = $self->getId;
 
     $self->SUPER::_realize;
 
+    $self->{__file}->setStyle(visibility => 'hidden');
     my $file = $self->{__file}->getJSON;
     my $arg = $self->{__uploadCallback} || 0;
-    $self->{__init}->setScript("IWL.Upload.create('$id', $file, {uploadCallback: window[$arg]})");
+    $self->{__button}->signalConnect(load => "IWL.Upload.create('$id', $file, {uploadCallback: $arg})");
 }
 
 sub _setupDefaultClass {
@@ -187,7 +188,6 @@ sub __init {
     my $frame  = IWL::IFrame->new;
     my $file   = IWL::File->new;
     my $button = IWL::Button->new(size => 'medium');
-    my $init   = IWL::Script->new;
 
     $self->{_defaultClass} = 'upload';
     $args{id} ||= randomize($self->{_defaultClass});
@@ -195,10 +195,8 @@ sub __init {
     $self->{__file}   = $file;
     $self->{__frame}  = $frame;
     $self->{__button} = $button;
-    $self->{__init}   = $init;
     $self->appendChild($button);
     $self->appendChild($frame);
-    $self->appendChild($init);
     $self->setId($args{id});
     delete @args{qw(id)};
 

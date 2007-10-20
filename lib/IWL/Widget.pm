@@ -479,8 +479,7 @@ sub _realize {
 
 	if ($id) {
 	    foreach my $signal (keys %{$self->{_customSignals}}) {
-		my $expr = '';
-		$expr .= ($_ || '') . ';' foreach (@{$self->{_customSignals}{$signal}});
+                my $expr = join '; ', @{$self->{_customSignals}{$signal}};
 		if ($expr) {
                     $signal = $self->_namespacedSignalName($signal);
 		    $parent->{_customSignalScript} = IWL::Script->new

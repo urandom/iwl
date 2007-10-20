@@ -12,5 +12,5 @@ like($ib->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effe
 </div>
 <div (?:(?:class="\1_status_label"|id="\2_status_label")\s*){2}></div>
 </div>
-<script.*?Iconbox.create.'\2'.*?</script>
+<script.*?IWL.Iconbox.create.'\2'.*?</script>
 $)s);

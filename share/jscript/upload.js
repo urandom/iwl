@@ -14,7 +14,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         if (!Prototype.Browser.WebKit)
             Element.setStyle(this.file, {left: -1 * (file_width - button_width) + 'px'});
-        Element.setOpacity(this.file, 0.001);
+        this.file.setStyle({opacity: 0.001, visibility: 'visible'});
         this.file.onchange = uploadFile.bindAsEventListener(this);
         this.file.onkeypress = function() {return false;};
         this.file.onpaste = function() {return false;};
