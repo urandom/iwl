@@ -781,7 +781,6 @@ sub generate_file {
     $container->appendChild($label);
     $container->appendChild($file);
     $label->setText('Press the button to upload a file.');
-    $file->setLabel('Browse ...');
 
     return $container;
 }
@@ -995,7 +994,7 @@ sub show_the_code_for {
     } elsif ($code_for eq 'tooltips_container') {
 	$paragraph->appendTextType(read_code("generate_tooltips", 21), 'pre');
     } elsif ($code_for eq 'file_container') {
-	$paragraph->appendTextType(read_code("generate_file", 13), 'pre');
+	$paragraph->appendTextType(read_code("generate_file", 12), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {
 	$paragraph->appendTextType(read_code("generate_rpc_events", 25), 'pre');
 	$paragraph->appendTextType(read_code("Event row handlers", 21), 'pre');

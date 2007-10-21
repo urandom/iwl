@@ -12,6 +12,8 @@ use IWL::String qw(randomize);
 
 use base 'IWL::Form';
 
+use Locale::TextDomain qw(org.bloka.iwl);
+
 =head1 NAME
 
 IWL::Upload - a file upload widget
@@ -169,7 +171,8 @@ sub _realize {
     $self->{__file}->setStyle(visibility => 'hidden');
     my $file = $self->{__file}->getJSON;
     my $arg = $self->{__uploadCallback} || 0;
-    $self->{__button}->signalConnect(load => "IWL.Upload.create('$id', $file, {uploadCallback: $arg})");
+    my $uploading = __"Uploading ...";
+    $self->{__button}->signalConnect(load => "IWL.Upload.create('$id', $file, {uploadCallback: $arg}, {uploading: '$uploading'})");
 }
 
 sub _setupDefaultClass {
@@ -195,12 +198,12 @@ sub __init {
     $self->{__file}   = $file;
     $self->{__frame}  = $frame;
     $self->{__button} = $button;
-    $self->appendChild($button);
     $self->appendChild($frame);
+    $self->appendChild($button);
     $self->setId($args{id});
     delete @args{qw(id)};
 
-    $button->setLabel('Browse ...');
+    $button->setLabel(__('Browse ...'));
     $file->_constructorArguments(%args);
     $self->requiredJs('base.js', 'upload.js', 'tooltip.js');
 

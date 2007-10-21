@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-10-10 23:06+0300\n"
-"PO-Revision-Date: 2007-10-08 12:23+0300\n"
+"POT-Creation-Date: 2007-10-21 20:59+0300\n"
+"PO-Revision-Date: 2007-10-21 20:59+0300\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net,"
 "viktor@imperia.net>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lib/IWL/GoogleMap.pm:159
+#: ../lib/IWL/GoogleMap.pm:158
 msgid "Container has no id"
 msgstr "Контейнерът няма ИД"
 
-#: ../lib/IWL/GoogleMap.pm:271
+#: ../lib/IWL/GoogleMap.pm:270
 msgid ""
 "No key provided.  Please follow this link in order to obtain a key from "
 "Google."
@@ -34,12 +34,12 @@ msgstr ""
 msgid "Invalid id: '{ID}'"
 msgstr "Невалидно ИД: '{ID}'"
 
-#: ../lib/IWL/Druid.pm:173
+#: ../lib/IWL/Druid.pm:172
 msgid "Finish"
 msgstr "Край"
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:165
+#: ../lib/IWL/PageControl.pm:166
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr "{PAGEENTRY} от {PAGECOUNT}"
@@ -225,6 +225,14 @@ msgstr "Общ текст"
 #, perl-brace-format
 msgid "The icon '{TITLE}' was removed."
 msgstr "Иконата „{TITLE}“ е премахната."
+
+#: ../lib/IWL/Upload.pm:174
+msgid "Uploading ..."
+msgstr "Качване ..."
+
+#: ../lib/IWL/Upload.pm:206
+msgid "Browse ..."
+msgstr "Избор ..."
 
 #. TRANSLATORS: week day abbreviations, {ABBR} is a placeholder
 #: ../lib/IWL/Calendar.pm:21

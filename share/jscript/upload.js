@@ -24,7 +24,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.submit();
         this.tooltip = IWL.Tooltip.create(this.id + '_tooltip', {centerOnElement: false, pivot: this});
         this.tooltip.bindToWidget(this.button);
-        this.tooltip.setContent('Uploading ...');
+        this.tooltip.setContent(this.messages.uploading);
 
         Event.observe(this.frame, 'load', frameLoad.bind(this));
         Event.observe(this.frame, 'readystatechange', frameReadyStateChange.bind(this));
@@ -73,6 +73,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.options = Object.extend({
                 uploadCallback: Prototype.emptyFunction
             }, arguments[2] || {});
+            this.messages = Object.extend({}, arguments[3]);
             button.createHtmlElement(form);
             this.file = $(id + '_file');
             this.button = button;

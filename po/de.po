@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-10-10 23:06+0300\n"
+"POT-Creation-Date: 2007-10-21 20:59+0300\n"
 "PO-Revision-Date: 2007-10-05 13:12+0300\n"
 "Last-Translator: Guido Flohr <guido@imperia.net>\n"
 "Language-Team:  <guido@imperia.net>\n"
@@ -15,11 +15,11 @@ msgstr ""
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.10.2\n"
 
-#: ../lib/IWL/GoogleMap.pm:159
+#: ../lib/IWL/GoogleMap.pm:158
 msgid "Container has no id"
 msgstr "Container hat kein id-Attribut"
 
-#: ../lib/IWL/GoogleMap.pm:271
+#: ../lib/IWL/GoogleMap.pm:270
 msgid ""
 "No key provided.  Please follow this link in order to obtain a key from "
 "Google."
@@ -32,12 +32,12 @@ msgstr ""
 msgid "Invalid id: '{ID}'"
 msgstr ""
 
-#: ../lib/IWL/Druid.pm:173
+#: ../lib/IWL/Druid.pm:172
 msgid "Finish"
 msgstr "Beenden"
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:165
+#: ../lib/IWL/PageControl.pm:166
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr "{PAGEENTRY} of {PAGECOUNT}"
@@ -223,6 +223,15 @@ msgstr "Generischer Text"
 #, perl-brace-format
 msgid "The icon '{TITLE}' was removed."
 msgstr "Das Icon »{TITLE}« wurde entfernt."
+
+#: ../lib/IWL/Upload.pm:174
+#, fuzzy
+msgid "Uploading ..."
+msgstr "Hochladen"
+
+#: ../lib/IWL/Upload.pm:206
+msgid "Browse ..."
+msgstr ""
 
 #. TRANSLATORS: week day abbreviations, {ABBR} is a placeholder
 #: ../lib/IWL/Calendar.pm:21
