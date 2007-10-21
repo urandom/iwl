@@ -387,7 +387,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     if (reference)
                         this.body.insertBefore(row, reference);
                 } else {
-                    row = IWL.createHtmlElement(row_data, this.body, reference);
+                    row = this.body.createHtmlElement(row_data, reference);
                 }
                 row = $(row);
                 if (!row) return;

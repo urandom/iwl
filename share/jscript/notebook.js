@@ -23,7 +23,7 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (typeof data === 'string')
             page.update(data);
         else if (typeof data === 'object')
-            IWL.createHtmlElement(data, page);
+            page.createHtmlElement(data);
         return tab;
     }
 

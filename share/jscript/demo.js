@@ -10,7 +10,7 @@ function activate_widgets_response(json) {
     if (!json.data) return;
     var content = $('content');
     content.update();
-    IWL.createHtmlElement(json.data, content);
+    content.createHtmlElement(json.data);
     content.setStyle({display: 'block'});
 }
 
@@ -409,7 +409,7 @@ function run_base_tests() {
                 }],
                 attributes: {'class': 'foo', id: 'bar', 'iwl:fooBar': 'alpha'}
             };
-            var element = IWL.createHtmlElement(obj, $('testlog'));
+            var element = $('testlog').createHtmlElement(obj);
 
             assert(Object.isElement(element));
             assertEqual('DIV', element.tagName);
@@ -433,7 +433,7 @@ function run_base_tests() {
                 element.next().remove();
                 element.remove();
                 benchmark(function () {
-                    var element = IWL.createHtmlElement(obj, $('testlog'));
+                    var element = $('testlog').createHtmlElement(obj);
                     element.next().remove();
                     element.next().remove();
                     element.remove();

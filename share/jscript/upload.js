@@ -73,7 +73,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.options = Object.extend({
                 uploadCallback: Prototype.emptyFunction
             }, arguments[2] || {});
-            IWL.createHtmlElement(form, button);
+            button.createHtmlElement(form);
             this.file = $(id + '_file');
             this.button = button;
             this.frame = $(id + '_frame');

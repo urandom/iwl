@@ -252,7 +252,7 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     if (reference)
                         this.iconsContainer.insertBefore(icon, reference);
                 } else {
-                    icon = createHtmlElement(icon_data, this.iconsContainer, reference);
+                    icon = this.iconsContainer.createHtmlElement(icon_data, reference);
                 }
                 this.icons.push(IWL.Iconbox.Icon.create(icon, this));
             }

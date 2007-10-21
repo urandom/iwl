@@ -171,58 +171,47 @@ Object.extend(IWL, (function() {
     return {
         /**
          * Creates an html element from IWL's json structure
-         * @param obj The json object
-         * @param paren The parent element
-         * @param before_el A reference element. If given, the created element will appear before this one. Optional
+         * @param json The json object
+         * @param parentElement The parent element. Optional
+         * @param previousElement A reference element. If given, the created element will appear before this one. Optional
          *
-         * @returns The created element or 'true', if the element is a text node
+         * @returns The created element
          * */
-        createHtmlElement: function(obj, paren, before_el) {
+        createHtmlElement: function(json, parentElement, previousElement) {
             var element;
             var flags = {disabled: true, multiple: true};
-            if (!obj) return;
-            if (!paren) return;
-            if (obj.scripts) {
-                while (obj.scripts.length) {
-                    var url = obj.scripts.shift().attributes.src;
+            if (!json || !(parentElement == $(parentElement))) return;
+            previousElement = $(previousElement);
+            if (json.scripts) {
+                while (json.scripts.length) {
+                    var url = json.scripts.shift().attributes.src;
                     if (!($$('script').pluck('src').grep(url + "$").length))
                         ++script_urls;
                     document.insertScript(url, {onComplete: addScript});
                 }
             }
-            if (!obj.tag) {
-                if (obj.text === undefined || obj.text === null) return false;
-                if (paren.tagName.toLowerCase() == 'script') {
+            if (!json.tag) {
+                if (json.text === undefined || json.text === null) return false;
+                if (parentElement.tagName.toLowerCase() == 'script') {
                     if (script_urls)
-                        scripts.push(obj.text);
+                        scripts.push(json.text);
                     else
-                        eval(obj.text);
-                    return true;
+                        eval(json.text);
+                    return json.text.toString().createTextNode();
                 }
-                if (Prototype.Browser.IE) {
-                    if (paren.tagName.toLowerCase() == 'style') {
-                        paren.styleSheet.cssText = obj.text;
-                        return true;
-                    } else {
-                        if (before_el) {
-                            paren.insertBefore(obj.text.toString().createTextNode(),
-                                    before_el);
-                            return true;
-                        }
-                        paren.appendChild(obj.text.toString().createTextNode());
-                        return true;
-                    }
+                if (Prototype.Browser.IE && parentElement.tagName.toLowerCase() == 'style') {
+                    parentElement.styleSheet.cssText = json.text;
+                    return json.text.toString().createTextNode();
                 } else {
-                    if (before_el) {
-                        paren.insertBefore(obj.text.toString().createTextNode(),
-                                before_el);
-                        return true;
-                    }
-                    paren.appendChild(obj.text.toString().createTextNode());
-                    return true;
+                    var textNode = json.text.toString().createTextNode();
+                    if (previousElement)
+                        parentElement.insertBefore(textNode, previousElement);
+                    else 
+                        parentElement.appendChild(textNode);
+                    return textNode;
                 }
             } else {
-                var attributes = Object.extend({}, obj.attributes);
+                var attributes = Object.extend({}, json.attributes);
                 if (attributes.style) {
                     var time = new Date;
                     var style = $H(attributes.style);
@@ -230,26 +219,26 @@ Object.extend(IWL, (function() {
                         return [key, style.get(key)].join(": ");
                     }).join('; ');
                 }
-                element = new Element(obj.tag, attributes);
+                element = new Element(json.tag, attributes);
             }
 
-            if (obj.text)
-                element.appendChild(obj.text.createTextNode());
+            if (json.text)
+                element.appendChild(json.text.createTextNode());
 
-            if (before_el)
-                paren.insertBefore(element, before_el);
+            if (previousElement)
+                parentElement.insertBefore(element, previousElement);
             else
-                paren.appendChild(element);
+                parentElement.appendChild(element);
 
             // Internet explorer throws an error if an element is appended to a noscript element
-            if (obj.children && obj.tag != 'noscript')
-                obj.children.each(function(c) {
+            if (json.children && json.tag != 'noscript')
+                json.children.each(function(c) {
                     IWL.createHtmlElement(c, element);
                 });
 
-            if (obj.tailObjects)
-                obj.tailObjects.each(function(t) {
-                    IWL.createHtmlElement(t, paren);
+            if (json.tailObjects)
+                json.tailObjects.each(function(t) {
+                    IWL.createHtmlElement(t, parentElement);
                 });
 
             return element;
@@ -398,12 +387,13 @@ Object.extend(IWL, (function() {
  * */
 IWL.exceptionHandler = function() {
     IWL.enableView();
+    var error = arguments[1];
     if (window.console) {
-	console.dir(arguments[1]);
+	console.dir(error);
     } else {
-	IWL.displayStatus("Error message: " + arguments[1].message);
-	IWL.displayStatus(arguments[1].number & 0xFFFF);
-	IWL.displayStatus(arguments[1].name);
+	IWL.displayStatus("Error message: " + error.message);
+	IWL.displayStatus(error.number & 0xFFFF);
+	IWL.displayStatus(error.name);
     }
 };
 
@@ -466,6 +456,9 @@ IWL.keyLogger = function(element, callback) {
         },
         hasEvent: function(element, eventName) {
             return IWL.RPC.hasEvent.apply(Event, arguments);
+        },
+        createHtmlElement: function(element, json, previousElement) {
+            return IWL.createHtmlElement(json, element, previousElement);
         },
         registerFocus: function(element) {
             IWL.Focus.register.apply(IWL.Focus, arguments);

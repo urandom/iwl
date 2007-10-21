@@ -327,7 +327,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.create.bind(this, id, json, arguments[2]).delay(0.5);
                 return false;
             }
-            var container = IWL.createHtmlElement(json.container, script.parentNode, script);
+            var container = script.up().createHtmlElement(json.container, script);
             script.remove();
             if (!container) return;
             this.current = $(container);
