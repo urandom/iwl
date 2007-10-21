@@ -51,10 +51,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function checkComplete() {
         if (!this.buttonImage) {
-            if (!this.buttonLabel.childNodes.length)
-                this.buttonLabel.appendChild('&nbsp;'.createTextNode());
-
-            if (this.buttonLabel.firstChild.nodeValue 
+            if (this.buttonLabel.getText()
                     && !this.buttonContent.clientWidth)
                 checkComplete.bind(this).delay(0.1);
             else
@@ -160,18 +157,21 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!content) return;
             this.loaded = false;
             if (!label.getText()) {
-                var ml = parseInt(image.getStyle('margin-left')) || 0;
-                var mr = parseInt(image.getStyle('margin-right')) || 0;
-                var ih = parseInt(image.getStyle('height')) || image.height;
                 var text;
-                if (ml != mr)
-                    image.setStyle({marginLeft: ml + 'px', marginRight: ml + 'px'});
+                if (image) {
+                    var ml = parseInt(image.getStyle('margin-left')) || 0;
+                    var mr = parseInt(image.getStyle('margin-right')) || 0;
+                    var ih = parseInt(image.getStyle('height')) || image.height;
+                    if (ml != mr)
+                        image.setStyle({marginLeft: ml + 'px', marginRight: ml + 'px'});
+                }
                 label.appendChild(text = 'M'.createTextNode());
                 var height = content.getHeight();
                 label.removeChild(text);
                 if (height)
                     content.style.height = height + 'px';
-                image.style.marginTop = (height - ih)/2 + 'px';
+                if (image)
+                    image.style.marginTop = (height - ih)/2 + 'px';
             }
 
             if (this.options.size == 'medium') {
@@ -259,7 +259,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The text
          * */
         getLabel: function() {
-            if (!this.buttonLabel) return '';
             return this.buttonLabel.getText();
         },
         /**
@@ -268,8 +267,8 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setLabel: function(text) {
-            this.buttonLabel.firstChild.nodeValue = text;
-            this.adjust();
+            this.buttonLabel.update(text.toString());
+            return this.adjust();
         },
         /**
          * Submits the form it is in

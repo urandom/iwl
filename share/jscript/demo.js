@@ -515,3 +515,21 @@ function run_base_tests() {
         }}
     }, 'testlog');
 }
+
+function run_button_tests() {
+    var button = $('button_test');
+    new Test.Unit.Runner({
+        testLabels: function() { with(this) {
+            assert(!button.getLabel());
+            assertEqual(button, button.setLabel('Some label'));
+            assertEqual('Some label', button.getLabel());
+            assertEqual(button, button.setLabel('&nbsp;'));
+            assertEqual('&nbsp;'.unescapeHTML(), button.getLabel());
+            assertEqual(button, button.setLabel(''));
+            assert(!button.getLabel());
+            assertEqual(button, button.setLabel('<foo бар="あるは">'.escapeHTML()));
+            assertEqual('<foo бар="あるは">', button.getLabel());
+        }}
+    }, 'testlog');
+}
+
