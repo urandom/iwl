@@ -282,6 +282,35 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.adjust();
         },
         /**
+         * Gets the image of the button
+         * @returns The text
+         * */
+        getImage: function() {
+            return this.buttonImage;
+        },
+        /**
+         * Sets the image of the button
+         * @param {String} source The source location for the image
+         * @returns The object
+         * */
+        setImage: function(source) {
+            if (source) {
+                if (!this.buttonImage)
+                    this.buttonImage = this.buttonContent.insertBefore(
+                        new Element('img', {src: source, className: 'image ' + $A(this.classNames()).first() + '_image'}),
+                        this.buttonLabel
+                    );
+                else
+                    this.buttonImage.src = source;
+                this.buttonImage.observe('load', this.adjust.bind(this));
+            } else {
+                this.buttonImage.remove();
+                this.buttonImage = undefined;
+            }
+            this.adjust();
+            return this;
+        },
+        /**
          * Submits the form it is in
          * */
         submit: function() {

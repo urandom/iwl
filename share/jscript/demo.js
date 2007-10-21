@@ -540,6 +540,12 @@ function run_button_tests() {
             assertEqual(button, button.setLabel('<foo бар="あるは">'.escapeHTML()));
             assertEqual('<foo бар="あるは">', button.getLabel());
         }},
+        testImages: function() { with(this) {
+            assert(!button.getImage());
+            assertEqual(button, button.setImage(IWL.Config.ICON_DIR + '/next.' + IWL.Config.ICON_EXT));
+            assertInstanceOf(HTMLImageElement, button.getImage());
+            assertEqual(window.location.protocol + '//' + window.location.host + IWL.Config.ICON_DIR + '/next.' + IWL.Config.ICON_EXT, button.getImage().src);
+        }},
         testDisable: function() { with(this) {
             assert(!button.isNotEnabled());
             assertEqual(button, button.setDisabled(true));
