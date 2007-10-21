@@ -123,27 +123,6 @@ Object.extend(IWL, {RPC: (function() {
       }
   };
 })()});
-(function() {
-    var ElementMethods = {
-        registerEvent: function(element, eventName, url, params, options) {
-            IWL.RPC.registerEvent.apply(Event, arguments);
-            return $A(arguments).first();        
-        },
-        prepareEvents: function(element) {
-            IWL.RPC.prepareEvents.apply(Event, arguments);
-            return $A(arguments).first();       
-        },
-        emitEvent: function(element, eventName, params, options) {
-            IWL.RPC.emitEvent.apply(Event, arguments);
-            return $A(arguments).first();  
-        },
-        hasEvent: function(element, eventName) {
-            return IWL.RPC.hasEvent.apply(Event, arguments);
-        }
-    };
-    Element.addMethods(ElementMethods);
-    Object.extend(Element, ElementMethods);
-})();
 
 /**
  * @class IWL.Widget is the base class for all IWL widgets
@@ -444,10 +423,12 @@ Object.extend(IWL, {Focus: {
     current: null,
     register: function(element) {
         if (!(element = $(element))) return;
-        element.signalConnect('dom:mouseenter', function() {
-            IWL.Focus.current = element});
-        element.signalConnect('click', function() {
-            IWL.Focus.current = element});
+        element.signalConnect('dom:mouseenter', IWL.Focus.gainFocusCallback.bind(this, element));
+        element.signalConnect('click', IWL.Focus.gainFocusCallback.bind(this, element));
+    },
+    gainFocusCallback: function(element) {
+        if (!(element = $(element))) return;
+        IWL.Focus.current = element;
     },
     loseFocusCallback: function(event) {
         if (!Event.checkElement(event, IWL.Focus.current))
@@ -456,7 +437,7 @@ Object.extend(IWL, {Focus: {
 }});
 
 IWL.keyLogger = function(element, callback) {
-    if (!(element = $(element))) return Prototype.emptyFunction;
+    if (!(element = $(element))) return;
     var callbackWrapper = function(event) {
         if (IWL.Focus.current != element)
             return;
@@ -468,6 +449,36 @@ IWL.keyLogger = function(element, callback) {
     else
         Event.signalConnect(window, 'keypress', callbackWrapper);
 };
+
+(function() {
+    var ElementMethods = {
+        registerEvent: function(element, eventName, url, params, options) {
+            IWL.RPC.registerEvent.apply(Event, arguments);
+            return $A(arguments).first();        
+        },
+        prepareEvents: function(element) {
+            IWL.RPC.prepareEvents.apply(Event, arguments);
+            return $A(arguments).first();       
+        },
+        emitEvent: function(element, eventName, params, options) {
+            IWL.RPC.emitEvent.apply(Event, arguments);
+            return $A(arguments).first();  
+        },
+        hasEvent: function(element, eventName) {
+            return IWL.RPC.hasEvent.apply(Event, arguments);
+        },
+        registerFocus: function(element) {
+            IWL.Focus.register.apply(IWL.Focus, arguments);
+            return element;  
+        },
+        keyLogger: function(element, callback) {
+            IWL.keyLogger.apply(IWL, arguments);
+            return element;  
+        }
+    };
+    Element.addMethods(ElementMethods);
+    Object.extend(Element, ElementMethods);
+})();
 
 (function() {
     var b = Prototype.Browser;

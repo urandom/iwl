@@ -334,7 +334,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (paren === document) break;
                 paren = paren.up();
             }
-            IWL.Focus.register(this);
+            this.registerFocus();
             Event.observe(window, 'click', function(event) {
                 if (!Event.checkElement(event, this))
                     this.popDown();
@@ -343,7 +343,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!Event.checkElement(event, this))
                     this.popDown();
             }.bind(this));
-            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
+            this.keyLogger(keyEventsCB.bindAsEventListener(this));
         }
     }
 })());

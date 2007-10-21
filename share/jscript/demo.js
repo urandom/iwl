@@ -496,7 +496,7 @@ function run_base_tests() {
             var test_span = new Element('span', {style: "display: none", id: 'test_span'});
             $('testlog').parentNode.appendChild(test_span);
 
-            IWL.Focus.register(test_span);
+            test_span.registerFocus();
             Event.simulateMouse(test_span, 'click');
             wait(1000, function() {
                 assertEqual(test_span, IWL.Focus.current);

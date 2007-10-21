@@ -294,8 +294,8 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             Event.observe(window, 'resize', 
                     resizeEvent.bindAsEventListener(this));
-            IWL.Focus.register(this);
-            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
+            this.registerFocus();
+            this.keyLogger(keyEventsCB.bindAsEventListener(this));
         },
         _alignIconsVertically: function() {
             if (!this.icons) return;

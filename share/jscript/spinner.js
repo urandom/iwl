@@ -229,8 +229,8 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.setValue(this.options.value);
 
             connectSpinnerSignals.call(this);
-            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
-            IWL.Focus.register(this);
+            this.keyLogger(keyEventsCB.bindAsEventListener(this));
+            this.registerFocus();
 
             this.emitSignal('iwl:load');
         }

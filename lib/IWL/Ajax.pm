@@ -50,7 +50,7 @@ A javascript function to be called after the update takes place
 sub updaterCallback {
     my ($id, $url, %options) = @_;
     return unless $id && $url;
-    my $options = 'onException: exceptionHandler';
+    my $options = 'onException: IWL.exceptionHandler';
 
     $options .= ",onComplete: " . $options{onComplete} if $options{onComplete};
     if ($options{parameters}) {

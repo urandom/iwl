@@ -212,7 +212,7 @@ sub __defaultEvent {
     my ($data, $extras) = $handler->($event->{params}, $event->{options}{id},
         $event->{options}{collectData} ? $event->{options}{elementData} : undef)
       if 'CODE' eq ref $handler;
-    if (UNIVERSAL::can($data, 'IWL::Object')) {
+    if (UNIVERSAL::isa($data, 'IWL::Object')) {
         $data = $data->getJSON;
     } elsif (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
         $data = toJSON($data);

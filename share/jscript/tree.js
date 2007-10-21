@@ -496,8 +496,8 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.nav_images['span'] = '<span class="tree_nav_con"></span>';
             initNavRebuild.bind(this, this.body.rows.length).delay(0.1);
 
-            IWL.Focus.register(this);
-            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
+            this.registerFocus();
+            this.keyLogger(keyEventsCB.bindAsEventListener(this));
         },
         // On the same level
         _getPrevRow: function(row) {

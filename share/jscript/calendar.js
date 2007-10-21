@@ -781,8 +781,8 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
             connectHeadingSignals.call(this);
             connectTimeSignals.call(this);
-            IWL.keyLogger(this, keyEventsCB.bindAsEventListener(this));
-            IWL.Focus.register(this);
+            this.keyLogger(keyEventsCB.bindAsEventListener(this));
+            this.registerFocus;
 
             this.emitSignal('iwl:load');
         }
