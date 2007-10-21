@@ -94,6 +94,18 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!this.parentNode)
             return;
 
+        this.disabledLayer = new Element('div', {
+                className: $A(this.classNames()).first() + '_disabled_layer'
+            });
+        this.parentNode.appendChild(this.disabledLayer);
+        this.disabledLayer.signalConnect('click', function(event) {event.stop()});
+
+        return this;
+    }
+
+    function positionDisabledLayer() {
+        if (!this.disabledLayer) return;
+
         var position     = this.cumulativeOffset();
         var dims         = this.getDimensions();
         var marginTop    = parseInt(this.getStyle('margin-top'));
@@ -107,10 +119,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (isNaN(marginLeft))   marginLeft   = 0;
         if (isNaN(zIndex))       zIndex       = 0;
 
-        this.disabledLayer = new Element('div', {
-                className: $A(this.classNames()).first() + '_disabled_layer'
-            });
-        this.parentNode.appendChild(this.disabledLayer);
         this.disabledLayer.setStyle({
                 opacity: 0.01, position: 'absolute',
                 width: dims.width + marginRight + marginLeft + 'px',
@@ -119,9 +127,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 left: position[0] - marginLeft + 'px',
                 top: position[1] - marginTop + 'px'
             });
-        this.disabledLayer.signalConnect('click', function(event) {event.stop()});
-
-        return this;
     }
 
     function removeDisabledLayer() {
@@ -131,6 +136,10 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.disabledLayer.remove();
         this.disabledLayer = undefined;
         return this;
+    }
+
+    function disableButton(event) {
+        positionDisabledLayer.call(this);
     }
 
     return {
@@ -155,7 +164,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var state = visibilityToggle.call(this);
 
             if (!content) return;
-            this.loaded = false;
             if (!label.getText()) {
                 var text;
                 if (image) {
@@ -249,10 +257,13 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             this.style.width = 2 * corner_size + width + 'px';
             this.style.height = 2 * square + height + 'px';
-            this.emitSignal('iwl:load');
-            this.loaded = true;
 
-            return this;
+            if (!this.loaded) {
+                this.loaded = true;
+                this.emitSignal('iwl:load');
+            }
+
+            return this.emitSignal('iwl:adjust');
         },
         /**
          * Gets the label of the button
@@ -267,15 +278,15 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setLabel: function(text) {
-            this.buttonLabel.update(text.toString());
+            this.buttonLabel.update(text && text.toString ? text.toString() : '');
             return this.adjust();
         },
         /**
          * Submits the form it is in
          * */
         submit: function() {
-            if (this.button_submit)
-                this.button_submit.click();
+            if (this.buttonSubmit)
+                this.buttonSubmit.click();
         },
         /**
          * Submits a form
@@ -299,13 +310,16 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.addClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = true;
                 disabledImageChange.call(this);
-                createDisabledLayer.bind(this).delay(0.5);
+                createDisabledLayer.call(this);
+                positionDisabledLayer.bind(this).delay(0.5);
+                this.signalConnect('iwl:adjust', disableButton);
                 this.adjust();
             } else {
                 this.removeClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = false;
                 defaultImageChange.call(this);
                 removeDisabledLayer.call(this);
+                this.signalDisconnect('iwl:adjust', disableButton);
                 this.adjust();
             }
             return this;
@@ -342,7 +356,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 disabled: false,
                 submit: false 
             }, arguments[2] || {});
-            this.button_submit = this.options.submit ? this.next() : null;
+            this.buttonSubmit = this.options.submit ? this.next() : null;
             this.loaded = false;
             createElements.call(this, json.image, json.label);
             checkComplete.call(this);

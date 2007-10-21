@@ -518,7 +518,17 @@ function run_base_tests() {
 
 function run_button_tests() {
     var button = $('button_test');
+    var className = $A(button.classNames()).first();
     new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            var parts = button.childElements();
+            assertEqual(9, parts.length);
+            $w("tl top tr l content r bl bottom br").each(function(part, index) {
+                assert(parts[index].hasClassName(className + '_' + part));
+            });
+            assert(button.buttonLabel);
+            assert(button.buttonLabel.hasClassName(className + '_label'));
+        }},
         testLabels: function() { with(this) {
             assert(!button.getLabel());
             assertEqual(button, button.setLabel('Some label'));
@@ -529,6 +539,16 @@ function run_button_tests() {
             assert(!button.getLabel());
             assertEqual(button, button.setLabel('<foo бар="あるは">'.escapeHTML()));
             assertEqual('<foo бар="あるは">', button.getLabel());
+        }},
+        testDisable: function() { with(this) {
+            assert(!button.isNotEnabled());
+            assertEqual(button, button.setDisabled(true));
+            assert(button.isNotEnabled());
+            assert(button.disabledLayer);
+            assert(button.hasClassName(className + '_disabled'));
+            assertEqual(button, button.setDisabled(false));
+            assert(!button.isNotEnabled());
+            assert(!button.disabledLayer);
         }}
     }, 'testlog');
 }

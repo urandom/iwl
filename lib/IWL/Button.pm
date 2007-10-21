@@ -63,7 +63,11 @@ Where B<STOCK_ID> is the B<IWL::Stock> id.
 
 =item B<load>
 
-Fires when the button has finished loading and adjusting
+Fires when the button has finished loading
+
+=item B<load>
+
+Fires when the button has finished adjusting
 
 =back
 
@@ -463,7 +467,7 @@ sub __init {
     # Callbacks
     # Hides the dashed focus border in IE. For firefox, this is done by css
     $self->signalConnect(focus => "this.hideFocus = true");
-    $self->{__button}{_customSignals} = {load => []};
+    $self->{__button}{_customSignals} = {load => [], adjust => []};
 
     return $self;
 }
