@@ -374,7 +374,7 @@ sub generate_buttons {
     $radio2->setLabel('Another radio button');
     $radio1->setGroup('radio')->setClass('demo');
     $radio2->setGroup('radio');
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_entries {
@@ -398,7 +398,7 @@ sub generate_entries {
 	    insertion => 'bottom',
 	    onComplete => q|displayStatus.bind(this, 'Completed')|,
     ));
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_spinners {
@@ -408,7 +408,7 @@ sub generate_spinners {
 
     $mask_spinner->setRange(-250, 1000)->setWrap(1)->setMask("Цена: #{number} лв")->setIncrements(0.2, 7.6);
     $container->appendChild($spinner, IWL::Break->new, $mask_spinner);
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_images {
@@ -425,7 +425,7 @@ sub generate_images {
     $frame->setLabel('Stock images');
     $normal_image->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_labels {
@@ -443,7 +443,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOF
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_calendars {
@@ -464,7 +464,7 @@ sub generate_calendars {
     $tip1->setContent($calendar2);
     $container->appendChild($calendar1, $entry1, IWL::Break->new, $label, $icon, $tip1, IWL::Break->new, $entry2);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_combobox {
@@ -477,7 +477,7 @@ sub generate_combobox {
     $normal_combobox->appendOption('dolor' => 3);
     $normal_combobox->appendOption('sit' => 4);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_sliders {
@@ -504,7 +504,7 @@ sub generate_sliders {
     $ranged_slider->signalConnect(slide => "\$('ranged_label').update(value)");
     $vertical_slider->signalConnect(slide => "\$('vertical_label').update(value.toPrecision(2))");
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_iconbox {
@@ -528,7 +528,7 @@ sub generate_iconbox {
 	$icon->setSelected(1) if $_ == 1;
     }
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_menus {
@@ -570,7 +570,7 @@ sub generate_menus {
     });
     $submenu->appendMenuItem("Submenu item $_")->setType('check')->setId($_) foreach (1 .. 20);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_list {
@@ -615,7 +615,7 @@ sub generate_list {
 
     $list->setSortableCallback(2, "sortTheMoney");
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_table {
@@ -656,7 +656,7 @@ sub generate_table {
     $body->appendTextCell('4,320,600');
     $body->appendTextCell('$21.80');
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_tree {
@@ -666,7 +666,7 @@ sub generate_tree {
     $container->appendChild($label);
     $label->setText('<----   The tree');
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_accordions {
@@ -687,7 +687,7 @@ sub generate_accordions {
 
     $container->appendChild($accordion);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_contentbox {
@@ -712,7 +712,7 @@ sub generate_contentbox {
     $chooser->appendOption('noresize');
     $chooser->signalConnect(change => "contentbox_chooser_change(this)");
     $outline->setLabel('Outline resizing');
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_druid {
@@ -729,7 +729,7 @@ sub generate_druid {
     )->setId('first_page');
     $label1->setText('This is page 1');
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_notebook {
@@ -744,7 +744,7 @@ sub generate_notebook {
     $label1->setText('This is page 1');
     $label2->setText('This is page 2');
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_tooltips {
@@ -766,7 +766,7 @@ sub generate_tooltips {
     $label->setText('Hover over me');
     $container->appendChild($button, $label, $tip1, $tip2);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_file {
@@ -779,7 +779,7 @@ sub generate_file {
     $label->setText('Press the button to upload a file.');
     $file->setLabel('Browse ...');
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_rpc_events {
@@ -811,7 +811,7 @@ sub generate_rpc_events {
     $label->appendChild($link);
     $container->appendChild($label, $button, $combo);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_rpc_pagecontrol {
@@ -824,7 +824,7 @@ sub generate_rpc_pagecontrol {
     $content->appendChild(IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif'));
     $container->appendChild($content, $pager);
 
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_prototype {
@@ -834,7 +834,7 @@ sub generate_prototype {
 
     $script->setScript("run_prototype_tests()");
     $container->appendChild($testlog, $script);
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_scriptaculous {
@@ -844,7 +844,7 @@ sub generate_scriptaculous {
 
     $script->setScript("run_scriptaculous_tests()");
     $container->appendChild($testlog, $script);
-    return $container->getObject;
+    return $container;
 }
 
 sub generate_base {
@@ -854,7 +854,7 @@ sub generate_base {
 
     $script->setScript("run_base_tests()");
     $container->appendChild($testlog, $script);
-    return $container->getObject;
+    return $container;
 }
 
 sub register_row_event {

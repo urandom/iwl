@@ -212,22 +212,24 @@ sub __defaultEvent {
     my ($data, $extras) = $handler->($event->{params}, $event->{options}{id},
         $event->{options}{collectData} ? $event->{options}{elementData} : undef)
       if 'CODE' eq ref $handler;
-    if (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
-	$data = toJSON($data);
+    if (UNIVERSAL::can($data, 'IWL::Object')) {
+        $data = $data->getJSON;
+    } elsif (ref $data eq 'ARRAY' || ref $data eq 'HASH') {
+        $data = toJSON($data);
     } else {
         $data = qq|"$data"| unless $event->{options}{update};
     }
 
     if ($event->{options}{update}) {
-	IWL::Object::printHTMLHeader;
-	if (UNIVERSAL::isa($data, 'IWL::Object')) {
-	    $data->print;
-	} else {
-	    print $data;
-	}
+        IWL::Object::printHTMLHeader;
+        if (UNIVERSAL::isa($data, 'IWL::Object')) {
+            $data->print;
+        } else {
+            print $data;
+        }
     } else {
-	IWL::Object::printJSONHeader;
-	print '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}';
+        IWL::Object::printJSONHeader;
+        print '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}';
     }
 }
 
