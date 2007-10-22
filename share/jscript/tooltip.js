@@ -141,13 +141,33 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         return draw.call(this, x, y);
     }
 
+    function placeAtElement() {
+        if (!this.element) return;
+        var pos = this.element.cumulativeOffset();
+        var scroll = this.element.cumulativeScrollOffset();
+        if (Prototype.Browser.Opera) {
+            if (scroll[0] != pos[0])
+                pos[0] -= scroll[0];
+            if (scroll[1] != pos[1])
+                pos[1] -= scroll[1];
+        } else {
+            pos[0] -= scroll[0];
+            pos[1] -= scroll[1];
+        }
+        pos[1] += this.element.getDimensions().height;
+
+        if (this.options.centerOnElement)
+            pos[0] += this.element.getDimensions().width/2;
+        draw.call(this, pos[0], pos[1]);
+    }
+
     return {
         /**
          * Shows the tooltip
          * @returns The object
          * */
         showTooltip: function() {
-            this.placeAtElement();
+            placeAtElement.call(this);
             if (this.__fade) {
                 this.__fade.cancel();
                 this.__fade = undefined;
@@ -189,31 +209,6 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                     this.content.appendChild(elements);
                 }
             }
-            return this;
-        },
-        /**
-         * Places the tooltip at the bound element
-         * @returns The object
-         * */
-        placeAtElement: function() {
-            if (!this.element) return;
-            var pos = this.element.cumulativeOffset();
-            var scroll = this.element.cumulativeScrollOffset();
-            if (Prototype.Browser.Opera) {
-                if (scroll[0] != pos[0])
-                    pos[0] -= scroll[0];
-                if (scroll[1] != pos[1])
-                    pos[1] -= scroll[1];
-            } else {
-                pos[0] -= scroll[0];
-                pos[1] -= scroll[1];
-            }
-            pos[1] += this.element.getDimensions().height;
-
-            if (this.options.centerOnElement)
-                pos[0] += this.element.getDimensions().width/2;
-            draw.call(this, pos[0], pos[1]);
-
             return this;
         },
         /**
