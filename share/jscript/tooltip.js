@@ -145,6 +145,10 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (!this.element) return;
         var pos = this.element.cumulativeOffset();
         var scroll = this.element.cumulativeScrollOffset();
+        if (scroll[0] || (Prototype.Browser.Opera && scroll[0] != pos[0]))
+            scroll[0] -= (document.viewport.getMaxDimensions().width - document.viewport.getWidth());
+        if (scroll[1] || (Prototype.Browser.Opera && scroll[1] != pos[1]))
+            scroll[1] -= (document.viewport.getMaxDimensions().height - document.viewport.getHeight());
         if (Prototype.Browser.Opera) {
             if (scroll[0] != pos[0])
                 pos[0] -= scroll[0];
