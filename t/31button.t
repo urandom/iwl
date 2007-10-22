@@ -4,7 +4,6 @@ use IWL::Button;
 
 use Locale::TextDomain qw(org.bloka.iwl);
 
-
 {
 	my $button = IWL::Button->newFromStock('IWL_STOCK_SAVE', id => 'foo');
     is($button->getId, 'foo');
