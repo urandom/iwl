@@ -77,17 +77,18 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         }
 
         var vdims = document.viewport.getDimensions();
+        var soffset = document.viewport.getScrollOffsets();
         var tdims = this.getDimensions();
         var compensation = this.options.followMouse ? 2.5 : 0;
         var margins = 5;
         var left = x;
         var top = y;
-        if (x < margins) left = margins;
-        if (x + tdims.width > vdims.width - margins)
-            left = vdims.width - tdims.width - margins;
-        if (y < margins) top = margins;
-        if (y + tdims.height > vdims.height - margins)
-            top = y - tdims.height - margins * 2;
+        if (x < margins + soffset.left) left = margins + soffset.left;
+        if (x + tdims.width > vdims.width + soffset.left - margins)
+            left = vdims.width + soffset.left - margins - tdims.width;
+        if (y < margins + soffset.top) top = margins + soffset.top;
+        if (y + tdims.height > vdims.height + soffset.top - margins)
+            top = vdims.height + soffset.top - margins - tdims.height;
 
         /* Vertical offset */
         if (top < y) {
