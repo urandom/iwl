@@ -629,6 +629,12 @@ if (Prototype.Browser.IE)
     Object.extend(this.Element, element || { });
   }).call(window);
 
+document.viewport.getMaxDimensions = function () {
+  var width = Prototype.Browser.WebKit ? document.body.scrollWidth : document.documentElement.scrollWidth;
+  var height = Prototype.Browser.WebKit ? document.body.scrollHeight : document.documentElement.scrollHeight;
+  return Element._returnOffset(width, height);
+}
+
 /* Abort works correctly in 1.6
 // Overload this, for aborting the request
 Object.extend(Ajax.Request.prototype, {

@@ -254,6 +254,14 @@ function run_prototype_tests() {
             assertEqual(35, date.getDayOfYear());
             assert(date.getTimezoneName().length > 0);
         }},
+        testViewport: function() { with(this) {
+            var test_div = document.body.appendChild(new Element(
+                    'div',
+                    {style: 'height: 100px; width: 100px; position: absolute; top: 1900px; left: 2400px; background: red;'}
+                ));
+            assertEnumEqual([2500, 2000], document.viewport.getMaxDimensions());
+            test_div.remove();
+        }},
         testInsertScript: function() { with(this) {
             var loaded = false;
             var script = IWL.Config.JS_DIR + '/calendar.js';
