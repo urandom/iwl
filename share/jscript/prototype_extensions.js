@@ -610,13 +610,13 @@ if (Prototype.Browser.IE)
       tagName = tagName.toLowerCase();
       var cache = Element.cache;
       if (Prototype.Browser.IE) {
-        var conflicts = $H(attributes).grep(/(?:name|on\w+)/);
+        var conflicts = $H(attributes).keys().grep(/(?:name|on\w+)/);
         if (conflicts.length) {
           var attributeString = '';
-          conflicts.each(function (tuple) {
-              if (typeof tuple[1] == 'string') {
-                delete attributes[tuple[0]];
-                attributeString += tuple[0] + '="' + tuple[1] + '"';
+          conflicts.each(function (key) {
+              if (typeof attributes[key] == 'string') {
+                attributeString += key + '="' + attributes[key] + '"';
+                delete attributes[key];
               }
             });
           tagName = '<' + tagName + ' ' + attributeString + '>';

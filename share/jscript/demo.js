@@ -533,8 +533,8 @@ function run_button_tests() {
             assert(!button.getLabel());
             assertEqual(button, button.setLabel('Some label'));
             assertEqual('Some label', button.getLabel());
-            assertEqual(button, button.setLabel('&nbsp;'));
-            assertEqual('&nbsp;'.unescapeHTML(), button.getLabel());
+            assertEqual(button, button.setLabel('&lt;'));
+            assertEqual('<', button.getLabel());
             assertEqual(button, button.setLabel(''));
             assert(!button.getLabel());
             assertEqual(button, button.setLabel('<foo бар="あるは">'.escapeHTML()));
@@ -543,8 +543,11 @@ function run_button_tests() {
         testImages: function() { with(this) {
             assert(!button.getImage());
             assertEqual(button, button.setImage(IWL.Config.ICON_DIR + '/next.' + IWL.Config.ICON_EXT));
-            assertInstanceOf(HTMLImageElement, button.getImage());
+            assertEqual('IMG', button.getImage().tagName);
             assertEqual(window.location.protocol + '//' + window.location.host + IWL.Config.ICON_DIR + '/next.' + IWL.Config.ICON_EXT, button.getImage().src);
+            assert(button.buttonImage.hasClassName('button_image'));
+            assert(button.buttonImage.hasClassName('image'));
+            assertEqual('button_test_image', button.buttonImage.id);
         }},
         testDisable: function() { with(this) {
             assert(!button.isNotEnabled());

@@ -297,7 +297,11 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (source) {
                 if (!this.buttonImage)
                     this.buttonImage = this.buttonContent.insertBefore(
-                        new Element('img', {src: source, className: 'image ' + $A(this.classNames()).first() + '_image'}),
+                        new Element('img', {
+                                src: source,
+                                id: this.id + '_image',
+                                className: 'image ' + $A(this.classNames()).first() + '_image'
+                            }),
                         this.buttonLabel
                     );
                 else
