@@ -271,7 +271,7 @@ Object.extend(IWL, (function() {
                 var rail = new Element('div', {id: "disabled_view_rail",
                             className: "disabled_view_rail", style: 'visibility: hidden'});
                 if (options.fullCover) {
-                    var page_dims = document.viewport.getDimensions();
+                    var page_dims = document.viewport.getMaxDimensions();
                     var container = new Element('div', {id: "disabled_view",
                                 className: "disabled_view", style: 'visibility: hidden'});
 
@@ -285,7 +285,7 @@ Object.extend(IWL, (function() {
                         container.setOpacity(options.opacity);
                     container.setStyle({visibility: 'visible'});
                     Event.signalConnect(window, 'resize', function() {
-                        var page_dims = document.viewport.getDimensions();
+                        var page_dims = document.viewport.getMaxDimensions();
                         container.setStyle({
                             height: page_dims.height + 'px',
                             width: page_dims.width + 'px'

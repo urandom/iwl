@@ -104,14 +104,14 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.modalElement.observe('click', this.close.bind(this));
         this.modalElement.setOpacity(this.options.modalOpacity);
         this.modalElement.setStyle({zIndex: zIndex - 1});
-        var page_dims = document.viewport.getDimensions();
+        var page_dims = document.viewport.getMaxDimensions();
         this.modalElement.setStyle({
             height: page_dims.height + 'px',
             width: page_dims.width + 'px'
         });
         Event.observe(window, 'resize', function() {
             if (!this.modalElement) return;
-            var page_dims = document.viewport.getDimensions();
+            var page_dims = document.viewport.getMaxDimensions();
             this.modalElement.setStyle({
                 height: page_dims.height + 'px',
                 width: page_dims.width + 'px'

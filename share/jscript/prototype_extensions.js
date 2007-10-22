@@ -632,7 +632,7 @@ if (Prototype.Browser.IE)
 document.viewport.getMaxDimensions = function () {
   var width = Prototype.Browser.WebKit ? document.body.scrollWidth : document.documentElement.scrollWidth;
   var height = Prototype.Browser.WebKit ? document.body.scrollHeight : document.documentElement.scrollHeight;
-  return Element._returnOffset(width, height);
+  return {width: width, height: height};
 }
 
 /* Abort works correctly in 1.6

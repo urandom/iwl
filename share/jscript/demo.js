@@ -259,7 +259,8 @@ function run_prototype_tests() {
                     'div',
                     {style: 'height: 100px; width: 100px; position: absolute; top: 1900px; left: 2400px; background: red;'}
                 ));
-            assertEnumEqual([2500, 2000], document.viewport.getMaxDimensions());
+            assertEqual(2500, document.viewport.getMaxDimensions().width);
+            assertEqual(2000, document.viewport.getMaxDimensions().height);
             test_div.remove();
         }},
         testInsertScript: function() { with(this) {
