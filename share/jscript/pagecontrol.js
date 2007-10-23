@@ -40,7 +40,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.input.signalConnect('keydown', function(event) {
             if (!this.element) return;
             if (event.keyCode == Event.KEY_RETURN && this.input.value != this.currentPage) {
-                if (!this.input.checkElementValue({reg:/^\d*$/})) return;
+                if (!this.input.checkValue({reg:/^\d*$/})) return;
                 this.emitSignal('iwl:current_page_is_changing', {type: 'input', value: this.input.value});
                 this.element.emitEvent(this.eventName, {
                     page: this.currentPage, type: 'input',

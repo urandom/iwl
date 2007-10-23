@@ -142,13 +142,13 @@ function run_prototype_tests() {
             assertEqual('foo', params.get('select'), 'Select param');
             assertEqual(0.26, params.get('slider'), 'Slider param');
 
-            assert(test_span.down().childElements()[1].checkElementValue({reg: /^(?:foo|bar)$/}), 'Regular expression');
-            assert(test_span.down(1).childElements()[1].checkElementValue({range: $R(0,1)}), 'Range');
-            assert(!test_span.down(1).childElements()[1].checkElementValue({range: $R(-1,0), deleteValue: true}), 'Delete value');
+            assert(test_span.down().childElements()[1].checkValue({reg: /^(?:foo|bar)$/}), 'Regular expression');
+            assert(test_span.down(1).childElements()[1].checkValue({range: $R(0,1)}), 'Range');
+            assert(!test_span.down(1).childElements()[1].checkValue({range: $R(-1,0), deleteValue: true}), 'Delete value');
             wait(550, function() {
                 assert(!test_span.down(1).childElements()[1].value, 'No value');
-                assert(test_span.down().childElements()[1].checkElementValue({passEmpty: true}), 'Pass empty');
-                assert(!test_span.down().childElements()[2].checkElementValue({reg: /^(?:foo|bar)$/, errorString: 'Invalid value'}), 'Error string');
+                assert(test_span.down().childElements()[1].checkValue({passEmpty: true}), 'Pass empty');
+                assert(!test_span.down().childElements()[2].checkValue({reg: /^(?:foo|bar)$/, errorString: 'Invalid value'}), 'Error string');
                 assertEqual('Invalid value', test_span.down().childElements()[2].value);
 
                 test_span.setStyle({visibility: '', display: 'none', position: ''});

@@ -279,7 +279,7 @@ Object.extend(Event, (function() {
      * 	duration: number (0.5). The duration of the blink
      * 	flash: if true, the element flashes, without being otherwise checked
      * */
-    checkElementValue: function(element) {
+    checkValue: function(element) {
       if (!(element = $(element))) return false;
       var options = Object.extend({
         reg: false,
