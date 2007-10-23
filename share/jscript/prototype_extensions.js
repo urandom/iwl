@@ -629,11 +629,19 @@ if (Prototype.Browser.IE)
     Object.extend(this.Element, element || { });
   }).call(window);
 
-document.viewport.getMaxDimensions = function () {
-  var width = Prototype.Browser.WebKit ? document.body.scrollWidth : document.documentElement.scrollWidth;
-  var height = Prototype.Browser.WebKit ? document.body.scrollHeight : document.documentElement.scrollHeight;
-  return {width: width, height: height};
-}
+Object.extend(document.viewport, {
+  getMaxDimensions: function() {
+    var width = Prototype.Browser.WebKit ? document.body.scrollWidth : document.documentElement.scrollWidth;
+    var height = Prototype.Browser.WebKit ? document.body.scrollHeight : document.documentElement.scrollHeight;
+    return Object.extend([width, height], {width: width, height: height});
+  },
+  getMaxWidth: function() {
+    return this.getMaxDimensions().width;
+  },
+  getMaxHeight: function() {
+    return this.getMaxDimensions().height;
+  }
+});
 
 /* Abort works correctly in 1.6
 // Overload this, for aborting the request

@@ -14,7 +14,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return;
         }
         
-        container = new Element('div', {className: 'tooltip', id: id});
+        container = new Element('div', {className: 'tooltip', id: id, style: 'display: none'});
         var content = new Element('div', {className: 'tooltip_content'});
         var bubble1 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_1'});
         var bubble2 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_2'});
@@ -76,19 +76,22 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return this;
         }
 
-        var vdims = document.viewport.getDimensions();
-        var soffset = document.viewport.getScrollOffsets();
-        var tdims = this.getDimensions();
+        var viewport_dims = document.viewport.getDimensions();
+        var scroll_offset = document.viewport.getScrollOffsets();
+        var tooltip_dims = this.getDimensions();
+        var element_top = elementRealPosition.call(this)[1];
         var compensation = this.options.followMouse ? 2.5 : 0;
         var margins = 5;
         var left = x;
         var top = y;
-        if (x < margins + soffset.left) left = margins + soffset.left;
-        if (x + tdims.width > vdims.width + soffset.left - margins)
-            left = vdims.width + soffset.left - margins - tdims.width;
-        if (y < margins + soffset.top) top = margins + soffset.top;
-        if (y + tdims.height > vdims.height + soffset.top - margins)
-            top = vdims.height + soffset.top - margins - tdims.height;
+        if (x < margins + scroll_offset.left) left = margins + scroll_offset.left;
+        if (x + tooltip_dims.width > viewport_dims.width + scroll_offset.left - margins)
+            left = viewport_dims.width + scroll_offset.left - margins - tooltip_dims.width;
+        if (y < margins + scroll_offset.top) top = margins + scroll_offset.top;
+        if (y + tooltip_dims.height > viewport_dims.height + scroll_offset.top - margins)
+            top = element_top
+                ? element_top - tooltip_dims.height
+                : viewport_dims.height + scroll_offset.top - margins - element_height - tooltip_dims.height;
 
         /* Vertical offset */
         if (top < y) {
@@ -116,13 +119,13 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         /* Horizontal offset */
         var const_offset = bubbles[2].left + bubbles[2].width + compensation;
         var offset_x = x - left - const_offset;
-        if (offset_x > tdims.width) offset_x = tdims.width;
-        var offset_ratio = offset_x / tdims.width;
+        if (offset_x > tooltip_dims.width) offset_x = tooltip_dims.width;
+        var offset_ratio = offset_x / tooltip_dims.width;
         if (offset_ratio < 0) offset_ratio = 0;
 
-        var bubble0_x = (tdims.width - 2 * bubbles[0].left - bubbles[0].width + const_offset) * offset_ratio + bubbles[0].left;
-        var bubble1_x = (tdims.width - 2 * bubbles[1].left - bubbles[1].width + const_offset) * offset_ratio + bubbles[1].left;
-        var bubble2_x = (tdims.width - 2 * bubbles[2].left - bubbles[2].width + const_offset) * offset_ratio + bubbles[2].left;
+        var bubble0_x = (tooltip_dims.width - 2 * bubbles[0].left - bubbles[0].width + const_offset) * offset_ratio + bubbles[0].left;
+        var bubble1_x = (tooltip_dims.width - 2 * bubbles[1].left - bubbles[1].width + const_offset) * offset_ratio + bubbles[1].left;
+        var bubble2_x = (tooltip_dims.width - 2 * bubbles[2].left - bubbles[2].width + const_offset) * offset_ratio + bubbles[2].left;
 
         this.bubbles[0].style.left = bubble0_x + 'px';
         this.bubbles[1].style.left = bubble1_x + 'px';
@@ -138,18 +141,42 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
     function move(e) {
         var x = Event.pointerX(e);
         var y = Event.pointerY(e);
+        if (!this.__positioned) return;
 
         return draw.call(this, x, y);
     }
 
     function placeAtElement() {
-        if (!this.element) return;
+        this.__positioned = false;
+        if (!this.element) return false;
+
+        var viewport_scroll = document.viewport.getScrollOffsets();
+        var viewport_dims = document.viewport.getDimensions();
+        pos = elementRealPosition.call(this);
+        pos[1] += this.element.getHeight();
+
+        if (this.options.centerOnElement)
+            pos[0] += this.element.getWidth()/2;
+
+        if (pos[0] > viewport_dims.width + viewport_scroll.left ||
+            pos[1] > viewport_dims.height + viewport_scroll.height)
+            return false;
+
+        this.__positioned = true;
+        draw.call(this, pos[0], pos[1]);
+        return true;
+    }
+
+    function elementRealPosition() {
+        if (!this.element) return [0, 0];
         var pos = this.element.cumulativeOffset();
         var scroll = this.element.cumulativeScrollOffset();
+        var viewport_scroll = document.viewport.getScrollOffsets();
         if (scroll[0] || (Prototype.Browser.Opera && scroll[0] != pos[0]))
-            scroll[0] -= (document.viewport.getMaxDimensions().width - document.viewport.getWidth());
+            scroll[0] -= viewport_scroll.left;
         if (scroll[1] || (Prototype.Browser.Opera && scroll[1] != pos[1]))
-            scroll[1] -= (document.viewport.getMaxDimensions().height - document.viewport.getHeight());
+            scroll[1] -= viewport_scroll.top;
+
         if (Prototype.Browser.Opera) {
             if (scroll[0] != pos[0])
                 pos[0] -= scroll[0];
@@ -159,11 +186,8 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             pos[0] -= scroll[0];
             pos[1] -= scroll[1];
         }
-        pos[1] += this.element.getDimensions().height;
 
-        if (this.options.centerOnElement)
-            pos[0] += this.element.getDimensions().width/2;
-        draw.call(this, pos[0], pos[1]);
+        return pos;
     }
 
     return {
@@ -172,7 +196,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * @returns The object
          * */
         showTooltip: function() {
-            placeAtElement.call(this);
+            if (!placeAtElement.call(this)) return;
             if (this.__fade) {
                 this.__fade.cancel();
                 this.__fade = undefined;

@@ -259,8 +259,9 @@ function run_prototype_tests() {
                     'div',
                     {style: 'height: 100px; width: 100px; position: absolute; top: 1900px; left: 2400px; background: red;'}
                 ));
-            assertEqual(2500, document.viewport.getMaxDimensions().width);
-            assertEqual(2000, document.viewport.getMaxDimensions().height);
+            assertEnumEqual([2500, 2000], document.viewport.getMaxDimensions());
+            assertEqual(2500, document.viewport.getMaxWidth());
+            assertEqual(2000, document.viewport.getMaxHeight());
             test_div.remove();
         }},
         testInsertScript: function() { with(this) {
@@ -548,6 +549,8 @@ function run_button_tests() {
             assert(!button.getLabel());
             assertEqual(button, button.setLabel('<foo бар="あるは">'.escapeHTML()));
             assertEqual('<foo бар="あるは">', button.getLabel());
+            assertEqual('button_test_label', button.buttonLabel.id);
+            assert(button.buttonLabel.hasClassName('button_label'));
         }},
         testImages: function() { with(this) {
             assert(!button.getImage());
