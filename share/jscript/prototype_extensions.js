@@ -267,7 +267,7 @@ Object.extend(Event, (function() {
     /**
      * Checks whether the value of an element passes certain conditions
      * @param element The element, whose value will be checked.
-     * @param options. An options hash. The following keys are recognised:
+     * @param options. An options object. The following keys are recognised:
      * 	reg: regular expression. The value will be tried for a match.
      * 	range: An ObjectRange. The method will return true if the value of the element is within the range
      * 	passEmpty: boolean (default: false). If true, an empty value will return true
