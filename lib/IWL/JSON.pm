@@ -26,6 +26,10 @@ my %special = ("\b" => '\b', "\t" => '\t', "\n" => '\n', "\f" => '\f', "\r" => '
 
 IWL::JSON - helper functions for converting to and from JSON notation
 
+=head1 DESCRIPTION
+
+IWL::JSON provides function for converting JSON strings to Perl objects and vice versa. It is an exact replica of Prototype JS' toJSON and evalJSON, which means that the equivalent operations in JavaScript should be done with those methods.
+
 =head1 Functions
 
 =over 4

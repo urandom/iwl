@@ -1,4 +1,4 @@
-use Test::More tests => 28;
+use Test::More tests => 29;
 
 use IWL::JSON ':all';
 
@@ -74,4 +74,5 @@ use IWL::JSON ':all';
     is_deeply(evalJSON('[eval("16"), 2]'), [16, 2]);
     is('malicious attack;', evalJSON('); return "malicious attack;";('));
     is('', evalJSON('); return "malicious attack;";(', 1));
+    is_deeply({escaped => qq({"foo": "bar", "alpha": [1,2]})}, evalJSON(qq({"escaped": "{\\"foo\\": \\"bar\\", \\"alpha\\": [1,2]}"}), 1));
 }
