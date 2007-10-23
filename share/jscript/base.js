@@ -501,3 +501,4 @@ var registerFocus = IWL.Focus.register;
 var loseFocus = IWL.Focus.loseFocusCallback;
 var focused_widget = IWL.Focus.current;
 var Widget = IWL.Widget;
+var getKeyCode = Event.getKeyCode;

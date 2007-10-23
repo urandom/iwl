@@ -90,7 +90,7 @@ sub evalJSON {
     return if !$string;
     
     if (!$sanitize || isJSON($string)) {
-        $string =~ s/":/" =>/go;
+        $string =~ s/(?<!\\)":/" =>/go;
         $string =~ s/\$/\\\$/go;
         $string =~ s/\@/\\\@/go;
         $string =~ s/\%/\\\%/go;
