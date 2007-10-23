@@ -532,11 +532,15 @@ function run_button_tests() {
     new Test.Unit.Runner({
         testParts: function() { with(this) {
             var parts = button.childElements();
+            assert(button.hasClassName('button'));
+            assertEqual('button_test', button.id);
             assertEqual(9, parts.length);
             $w("tl top tr l content r bl bottom br").each(function(part, index) {
                 assert(parts[index].hasClassName(className + '_' + part));
+                assertEqual(button.id + '_' + part, parts[index].id);
             });
             assert(button.buttonLabel);
+            assertEqual('button_test_label', button.buttonLabel.id);
             assert(button.buttonLabel.hasClassName(className + '_label'));
         }},
         testLabels: function() { with(this) {
@@ -549,8 +553,6 @@ function run_button_tests() {
             assert(!button.getLabel());
             assertEqual(button, button.setLabel('<foo бар="あるは">'.escapeHTML()));
             assertEqual('<foo бар="あるは">', button.getLabel());
-            assertEqual('button_test_label', button.buttonLabel.id);
-            assert(button.buttonLabel.hasClassName('button_label'));
         }},
         testImages: function() { with(this) {
             assert(!button.getImage());
