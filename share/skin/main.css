@@ -1069,31 +1069,6 @@ span.pagecontrol_label input {
     text-align: center;
 }
 
-.general_settings p {
-    margin: 0;
-}
-
-#general_settings_radio_button_cell {
-    border-bottom: 1px solid #dedede;
-}
-
-#settings_radio {
-    margin-bottom: 4px;
-    padding-left: 20px;
-}
-#settings_pagesize {
-    padding: 5px 0;
-}
-#settings_pagesize .entry {
-    margin-left: 4px;
-}
-#settings_pagesize .entry input {
-    text-align: center;
-}
-#radios_label {
-    margin-bottom: 10px;
-}
-
 /* Accordions */
 .accordion_page_title {
     background: #f1ece6;
