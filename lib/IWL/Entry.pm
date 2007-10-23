@@ -527,10 +527,7 @@ sub __setup_completion {
 	$self->appendChild($self->{__completion});
 	$self->{__completionAdded} = 1;
     }
-    $self->requiredJs('dist/prototype.js');
-    $self->requiredJs('dist/effects.js');
-    $self->requiredJs('dist/controls.js');
-    $self->requiredJs('scriptaculous_extensions.js');
+    $self->requiredJs('base.js');
     return $self;
 }
 
