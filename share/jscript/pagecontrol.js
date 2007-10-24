@@ -133,6 +133,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
          *                 prev: Goes to the previous page
          *                 next: Goes to the next page
          *                 last: Goes to the last page
+         * @param parameters Additional parameters to pass to the when changing the page.
          * @returns The object
          * */
         setCurrentPage: function(page) {
@@ -140,9 +141,9 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             var parameters = Object.extend({}, arguments[1]);
             if (typeof page == 'number' && page > 0)
-                parameters = {type: 'input', value: page};
+                Object.extend(parameters, {type: 'input', value: page});
             else if (["first", "prev", "next", "last"].include(page))
-                parameters = {type: page};
+                Object.extend(parameters, {type: page});
             else return;
             this.emitSignal('iwl:current_page_is_changing', parameters);
             this.element.emitEvent(this.eventName, Object.extend(parameters, {
