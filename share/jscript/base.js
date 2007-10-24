@@ -160,7 +160,7 @@ Object.extend(IWL, (function() {
     var script_urls = 0;
     var scripts     = [];
     
-    function addScript () {
+    function evalScript () {
         if (--script_urls > 0) return;
         scripts.each(function(s) {
             eval(s);
@@ -185,9 +185,8 @@ Object.extend(IWL, (function() {
             if (json.scripts) {
                 while (json.scripts.length) {
                     var url = json.scripts.shift().attributes.src;
-                    if (!($$('script').pluck('src').grep(url + "$").length))
-                        ++script_urls;
-                    document.insertScript(url, {onComplete: addScript});
+                    ++script_urls;
+                    document.insertScript(url, {onComplete: evalScript});
                 }
             }
             if (!json.tag) {

@@ -15,7 +15,7 @@ use constant false => '';
 use constant null => undef;
 use constant undefined => undef;
 use constant NaN => undef;
-use constant infinity => undef;
+use constant Infinity => undef;
 
 my $number  = qr/^-?\d+(?:\.\d+)?(?:e[-+]\d+)?$/;
 my $json    = qr/^[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]*$/;
@@ -117,6 +117,9 @@ sub isJSON {
 
     $string =~ s/\\./@/go;
     $string =~ s/"[^"\\\n\r]*"//go;
+    $string =~ s/\bInfinity\b//go;
+    $string =~ s/\bNaN\b//go;
+    $string =~ s/\bundefined\b//go;
 
     return !(!($string =~ $json));
 }

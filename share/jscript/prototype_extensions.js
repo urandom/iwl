@@ -357,18 +357,6 @@ Object.extend(String.prototype, {
     var div = document.createElement('div');
     div.innerHTML = this.stripTags();
     return div.firstChild;
-  },
-  evalScripts: function() {
-    var head = document.getElementsByTagName('head')[0];
-    var matchAll = new RegExp(Prototype.ScriptFragment, 'img');
-    var source = new RegExp('<script[^>]*?src=["\'](.*?)["\'][^>]*?><\/script>', 'im');
-    var result = this.extractScripts().map(function(script) { return eval(script) });
-    result.push((this.match(matchAll) || []).map(function(scriptTag) {
-      var match = scriptTag.match(source);
-      if (match && match[1])
-        return head.appendChild(new Element('script', {src: match[1], type: 'text/javascript'}));
-    }));
-    return result;
   }
 });
 
@@ -568,19 +556,23 @@ document.insertScript = (function () {
       url += '?' + query.toQueryString();
     }
     if (!scripts) scripts = $$('script').pluck('src');
-    if (scripts.grep(url + "$").length) return;
+    if (scripts.grep(url + "$").length) {
+      if (options.onComplete)
+        options.onComplete.bind(window, url).delay(0.1);
+      return;
+    }
     scripts.push(url);
 
     var script = new Element('script', {type: 'text/javascript', charset: 'utf-8', defer: true});
-    var alreadyFired = false;
+    var fired = false;
     var stateChangedCallback = function() {
       if (script.readyState && script.readyState != 'loaded' &&
           script.readyState != 'complete')
         return;
-      if (alreadyFired) return;
+      if (fired) return;
       script.onreadystatechange = script.onload = null;
       if (options.onComplete) options.onComplete(url);
-      alreadyFired = true;
+      fired = true;
     };
 
     script.onload = script.onreadystatechange = stateChangedCallback;
@@ -601,6 +593,39 @@ document.insertScript = (function () {
     }
   }
 })();
+
+Object.extend(String.prototype, (function() {
+  var urlCount     = 0;
+  var codeSnippets = [];
+
+  function evalSnippet() {
+    if (--urlCount > 0) return;
+    codeSnippets.each(function(code) {
+      eval(code);
+    });
+    codeSnippets = [];
+  }
+
+  return {
+    evalScripts: function() {
+      var matchAll = new RegExp(Prototype.ScriptFragment, 'img');
+      var source = new RegExp('<script[^>]*?src=["\'](.*?)["\'][^>]*?><\/script>', 'im');
+      (this.match(matchAll) || []).map(function(scriptTag) {
+        var match = scriptTag.match(source);
+        if (match && match[1]) {
+          ++urlCount;
+          return document.insertScript(match[1], {onComplete: evalSnippet});
+        }
+      });
+      this.extractScripts().each(function(script) {
+        if (urlCount)
+          codeSnippets.push(script) 
+        else
+          eval(script);
+      });
+    }
+  }
+})());
 
 if (Prototype.Browser.IE)
   (function() {

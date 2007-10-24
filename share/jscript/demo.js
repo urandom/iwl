@@ -191,8 +191,7 @@ function run_prototype_tests() {
             assertEqual(4, evalScriptsCounter);
 
             IWL.Menu = undefined;
-            assertEqual("SCRIPT",
-                (('foo <script src="' + IWL.Config.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts())[1][0].tagName);
+            ('foo <script src="' + IWL.Config.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts();
             wait(2000, function() { assertEqual('object', typeof IWL.Menu); });
             window.evalScriptsCounter = undefined;
         }},
