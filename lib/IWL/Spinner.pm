@@ -290,7 +290,7 @@ sub isSnapping {
 
 Sets the mask of the spinner. A mask defines a string, a portion of which represents the numeric value, and the rest is text.
 
-Parameters: B<MASK> - a string mask. In order to display the spinner value, the string must contain I<#{number}>. e.g.: "#{number} euros"
+Parameters: B<MASK> - a string mask. In order to display the spinner value, the string must contain I<#{number}>. e.g.: "#{number} euro"
 
 =cut
 
@@ -414,9 +414,9 @@ sub __init {
         stepIncrement => 1.0, pageIncrement => 10.0,
         acceleration => 0.2, snap => 0, wrap => 0};
 
+    $self->{_options}{to}            = $args{to}            if exists $args{to};
+    $self->{_options}{from}          = $args{from}          if exists $args{from};
     $self->{_options}{value}         = $args{value}         if defined $args{value};
-    $self->{_options}{to}            = $args{to}            if defined $args{to};
-    $self->{_options}{from}          = $args{from}          if defined $args{from};
     $self->{_options}{stepIncrement} = $args{stepIncrement} if defined $args{stepIncrement};
     $self->{_options}{pageIncrement} = $args{pageIncrement} if defined $args{pageIncrement};
     $self->{_options}{acceleration}  = $args{acceleration}  if defined $args{acceleration};

@@ -69,17 +69,17 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function spinnerPeriodical(pe) {
-        var new_value = this.spinDirection == 'left' ? this.value - this.speed : this.value + this.speed;
+        var new_value = this.spinDirection == 'left' ? this.preciseValue - this.speed : this.preciseValue + this.speed;
         this.setValue(new_value);
     }
 
     function inputBlur(event) {
         this.input.removeClassName('spinner_text_selected');
-        this.setValue(this.value);
+        this.setValue(this.preciseValue);
     }
     function inputFocus(event) {
         this.input.addClassName('spinner_text_selected');
-        var value = this.value;
+        var value = this.preciseValue;
         if (!isNaN(this.options.precision))
             value = value.toFixed(this.options.precision);
         this.input.value = value;
@@ -145,15 +145,15 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (isNaN(number)) return;
 
         if (this.options.wrap) {
-            while (number < this.options.from)
-                number = this.options.to + number + 1 - this.options.from;
-            while (number > this.options.to)
-                number = this.options.from + number - 1 - this.options.to;
+            while (number < this.from)
+                number = this.to + number + 1 - this.from;
+            while (number > this.to)
+                number = this.from + number - 1 - this.to;
         } else {
-            if (number < this.options.from)
-                number = this.options.from;
-            else if (number > this.options.to)
-                number = this.options.to;
+            if (number < this.from)
+                number = this.from;
+            else if (number > this.to)
+                number = this.to;
         }
 
         return number;
@@ -171,7 +171,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         event.shiftKey ? this.options.pageIncrement : this.options.stepIncrement;
         var delta = (x - this.dragStartPosition) * offset;
         this.dragStartPosition = x;
-        this.setValue(this.value + delta);
+        this.setValue(this.preciseValue + delta);
     }
 
     function documentMouseUp(event) {
@@ -189,9 +189,10 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             number = wrapValue.call(this, number);
             if (isNaN(number)) return;
 
-            this.value = number;
+            this.preciseValue = number;
             if (!isNaN(this.options.precision))
                 number = number.toFixed(this.options.precision);
+            this.value = parseFloat(number);
             this.input.value = this.mask ? this.mask.evaluate({number: number}) : number;
             return this;
         },
@@ -219,10 +220,11 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.input = this.select('.spinner_text')[0];
             this.leftSpinner = this.select('.spinner_left')[0];
             this.rightSpinner = this.select('.spinner_right')[0];
-            this.range = $R(parseFloat(this.options.from) || 0, parseFloat(this.options.to) || 100);
             this.speed = this.options.stepIncrement;
             this.mask = null;
             this.dragging = false;
+            this.from = parseFloat(this.options.from) || -Infinity;
+            this.to = parseFloat(this.options.to) || Infinity;
             if (this.options.mask && this.options.mask.match(/#\{number\}/))
                 this.mask = new Template(this.options.mask);
 
