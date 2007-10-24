@@ -12,19 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TODO: Patterns
-// TODO: Radial gradient
-// TODO: Clipping paths
-// TODO: Coordsize
-// TODO: Painting mode
-// TODO: Optimize
-// TODO: canvas width/height sets content size in moz, border size in ie
-// TODO: Painting outside the canvas should not be allowed
+
+// Known Issues:
+//
+// * Patterns are not implemented.
+// * Radial gradient are not implemented. The VML version of these look very
+//   different from the canvas one.
+// * Clipping paths are not implemented.
+// * Coordsize. The width and height attribute have higher priority than the
+//   width and height style values which isn't correct.
+// * Painting mode isn't implemented.
+// * Canvas width/height should is using content-box by default. IE in
+//   Quirks mode will draw the canvas using border-box. Either change your
+//   doctype to HTML5
+//   (http://www.whatwg.org/specs/web-apps/current-work/#the-doctype)
+//   or use Box Sizing Behavior from WebFX
+//   (http://webfx.eae.net/dhtml/boxsizing/boxsizing.html)
+// * Optimize. There is always room for speed improvements.
 
 // only add this code if we do not already have a canvas implementation
 if (!window.CanvasRenderingContext2D) {
 
 (function () {
+
+  // alias some functions to make (compiled) code shorter
+  var m = Math;
+  var mr = m.round;
+  var ms = m.sin;
+  var mc = m.cos;
+
+  // this is used for sub pixel precision
+  var Z = 10;
+  var Z2 = Z / 2;
 
   var G_vmlCanvasManager_ = {
     init: function (opt_doc) {
@@ -37,7 +56,7 @@ if (!window.CanvasRenderingContext2D) {
       }
     },
 
-    init_: function (doc, e) {
+    init_: function (doc) {
       if (doc.readyState == "complete") {
         // create xmlns
         if (!doc.namespaces["g_vml_"]) {
@@ -47,8 +66,9 @@ if (!window.CanvasRenderingContext2D) {
         // setup default css
         var ss = doc.createStyleSheet();
         ss.cssText = "canvas{display:inline-block;overflow:hidden;" +
-            "text-align:left;}" +
-            "canvas *{behavior:url(#default#VML)}";
+            // default size is 300x150 in Gecko and Opera
+            "text-align:left;width:300px;height:150px}" +
+            "g_vml_\\:*{behavior:url(#default#VML)}";
 
         // find all canvas elements
         var els = doc.getElementsByTagName("canvas");
@@ -64,7 +84,8 @@ if (!window.CanvasRenderingContext2D) {
       // in IE before version 5.5 we would need to add HTML: to the tag name
       // but we do not care about IE before version 6
       var outerHTML = el.outerHTML;
-      var newEl = document.createElement(outerHTML);
+
+      var newEl = el.ownerDocument.createElement(outerHTML);
       // if the tag is still open IE has created the children as siblings and
       // it has also created a tag with the name "/FOO"
       if (outerHTML.slice(-2) != "/>") {
@@ -86,12 +107,13 @@ if (!window.CanvasRenderingContext2D) {
     /**
      * Public initializes a canvas element so that it can be used as canvas
      * element from now on. This is called automatically before the page is
-     * loaded but if you are creating elements using createElement yuo need to
+     * loaded but if you are creating elements using createElement you need to
      * make sure this is called on the element.
-     * @param el {HTMLElement} The canvas element to initialize.
+     * @param {HTMLElement} el The canvas element to initialize.
+     * @return {HTMLElement} the element that was created.
      */
     initElement: function (el) {
-      //el = this.fixElement_(el);
+      el = this.fixElement_(el);
       el.getContext = function () {
         if (this.context_) {
           return this.context_;
@@ -99,33 +121,52 @@ if (!window.CanvasRenderingContext2D) {
         return this.context_ = new CanvasRenderingContext2D_(this);
       };
 
-      var self = this; //bind
-      el.attachEvent("onpropertychange", function (e) {
-        // we need to watch changes to width and height
-        switch (e.propertyName) {
-          case "width":
-          case "height":
-            // coord size changed?
-            break;
-        }
-      });
-
-      // if style.height is set
+      // do not use inline function because that will leak memory
+      el.attachEvent('onpropertychange', onPropertyChange);
+      el.attachEvent('onresize', onResize);
 
       var attrs = el.attributes;
       if (attrs.width && attrs.width.specified) {
         // TODO: use runtimeStyle and coordsize
         // el.getContext().setWidth_(attrs.width.nodeValue);
         el.style.width = attrs.width.nodeValue + "px";
+      } else {
+        el.width = el.clientWidth;
       }
       if (attrs.height && attrs.height.specified) {
         // TODO: use runtimeStyle and coordsize
         // el.getContext().setHeight_(attrs.height.nodeValue);
         el.style.height = attrs.height.nodeValue + "px";
+      } else {
+        el.height = el.clientHeight;
       }
       //el.getContext().setCoordsize_()
+      return el;
     }
   };
+
+  function onPropertyChange(e) {
+    var el = e.srcElement;
+
+    switch (e.propertyName) {
+      case 'width':
+        el.style.width = el.attributes.width.nodeValue + "px";
+        el.getContext().clearRect();
+        break;
+      case 'height':
+        el.style.height = el.attributes.height.nodeValue + "px";
+        el.getContext().clearRect();
+        break;
+    }
+  }
+
+  function onResize(e) {
+    var el = e.srcElement;
+    if (el.firstChild) {
+      el.firstChild.style.width =  el.clientWidth + 'px';
+      el.firstChild.style.height = el.clientHeight + 'px';
+    }
+  }
 
   G_vmlCanvasManager_.init();
 
@@ -173,6 +214,8 @@ if (!window.CanvasRenderingContext2D) {
     o2.shadowOffsetX = o1.shadowOffsetX;
     o2.shadowOffsetY = o1.shadowOffsetY;
     o2.strokeStyle   = o1.strokeStyle;
+    o2.arcScaleX_    = o1.arcScaleX_;
+    o2.arcScaleY_    = o1.arcScaleY_;
   }
 
   function processStyle(styleString) {
@@ -186,7 +229,7 @@ if (!window.CanvasRenderingContext2D) {
 
       str = "#";
       for (var i = 0; i < 3; i++) {
-        str += dec2hex[parseInt(guts[i])];
+        str += dec2hex[Number(guts[i])];
       }
 
       if ((guts.length == 4) && (styleString.substr(3, 1) == "a")) {
@@ -214,12 +257,11 @@ if (!window.CanvasRenderingContext2D) {
   /**
    * This class implements CanvasRenderingContext2D interface as described by
    * the WHATWG.
-   * @param surfaceElement {HTMLElement} The element that the 2D context should
+   * @param {HTMLElement} surfaceElement The element that the 2D context should
    * be associated with
    */
    function CanvasRenderingContext2D_(surfaceElement) {
     this.m_ = createMatrixIdentity();
-    this.element_ = surfaceElement;
 
     this.mStack_ = [];
     this.aStack_ = [];
@@ -227,13 +269,25 @@ if (!window.CanvasRenderingContext2D) {
 
     // Canvas context properties
     this.strokeStyle = "#000";
-    this.fillStyle = "#ccc";
+    this.fillStyle = "#000";
 
     this.lineWidth = 1;
     this.lineJoin = "miter";
     this.lineCap = "butt";
-    this.miterLimit = 10;
+    this.miterLimit = Z * 1;
     this.globalAlpha = 1;
+    this.canvas = surfaceElement;
+
+    var el = surfaceElement.ownerDocument.createElement('div');
+    el.style.width =  surfaceElement.clientWidth + 'px';
+    el.style.height = surfaceElement.clientHeight + 'px';
+    el.style.overflow = 'hidden';
+    el.style.position = 'absolute';
+    surfaceElement.appendChild(el);
+
+    this.element_ = el;
+    this.arcScaleX_ = 1;
+    this.arcScaleY_ = 1;
   };
 
   var contextPrototype = CanvasRenderingContext2D_.prototype;
@@ -251,10 +305,14 @@ if (!window.CanvasRenderingContext2D) {
 
   contextPrototype.moveTo = function(aX, aY) {
     this.currentPath_.push({type: "moveTo", x: aX, y: aY});
+    this.currentX_ = aX;
+    this.currentY_ = aY;
   };
 
   contextPrototype.lineTo = function(aX, aY) {
     this.currentPath_.push({type: "lineTo", x: aX, y: aY});
+    this.currentX_ = aX;
+    this.currentY_ = aY;
   };
 
   contextPrototype.bezierCurveTo = function(aCP1x, aCP1y,
@@ -267,29 +325,38 @@ if (!window.CanvasRenderingContext2D) {
                            cp2y: aCP2y,
                            x: aX,
                            y: aY});
+    this.currentX_ = aX;
+    this.currentY_ = aY;
   };
 
   contextPrototype.quadraticCurveTo = function(aCPx, aCPy, aX, aY) {
-    // VML's qb produces different output to Firefox's
-    // FF's behaviour seems to have changed in 1.5.0.1, check this
-    this.bezierCurveTo(aCPx, aCPy, aCPx, aCPy, aX, aY);
+    // the following is lifted almost directly from
+    // http://developer.mozilla.org/en/docs/Canvas_tutorial:Drawing_shapes
+    var cp1x = this.currentX_ + 2.0 / 3.0 * (aCPx - this.currentX_);
+    var cp1y = this.currentY_ + 2.0 / 3.0 * (aCPy - this.currentY_);
+    var cp2x = cp1x + (aX - this.currentX_) / 3.0;
+    var cp2y = cp1y + (aY - this.currentY_) / 3.0;
+    this.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, aX, aY);
   };
 
   contextPrototype.arc = function(aX, aY, aRadius,
                                   aStartAngle, aEndAngle, aClockwise) {
-    if (!aClockwise) {
-      var t = aStartAngle;
-      aStartAngle = aEndAngle;
-      aEndAngle = t;
+    aRadius *= Z;
+    var arcType = aClockwise ? "at" : "wa";
+
+    var xStart = aX + (mc(aStartAngle) * aRadius) - Z2;
+    var yStart = aY + (ms(aStartAngle) * aRadius) - Z2;
+
+    var xEnd = aX + (mc(aEndAngle) * aRadius) - Z2;
+    var yEnd = aY + (ms(aEndAngle) * aRadius) - Z2;
+
+    // IE won't render arches drawn counter clockwise if xStart == xEnd.
+    if (xStart == xEnd && !aClockwise) {
+      xStart += 0.125; // Offset xStart by 1/80 of a pixel. Use something
+                       // that can be represented in binary
     }
 
-    var xStart = aX + (Math.cos(aStartAngle) * aRadius);
-    var yStart = aY + (Math.sin(aStartAngle) * aRadius);
-
-    var xEnd = aX + (Math.cos(aEndAngle) * aRadius);
-    var yEnd = aY + (Math.sin(aEndAngle) * aRadius);
-
-    this.currentPath_.push({type: "arc",
+    this.currentPath_.push({type: arcType,
                            x: aX,
                            y: aY,
                            radius: aRadius,
@@ -348,8 +415,20 @@ if (!window.CanvasRenderingContext2D) {
 
   contextPrototype.drawImage = function (image, var_args) {
     var dx, dy, dw, dh, sx, sy, sw, sh;
+
+    // to find the original width we overide the width and height
+    var oldRuntimeWidth = image.runtimeStyle.width;
+    var oldRuntimeHeight = image.runtimeStyle.height;
+    image.runtimeStyle.width = 'auto';
+    image.runtimeStyle.height = 'auto';
+
+    // get the original size
     var w = image.width;
     var h = image.height;
+
+    // and remove overides
+    image.runtimeStyle.width = oldRuntimeWidth;
+    image.runtimeStyle.height = oldRuntimeHeight;
 
     if (arguments.length == 3) {
       dx = arguments[1];
@@ -380,16 +459,19 @@ if (!window.CanvasRenderingContext2D) {
 
     var d = this.getCoords_(dx, dy);
 
-    var w2 = (sw / 2);
-    var h2 = (sh / 2);
+    var w2 = sw / 2;
+    var h2 = sh / 2;
 
     var vmlStr = [];
 
+    var W = 10;
+    var H = 10;
+
     // For some reason that I've now forgotten, using divs didn't work
     vmlStr.push(' <g_vml_:group',
-                ' coordsize="100,100"',
-                ' coordorigin="0, 0"' ,
-                ' style="width:100px;height:100px;position:absolute;');
+                ' coordsize="', Z * W, ',', Z * H, '"',
+                ' coordorigin="0,0"' ,
+                ' style="width:', W, ';height:', H, ';position:absolute;');
 
     // If filters are necessary (rotation exists), create them
     // filters are bog-slow, so only create them if abbsolutely necessary
@@ -404,30 +486,30 @@ if (!window.CanvasRenderingContext2D) {
                   "M12='", this.m_[1][0], "',",
                   "M21='", this.m_[0][1], "',",
                   "M22='", this.m_[1][1], "',",
-                  "Dx='", d.x, "',",
-                  "Dy='", d.y, "'");
+                  "Dx='", mr(d.x / Z), "',",
+                  "Dy='", mr(d.y / Z), "'");
 
       // Bounding box calculation (need to minimize displayed area so that
       // filters don't waste time on unused pixels.
       var max = d;
-      var c2 = this.getCoords_(dx+dw, dy);
-      var c3 = this.getCoords_(dx, dy+dh);
-      var c4 = this.getCoords_(dx+dw, dy+dh);
+      var c2 = this.getCoords_(dx + dw, dy);
+      var c3 = this.getCoords_(dx, dy + dh);
+      var c4 = this.getCoords_(dx + dw, dy + dh);
 
       max.x = Math.max(max.x, c2.x, c3.x, c4.x);
       max.y = Math.max(max.y, c2.y, c3.y, c4.y);
 
-      vmlStr.push(" padding:0 ", Math.floor(max.x), "px ", Math.floor(max.y),
+      vmlStr.push("padding:0 ", mr(max.x / Z), "px ", mr(max.y / Z),
                   "px 0;filter:progid:DXImageTransform.Microsoft.Matrix(",
                   filter.join(""), ", sizingmethod='clip');")
     } else {
-      vmlStr.push(" top:", d.y, "px;left:", d.x, "px;")
+      vmlStr.push("top:", mr(d.y / Z), "px;left:", mr(d.x / Z), "px;")
     }
 
     vmlStr.push(' ">' ,
                 '<g_vml_:image src="', image.src, '"',
-                ' style="width:', dw, ';',
-                ' height:', dh, ';"',
+                ' style="width:', Z * dw, ';',
+                ' height:', Z * dh, ';"',
                 ' cropleft="', sx / w, '"',
                 ' croptop="', sy / h, '"',
                 ' cropright="', (w - sx - sw) / w, '"',
@@ -446,11 +528,14 @@ if (!window.CanvasRenderingContext2D) {
     var color = a[0];
     var opacity = a[1] * this.globalAlpha;
 
+    var W = 10;
+    var H = 10;
+
     lineStr.push('<g_vml_:shape',
                  ' fillcolor="', color, '"',
                  ' filled="', Boolean(aFill), '"',
-                 ' style="position:absolute;width:10;height:10;"',
-                 ' coordorigin="0 0" coordsize="10 10"',
+                 ' style="position:absolute;width:', W, ';height:', H, ';"',
+                 ' coordorigin="0 0" coordsize="', Z * W, ' ', Z * H, '"',
                  ' stroked="', !aFill, '"',
                  ' strokeweight="', this.lineWidth, '"',
                  ' strokecolor="', color, '"',
@@ -466,11 +551,11 @@ if (!window.CanvasRenderingContext2D) {
       if (p.type == "moveTo") {
         lineStr.push(" m ");
         var c = this.getCoords_(p.x, p.y);
-        lineStr.push(Math.floor(c.x), ",", Math.floor(c.y));
+        lineStr.push(mr(c.x), ",", mr(c.y));
       } else if (p.type == "lineTo") {
         lineStr.push(" l ");
         var c = this.getCoords_(p.x, p.y);
-        lineStr.push(Math.floor(c.x), ",", Math.floor(c.y));
+        lineStr.push(mr(c.x), ",", mr(c.y));
       } else if (p.type == "close") {
         lineStr.push(" x ");
       } else if (p.type == "bezierCurveTo") {
@@ -478,27 +563,21 @@ if (!window.CanvasRenderingContext2D) {
         var c = this.getCoords_(p.x, p.y);
         var c1 = this.getCoords_(p.cp1x, p.cp1y);
         var c2 = this.getCoords_(p.cp2x, p.cp2y);
-        lineStr.push(Math.floor(c1.x), ",", Math.floor(c1.y), ",",
-                     Math.floor(c2.x), ",", Math.floor(c2.y), ",",
-                     Math.floor(c.x), ",", Math.floor(c.y));
-      } else if (p.type == "arc") {
-        lineStr.push(" ar ");
+        lineStr.push(mr(c1.x), ",", mr(c1.y), ",",
+                     mr(c2.x), ",", mr(c2.y), ",",
+                     mr(c.x), ",", mr(c.y));
+      } else if (p.type == "at" || p.type == "wa") {
+        lineStr.push(" ", p.type, " ");
         var c  = this.getCoords_(p.x, p.y);
         var cStart = this.getCoords_(p.xStart, p.yStart);
         var cEnd = this.getCoords_(p.xEnd, p.yEnd);
 
-        // TODO: FIX (matricies (scale+rotation) now buggered this up)
-        //       VML arc also doesn't seem able to do rotated non-circular
-        //       arcs without parent grouping.
-        var absXScale = this.m_[0][0];
-        var absYScale = this.m_[1][1];
-
-        lineStr.push(Math.floor(c.x - absXScale * p.radius), ",",
-                     Math.floor(c.y - absYScale * p.radius), " ",
-                     Math.floor(c.x + absXScale * p.radius), ",",
-                     Math.floor(c.y + absYScale * p.radius), " ",
-                     Math.floor(cStart.x), ",", Math.floor(cStart.y), " ",
-                     Math.floor(cEnd.x), ",", Math.floor(cEnd.y));
+        lineStr.push(mr(c.x - this.arcScaleX_ * p.radius), ",",
+                     mr(c.y - this.arcScaleY_ * p.radius), " ",
+                     mr(c.x + this.arcScaleX_ * p.radius), ",",
+                     mr(c.y + this.arcScaleY_ * p.radius), " ",
+                     mr(cStart.x), ",", mr(cStart.y), " ",
+                     mr(cEnd.x), ",", mr(cEnd.y));
       }
 
 
@@ -530,8 +609,8 @@ if (!window.CanvasRenderingContext2D) {
       var height = (max.y - min.y);
       var dimension = (width > height) ? width : height;
 
-      focus.x = Math.floor((this.fillStyle.focus_.x / width) * 100 + 50) + "%";
-      focus.y = Math.floor((this.fillStyle.focus_.y / height) * 100 + 50) + "%";
+      focus.x = mr((this.fillStyle.focus_.x / width) * 100 + 50) + "%";
+      focus.y = mr((this.fillStyle.focus_.y / height) * 100 + 50) + "%";
 
       var colors = [];
 
@@ -613,8 +692,8 @@ if (!window.CanvasRenderingContext2D) {
    */
   contextPrototype.getCoords_ = function(aX, aY) {
     return {
-      x: (aX * this.m_[0][0] + aY * this.m_[1][0] + this.m_[2][0]),
-      y: (aX * this.m_[0][1] + aY * this.m_[1][1] + this.m_[2][1])
+      x: Z * (aX * this.m_[0][0] + aY * this.m_[1][0] + this.m_[2][0]) - Z2,
+      y: Z * (aX * this.m_[0][1] + aY * this.m_[1][1] + this.m_[2][1]) - Z2
     }
   };
 
@@ -642,8 +721,8 @@ if (!window.CanvasRenderingContext2D) {
   };
 
   contextPrototype.rotate = function(aRot) {
-    var c = Math.cos(aRot);
-    var s = Math.sin(aRot);
+    var c = mc(aRot);
+    var s = ms(aRot);
 
     var m1 = [
       [c,  s, 0],
@@ -655,6 +734,8 @@ if (!window.CanvasRenderingContext2D) {
   };
 
   contextPrototype.scale = function(aX, aY) {
+    this.arcScaleX_ *= aX;
+    this.arcScaleY_ *= aY;
     var m1 = [
       [aX, 0,  0],
       [0,  aY, 0],
