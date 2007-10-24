@@ -262,8 +262,6 @@ share/jscript/dist/controls.js
 share/jscript/dist/dragdrop.js
 share/jscript/dist/effects.js
 share/jscript/dist/excanvas.js
-share/jscript/dist/json.js
-share/jscript/dist/minify.pl
 share/jscript/dist/prototype.js
 share/jscript/dist/scriptaculous.js
 share/jscript/dist/slider.js
@@ -273,7 +271,6 @@ share/jscript/druid.js
 share/jscript/gmap.js
 share/jscript/iconbox.js
 share/jscript/menu.js
-share/jscript/minify.pl
 share/jscript/notebook.js
 share/jscript/pagecontrol.js
 share/jscript/prototype_extensions.js
