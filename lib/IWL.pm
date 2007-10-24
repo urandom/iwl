@@ -211,9 +211,6 @@ In order to actually use the library, the javascript and css files will also hav
  - In Internet explorer, floats will escape a container with scrollbars,
    if the positioning on the container is static, or the floats have a 
    relative positioning
- - The JSON library used in IWL has a bug where it will incorrectly unescape
-   double quotes. It is preferred to escape potentially dangerous strings
-   beforehand, or not use JSON at all
 
 =head1 AUTHOR
 
