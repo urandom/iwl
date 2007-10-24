@@ -6,46 +6,21 @@
 IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function initEvents() {
         this.firstButton.signalConnect('click', function() {
-            if (!this.element) return;
-            this.emitSignal('iwl:current_page_is_changing', {type: 'first'});
-            this.element.emitEvent(this.eventName, {
-                page: this.currentPage, type: 'first',
-                pageSize: this.options.pageSize, pageCount: this.options.pageCount
-            }, {responseCallback: onEventComplete.bind(this)});
+            this.setCurrentPage('first');
         }.bind(this));
         this.prevButton.signalConnect('click', function() {
-            if (!this.element) return;
-            this.emitSignal('iwl:current_page_is_changing', {type: 'prev'});
-            this.element.emitEvent(this.eventName, {
-                page: this.currentPage, type: 'prev',
-                pageSize: this.options.pageSize, pageCount: this.options.pageCount
-            }, {responseCallback: onEventComplete.bind(this)});
+            this.setCurrentPage('prev');
         }.bind(this));
         this.nextButton.signalConnect('click', function() {
-            if (!this.element) return;
-            this.emitSignal('iwl:current_page_is_changing', {type: 'next'});
-            this.element.emitEvent(this.eventName, {
-                page: this.currentPage, type: 'next',
-                pageSize: this.options.pageSize, pageCount: this.options.pageCount
-            }, {responseCallback: onEventComplete.bind(this)});
+            this.setCurrentPage('next');
         }.bind(this));
         this.lastButton.signalConnect('click', function() {
-            if (!this.element) return;
-            this.emitSignal('iwl:current_page_is_changing', {type: 'last'});
-            this.element.emitEvent(this.eventName, {
-                page: this.currentPage, type: 'last',
-                pageSize: this.options.pageSize, pageCount: this.options.pageCount
-            }, {responseCallback: onEventComplete.bind(this)});
+            this.setCurrentPage('last');
         }.bind(this));
         this.input.signalConnect('keydown', function(event) {
-            if (!this.element) return;
             if (event.keyCode == Event.KEY_RETURN && this.input.value != this.currentPage) {
-                if (!this.input.checkValue({reg:/^\d*$/})) return;
-                this.emitSignal('iwl:current_page_is_changing', {type: 'input', value: this.input.value});
-                this.element.emitEvent(this.eventName, {
-                    page: this.currentPage, type: 'input',
-                    value: this.input.value, pageSize: this.options.pageSize, pageCount: this.options.pageCount
-                }, {responseCallback: onEventComplete.bind(this)});
+                if (!this.input.checkValue({reg:/^\d*$/, range: $R(1, Infinity)})) return;
+                this.setCurrentPage(parseInt(this.input.value));
             }
         }.bind(this));
     }
@@ -149,6 +124,32 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         setPageSize: function(size) {
             this.options.pageSize = size;
+            return this;
+        },
+        /**
+         * Changes the current page to the requested one
+         * @param page The page to change to. Can be either an integer, or one of the following strings:
+         *                 first: Goes to the first page
+         *                 prev: Goes to the previous page
+         *                 next: Goes to the next page
+         *                 last: Goes to the last page
+         * @returns The object
+         * */
+        setCurrentPage: function(page) {
+            if (!this.element) return;
+
+            var parameters = Object.extend({}, arguments[1]);
+            if (typeof page == 'number' && page > 0)
+                parameters = {type: 'input', value: page};
+            else if (["first", "prev", "next", "last"].include(page))
+                parameters = {type: page};
+            else return;
+            this.emitSignal('iwl:current_page_is_changing', parameters);
+            this.element.emitEvent(this.eventName, Object.extend(parameters, {
+                page: this.currentPage,
+                pageSize: this.options.pageSize,
+                pageCount: this.options.pageCount
+            }), {responseCallback: onEventComplete.bind(this)});
             return this;
         },
         /**
