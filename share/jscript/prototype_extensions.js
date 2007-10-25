@@ -627,6 +627,12 @@ Object.extend(String.prototype, (function() {
   }
 })());
 
+if (Prototype.Browser.IE) {
+  Object.extend(Element._attributeTranslations.write.names, {
+      'cellspacing': 'cellSpacing',
+      'cellpadding': 'cellPadding'
+  });
+}
 if (Prototype.Browser.IE)
   (function() {
     var element = this.Element;

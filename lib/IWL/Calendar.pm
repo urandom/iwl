@@ -346,16 +346,6 @@ sub updateOnSignal {
     return $self;
 }
 
-# Overrides
-#
-sub setId {
-    my ($self, $id) = @_;
-
-    $self->SUPER::setId($id);
-
-    return $self;
-}
-
 # Protected
 #
 sub _realize {
@@ -433,7 +423,7 @@ sub __init {
     };
 
     my $heading = IWL::Table::Row->new(class => 'calendar_heading');
-    $heading->appendCell(undef, class => 'calendar_week_number_header');
+    $heading->appendCell(undef, class => 'calendar_header_cell');
     my $month_cell = $heading->appendCell(undef, class => 'calendar_month_cell', colspan => 4);
     $month_cell->appendChild(
         IWL::Container->new(
@@ -454,7 +444,7 @@ sub __init {
             inline => 1, class => 'calendar_year_next'
         )->appendChild(IWL::Text->new('&gt;')),
     );
-    $heading->appendCell(undef, class => 'calendar_week_day_header');
+    $heading->appendCell(undef, class => 'calendar_header_cell');
 
     my $week_days = IWL::Table::Row->new(class => 'calendar_week_days');
     $week_days->appendCell(undef, class => 'calendar_week_number_header');

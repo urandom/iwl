@@ -575,3 +575,49 @@ function run_button_tests() {
     }, 'testlog');
 }
 
+function run_calendar_tests() {
+    var calendar = $('calendar_test');
+    var className = $A(calendar.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assertEqual('calendar', className);
+            assertEqual(42, calendar.dateCells.length);
+            assertEqual(1, calendar.select('.' + className + '_time').length);
+            assertEqual(6, calendar.select('.' + className + '_week').length);
+            assertEqual(1, calendar.select('.' + className + '_heading').length);
+            assertEqual(1, calendar.select('input.' + className + '_hours').length);
+            assertEqual(1, calendar.select('input.' + className + '_minutes').length);
+            assertEqual(1, calendar.select('input.' + className + '_seconds').length);
+            assertEqual(6, calendar.select('.' + className + '_week_number').length);
+            assertEqual(1, calendar.select('.' + className + '_week_days').length);
+            assertEqual(7, calendar.select('.' + className + '_week_day_header').length);
+            assertEqual(2, calendar.select('.' + className + '_weekend_header').length);
+            assertEqual(2, calendar.select('.' + className + '_header_cell').length);
+            assertEqual(1, calendar.select('span.' + className + '_month_prev').length);
+            assertEqual(1, calendar.select('input.' + className + '_month').length);
+            assertEqual(1, calendar.select('span.' + className + '_month_next').length);
+            assertEqual(1, calendar.select('span.' + className + '_year_prev').length);
+            assertEqual(1, calendar.select('input.' + className + '_year').length);
+            assertEqual(1, calendar.select('span.' + className + '_year_next').length);
+        }},
+        testDate: function() { with(this) {
+            var date = calendar.getDate();
+            assertInstanceOf(Date, date);
+            assertEqual(2007, date.getFullYear());
+            assertEqual(10, date.getMonth());
+            assertEqual(21, date.getDate());
+            assertEqual(17, date.getHours());
+            assertEqual(23, date.getMinutes());
+            assertEqual(5, date.getSeconds());
+            assertEqual(47, date.getWeek());
+            assertEqual(date.getTime(), calendar.currentDate.getDate().getTime());
+
+            assertEqual(calendar, calendar.setDate(new Date(1972, 1, 13, 17, 2, 12)));
+            assertEqual(new Date(1972, 1, 13, 17, 2, 12).getTime(), calendar.getDate().getTime());
+            assertEqual(new Date(1972, 1, 13, 17, 2, 12).getTime(), calendar.currentDate.getDate().getTime());
+        }},
+        testShowMethods: function() {with(this) {
+            assertEqual(calendar, calendar.showWeekNumbers(false));
+        }}
+    }, 'testlog');
+}

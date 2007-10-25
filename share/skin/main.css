@@ -1207,7 +1207,7 @@ span.pagecontrol_label input {
 .calendar_weekend_header {
     color: #000876;
 }
-.calendar_heading td {
+.calendar_month_cell, .calendar_year_cell {
     cursor: pointer;
 }
 .calendar_month, .calendar_year, .calendar_time input {

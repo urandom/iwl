@@ -340,6 +340,7 @@ sub build_tests {
     my $scriptaculous = IWL::Tree::Row->new(id => 'scriptaculous_row');
     my $base          = IWL::Tree::Row->new(id => 'base_row');
     my $button_test   = IWL::Tree::Row->new(id => 'button_test_row');
+    my $calendar_test = IWL::Tree::Row->new(id => 'calendar_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -349,9 +350,11 @@ sub build_tests {
     $row->appendRow($base);
     $button_test->appendTextCell('Button Test');
     $row->appendRow($button_test);
+    $calendar_test->appendTextCell('Calendar Test');
+    $row->appendRow($calendar_test);
 
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test);
 }
 
 sub generate_buttons {
@@ -861,13 +864,24 @@ sub generate_base {
 }
 
 sub generate_button_test {
-    my $container = IWL::Container->new(id => 'base_container');
+    my $container = IWL::Container->new(id => 'button_test_container');
     my $testlog   = IWL::Container->new(id => 'testlog');
     my $button    = IWL::Button->new(id => 'button_test');
     my $script    = IWL::Script->new;
 
     $script->setScript("run_button_tests()");
     $container->appendChild($testlog, $button, $script);
+    return $container;
+}
+
+sub generate_calendar_test {
+    my $container = IWL::Container->new(id => 'calendar_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $calendar  = IWL::Calendar->new(id => 'calendar_test', startDate => [2007, 10, 21, 17, 23, 5]);
+    my $script    = IWL::Script->new;
+
+    $script->setScript("run_calendar_tests()");
+    $container->appendChild($testlog, $calendar, $script);
     return $container;
 }
 
