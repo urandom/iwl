@@ -541,7 +541,8 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
             format.T = format.H + ':' + format.M + ':' + format.S;
 
             return string.gsub(reg, function(match) {
-                return format[match[0].substring(1)] || match;
+                var value = format[match[0].substring(1)];
+                return typeof value == 'undefined' ? match : value;
             });
         }
     });
@@ -589,7 +590,8 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * */
         showWeekNumbers: function(show) {
             var cells = this.select('.calendar_week_number_header').concat(
-                this.select('.calendar_week_number'));
+                this.select('.calendar_week_number')).concat(
+                this.select('.calendar_header_cell')[0]);
             cells.invoke(show ? 'show' : 'hide');
             return this;
         },

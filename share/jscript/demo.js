@@ -615,9 +615,60 @@ function run_calendar_tests() {
             assertEqual(calendar, calendar.setDate(new Date(1972, 1, 13, 17, 2, 12)));
             assertEqual(new Date(1972, 1, 13, 17, 2, 12).getTime(), calendar.getDate().getTime());
             assertEqual(new Date(1972, 1, 13, 17, 2, 12).getTime(), calendar.currentDate.getDate().getTime());
+            assertEqual(new Date(1972, 1, 3, 17, 2, 12).getTime(), calendar.getByDate(new Date(1972, 1, 3)).getDate().getTime());
         }},
-        testShowMethods: function() {with(this) {
+        testShowMethods: function() { with(this) {
             assertEqual(calendar, calendar.showWeekNumbers(false));
+            var cells = calendar.select('.calendar_week_number_header').concat(
+                calendar.select('.calendar_week_number')).concat(
+                calendar.select('.calendar_header_cell')[0]);
+            assertEnumEqual([false, false, false, false, false, false, false, false], cells.invoke('visible'));
+            assertEqual(calendar, calendar.showWeekNumbers(true));
+            assertEnumEqual([true, true, true, true, true, true, true, true], cells.invoke('visible'));
+
+            assertEqual(calendar, calendar.showHeading(false));
+            assert(!calendar.select('.calendar_heading')[0].visible());
+            assertEqual(calendar, calendar.showHeading(true));
+            assert(calendar.select('.calendar_heading')[0].visible());
+
+            assertEqual(calendar, calendar.showTime(false));
+            assert(!calendar.select('.calendar_time')[0].visible());
+            assertEqual(calendar, calendar.showTime(true));
+            assert(calendar.select('.calendar_time')[0].visible());
+        }},
+        testUpdate: function() { with(this) {
+            var update = $('testlog').appendChild(new Element('span'));
+            assertEqual(calendar,
+                calendar.updateOnSignal('iwl:activate', update,
+                    "foo %a - %A, %b - %B, %C, %d, %D, %e, %E, %F, %h, %H, %I, %j, %k, %l, %m, %M, %p, %P, %r, %R, %s, %S, %T, %u, %U, %w, %y, %Y, %%"
+                ));
+
+            assertEqual(calendar.currentDate, calendar.currentDate.activate());
+            assertEqual('foo ' + IWL.Calendar.abbreviatedWeekDays[6] + ' - '
+                + IWL.Calendar.weekDays[6] + ', ' + IWL.Calendar.abbreviatedMonths[1] + ' - '
+                + IWL.Calendar.months[1] + ', 19, 13, 2/13/72, 13, %E, 1972-02-13, Feb, 17, 05, 044, 17, 5, 02, 02, '
+                + 'PM, pm, 05:02:12 PM, 17:02, 66841332000, 12, 17:02:12, 7, 07, 0, 72, 1972, %',
+                update.innerHTML);
+            update.remove();
+        }},
+        testMarks: function() { with(this) {
+            assertEqual(calendar, calendar.markDate({date: 16}));
+            assertEqual(calendar, calendar.markDate({month: 1, date: 6}));
+            assertEqual(calendar, calendar.markDate(new Date(1975, 2, 11)));
+            assertEqual(3, calendar.options.markedDates.length);
+            assertEqual(16, calendar.options.markedDates[0].date);
+            assertEnumEqual([1, 6], [calendar.options.markedDates[1].month, calendar.options.markedDates[1].date]);
+            assertEnumEqual([1975, 2, 11], [calendar.options.markedDates[2].year,
+                calendar.options.markedDates[2].month, calendar.options.markedDates[2].date]);
+
+            assertEqual(calendar, calendar.unmarkDate({month: 1, date: 6}));
+            assertEqual(2, calendar.options.markedDates.length);
+            assertEqual(16, calendar.options.markedDates[0].date);
+            assertEnumEqual([1975, 2, 11], [calendar.options.markedDates[1].year,
+                calendar.options.markedDates[1].month, calendar.options.markedDates[1].date]);
+
+            assertEqual(calendar, calendar.clearMarks());
+            assertEqual(0, calendar.options.markedDates.length);
         }}
     }, 'testlog');
 }
