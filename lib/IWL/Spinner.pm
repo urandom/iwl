@@ -373,14 +373,12 @@ sub _setupDefaultClass {
 
 sub _realize {
     my $self    = shift;
-    my $script  = IWL::Script->new;
     my $id      = $self->getId;
 
     $self->SUPER::_realize;
     my $options = toJSON($self->{_options});
 
-    $script->setScript("IWL.Spinner.create('$id', $options);");
-    $self->_appendAfter($script);
+    $self->_appendInitScript("IWL.Spinner.create('$id', $options);");
 }
 
 # Internal

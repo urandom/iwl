@@ -415,15 +415,13 @@ sub signalConnect {
 #
 sub _realize {
     my $self   = shift;
-    my $script = IWL::Script->new;
     my $id     = $self->getId;
 
     $self->SUPER::_realize;
     $self->setStyle(visibility => 'hidden');
 
     my $options = toJSON($self->{_options});
-    $script->setScript("IWL.Entry.create('$id', $options);");
-    $self->_appendAfter($script);
+    $self->_appendInitScript("IWL.Entry.create('$id', $options);");
 }
 
 sub _setupDefaultClass {

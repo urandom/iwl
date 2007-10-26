@@ -66,6 +66,9 @@ sub new {
     # Object tag
     $self->{_tag} = '';
 
+    # The initialization scripts
+    $self->{_initScripts} = [];
+
     return $self;
 }
 
@@ -447,6 +450,7 @@ sub getContent {
         $content .= "</" . $self->{_tag} . ">\n";
     }
 
+    unshift @{$self->{_tailObjects}}, @{$self->{_initScripts}};
     foreach (@{$self->{_tailObjects}}) {
         $content .= $_->getContent;
     }
@@ -520,6 +524,7 @@ sub getObject {
         push @$children, $child->getObject if $child;
     }
 
+    unshift @{$self->{_tailObjects}}, @{$self->{_initScripts}};
     foreach (@{$self->{_tailObjects}}) {
 	push @$objects, $_->getObject;
     }
@@ -1042,6 +1047,14 @@ sub _appendAfter {
     my ($self, @objects) = @_;
 
     unshift @{$self->{_tailObjects}}, @objects;
+    return $self;
+}
+
+sub _appendInitScript {
+    my ($self, @scripts) = @_;
+
+    my $script = IWL::Script->new->setScript(join '; ', @scripts);
+    push @{$self->{_initScripts}}, $script;
     return $self;
 }
 
