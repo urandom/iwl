@@ -358,6 +358,24 @@ sub setAutoComplete {
     return $self;
 }
 
+=item B<printCompletions> (B<COMPLETION>, ...)
+
+Prints the supplied completions in a format, which is required for auto-completion.
+
+This method is a class method!  You do not need to instantiate an object in order to call it.
+
+=cut
+
+sub printCompletions {
+    my @completions = @_;
+
+    my $list = IWL::List->new->setClass('entry_completion_list');
+    $list->appendListItemText($_) foreach @completions;
+
+    IWL::Object::printTextHeader;
+    return $list->print;
+}
+
 # Overrides
 #
 

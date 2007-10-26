@@ -176,15 +176,13 @@ if (my $file = $form{upload_file}) {
     print IWL::Break->new()->getContent;
     exit 0;
 } elsif (my $search = quotemeta $form{completion}) {
-    my $list = IWL::List->new;
+    my @completions;
     if ($search =~ /IWL/) {
-        $list->appendListItemText("IWL::" . $_) foreach qw(Calendar Entry List Spinner);
+        @completions = map{'IWL::'. $_} qw(Calendar Entry List Spinner);
     } elsif ($search =~ /tk/i) {
-        $list->appendListItemText($_) foreach qw(GTK+ GTK+2.0 ETK);
+        @completions = qw(GTK+ GTK+2.0 ETK);
     }
-
-    IWL::Object::printTextHeader;
-    return $list->print;
+    IWL::Entry::printCompletions(@completions);
 } else {
     my $page = IWL::Page->new;
     my $hbox = IWL::HBox->new;

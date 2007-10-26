@@ -266,6 +266,9 @@ div.entry_receiver ul li {
     display: block;
     cursor: pointer;
 }
+.entry_completion_list {
+    font-size: 10px;
+}
 
 select.combo {
     color: black;
