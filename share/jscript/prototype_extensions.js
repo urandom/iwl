@@ -587,8 +587,11 @@ document.insertScript = (function () {
 
     if ((Prototype.Browser.WebKit || Prototype.Browser.KHTML) && options.onComplete) {
       var helper = new Element('script', {type: 'text/javascript'});
-      Prototype._helpers.push({script: helper, callback: stateChangedCallback});
-      helper.update('var helper = Prototype._helpers.pop();helper.callback();helper.script.remove.delay(0.1)');
+      var index = Prototype._helpers.push({script: helper, callback: stateChangedCallback}) - 1;
+      helper.update(
+        'var helper = Prototype._helpers[' + index + '];helper.callback();' +
+        'helper.script.remove.delay(0.1);Prototype._helpers = Prototype._helpers.without(helper)'
+      );
       Element.extend(document.body).appendChild.bind(document.body, helper).delay(0.1);
     }
   }
