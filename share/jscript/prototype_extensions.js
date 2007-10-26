@@ -1,6 +1,6 @@
 // vim: set autoindent shiftwidth=2 tabstop=8:
 Object.extend(Prototype.Browser, {
-  KHTML: navigator.userAgent.indexOf('KHTML') > -1,
+  KHTML: navigator.userAgent.indexOf('KHTML') > -1 && !Prototype.Browser.WebKit,
   IE7: !!(Prototype.Browser.IE && window.XMLHttpRequest)
 });
 
@@ -541,10 +541,14 @@ Object.extend(Date.prototype, {
 document.insertScript = (function () {
   var scripts = null;
 
+  if (Prototype.Browser.WebKit || Prototype.Browser.KHTML)
+    Prototype._helpers = [];
+
   return function(url) {
     var options = Object.extend({
       onComplete: Prototype.emptyFunction,
-      skipCache: false
+      skipCache: false,
+      debug: false
     }, arguments[1]);
     if (options.skipCache) {
       var query = $H({_: Math.random()});
@@ -563,15 +567,16 @@ document.insertScript = (function () {
     }
     scripts.push(url);
 
-    var script = new Element('script', {type: 'text/javascript', charset: 'utf-8', defer: true});
+    var script = new Element('script', {type: 'text/javascript', charset: 'utf-8'});
     var fired = false;
     var stateChangedCallback = function() {
+      if (fired) return;
       if (script.readyState && script.readyState != 'loaded' &&
           script.readyState != 'complete')
         return;
-      if (fired) return;
       script.onreadystatechange = script.onload = null;
       if (options.onComplete) options.onComplete(url);
+      if (!options.debug) script.remove();
       fired = true;
     };
 
@@ -580,16 +585,11 @@ document.insertScript = (function () {
 
     document.getElementsByTagName('head').item(0).appendChild(script);
 
-    if (Prototype.Browser.WebKit && options.onComplete) {
-      var version = navigator.appVersion.match(/Version\/(\d+)(?:[\d\.]*)/);
-      if (version[1] >= 3) return;
-      var iframe = new Element('iframe', {style: "display: none;", src: url});
-      document.getElementsByTagName('body').item(0).appendChild(iframe);
-
-      iframe.onload = function() {
-        stateChangedCallback();
-        iframe.remove();
-      }
+    if ((Prototype.Browser.WebKit || Prototype.Browser.KHTML) && options.onComplete) {
+      var helper = new Element('script', {type: 'text/javascript'});
+      Prototype._helpers.push({script: helper, callback: stateChangedCallback});
+      helper.update('var helper = Prototype._helpers.pop();helper.callback();helper.script.remove.delay(0.1)');
+      Element.extend(document.body).appendChild.bind(document.body, helper).delay(0.1);
     }
   }
 })();

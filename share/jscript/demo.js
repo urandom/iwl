@@ -61,7 +61,8 @@ function run_prototype_tests() {
                 assert(Prototype.Browser.WebKit);
             }
 
-            if(navigator.userAgent.indexOf('KHTML') > -1) {
+            if(navigator.userAgent.indexOf('KHTML') > -1
+                && navigator.userAgent.indexOf('AppleWebKit/') == -1) {
                 info('Running on KHTML');
                 assert(Prototype.Browser.KHTML);
             }
