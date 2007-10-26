@@ -175,6 +175,16 @@ if (my $file = $form{upload_file}) {
     print "The following text was received: $text";
     print IWL::Break->new()->getContent;
     exit 0;
+} elsif (my $search = quotemeta $form{completion}) {
+    my $list = IWL::List->new;
+    if ($search =~ /IWL/) {
+        $list->appendListItemText("IWL::" . $_) foreach qw(Calendar Entry List Spinner);
+    } elsif ($search =~ /tk/i) {
+        $list->appendListItemText($_) foreach qw(GTK+ GTK+2.0 ETK);
+    }
+
+    IWL::Object::printTextHeader;
+    return $list->print;
 } else {
     my $page = IWL::Page->new;
     my $hbox = IWL::HBox->new;
@@ -385,16 +395,16 @@ sub generate_buttons {
 }
 
 sub generate_entries {
-    my $container = IWL::Container->new(id => 'entries_container');
-    my $normal_entry = IWL::Entry->new;
+    my $container      = IWL::Container->new(id => 'entries_container');
+    my $normal_entry   = IWL::Entry->new;
     my $password_entry = IWL::Entry->new;
-    my $cleanup_entry = IWL::Entry->new;
-    my $image_entry = IWL::Entry->new(id => 'image_entry');
+    my $cleanup_entry  = IWL::Entry->new;
+    my $image_entry    = IWL::Entry->new(id => 'image_entry');
+    my $label          = IWL::Label->new;
+    my $completion     = IWL::Entry->new(id => 'entry_completion');
 
-    $container->appendChild($normal_entry, IWL::Break->new);
-    $container->appendChild($password_entry, IWL::Break->new);
-    $container->appendChild($cleanup_entry, IWL::Break->new);
-    $container->appendChild($image_entry, IWL::Break->new);
+    $container->appendChild($normal_entry, $password_entry, $cleanup_entry,
+        $image_entry, IWL::Break->new, $label, $completion);
     $normal_entry->setDefaultText('Type here');
     $password_entry->setPassword(1);
     $cleanup_entry->addClearButton;
@@ -405,6 +415,8 @@ sub generate_entries {
 	    insertion => 'bottom',
 	    onComplete => q|displayStatus.bind(this, 'Completed')|,
     ));
+    $label->setText("The following entry provides completion capabilities. Try searching for 'gtk' or 'IWL'.");
+    $completion->setAutoComplete('iwl_demo.pl', paramName => 'completion');
     return $container;
 }
 
@@ -414,7 +426,7 @@ sub generate_spinners {
     my $mask_spinner = IWL::Spinner->new(id => 'masked_spinner', acceleration => 0.5, precision => 2);
 
     $mask_spinner->setRange(-250, 1000)->setWrap(1)->setMask("Цена: #{number} лв")->setIncrements(0.2, 7.6);
-    $container->appendChild($spinner, IWL::Break->new, $mask_spinner);
+    $container->appendChild($spinner, $mask_spinner);
     return $container;
 }
 
@@ -971,7 +983,9 @@ sub show_the_code_for {
     if ($code_for eq 'buttons_container') {
 	$paragraph->appendTextType(read_code("generate_buttons", 27), 'pre');
     } elsif ($code_for eq 'entries_container') {
-	$paragraph->appendTextType(read_code("generate_entries", 24), 'pre');
+	$paragraph->appendTextType(read_code("generate_entries", 25), 'pre');
+	$paragraph->appendTextType('...', 'pre');
+	$paragraph->appendTextType(read_code('my \$search = quotemeta \$form\{completion\}', 10), 'pre');
     } elsif ($code_for eq 'spinners_container') {
 	$paragraph->appendTextType(read_code("generate_spinners", 9), 'pre');
     } elsif ($code_for eq 'images_container') {
@@ -995,7 +1009,7 @@ sub show_the_code_for {
     } elsif ($code_for eq 'tree_container') {
 	$paragraph->appendTextType(read_code("sub build_tree", 119), 'pre');
         $paragraph->appendTextType(read_code("Tree row handlers", 21), 'pre');
-        $paragraph->appendTextType(read_code('^\);', 1), 'pre');
+        $paragraph->appendTextType(');', 'pre');
     } elsif ($code_for eq 'contentbox_container') {
 	$paragraph->appendTextType(read_code("generate_contentbox", 24), 'pre');
     } elsif ($code_for eq 'accordions_container') {

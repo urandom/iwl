@@ -153,7 +153,7 @@ sub _setupDefaultClass {
 #
 sub __init {
     my ($self, %args) = @_;
-    my $label = IWL::Label->new;
+    my $label = IWL::Container->new;
     my $page_count = IWL::Label->new->appendText($args{pageCount});
     my $page_entry = IWL::Entry->new->setSize(2);
     my ($first, $prev, $next, $last) = IWL::Button->newMultiple(
@@ -166,15 +166,15 @@ sub __init {
     my $info = __"{PAGEENTRY} of {PAGECOUNT}";
     my ($pre, $post) = $info =~ m{^(.*){PAGEENTRY}(.*)$};
     if ($pre =~ m{^(.*){PAGECOUNT}(.*)$}) {
-	$label->appendText($1)->appendChild($page_count)->appendChild($2);
+        $label->appendChild(IWL::Label->new->setText($1))->appendChild($page_count)->appendChild($2);
     } else {
-	$label->appendText($pre);
+        $label->appendChild(IWL::Label->new->setText($pre));
     }
     $label->appendChild($page_entry);
     if ($post =~ m{^(.*){PAGECOUNT}(.*)$}) {
-	$label->appendText($1)->appendChild($page_count)->appendChild($2);
+        $label->appendChild(IWL::Label->new->setText($1))->appendChild($page_count)->appendChild($2);
     } else {
-	$label->appendText($post);
+        $label->appendChild(IWL::Label->new->setText($post));
     }
 
     $self->{__first} = $first->setImage('IWL_STOCK_GOTO_FIRST');

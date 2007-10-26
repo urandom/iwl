@@ -85,10 +85,6 @@ The spinner mask
 
 =back
 
-=head1 NOTES
-
-Since the Spinner is a compound object, settings the class and the id will also set the above to the components of the Entry. They will automatically obtain a suffix of "_left" for the left image, "_left" for the right image, and "_text" for the text control.
-
 =cut
 
 sub new {
@@ -432,7 +428,7 @@ sub __init {
 
     delete @args{qw(readonly maxlength password id class value to from
           stepIncrement pageIncrement acceleration precision mask snap wrap)};
-    $self->requiredJs('base.js', 'spinner.js');
+    $self->requiredJs('base.js', 'entry.js', 'spinner.js');
     $entry->_constructorArguments(%args);
 
     return $self;

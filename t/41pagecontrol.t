@@ -16,10 +16,13 @@ like($pc->getContent, qr(^<script.*dist/prototype.js.*prototype_extensions.js.*d
 <script .*?IWL.Button.create.'\2_first',.*?</script>
 <noscript (?:(?:class="button_noscript \1_prev"|id="\2_prev_noscript")\s*){2}></noscript>
 <script .*?IWL.Button.create.'\2_prev',.*?</script>
-<span (?:(?:class="\1_label"|id="\2_label")\s*){2}><span (?:(?:class="entry \1_page_entry"|id="\2_page_entry")\s*){2}><input (?:(?:class="entry_text"|id="\2_page_entry_text"|type="text"|size="2")\s*){4}/>
-</span>
- of <span (?:(?:class="\1_page_count"|id="\2_page_count")\s*){2}></span>
-</span>
+<div (?:(?:class="\1_label"|id="\2_label")\s*){2}><script.*entry.js.*</script>
+<div (?:(?:class="entry \1_page_entry"|style="visibility: hidden; "|id="\2_page_entry")\s*){3}><input (?:(?:class="entry_text"|id="\2_page_entry_text"|type="text"|size="2")\s*){4}/>
+</div>
+<script.*IWL.Entry.create.*</script>
+<span id="label_\d+"> of </span>
+<span (?:(?:class="\1_page_count"|id="\2_page_count")\s*){2}></span>
+</div>
 <noscript (?:(?:class="button_noscript \1_next"|id="\2_next_noscript")\s*){2}></noscript>
 <script .*?IWL.Button.create.'\2_next',.*?</script>
 <noscript (?:(?:class="button_noscript \1_last"|id="\2_last_noscript")\s*){2}></noscript>

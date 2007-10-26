@@ -6,6 +6,7 @@ package IWL::Object;
 use strict;
 use constant JSON_HEADER => "Content-type: application/json\nX-IWL: 1\n\n";
 use constant HTML_HEADER => "Content-type: text/html; charset=utf-8\n\n";
+use constant TEXT_HEADER => "Content-type: text/plain\n\n";
 
 use IWL::Config qw(%IWLConfig);
 use IWL::JSON qw(toJSON);
@@ -594,7 +595,6 @@ Prints the JSON Header which is used by IWL
 =cut
 
 sub printJSONHeader {
-    my $self = shift;
     return print JSON_HEADER;
 }
 
@@ -605,8 +605,17 @@ Prints the HTML Header which is used by IWL
 =cut
 
 sub printHTMLHeader {
-    my $self = shift;
     return print HTML_HEADER;
+}
+
+=item B<printTextHeader>
+
+Prints the Text Header which is used by IWL
+
+=cut
+
+sub printTextHeader {
+    return print TEXT_HEADER;
 }
 
 =item B<setAttribute> (B<ATTR>, B<VALUE>, B<ESCAPING>)
@@ -792,7 +801,7 @@ sub requiredJs {
 	push @{$self->{_requiredJs}}, [$src => $script];
     }
 
-    return 1;
+    return $self;
 }
 
 =item B<requiredConditionalJs> [B<CONDITION>, B<URLS>]
@@ -827,7 +836,7 @@ sub requiredConditionalJs {
 	push @{$self->{_requiredJs}}, [$src => $comment];
     }
 
-    return 1;
+    return $self;
 }
 
 =item B<cleanStateful>

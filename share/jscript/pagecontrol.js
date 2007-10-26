@@ -91,6 +91,13 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function alignLabels() {
+        var height = this.nextButton.getHeight() + (parseFloat(this.nextButton.getStyle('margin-top')) || 0) + 'px';
+        this.labelContainer.select('span').each(function(span) {
+            span.style.lineHeight = height;
+        }.bind(this));
+    }
+
     return {
         /**
          * Binds an element to the page control widget
@@ -180,6 +187,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (--buttonCount === 0) {
                     this.loaded = true;
                     refresh.call(this);
+                    alignLabels.call(this);
                     this.emitSignal('iwl:load');
                 }
             };

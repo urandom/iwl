@@ -57,9 +57,11 @@ Object.extend(Effect, {
 
 Object.extend(Ajax.Autocompleter.prototype, {
   fixIEOverlapping: function() {
-    this.update.clone(this.iefix, {setTop:(!this.update.style.height)});
-    this.iefix.style.zIndex = $s('iframe.completion').zIndex;
-    this.update.style.zIndex = $s('ul.completion').zIndex;
+    Position.clone(this.update, this.iefix, {setTop:(!this.update.style.height)});
+    var completionIndex = $$('ul.completion')[0];
+    completionIndex = completionIndex ? completionIndex.getStyle('zIndex') : 2;
+    this.iefix.style.zIndex = completionIndex - 1;
+    this.update.style.zIndex = completionIndex;
     Element.show(this.iefix);
   }
 });
