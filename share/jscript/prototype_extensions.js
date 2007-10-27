@@ -556,6 +556,7 @@ document.insertScript = (function () {
         options.onComplete.bind(window, url).delay(0.1);
       return;
     }
+    scripts.push(url);
     if (options.skipCache) {
       var query = $H({_: Math.random()});
       var index = url.indexOf('?');
@@ -565,7 +566,6 @@ document.insertScript = (function () {
       }
       url += '?' + query.toQueryString();
     }
-    scripts.push(url);
 
     var script = new Element('script', {type: 'text/javascript', charset: 'utf-8'});
     var fired = false;
