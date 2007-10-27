@@ -572,6 +572,31 @@ function run_button_tests() {
             assertEqual(button, button.setDisabled(false));
             assert(!button.isNotEnabled());
             assert(!button.disabledLayer);
+        }},
+        testSubmit: function() { with(this) {
+            var form = new Element('form', {name: 'foo', target: '_blank'});
+            $('testlog').appendChild(form);
+            form.appendChild(button);
+            assertEqual(button, button.setSubmit());
+            assertEqual(form, button.form);
+            assert(button.submit);
+            button.submit = false;
+            $('testlog').appendChild(button);
+
+            assert(!button.setSubmit());
+            assertEqual(button, button.setSubmit(null, null, form));
+            assertEqual(form, button.form);
+            assert(button.submit);
+            button.submit = false;
+
+            assert(!button.setSubmit());
+            assertEqual(button, button.setSubmit('alpha', 'tango', 'foo'));
+            assertEqual(form, button.form);
+            assert(button.submit);
+            assert(button.hidden);
+            assertEqual('alpha', button.hidden.name);
+            assertEqual('tango', button.hidden.value);
+            button.submit = false;
         }}
     }, 'testlog');
 }
@@ -670,6 +695,146 @@ function run_calendar_tests() {
 
             assertEqual(calendar, calendar.clearMarks());
             assertEqual(0, calendar.options.markedDates.length);
+        }}
+    }, 'testlog');
+}
+
+function run_contentbox_tests() {
+    var contentbox = $('contentbox_test');
+    var className = $A(contentbox.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(contentbox.contentboxTitle));
+            assertEqual('contentbox_test_titler', contentbox.contentboxTitle.id);
+            assert(contentbox.contentboxTitle.hasClassName(className + '_titler'));
+
+            assert(Object.isElement(contentbox.contentboxHeader));
+            assertEqual('contentbox_test_header', contentbox.contentboxHeader.id);
+            assert(contentbox.contentboxHeader.hasClassName(className + '_header'));
+
+            assert(Object.isElement(contentbox.contentboxContent));
+            assertEqual('contentbox_test_content', contentbox.contentboxContent.id);
+            assert(contentbox.contentboxContent.hasClassName(className + '_content'));
+
+            assert(Object.isElement(contentbox.contentboxFooter));
+            assertEqual('contentbox_test_footerr', contentbox.contentboxFooter.id);
+            assert(contentbox.contentboxFooter.hasClassName(className + '_footerr'));
+        }},
+        testVisibility: function() { with(this) {
+            var show = false, hide = false, close = false;
+            contentbox.signalConnect('iwl:show', function() { show = true });
+            contentbox.signalConnect('iwl:hide', function() { hide = true });
+            contentbox.signalConnect('iwl:close', function() { close = true });
+            assertEqual(contentbox, contentbox.hide());
+            assert(!contentbox.visible());
+            assertEqual(contentbox, contentbox.show());
+            assert(contentbox.visible());
+            assertEqual(contentbox, contentbox.close());
+            assert(!contentbox.parentNode);
+            assertEqual(contentbox, contentbox.show('testlog'));
+            assert(contentbox.parentNode == $('testlog'));
+            assert(contentbox.visible());
+            wait(500, function() {
+                assert(show);
+                assert(hide);
+                assert(close);
+            });
+        }},
+        testType: function() { with(this) {
+            assertEqual('none', contentbox.options.type);
+
+            assertEqual(contentbox, contentbox.setType('drag'));
+            assertEqual('drag', contentbox.options.type);
+            assertEqual('move', contentbox.contentboxTitle.style.cursor);
+            assertInstanceOf(Draggable, contentbox._draggable);
+            assert(Draggables.drags.include(contentbox._draggable));
+
+            assertEqual(contentbox, contentbox.setType('none'));
+            assertEqual('none', contentbox.options.type);
+            assert(!Draggables.drags.include(contentbox._draggable));
+            assertEqual('default', contentbox.contentboxTitle.style.cursor);
+
+            assertEqual(contentbox, contentbox.setType('resize'));
+            assertEqual('resize', contentbox.options.type);
+            assertInstanceOf(Resizer, contentbox._resizer);
+            contentbox.setType('none')
+            assert($H(contentbox._resizer.handlers).keys().length == 0);
+
+            assertEqual(contentbox, contentbox.setType('dialog'));
+            assertEqual('dialog', contentbox.options.type);
+            assertEqual('move', contentbox.contentboxTitle.style.cursor);
+            assert(Draggables.drags.include(contentbox._draggable));
+            assertInstanceOf(Resizer, contentbox._resizer);
+            assert($H(contentbox._resizer.handlers).keys().length > 0);
+            contentbox.setType('none')
+            assert($H(contentbox._resizer.handlers).keys().length == 0);
+            assert(!Draggables.drags.include(contentbox._draggable));
+
+            assertEqual(contentbox, contentbox.setType('window'));
+            assertEqual('window', contentbox.options.type);
+            assertEqual('move', contentbox.contentboxTitle.style.cursor);
+            assert(Draggables.drags.include(contentbox._draggable));
+            assertInstanceOf(Resizer, contentbox._resizer);
+            assert($H(contentbox._resizer.handlers).keys().length > 0);
+            assert(Object.isElement(contentbox.contentboxButtons));
+            assert(Object.isElement(contentbox.contentboxClose));
+            assert(contentbox.contentboxClose.hasClassName(className + '_close'));
+            assert('contentbox_test_close', contentbox.contentboxClose.id);
+            contentbox.setType('none')
+            assert($H(contentbox._resizer.handlers).keys().length == 0);
+            assert(!Draggables.drags.include(contentbox._draggable));
+            assert(!contentbox.contentboxClose);
+
+            assertEqual(contentbox, contentbox.setType('noresize'));
+            assertEqual('noresize', contentbox.options.type);
+            assertEqual('move', contentbox.contentboxTitle.style.cursor);
+            assert(Draggables.drags.include(contentbox._draggable));
+            assert(Object.isElement(contentbox.contentboxClose));
+            assert(contentbox.contentboxClose.hasClassName(className + '_close'));
+            assert('contentbox_test_close', contentbox.contentboxClose.id);
+            contentbox.setType('none')
+            assert(!Draggables.drags.include(contentbox._draggable));
+            assert(!contentbox.contentboxClose);
+        }},
+        testModal: function() {with(this) {
+            assert(!contentbox.options.modal);
+            assertEqual(contentbox, contentbox.setModal(true));
+            assert(contentbox.options.modal);
+            assert(Object.isElement(contentbox.modalElement));
+
+            assertEqual(contentbox, contentbox.setModal(false));
+            assert(!contentbox.options.modal);
+            assert(!Object.isElement(contentbox.modalElement));
+        }},
+        testShadows: function() { with(this) {
+            assert(!contentbox.options.hasShadows);
+            assert(!contentbox.hasClassName('shadowbox'));
+            assertEqual(contentbox, contentbox.setShadows(true));
+            assert(contentbox.hasClassName('shadowbox'));
+            assert(contentbox.options.hasShadows);
+            assertEqual(contentbox, contentbox.setShadows(false));
+            assert(!contentbox.hasClassName('shadowbox'));
+            assert(!contentbox.options.hasShadows);
+        }},
+        testAutoWidth: function() { with(this) {
+            var dims = contentbox.getDimensions();
+            assertEqual(contentbox, contentbox.autoWidth());
+            assertEqual(dims.height, contentbox.getHeight());
+            assert(contentbox.getWidth() < dims.width);
+        }},
+        testTitle: function() { with(this) {
+            assertEqual('Tango', contentbox.getTitle());
+            var elements = contentbox.getTitleElements();
+            assertEqual(1, elements.length);
+            assertEqual('Tango', elements[0].nodeValue);
+            assertEqual(contentbox, contentbox.setTitle('Foxtrot'));
+            assertEqual('Foxtrot', contentbox.getTitle());
+            assertEqual(contentbox, contentbox.setTitle('<span>Beta</span>'));
+            assertEqual('Beta', contentbox.getTitle());
+            assertEqual('SPAN', contentbox.getTitleElements().reduce().tagName);
+            assertEqual(contentbox, contentbox.setTitle(new Element('div').update('Orange')));
+            assertEqual('Orange', contentbox.getTitle());
+            assertEqual('DIV', contentbox.getTitleElements().reduce().tagName);
         }}
     }, 'testlog');
 }

@@ -7,7 +7,6 @@ use strict;
 
 use base 'IWL::Widget';
 
-use IWL::Script;
 use IWL::Input;
 use IWL::Anchor;
 use IWL::Image;
@@ -185,21 +184,18 @@ sub setFromStock {
 
 Sets the button to act as a submit button for a form. It creates a signal handler to the I<CLICK> signal.
 
-Parameters: B<FORM_NAME> - the name of the form. B<NAME> - the name of the element, B<VALUE> - the value of the element
+Parameters: B<NAME> - the name of the element, B<VALUE> - the value of the element, B<FORM_NAME> - the name of the form
 
 =cut
 
 sub setSubmit {
     my ($self, $name, $value, $form_name) = @_;
 
-    return unless $name;
-    $self->{_options}{submit} = 1;
-    $self->{__hidden}{_ignore} = 0;
-    $self->{__hidden}->setName($name);
-    $self->{__hidden}->setValue($value);
-    $self->{__hidden}->setClass('fake_button_submit');
-    $self->{__hiddenName} = $name;
-    $self->{__formName}   = $form_name;
+    if (!$name) {
+        $self->{_options}{submit} = 1;
+    } else {
+        $self->{_options}{submit} = [$name, $value, $form_name];
+    }
     return $self;
 }
 
@@ -396,18 +392,10 @@ sub getHref {
 #
 sub _realize {
     my $self    = shift;
-    my $script  = IWL::Script->new;
     my $id      = $self->{__button}->getId;
     my $options = {};
 
     $self->SUPER::_realize;
-    if ($self->{__formName}) {
-        $self->{__button}->signalConnect(
-            click => qq{this.submitForm("$self->{__formName}")});
-    } elsif ($self->{__hiddenName}) {
-        $self->{__button}->signalConnect(
-            click => "this.submit()");
-    }
 
     $self->{__button}{image}->signalConnect(load => "\$('$id').adjust()");
     $self->{__button}{_handlers} = $self->{_handlers};
@@ -418,9 +406,7 @@ sub _realize {
     my $json      = qq|{container:$container,image:"$image",label:"$label"}|;
 
     $options = toJSON($self->{_options});
-    $script->setScript("IWL.Button.create('$id', $json, $options);");
-    $self->_appendAfter($script);
-    $self->_appendAfter($self->{__hidden}) if $self->{_options}{submit};
+    $self->_appendInitScript("IWL.Button.create('$id', $json, $options);");
 }
 
 sub _setupDefaultClass {
@@ -434,31 +420,25 @@ sub _setupDefaultClass {
 #
 sub __init {
     my ($self, %args) = @_;
-    my $hidden = IWL::Input->new;
     my $anchor = IWL::Anchor->new;
     my $image  = IWL::Image->new;
     my $id     = $args{id};
 
     $self->{_defaultClass}     = 'button';
     $image->{_ignore}          = 1;
-    $hidden->{_ignore}         = 1;
 
     $self->{__button}          = IWL::Container->new;
     $self->{__button}{image}   = $image;
     $self->{__button}{label}   = '';
-    $self->{__hidden}          = $hidden;
     $self->{__nsAnchor}        = $anchor;
     $self->{__nsAnchor}{added} = 0;
 
-    $hidden->setAttribute(type => 'submit');
-    $hidden->setStyle(display => 'none');
     $id = randomize($self->{_defaultClass}) unless $id;
     $self->{_tag} = "noscript";
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
     $self->{_options}{disabled} = $args{disabled} ? 1 : 0;
-    $self->{_options}{submit} = 0;
 
     delete @args{qw(size id)};
     $self->{__button}->_constructorArguments(%args);

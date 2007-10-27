@@ -183,6 +183,11 @@ if (my $file = $form{upload_file}) {
         @completions = qw(GTK+ GTK+2.0 ETK);
     }
     IWL::Entry::printCompletions(@completions);
+    exit 0;
+} elsif (my $text = $form{image}) {
+    IWL::Object::printHTMLHeader;
+    print "The following text was received: $text";
+    exit 0;
 } else {
     my $page = IWL::Page->new;
     my $hbox = IWL::HBox->new;
@@ -343,12 +348,13 @@ sub build_misc {
 }
 
 sub build_tests {
-    my $row           = shift;
-    my $prototype     = IWL::Tree::Row->new(id => 'prototype_row');
-    my $scriptaculous = IWL::Tree::Row->new(id => 'scriptaculous_row');
-    my $base          = IWL::Tree::Row->new(id => 'base_row');
-    my $button_test   = IWL::Tree::Row->new(id => 'button_test_row');
-    my $calendar_test = IWL::Tree::Row->new(id => 'calendar_test_row');
+    my $row             = shift;
+    my $prototype       = IWL::Tree::Row->new(id => 'prototype_row');
+    my $scriptaculous   = IWL::Tree::Row->new(id => 'scriptaculous_row');
+    my $base            = IWL::Tree::Row->new(id => 'base_row');
+    my $button_test     = IWL::Tree::Row->new(id => 'button_test_row');
+    my $calendar_test   = IWL::Tree::Row->new(id => 'calendar_test_row');
+    my $contentbox_test = IWL::Tree::Row->new(id => 'contentbox_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -360,9 +366,10 @@ sub build_tests {
     $row->appendRow($button_test);
     $calendar_test->appendTextCell('Calendar Test');
     $row->appendRow($calendar_test);
+    $contentbox_test->appendTextCell('Contentbox Test');
+    $row->appendRow($contentbox_test);
 
-
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test);
 }
 
 sub generate_buttons {
@@ -375,10 +382,11 @@ sub generate_buttons {
     my $check = IWL::Checkbox->new;
     my $radio1 = IWL::RadioButton->new;
     my $radio2 = IWL::RadioButton->new;
+    my $form = IWL::Form->new(target => '_blank', action => 'iwl_demo.pl', name => 'some_form');
 
     $container->appendChild($normal_button, $stock_button, $image_button, $disabled_button,
-        $input_button, $check, IWL::Break->new, $radio1, $radio2);
-    $normal_button->setTitle('This is a title');
+        $input_button, $check, IWL::Break->new, $radio1, $radio2, $form);
+    $normal_button->setTitle('This is a title')->setSubmit(image => 'DELETE', 'some_form');
     $image_button->setImage('IWL_STOCK_DELETE');
     $normal_button->setLabel('Labeled button')->setClass('demo');
     $stock_button->signalConnect(load => "displayStatus('Stock button loaded')");
@@ -895,6 +903,21 @@ sub generate_calendar_test {
     return $container;
 }
 
+sub generate_contentbox_test {
+    my $container  = IWL::Container->new(id => 'contentbox_test_container');
+    my $testlog    = IWL::Container->new(id => 'testlog');
+    my $contentbox = IWL::Contentbox->new(id => 'contentbox_test');
+    my $script     = IWL::Script->new;
+
+    $contentbox->appendTitleText('Tango');
+    $contentbox->appendHeaderText('Foo');
+    $contentbox->appendContentText('Bar');
+    $contentbox->appendFooterText('Baz');
+    $script->setScript("run_contentbox_tests()");
+    $container->appendChild($testlog, $contentbox, $script);
+    return $container;
+}
+
 sub register_row_event {
     foreach my $row (@_) {
 	my $function = 'generate_' .$row->getId;
@@ -979,7 +1002,7 @@ sub show_the_code_for {
     my $paragraph = IWL::Label->new;
 
     if ($code_for eq 'buttons_container') {
-	$paragraph->appendTextType(read_code("generate_buttons", 27), 'pre');
+	$paragraph->appendTextType(read_code("generate_buttons", 28), 'pre');
     } elsif ($code_for eq 'entries_container') {
 	$paragraph->appendTextType(read_code("generate_entries", 25), 'pre');
 	$paragraph->appendTextType('...', 'pre');

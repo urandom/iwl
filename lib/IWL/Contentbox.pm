@@ -122,11 +122,8 @@ Parameters: B<TEXT> - the text to be append as the title
 sub appendTitleText {
     my ($self, $text) = @_;
 
-    if (!$self->{__titleLabel}) {
-	$self->{__titleLabel} = IWL::Label->new;
-	$self->{__titler}->appendChild($self->{__titleLabel});
-    }
     $self->{__titleLabel}->appendText($text);
+    $self->{__titleLabel}{_ignore} = 0;
     return $self;
 }
 
@@ -397,9 +394,9 @@ sub setId {
     $self->{__footerr}->setId($id . "_footerr");
     $self->{__bottom}->setId($id . "_bottom");
     $self->{__bottomr}->setId($id . "_bottomr");
+    $self->{__titleLabel}->setId($id . "_title_label");
 
     $self->{__titleImage}->setId($id . "_title_image") if $self->{__titleImage};
-    $self->{__titleLabel}->setId($id . "_title_label") if $self->{__titleLabel};
 
     return $self;
 }
@@ -428,8 +425,8 @@ sub _setupDefaultClass {
     $self->{__middle}->prependClass($self->{_defaultClass} . "_middle");
     $self->{__middler}->prependClass($self->{_defaultClass} . "_middler");
     $self->{__content}->prependClass($self->{_defaultClass} . "_content");
+    $self->{__titleLabel}->prependClass($self->{_defaultClass} . "_title_label");
     $self->{__titleImage}->prependClass($self->{_defaultClass} . "_title_image") if $self->{__titleImage};
-    $self->{__titleLabel}->prependClass($self->{_defaultClass} . "_title_label") if $self->{__titleLabel};
 
     my $hindex = $self->{__headerColorIndex};
     my $findex = $self->{__footerColorIndex};
@@ -500,6 +497,10 @@ sub __init {
 
     $header->{_ignore} = 1;
     $footer->{_ignore} = 1;
+
+    $self->{__titleLabel} = IWL::Label->new;
+    $self->{__titleLabel}{_ignore}= 1;
+    $self->{__titler}->appendChild($self->{__titleLabel});
 
     if ($args{autoWidth}) {
 	$self->{_options}{auto} = 1;

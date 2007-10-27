@@ -14,21 +14,21 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function createButtonsElement() {
-        if (this.contentbox_buttons) return;
+        if (this.contentboxButtons) return;
         var element = new Element('div', {
             "class": $A(this.classNames()).first() + '_buttons', "id": this.id + '_buttons'});
         this.contentboxTitle.appendChild(element);
-        this.contentbox_buttons = element;
+        this.contentboxButtons = element;
     }
 
     function createCloseElement() {
-        if (this.contentbox_close) return;
-        if (!this.contentbox_buttons) createButtonsElement.call(this);
+        if (this.contentboxClose) return;
+        if (!this.contentboxButtons) createButtonsElement.call(this);
         var element = new Element('div', {
             "class": $A(this.classNames()).first() + '_close', "id": this.id + '_close'});
-        this.contentbox_buttons.appendChild(element);
-        this.contentbox_close = element;
-        this.contentbox_close.onclick = this.close.bindAsEventListener(this);
+        this.contentboxButtons.appendChild(element);
+        this.contentboxClose = element;
+        this.contentboxClose.onclick = this.close.bindAsEventListener(this);
     }
 
     function calculateWidth(element) {
@@ -93,7 +93,10 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function setupModal() {
         if (this.modalElement) return;
-        this.absolutize();
+        if (!this.originalPosition)
+            this.originalPosition = this.getStyle('position');
+        if (this.originalPosition != 'absolute')
+            this.absolutize();
         var paren = this.parentNode;
         var zIndex = parseInt(this.getStyle('z-index'));
         this.modalElement = new Element('div', {
@@ -136,6 +139,10 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (this.__qframe) {
             this.__qframe.parentNode.removeChild(this.__qframe);
             this.__qframe = null;
+        }
+        if (this.originalPosition != 'absolute') {
+            this.relativize();
+            this.style.position = this.originalPosition;
         }
     }
 
@@ -254,7 +261,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         show: function() {
             if (!this.parentNode)
-                (arguments[0] || document.body).appendChild(this);
+                ($(arguments[0]) || document.body).appendChild(this);
             else
                 this.style.display = '';
             if (this.options.modal) setupModal.call(this);
@@ -373,9 +380,9 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setNoType: function() {
             this.contentboxTitle.style.cursor = 'default';
             this.contentboxTitle.parentNode.style.cursor = 'default';
-            if (this.contentbox_close) {
-                this.contentbox_close.parentNode.removeChild(this.contentbox_close);
-                this.contentbox_close = null;
+            if (this.contentboxClose) {
+                this.contentboxClose.parentNode.removeChild(this.contentboxClose);
+                this.contentboxClose = null;
             }
             if (this._draggable)
                 this._draggable.destroy();
@@ -434,23 +441,10 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setTitle: function(element) {
-            var text = false;
-            if (typeof element == 'string') {
-                element = element.createTextNode();
-                text = true;
-            }
-            element = $(element);
-            if (!element) return;
-            if (text) {
-                var label = $(this.id + '_title_label');
-                if (!label)
-                    label = this.contentboxTitle.appendChild(new Element('span', {id: this.id + '_title_label', className: $A(this.classNames()).first() + '_title_label'}));
-                label.update();
-                label.appendChild(element);
-            } else {
-                this.contentboxTitle.update();
-                this.contentboxTitle.appendChild(element);
-            }
+            var label = $(this.id + '_title_label');
+            if (!label)
+                label = this.contentboxTitle.appendChild(new Element('span', {id: this.id + '_title_label', className: $A(this.classNames()).first() + '_title_label'}));
+            label.update(element);
             return this;
         },
         /**
@@ -469,7 +463,9 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @type Array
          * */
         getTitleElements: function() {
-            return $A(this.contentboxTitle.childNodes);
+            var label = $(this.id + '_title_label');
+            if (!label) return [];
+            return $A(label.cleanWhitespace().childNodes);
         },
         flush: function() {
             var w = this.getDimensions().width;

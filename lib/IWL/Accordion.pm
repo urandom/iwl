@@ -209,7 +209,6 @@ sub getDefaultSize {
 #
 sub _realize {
     my $self     = shift;
-    my $script   = IWL::Script->new;
     my $id       = $self->getId;
     my @pages    = @{$self->{__pages}};
     my $selected = 0;
@@ -231,8 +230,7 @@ var accordion_widget = \$('$id');
 accordion_widget.control = new accordion('#$id', $options);
 accordion_widget.control.activate(\$('$page_id'));
 EOF
-    $script->setScript($text);
-    $self->_appendAfter($script);
+    $self->_appendInitScript($text);
 }
 
 sub _setupDefaultClass {

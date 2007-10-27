@@ -142,6 +142,15 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         positionDisabledLayer.call(this);
     }
 
+    function submitForm() {
+        if (!this.form) return;
+        if (this.hidden)
+            this.form.appendChild(this.hidden);
+        this.form.submit();
+        if (this.hidden)
+            this.hidden.remove();
+    }
+
     return {
         /**
          * Adjusts the button. Should be called if the button was hidden when created
@@ -315,20 +324,23 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
         /**
-         * Submits the form it is in
+         * Sets the button as a form submit button
+         * @param {String} name The name of the parameter to submit along with the form
+         * @param {String} value The value of the parameter
+         * @param formName the form which to submit
          * */
-        submit: function() {
-            if (this.buttonSubmit)
-                this.buttonSubmit.click();
-        },
-        /**
-         * Submits a form
-         * @param form_name The name of the form to be submitted
-         * */
-        submitForm: function(form_name) {
-            var form = document[form_name];
-            if (form)
-                form.submit();
+        setSubmit: function(name, value, formName) {
+            if (this.submit) return;
+            if (Object.isElement(formName))
+                this.form = formName;
+            else
+                this.form = document[formName] || this.up('form');
+            if (!this.form) return;
+            if (Object.isString(name) && name)
+                this.hidden = new Element('input', {type: 'hidden', name: name, value: value});
+            this.signalConnect('click', submitForm.bind(this));
+            this.submit = true;
+            return this;
         },
         /**
          * Sets whether the button should be disabled
@@ -389,7 +401,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 disabled: false,
                 submit: false 
             }, arguments[2] || {});
-            this.buttonSubmit = this.options.submit ? this.next() : null;
             this.loaded = false;
             createElements.call(this, json.image, json.label);
             checkComplete.call(this);
@@ -397,6 +408,8 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
             if (this.options.disabled)
                 this.setDisabled(true);
+            if (this.options.submit)
+                this.setSubmit.apply(this, Object.isArray(this.options.submit) ? this.options.submit : []);
         }
     }
 })());
