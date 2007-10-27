@@ -590,7 +590,7 @@ document.insertScript = (function () {
       var index = Prototype._helpers.push({script: helper, callback: stateChangedCallback}) - 1;
       helper.update(
         'var helper = Prototype._helpers[' + index + '];helper.callback();' +
-        'helper.script.remove.delay(0.1);Prototype._helpers = Prototype._helpers.without(helper)'
+        'helper.script.remove.delay(0.1);Prototype._helpers[' + index + '] = undefined'
       );
       Element.extend(document.body).appendChild.bind(document.body, helper).delay(0.1);
     }
