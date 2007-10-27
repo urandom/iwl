@@ -54,6 +54,10 @@ The directory, containing all javascript files. It is relative to the server roo
 
 The level of strictness. If greater than 1, attribute names will be checked, and and an exception will be thrown in case the name is illegal. Default value: I<'1'>
 
+=item B<DEBUG>
+
+If true, more debug information will be produced. Default value: I<''>
+
 =item I<EXAMPLE CONFIG FILE>
 
     SKIN = "myskin"
@@ -109,6 +113,7 @@ if (!exists $IWLConfig{JS_DIR}) {
 	ICON_EXT     => 'gif',
 	JS_DIR       => '/iwl/jscript',
 	STRICT_LEVEL => 1,
+        DEBUG        => '',
     );
 
     if ($ENV{IWL_CONFIG_FILE} && -s $ENV{IWL_CONFIG_FILE}) {

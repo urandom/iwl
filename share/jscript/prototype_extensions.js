@@ -550,6 +550,12 @@ document.insertScript = (function () {
       skipCache: false,
       debug: false
     }, arguments[1]);
+    if (!scripts) scripts = $$('script').pluck('src');
+    if (scripts.grep(url + "$").length) {
+      if (options.onComplete)
+        options.onComplete.bind(window, url).delay(0.1);
+      return;
+    }
     if (options.skipCache) {
       var query = $H({_: Math.random()});
       var index = url.indexOf('?');
@@ -558,12 +564,6 @@ document.insertScript = (function () {
         url = url.substr(0, index);
       }
       url += '?' + query.toQueryString();
-    }
-    if (!scripts) scripts = $$('script').pluck('src');
-    if (scripts.grep(url + "$").length) {
-      if (options.onComplete)
-        options.onComplete.bind(window, url).delay(0.1);
-      return;
     }
     scripts.push(url);
 

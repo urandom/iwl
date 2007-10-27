@@ -186,7 +186,8 @@ Object.extend(IWL, (function() {
                 while (json.scripts.length) {
                     var url = json.scripts.shift().attributes.src;
                     ++script_urls;
-                    document.insertScript(url, {onComplete: evalScript});
+                    document.insertScript(url,
+                        {onComplete: evalScript, debug: IWL.Config.DEBUG, skipCache: IWL.Config.DEBUG});
                 }
             }
             if (!json.tag) {
