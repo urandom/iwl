@@ -117,7 +117,13 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 }.bind(this));
                 if (!this.control.getWidth() || !this.control.getHeight()) {
                     count++;
-                    callback.delay(0.1);
+                    new PeriodicalExecuter(function(pe) {
+                        var dims = this.control.getDimensions();
+                        if (dims.width && dims.height) {
+                            pe.stop();
+                            callback();
+                        }
+                    }.bind(this), 0.1);
                 }
             }
 
