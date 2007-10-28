@@ -48,6 +48,14 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
     }
 
+    function periodicalChecker(element, callback, pe) {
+        var dims = element.getDimensions();
+        if (dims.width && dims.height) {
+            pe.stop();
+            callback();
+        }
+    }
+
     return {
         /**
          * Enables the auto-completing feature of the entry
@@ -113,17 +121,16 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 images.each(function(image) {
                     if (image.getWidth() && image.getHeight()) return;
                     count++;
-                    image.signalConnect('load', callback);
+                    if (image.complete)
+                        new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1);
+                    else
+                        image.signalConnect('load', function() {
+                            new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1)
+                        }.bind(this));
                 }.bind(this));
                 if (!this.control.getWidth() || !this.control.getHeight()) {
                     count++;
-                    new PeriodicalExecuter(function(pe) {
-                        var dims = this.control.getDimensions();
-                        if (dims.width && dims.height) {
-                            pe.stop();
-                            callback();
-                        }
-                    }.bind(this), 0.1);
+                    new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1);
                 }
             }
 
