@@ -111,7 +111,6 @@ sub setId {
 #
 sub _realize {
     my $self     = shift;
-    my $script   = IWL::Script->new;
     my $id       = $self->getId;
     my $selected = 0;
 
@@ -120,8 +119,7 @@ sub _realize {
         last if $selected = $tab->isSelected;
     }
     $self->{__tabs}[0]->setSelected(1) if !$selected;
-    $script->setScript("IWL.Notebook.create('$id');");
-    $self->_appendAfter($script);
+    $self->_appendInitScript("IWL.Notebook.create('$id');");
 }
 
 sub _registerEvent {

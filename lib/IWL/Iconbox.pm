@@ -132,22 +132,21 @@ sub setId {
 #
 sub _realize {
     my $self    = shift;
-    my $script  = IWL::Script->new;
     my $id      = $self->getId;
     my $options = toJSON($self->{_options});
+    my $script;
 
     # TRANSLATORS: {TITLE} is a placeholder
     my $delete  = escape(__"The icon '{TITLE}' was removed.");
 
     $self->SUPER::_realize;
 
-    $script->setScript("IWL.Iconbox.create('$id', $options, {'delete': '$delete'});");
+    $script = "IWL.Iconbox.create('$id', $options, {'delete': '$delete'});";
     foreach my $icon (@{$self->{__icons}}) {
 	my $icon_id = $icon->getId;
-        $script->appendScript("\$('$id').selectIcon('$icon_id');")
-          if $icon->{_selected};
+        $script .= "\$('$id').selectIcon('$icon_id');" if $icon->{_selected};
     }
-    $self->_appendAfter($script);
+    $self->_appendInitScript($script);
 }
 
 sub _setupDefaultClass {

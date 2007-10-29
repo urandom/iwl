@@ -212,12 +212,12 @@ sub signalConnect {
 # Protected
 #
 sub _realize {
-    my $self    = shift;
-    my $script  = IWL::Script->new;
-    my $id      = $self->getId;
-    my $handle  = $self->{__handle}->getId;
-    my $options = '';
+    my $self      = shift;
+    my $id        = $self->getId;
+    my $handle    = $self->{__handle}->getId;
+    my $options   = '';
     my $callbacks = '';
+    my $script;
     my $onchange;
     my $onslide;
     my $range;
@@ -251,24 +251,26 @@ sub _realize {
     } else {
 	$options =~ s/^{/{$callbacks, /;
     }
-    $script->setScript("\$('$id').control = new Control.Slider('$handle', '$id', $options)");
-    $script->appendScript("\$('$id').signalConnect('dom:mousewheel', function(event) {
-	var control = \$('$id').control;
-	if (control.options.values) {
-	    var index = control.options.values.indexOf(control.value);
-	    if (event.scrollDirection > 0) index++;
-	    else index--;
-	    if (index >= control.options.values.length) index--;
-	    control.setValue(control.options.values[index]);
-	} else {
-	    var length = control.trackLength / control.increment;
-	    var range = control.maximum - control.minimum;
-	    control.setValueBy((range / length) * event.scrollDirection);
-	}
-	if(control.initialized && control.options.onSlide) 
-	    control.options.onSlide(control.values.length>1 ? control.values : control.value, control);
-    })");
-    $self->_appendAfter($script);
+    $script = "\$('$id').control = new Control.Slider('$handle', '$id', $options);";
+    $script .= <<EOF;
+\$('$id').signalConnect('dom:mousewheel', function(event) {
+    var control = \$('$id').control;
+    if (control.options.values) {
+        var index = control.options.values.indexOf(control.value);
+        if (event.scrollDirection > 0) index++;
+        else index--;
+        if (index >= control.options.values.length) index--;
+        control.setValue(control.options.values[index]);
+    } else {
+        var length = control.trackLength / control.increment;
+        var range = control.maximum - control.minimum;
+        control.setValueBy((range / length) * event.scrollDirection);
+    }
+    if(control.initialized && control.options.onSlide) 
+        control.options.onSlide(control.values.length>1 ? control.values : control.value, control);
+});
+EOF
+    $self->_appendInitScript($script);
 }
 
 sub _setupDefaultClass {

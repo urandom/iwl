@@ -225,12 +225,12 @@ sub _realize {
 	content      => $self->{_defaultClass} . '_page_content'
     };
     my $options  = toJSON($self->{_options});
-    my $text = <<EOF;
+    my $script = <<EOF;
 var accordion_widget = \$('$id');
 accordion_widget.control = new accordion('#$id', $options);
 accordion_widget.control.activate(\$('$page_id'));
 EOF
-    $self->_appendInitScript($text);
+    $self->_appendInitScript($script);
 }
 
 sub _setupDefaultClass {

@@ -491,7 +491,8 @@ EOF
 	    }
 	}
 	if ($parent->{_customSignalScript} && !$parent->{_customSignalScript}{_added}) {
-	    $parent->_appendAfter($parent->{_customSignalScript}) if $parent->{_customSignalScript};
+            unshift @{$parent->{_tailObjects}}, $parent->{_customSignalScript}
+              if $parent->{_customSignalScript};
 	    $parent->{_customSignalScript}{_added} = 1;
 	}
     }
@@ -511,7 +512,7 @@ sub _realizeEvents {
 
     $self->SUPER::_realizeEvents;
 
-    $self->_appendAfter(IWL::Script->new->setScript(<<EOF));
+    unshift @{$self->{_tailObjects}}, IWL::Script->new->setScript(<<EOF);
 \$('$id').prepareEvents();
 EOF
 }

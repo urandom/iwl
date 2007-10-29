@@ -271,7 +271,7 @@ EOF
 			   . " in order to obtain a key from Google."));
     }
 
-    $self->_appendAfter ($elem);
+    unshift @{$self->{_tailObjects}}, $elem;
     return $self;
 }
 

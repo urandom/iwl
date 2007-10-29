@@ -7,7 +7,6 @@ use strict;
 
 use base 'IWL::Entry';
 
-use IWL::Script;
 use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
 

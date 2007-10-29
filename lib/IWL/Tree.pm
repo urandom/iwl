@@ -5,7 +5,6 @@ package IWL::Tree;
 
 use strict;
 
-use IWL::Script;
 use IWL::String qw(randomize escape);
 use IWL::JSON qw(toJSON);
 
@@ -274,7 +273,6 @@ sub prependFooter {
 sub _realize {
     my $self    = shift;
     my $cell    = IWL::Tree::Cell->new;
-    my $script  = IWL::Script->new;
     my $b       = escape($cell->_blank_indent->getContent);
     my $i       = escape($cell->_row_indent->getContent);
     my $l       = escape($cell->_l_junction->getContent);
@@ -285,6 +283,7 @@ sub _realize {
     my $t_c     = escape($cell->_t_collapse->getContent);
     my $id      = $self->getId;
     my $options = {};
+    my $script;
 
     $self->prependClass('list') if $self->{_options}{list};
     $self->SUPER::_realize;
@@ -297,12 +296,12 @@ sub _realize {
     $self->_set_alternate if $self->{_options}{alternate};
 
     my $images = qq({b:"$b",i:"$i",l:"$l",l_e:"$l_e",l_c:"$l_c",t:"$t",t_e:"$t_e",t_c:"$t_c"});
-    $script->prependScript("IWL.Tree.create('$id', $images, $options);");
+    $script = "IWL.Tree.create('$id', $images, $options);";
     foreach my $sortable (@{$self->{__sortables}}) {
-	$script->appendScript("\$('$id').setCustomSortable($sortable->[0], $sortable->[1])");
+	$script .= "\$('$id').setCustomSortable($sortable->[0], $sortable->[1])";
     }
 
-    $self->_appendAfter($script);
+    $self->_appendInitScript($script);
 }
 
 sub _registerEvent {

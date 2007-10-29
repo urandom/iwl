@@ -175,17 +175,17 @@ sub getMaxHeight {
 # Protected
 #
 sub _realize {
-    my $self = shift;
-    my $script = IWL::Script->new;
-    my $id = $self->getId;
+    my $self    = shift;
+    my $id      = $self->getId;
     my $options = toJSON($self->{_options});
+    my $script;
 
     $self->SUPER::_realize;
-    $script->setScript("var menu = IWL.Menu.create('$id', $options);");
+    $script = "var menu = IWL.Menu.create('$id', $options);";
     foreach my $bind (@{$self->{__bindWidgets}}) {
-        $script->appendScript(qq{menu.bindToWidget('$bind->[0]', '$bind->[1]')});
+        $script .= qq{menu.bindToWidget('$bind->[0]', '$bind->[1]')};
     }
-    return $self->_appendAfter($script);
+    return $self->_appendInitScript($script);
 }
 
 # Internal

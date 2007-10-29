@@ -1042,6 +1042,7 @@ sub _setBad {
 sub _appendAfter {
     my ($self, @objects) = @_;
 
+    warn "_appendAfter is deprecated";
     unshift @{$self->{_tailObjects}}, @objects;
     return $self;
 }

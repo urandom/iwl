@@ -147,19 +147,15 @@ sub getMouseOverActivation {
 # Protected
 #
 sub _realize {
-    my $self = shift;
-    my $script = IWL::Script->new;
-    my $id = $self->getId;
+    my $self    = shift;
+    my $id      = $self->getId;
     my $options = '';
 
     $self->SUPER::_realize;
     if ($self->{__mouseOverActivation}) {
 	$options .= "mouseOverActivation: true";
-    } else {
-	$options .= "mouseOverActivation: false";
     }
-    $script->appendScript("IWL.Menu.create('$id', {$options});");
-    return $self->_appendAfter($script);
+    return $self->_appendInitScript("IWL.Menu.create('$id', {$options});");
 }
 
 # Internal

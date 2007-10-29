@@ -12,7 +12,6 @@ use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
 use IWL::Label;
 use IWL::Image;
-use IWL::Script;
 
 use Locale::TextDomain qw(org.bloka.iwl);
 
@@ -411,7 +410,7 @@ sub _realize {
     $self->SUPER::_realize;
     $self->{__titler}->prependChild($self->{__titleImage});
     $self->__set_type;
-    $self->{__init}->setScript("IWL.Contentbox.create('$id', $options);");
+    $self->_appendInitScript("IWL.Contentbox.create('$id', $options);");
 }
 
 sub _setupDefaultClass {
@@ -522,13 +521,11 @@ sub __init {
     }
     delete @args{qw(id autoWidth modal closeModalOnClick shadows)};
 
-    $self->{__init} = IWL::Script->new;
     $self->setType('none');
 
     $self->{__headerColorIndex} = 0;
     $self->{__footerColorIndex} = 0;
 
-    $self->_appendAfter($self->{__init});
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'dist/dragdrop.js', 'resizer.js', 'contentbox.js');
     $self->{_customSignals} = {close => [], hide => [], show => []};

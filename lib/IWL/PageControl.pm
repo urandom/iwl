@@ -123,17 +123,17 @@ sub setId {
 # Protected
 #
 sub _realize {
-    my $self = shift;
-    my $script = IWL::Script->new;
-    my $id = $self->getId;
+    my $self    = shift;
+    my $id      = $self->getId;
     my $options = toJSON($self->{__options});
+    my $script;
 
     $self->setStyle(display => 'none');
     $self->SUPER::_realize;
-    $script->appendScript("IWL.PageControl.create('$id', $options);");
-    $script->appendScript("\$('$id').bindToWidget('$self->{__bind}{widgetId}', '$self->{__bind}{eventName}');")
+    $script = "IWL.PageControl.create('$id', $options);";
+    $script .= "\$('$id').bindToWidget('$self->{__bind}{widgetId}', '$self->{__bind}{eventName}');"
 	if $self->{__options}{bound};
-    return $self->_appendAfter($script);
+    return $self->_appendInitScript($script);
 }
 
 sub _setupDefaultClass {

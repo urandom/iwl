@@ -5,7 +5,6 @@ package IWL::Calendar;
 
 use strict;
 
-use IWL::Script;
 use IWL::Table::Row;
 use IWL::Table::Cell;
 use IWL::Input;
@@ -367,11 +366,11 @@ sub _realize {
     }
     $translations = toJSON($translations);
 
-    my $text = "IWL.Calendar.create('$id', $options, $translations);";
+    my $script = "IWL.Calendar.create('$id', $options, $translations);";
     foreach my $update (@{$self->{__updates}}) {
-        $text .= qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]')|;
+        $script .= qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]')|;
     }
-    $self->_appendInitScript($text);
+    $self->_appendInitScript($script);
 }
 
 # Internal

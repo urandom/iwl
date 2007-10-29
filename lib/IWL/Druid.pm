@@ -9,7 +9,6 @@ use base 'IWL::Container';
 
 use IWL::String qw(randomize escape);
 use IWL::Button;
-use IWL::Script;
 use IWL::Break;
 use IWL::Druid::Page;
 
@@ -126,7 +125,6 @@ sub setId {
 #
 sub _realize {
     my $self     = shift;
-    my $script   = IWL::Script->new;
     my $id       = $self->getId;
     my $selected = 0;
 
@@ -135,9 +133,7 @@ sub _realize {
         last if $selected = $page->isSelected;
     }
     $self->{__pages}[0]->setSelected(1) if !$selected;
-    $script->setScript(
-        "IWL.Druid.create('$id', '" . escape($self->{__finishText}) . "')");
-    $self->_appendAfter($script);
+    $self->_appendInitScript("IWL.Druid.create('$id', '" . escape($self->{__finishText}) . "')");
 }
 
 sub _setupDefaultClass {
