@@ -151,6 +151,17 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.hidden.remove();
     }
 
+    function init(json) {
+        createElements.call(this, json.image, json.label);
+        checkComplete.call(this);
+        this.observe('mousedown', clickImageChange.bindAsEventListener(this));
+        this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
+        if (this.options.disabled)
+            this.setDisabled(true);
+        if (this.options.submit)
+            this.setSubmit.apply(this, Object.isArray(this.options.submit) ? this.options.submit : []);
+    }
+
     return {
         /**
          * Adjusts the button. Should be called if the button was hidden when created
@@ -402,14 +413,10 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 submit: false 
             }, arguments[2] || {});
             this.loaded = false;
-            createElements.call(this, json.image, json.label);
-            checkComplete.call(this);
-            this.observe('mousedown', clickImageChange.bindAsEventListener(this));
-            this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
-            if (this.options.disabled)
-                this.setDisabled(true);
-            if (this.options.submit)
-                this.setSubmit.apply(this, Object.isArray(this.options.submit) ? this.options.submit : []);
+            if (document.loaded)
+                init.call(this, json);
+            else
+                document.observe('dom:loaded', init.bind(this, json));
         }
     }
 })());

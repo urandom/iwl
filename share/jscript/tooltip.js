@@ -318,7 +318,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (document.loaded)
                 append.call(this);
             else
-                Event.signalConnect(document, 'dom:loaded', append.bind(this));
+                document.observe('dom:loaded', append.bind(this));
 
             draw.call(this);
         }

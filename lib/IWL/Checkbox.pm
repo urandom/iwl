@@ -203,7 +203,7 @@ sub __init {
     my $label = IWL::Label->new(expand => 0);
 
     $self->{_label} = $label;
-    $self->_appendAfter($label);
+    $self->appendAfter($label);
     $self->{_defaultClass} = 'checkbox';
 
     my $id = $args{id} || randomize($self->{_defaultClass});
