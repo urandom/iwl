@@ -32,10 +32,10 @@ use IWL::Tree::Row;
 	is($row->makeSortable(5), undef);
 	is($child1->makeSortable(0), $child1);
 	like($row->getContent, qr(^<tr (?:(?:iwl:treeRowData=".*?"|class="(tree_row)"|id="\1_\d+")\s*){3}></tr>
-<tr (?:(?:iwl:treeRowData=".*?"|class="\1"|id="\1_\d+")\s*){3}><th style="cursor: pointer; "><span (?:(?:class="tree_nav_con"|id="\1_\d+_nav_con")\s*){2}></span>
+<tr (?:(?:iwl:treeRowData=".*?"|class="\1"|id="\1_\d+")\s*){3}><th style="cursor: pointer"><span (?:(?:class="tree_nav_con"|id="\1_\d+_nav_con")\s*){2}></span>
 Bar</th>
 </tr>
-<tr (?:(?:iwl:treeRowData=".*?"|class="\1"|id="\1_\d+"|style="display: none; ")\s*){4}></tr>
+<tr (?:(?:iwl:treeRowData=".*?"|class="\1"|id="\1_\d+"|style="display: none")\s*){4}></tr>
 <tr (?:(?:iwl:treeRowData=".*?"|class="\1"|id="\1_\d+")\s*){3}><td><span (?:(?:class="tree_nav_con"|id="\1_\d+_nav_con")\s*){2}></span>
 Foo</td>
 </tr>

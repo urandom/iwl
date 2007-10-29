@@ -10,4 +10,5 @@ is_deeply(\%IWLConfig, {
 	ICON_EXT     => 'gif',
 	JS_DIR       => '/jscript',
 	STRICT_LEVEL => 2,
+    DEBUG        => ''
 });

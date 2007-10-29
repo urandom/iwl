@@ -350,7 +350,6 @@ sub updateOnSignal {
 #
 sub _realize {
     my $self    = shift;
-    my $script  = IWL::Script->new;
     my $id      = $self->getId;
 
     $self->SUPER::_realize;
@@ -368,11 +367,11 @@ sub _realize {
     }
     $translations = toJSON($translations);
 
-    $script->setScript("IWL.Calendar.create('$id', $options, $translations);");
+    my $text = "IWL.Calendar.create('$id', $options, $translations);";
     foreach my $update (@{$self->{__updates}}) {
-        $script->appendScript(qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]')|);
+        $text .= qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]')|;
     }
-    $self->_appendAfter($script);
+    $self->_appendInitScript($text);
 }
 
 # Internal

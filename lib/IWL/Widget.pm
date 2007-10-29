@@ -521,9 +521,7 @@ sub _constructorArguments {
 
     foreach my $key (keys %args) {
 	if ($key eq 'style' && ref $args{$key} eq 'HASH') {
-	    foreach my $style (keys %{$args{$key}}) {
-		$self->setStyle($style => $args{$key}{$style});
-	    }
+            $self->setStyle(%{$args{$key}});
 	} elsif ($key eq 'class') {
 	    $self->setClass($args{$key});
 	} elsif ($key eq 'id') {

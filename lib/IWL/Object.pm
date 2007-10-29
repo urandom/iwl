@@ -432,11 +432,7 @@ sub getContent {
         $content .= qq( $key="$value");
     }
 
-    my $style = '';
-    foreach my $key (keys %{$self->{_style}}) {
-        my $value = $self->{_style}{$key};
-        $style .= "${key}: $value; ";
-    }
+    my $style = join '; ', map{$_ . ': ' . $self->{_style}{$_}} keys %{$self->{_style}};
     $content .= qq( style="$style") if $style;
 
     if ($self->{_noChildren}) {

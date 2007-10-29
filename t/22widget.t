@@ -30,10 +30,10 @@ use IWL::Widget;
 	$widget->setStyle(display => 'none');
 
 	is($widget->getStyle('width'), '80px');
-	like($widget->getContent, qr/< style="(?:[\w-]+:\s*[\w-]+;\s*){2}"><\/>/);
+	like($widget->getContent, qr/< style="(?:[\w-]+:\s*[\w-]+;*\s*){2}"><\/>/);
 
 	is($widget->deleteStyle('width'), $widget);
-	is($widget->getContent, '< style="display: none; "></>' . "\n");
+	is($widget->getContent, '< style="display: none"></>' . "\n");
 }
 
 {

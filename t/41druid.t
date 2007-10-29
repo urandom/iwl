@@ -23,7 +23,7 @@ like($druid->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/e
 <noscript.*?</noscript>
 <script.*?IWL.Button.create.*?</script>
 </div>
-<br style="clear: both; " />
+<br style="clear: both" />
 </div>
 <script.*?IWL.Druid.create.*?</script>
 $)s);

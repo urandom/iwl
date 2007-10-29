@@ -31,6 +31,11 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             Event.observe(document, 'mousemove', move.bindAsEventListener(container), false);
         }
 
+        var contentStyle = {};
+        for (var i in this.options.style)
+            contentStyle[i.camelize()] = this.options.style[i];
+        content.setStyle(contentStyle);
+
         this.current = container;
         this.content = content;
         this.bubbles = new Array(bubble1, bubble2, bubble3);
@@ -40,7 +45,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     function append() {
         var script = $(this.id + '_script');
-        pivot = $(this.options.pivot);
+        pivot = this.options.pivot == 'document.body' ? document.body : $(this.options.pivot);
         if (pivot)
             var parent_node = pivot.parentNode;
         else if (script)
@@ -299,7 +304,8 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 followMouse: false,
                 content: false,
                 bind: false,
-                bindHide: false
+                bindHide: false,
+                style: {}
             }, arguments[1] || {})
             if (!id) id = 'tooltip' + Math.random();
             build.call(this, id);

@@ -41,6 +41,10 @@ True, if the tooltip should appear in the center of the bound element
 
 True, if the tooltip should follow the mouse
 
+=item B<pivot>
+
+The element, whose parent will be the parent of the tooltip. Used to place the tooltip in a different parent, than it's script element
+
 =back
 
 =cut
@@ -149,6 +153,17 @@ sub hidingCallback {
     return "\$('$id').hideTooltip()";
 }
 
+# Overrides
+#
+sub setStyle {
+    my ($self, %style) = @_;
+    $self->SUPER::setStyle(%style);
+    $self->{_options}{style} = {
+        %{$self->{_options}{style}},
+        %style
+    };
+}
+
 # Protected
 #
 sub _realize {
@@ -176,13 +191,13 @@ sub _realize {
 #
 sub __init {
     my ($self, %args) = @_;
-    $self->{_defaultClass} = 'tooltip';
 
-    $self->{_options} = {};
+    $self->{_options} = {style => {}};
     $self->{_options}{centerOnElement} = $args{centerOnElement} ? 1 : 0 if defined $args{centerOnElement};
     $self->{_options}{followMouse}     = $args{followMouse}     ? 1 : 0 if defined $args{followMouse};
+    $self->{_options}{pivot}           = $args{pivot}                   if defined $args{pivot};
 
-    $args{id} ||= randomize($self->{_defaultClass});
+    $args{id} ||= randomize('tooltip');
     $self->{_tag} = "script";
 
     delete @args{qw(centerOnElement followMouse)};

@@ -10,5 +10,5 @@ use IWL::Tree::Cell;
 {
 	my $cell = IWL::Tree::Cell->new(type => 'header');
 	is($cell->makeSortable, $cell);
-	is($cell->getContent, '<th style="cursor: pointer; "></th>' . "\n");
+	is($cell->getContent, '<th style="cursor: pointer"></th>' . "\n");
 }

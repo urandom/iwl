@@ -18,7 +18,7 @@ use IWL::Table::Row;
 	is_deeply({$t->getFooterStyle}, {display => 'none'});
 	ok(!$t->isAlternating);
 	like($t->getContent, qr(^<table (?:(?:class="(table)"|id="(\1_\d+)"|summary="Summary"|cellspacing="0"|cellpadding="2")\s*){5}><caption (?:(?:class="\1_caption"|id="\2_caption")\s*){2}>Foo</caption>
-<tbody (?:(?:class="\1_body"|id="\2_body"|style="width: 24px; ")\s*){3}></tbody>
+<tbody (?:(?:class="\1_body"|id="\2_body"|style="width: 24px")\s*){3}></tbody>
 </table>
 $)s); #"
 }
