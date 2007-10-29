@@ -63,6 +63,7 @@ use IWL::Tree::Cell;
 use IWL::Tree::Row;
 use IWL::Tree;
 use IWL::Upload;
+use IWL::VBox;
 
 use vars qw($VERSION);
 

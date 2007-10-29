@@ -87,6 +87,7 @@ lib/IWL/Tree.pm
 lib/IWL/Tree/Cell.pm
 lib/IWL/Tree/Row.pm
 lib/IWL/Upload.pm
+lib/IWL/VBox.pm
 lib/IWL/Widget.pm
 lib/LocaleData/bg/LC_MESSAGES/org.bloka.iwl.mo
 lib/LocaleData/de/LC_MESSAGES/org.bloka.iwl.mo
@@ -341,6 +342,7 @@ t/40notebook.t
 t/40submitimage.t
 t/40textarea.t
 t/40tree_cell.t
+t/40vbox.t
 t/41combo.t
 t/41druid.t
 t/41iconbox.t

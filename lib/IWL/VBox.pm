@@ -1,7 +1,7 @@
 #! /bin/false
 # vim: set autoindent shiftwidth=4 tabstop=8:
 
-package IWL::HBox;
+package IWL::VBox;
 
 use strict;
 
@@ -9,19 +9,19 @@ use base 'IWL::Container';
 
 =head1 NAME
 
-IWL::HBox - A horizontal box container
+IWL::VBox - A horizontal box container
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::HBox>
+L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::VBox>
 
 =head1 DESCRIPTION
 
-An HBox is a container for stacking L<IWL::Widget>s horizontally.
+An VBox is a container for stacking L<IWL::Widget>s vertically.
 
 =head1 CONSTRUCTOR
 
-IWL::HBox->new ([B<%ARGS>])
+IWL::VBox->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
@@ -32,7 +32,9 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self = $class->SUPER::new(%args);
 
-    $self->{_defaultClass} = 'hbox';
+    $self->{_defaultClass} = 'vbox';
+    $self->{_start} = [];
+    $self->{_end} = [];
 
     return $self;
 }
@@ -43,7 +45,7 @@ sub new {
 
 =item B<packStart> (B<WIDGET>, [B<MARGIN>])
 
-Packs the given widget to the left side of the container.
+Packs the given widget to the top of the container.
 
 Parameters: B<WIDGET> - the widget to be packed, B<MARGIN> - the margin
 
@@ -55,17 +57,17 @@ sub packStart {
     my ($self, $widget, $margin) = @_;
     my $pack = IWL::Container->new;
 
-    $self->appendChild($pack);
     $pack->setStyle(margin => $margin) if $margin;
     $pack->appendChild($widget);
-    $pack->{_defaultClass} = 'hbox_start';
+    $pack->{_defaultClass} = 'vbox_start';
+    push @{$self->{_start}}, $pack;
 
     return $pack;
 }
 
 =item B<packEnd> (B<WIDGET>, [B<MARGIN>])
 
-Packs the given widget to the right side of the container.
+Packs the given widget to the bottom of the container.
 
 Parameters: B<WIDGET> - the widget to be packed, B<MARGIN> - the margin
 
@@ -77,10 +79,10 @@ sub packEnd {
     my ($self, $widget, $margin) = @_;
     my $pack = IWL::Container->new;
 
-    $self->appendChild($pack);
     $pack->setStyle(margin => $margin) if $margin;
     $pack->appendChild($widget);
-    $pack->{_defaultClass} = 'hbox_end';
+    $pack->{_defaultClass} = 'vbox_end';
+    unshift @{$self->{_end}}, $pack;
 
     return $pack;
 }
@@ -91,7 +93,7 @@ sub _realize {
     my $self = shift;
 
     $self->SUPER::_realize;
-    $self->appendAfter(IWL::Container->new(inline => 1, style => {clear => 'both'}));
+    $self->appendChild($_) foreach (@{$self->{_start}}, @{$self->{_end}});
 }
 
 1;
