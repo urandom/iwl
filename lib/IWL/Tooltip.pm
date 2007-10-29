@@ -41,9 +41,9 @@ True, if the tooltip should appear in the center of the bound element
 
 True, if the tooltip should follow the mouse
 
-=item B<pivot>
+=item B<parent>
 
-The element, whose parent will be the parent of the tooltip. Used to place the tooltip in a different parent, than it's script element
+The parent element of the tooltip
 
 =back
 
@@ -195,7 +195,7 @@ sub __init {
     $self->{_options} = {style => {}};
     $self->{_options}{centerOnElement} = $args{centerOnElement} ? 1 : 0 if defined $args{centerOnElement};
     $self->{_options}{followMouse}     = $args{followMouse}     ? 1 : 0 if defined $args{followMouse};
-    $self->{_options}{pivot}           = $args{pivot}                   if defined $args{pivot};
+    $self->{_options}{parent}          = $args{parent}                  if defined $args{parent};
 
     $args{id} ||= randomize('tooltip');
     $self->{_tag} = "script";
