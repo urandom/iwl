@@ -45,7 +45,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     function append() {
         var script = $(this.id + '_script');
-        pivot = this.options.pivot == 'document.body' ? document.body : $(this.options.pivot);
+        pivot = this.options.pivot == 'document.body' ? document.body.firstChild : $(this.options.pivot);
         if (pivot)
             var parent_node = pivot.parentNode;
         else if (script)
