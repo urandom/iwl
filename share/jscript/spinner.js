@@ -226,7 +226,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.from = parseFloat(this.options.from);
             this.to = parseFloat(this.options.to);
             if (isNaN(this.from)) this.from = -Infinity;
-            if (isNaN(this.to)) this.to = -Infinity;
+            if (isNaN(this.to)) this.to = Infinity;
             if (this.options.mask && this.options.mask.match(/#\{number\}/))
                 this.mask = new Template(this.options.mask);
 
