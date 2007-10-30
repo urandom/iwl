@@ -465,10 +465,10 @@ sub __init {
     my $image2 = IWL::Image->new;
     my $receiver   = IWL::Container->new;
 
-    $self->{image1} = $image1;
-    $self->{image2} = $image2;
-    $self->{text} = $entry;
-    $self->{__receiver}   = $receiver;
+    $self->{image1}        = $image1;
+    $self->{image2}        = $image2;
+    $self->{text}          = $entry;
+    $self->{__receiver}    = $receiver;
     $self->{_defaultClass} = 'entry';
 
     $self->appendChild($image1);

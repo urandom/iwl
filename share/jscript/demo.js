@@ -628,6 +628,9 @@ function run_calendar_tests() {
         }},
         testDate: function() { with(this) {
             var date = calendar.getDate();
+            var change = false;
+
+            calendar.signalConnect('iwl:change', function() {change = true});
             assertInstanceOf(Date, date);
             assertEqual(2007, date.getFullYear());
             assertEqual(10, date.getMonth());
@@ -642,6 +645,9 @@ function run_calendar_tests() {
             assertEqual(new Date(1972, 1, 13, 17, 2, 12).getTime(), calendar.getDate().getTime());
             assertEqual(new Date(1972, 1, 13, 17, 2, 12).getTime(), calendar.currentDate.getDate().getTime());
             assertEqual(new Date(1972, 1, 3, 17, 2, 12).getTime(), calendar.getByDate(new Date(1972, 1, 3)).getDate().getTime());
+            wait(100, function() {
+                assert(change);
+            });
         }},
         testShowMethods: function() { with(this) {
             assertEqual(calendar, calendar.showWeekNumbers(false));
@@ -944,6 +950,33 @@ function run_druid_tests() {
                 assert(selected2);
                 assert(unselected);
             });
+        }}
+    }, 'testlog');
+}
+
+function run_entry_tests() {
+    var entry = $('entry_test');
+    var className = $A(entry.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(entry.image1));
+            assert(Object.isElement(entry.image2));
+            assert(Object.isElement(entry.control));
+            assert(entry.image1.hasClassName(className + '_left'));
+            assert(entry.image2.hasClassName(className + '_right'));
+            assert(entry.control.hasClassName(className + '_text'));
+            assertEqual('entry_test_left', entry.image1.id);
+            assertEqual('entry_test_right', entry.image2.id);
+            assertEqual('entry_test_text', entry.control.id);
+            assertEqual('pointer', entry.image2.getStyle('cursor'));
+        }},
+        testMethods: function() { with(this) {
+            assert(!entry.getValue());
+            assertEqual(entry, entry.setValue('foobar'));
+            assertEqual('foobar', entry.getValue());
+            assertEqual(entry.control.value, entry.value);
+            assertEqual(entry, entry.setAutoComplete('iwl_demo.pl', {paramName: 'completion'}));
+            assertInstanceOf(Ajax.Autocompleter, entry.autoCompleter);
         }}
     }, 'testlog');
 }

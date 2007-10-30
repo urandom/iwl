@@ -356,6 +356,7 @@ sub build_tests {
     my $calendar_test   = IWL::Tree::Row->new(id => 'calendar_test_row');
     my $contentbox_test = IWL::Tree::Row->new(id => 'contentbox_test_row');
     my $druid_test      = IWL::Tree::Row->new(id => 'druid_test_row');
+    my $entry_test      = IWL::Tree::Row->new(id => 'entry_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -371,8 +372,10 @@ sub build_tests {
     $row->appendRow($contentbox_test);
     $druid_test->appendTextCell('Druid Test');
     $row->appendRow($druid_test);
+    $entry_test->appendTextCell('Entry Test');
+    $row->appendRow($entry_test);
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test);
 }
 
 sub generate_buttons {
@@ -930,6 +933,19 @@ sub generate_druid_test {
     $druid->appendPage(IWL::Label->new(id => 'first_page_label')->setText('Some text'));
     $script->setScript("run_druid_tests()");
     $container->appendChild($testlog, $druid, $script);
+    return $container;
+}
+
+sub generate_entry_test {
+    my $container = IWL::Container->new(id => 'entry_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $entry     = IWL::Entry->new(id => 'entry_test');
+    my $script    = IWL::Script->new;
+
+    $entry->setIconFromStock('IWL_STOCK_REFRESH');
+    $entry->addClearButton;
+    $script->setScript("run_entry_tests()");
+    $container->appendChild($testlog, $entry, $script);
     return $container;
 }
 

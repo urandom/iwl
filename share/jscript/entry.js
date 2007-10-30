@@ -45,6 +45,10 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         var url = this.options.autoComplete[0];
         var options = Object.extend({}, this.options.autoComplete[1]);
         var receiver = $(this.id + '_receiver');
+        if (!receiver)
+            receiver = this.appendChild(new Element('div', {
+                id: this.id + '_receiver', className: $A(this.classNames()).first() + '_receiver'
+            }));
         this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
     }
 
