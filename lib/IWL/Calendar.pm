@@ -368,7 +368,7 @@ sub _realize {
 
     my $script = "IWL.Calendar.create('$id', $options, $translations);";
     foreach my $update (@{$self->{__updates}}) {
-        $script .= qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]')|;
+        $script .= qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]');|;
     }
     $self->_appendInitScript($script);
 }

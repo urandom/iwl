@@ -170,7 +170,6 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 setTimeout(this._init.apply.bind(this, arguments), 500);
                 return;
             }
-            this.okButton 
             this.pageContainer = this.down();
             this.currentPage = this.pageContainer.select('.' +
                     $A(this.classNames()).first() + '_page_selected')[0];

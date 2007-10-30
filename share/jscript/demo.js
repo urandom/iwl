@@ -838,3 +838,25 @@ function run_contentbox_tests() {
         }}
     }, 'testlog');
 }
+
+function run_druid_tests() {
+    var druid = $('druid_test');
+    var className = $A(druid.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(druid.okButton));
+            assert(Object.isElement(druid.backButton));
+            assert(Object.isElement(druid.nextButton));
+            assert(Object.isElement(druid.pageContainer));
+            assert(Object.isElement(druid.currentPage));
+            assert(Object.isElement(druid.errorPage));
+            druid.pages.each(function(page) {
+                assert(Object.isElement(page));
+            });
+            assert(Object.isString(druid.finishText));
+            assert(Object.isString(druid.nextText));
+            assert(!druid.finishText.blank());
+            assert(!druid.nextText.blank());
+        }}
+    }, 'testlog');
+}

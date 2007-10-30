@@ -183,7 +183,7 @@ sub _realize {
     $self->SUPER::_realize;
     $script = "var menu = IWL.Menu.create('$id', $options);";
     foreach my $bind (@{$self->{__bindWidgets}}) {
-        $script .= qq{menu.bindToWidget('$bind->[0]', '$bind->[1]')};
+        $script .= qq{menu.bindToWidget('$bind->[0]', '$bind->[1]');};
     }
     return $self->_appendInitScript($script);
 }

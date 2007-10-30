@@ -175,7 +175,7 @@ if (my $file = $form{upload_file}) {
     print "The following text was received: $text";
     print IWL::Break->new()->getContent;
     exit 0;
-} elsif (my $search = quotemeta $form{completion}) {
+} elsif ($form{completion} && (my $search = quotemeta $form{completion})) {
     my @completions;
     if ($search =~ /IWL/) {
         @completions = map{'IWL::'. $_} qw(Calendar Entry List Spinner);
@@ -184,7 +184,7 @@ if (my $file = $form{upload_file}) {
     }
     IWL::Entry::printCompletions(@completions);
     exit 0;
-} elsif (my $text = $form{image}) {
+} elsif ($text = $form{image}) {
     IWL::Object::printHTMLHeader;
     print "The following text was received: $text";
     exit 0;
@@ -355,6 +355,7 @@ sub build_tests {
     my $button_test     = IWL::Tree::Row->new(id => 'button_test_row');
     my $calendar_test   = IWL::Tree::Row->new(id => 'calendar_test_row');
     my $contentbox_test = IWL::Tree::Row->new(id => 'contentbox_test_row');
+    my $druid_test      = IWL::Tree::Row->new(id => 'druid_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -368,8 +369,10 @@ sub build_tests {
     $row->appendRow($calendar_test);
     $contentbox_test->appendTextCell('Contentbox Test');
     $row->appendRow($contentbox_test);
+    $druid_test->appendTextCell('Druid Test');
+    $row->appendRow($druid_test);
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test);
 }
 
 sub generate_buttons {
@@ -915,6 +918,18 @@ sub generate_contentbox_test {
     $contentbox->appendFooterText('Baz');
     $script->setScript("run_contentbox_tests()");
     $container->appendChild($testlog, $contentbox, $script);
+    return $container;
+}
+
+sub generate_druid_test {
+    my $container = IWL::Container->new(id => 'druid_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $druid     = IWL::Druid->new(id => 'druid_test');
+    my $script    = IWL::Script->new;
+
+    $druid->appendPage(IWL::Label->new(id => 'first_page_label')->setText('Some text'));
+    $script->setScript("run_druid_tests()");
+    $container->appendChild($testlog, $druid, $script);
     return $container;
 }
 
