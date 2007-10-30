@@ -1,6 +1,6 @@
 Object.extend(Test.Unit.Runner.prototype, (function() {
   function delayCallback(test) {
-    if(test.delay) return;
+    if(test.delayed) return;
     clearInterval(test.delayInterval);
     this.runTests.call(this);
   }
@@ -36,11 +36,11 @@ Object.extend(Test.Unit.Runner.prototype, (function() {
 
 Object.extend(Test.Unit.Testcase.prototype, {
   delay: function(nextPart) {
-    this.isDelaying = this.delay = true;
+    this.isDelaying = this.delayed = true;
     this.test = nextPart;
   },
   proceed: function() {
-    this.delay = false;
+    this.delayed = false;
   },
   run: function() {
     try {

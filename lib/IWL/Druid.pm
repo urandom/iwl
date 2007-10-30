@@ -142,6 +142,9 @@ sub _setupDefaultClass {
     $self->SUPER::prependClass($self->{_defaultClass});
     $self->{__content}->prependClass($self->{_defaultClass} . '_content');
     $self->{__buttonContainer}->prependClass($self->{_defaultClass} . '_button_container');
+    $self->{__backButton}->prependClass($self->{_defaultClass} . '_back_button');
+    $self->{__nextButton}->prependClass($self->{_defaultClass} . '_next_button');
+    $self->{__okButton}->prependClass($self->{_defaultClass} . '_ok_button');
     return $self;
 }
 

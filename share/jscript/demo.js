@@ -294,7 +294,7 @@ function run_scriptaculous_tests() {
             assert(new Effect.ScrollElement(child, paren, {duration: 0.1}));
 
             wait(250, function() {
-                assertEqual(35, paren.scrollTop);
+                assert(paren.scrollTop > 0);
                 paren.remove();
             });
         }}
@@ -842,6 +842,10 @@ function run_contentbox_tests() {
 function run_druid_tests() {
     var druid = $('druid_test');
     var className = $A(druid.classNames()).first();
+    function visibleButton(button) {
+        return button.style.visibility != 'hidden';
+    }
+
     new Test.Unit.Runner({
         testParts: function() { with(this) {
             assert(Object.isElement(druid.okButton));
@@ -850,13 +854,96 @@ function run_druid_tests() {
             assert(Object.isElement(druid.pageContainer));
             assert(Object.isElement(druid.currentPage));
             assert(Object.isElement(druid.errorPage));
+
+            assert(druid.okButton.hasClassName(className + '_ok_button'));
+            assert(druid.backButton.hasClassName(className + '_back_button'));
+            assert(druid.nextButton.hasClassName(className + '_next_button'));
+            assert(druid.pageContainer.hasClassName(className + '_content'));
+            assert(druid.currentPage.hasClassName(className + '_page_selected'));
+            assert(druid.errorPage.hasClassName(className + '_page_error'));
+
             druid.pages.each(function(page) {
                 assert(Object.isElement(page));
+                assert(page.hasClassName(className + '_page'));
             });
             assert(Object.isString(druid.finishText));
             assert(Object.isString(druid.nextText));
             assert(!druid.finishText.blank());
             assert(!druid.nextText.blank());
+        }},
+        testPageCreation: function() { with(this) {
+            var new_page = druid.appendPage();
+            var removed = false;
+
+            assert(new_page.hasClassName(className + '_page'));
+            assertEqual(2, druid.pages.length);
+            assert(visibleButton(druid.nextButton));
+            assertEqual(new_page, druid.pages[1]);
+            new_page = druid.prependPage(true).update('Final page');
+            assert(new_page.hasClassName(className + '_page'));
+            assertEqual(3, druid.pages.length);
+            assert(visibleButton(druid.backButton));
+            assertEqual(new_page, druid.pages[0]);
+            assert(druid.pageIsFinal(new_page));
+            assert(new_page.isFinal());
+            new_page = druid.replacePageBefore(false, druid.pages[0]);
+            assert(new_page.hasClassName(className + '_page'));
+            assertEqual(4, druid.pages.length);
+            assertEqual(new_page, druid.pages[0]);
+            assert(druid.pages[1].isFinal());
+            var new_page2 = druid.replacePageBefore(false, druid.pages[1]);
+            assert(new_page2.hasClassName(className + '_page'));
+            assertEqual(4, druid.pages.length);
+            assertEqual(new_page2, druid.pages[0]);
+            assertNotEqual(new_page, new_page2);
+            assert(!new_page.parentNode);
+            new_page = druid.replacePageAfter(false, druid.pages.last());
+            assert(new_page.hasClassName(className + '_page'));
+            assertEqual(5, druid.pages.length);
+            assertEqual(new_page, druid.pages.last());
+            new_page = druid.pages[3];
+            new_page2 = druid.replacePageAfter(false);
+            assert(new_page2.hasClassName(className + '_page'));
+            assertEqual(5, druid.pages.length);
+            assertEqual(new_page2, druid.pages[3]);
+            assertNotEqual(new_page, new_page2);
+            assert(!new_page.parentNode);
+            assertEqual(druid, druid.setFinish(function() {}));
+            druid.pages[3].signalConnect('iwl:remove', function() {removed = true});
+            assertEqual(druid, druid.removePage(druid.pages[3]));
+            assertEqual(4, druid.pages.length);
+            wait(100, function() {
+                assert(removed)
+            });
+        }},
+        testPageSelection: function() { with(this) {
+            var prev = druid.getPrevPage();
+            var curr = druid.getCurrentPage();
+            var next = druid.getNextPage();
+            var selected = false, selected2 = false, unselected = false;
+            var scb1 = function() {selected = true};
+            var scb2 = function() {if (next == arguments[1]) selected2 = true};
+            var ucb  = function() {unselected = true};
+
+            prev.signalConnect('iwl:select', scb1);
+            druid.signalConnect('iwl:current_page_change', scb2);
+            curr.signalConnect('iwl:unselect', ucb);
+            assertEqual(druid.pages[1], prev);
+            assertEqual(druid.pages[2], curr);
+            assertEqual(druid.pages[3], next);
+            assertEqual(druid, druid.selectPage(prev));
+            assertEqual(prev, druid.currentPage);
+            assertEqual(next, next.setSelected(true));
+            assertEqual(next, druid.currentPage);
+            assert(next.isSelected());
+            assert(!prev.nextPage());
+            assertEqual(next, curr.nextPage());
+            assertEqual(prev, curr.prevPage());
+            wait(300, function() {
+                assert(selected);
+                assert(selected2);
+                assert(unselected);
+            });
         }}
     }, 'testlog');
 }

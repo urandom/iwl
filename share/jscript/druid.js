@@ -63,8 +63,8 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         removePage: function(page) {
-            page = $(page) || this.currentPage;
-            if (!page) return;
+            if (!(page = $(page)) && !(page = this.currentPage))
+                return;
             page.remove();
             return this;
         },
@@ -82,6 +82,19 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return page;
         },
         /**
+         * Prepends a new page to the druid
+         * @param {Boolean} final True if the new page should be the final page in the druid
+         * @returns The created page
+         * */
+        prependPage: function(final) {
+            var page = createPage.call(this, final);
+            this.pageContainer.insertBefore(page, this.pages[0]);
+            this.pages.unshift(page);
+            this._refreshButtons();
+
+            return page;
+        },
+        /**
          * Replaces the page before the given one
          * @param {Boolean} final True if the new page should be the final page in the druid
          * @param p The new page should be inserted before this one. If omited the current page is used
@@ -92,12 +105,12 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!p || this.pages.indexOf(p) == -1)
                 p = this.currentPage;
             var i = this.pages.indexOf(p);
-            var before_p = p.prevPage();
             if (i >= 0) {
                 if (i == 0) {
                     this.pageContainer.insertBefore(page, this.pages[0]);
                     this.pages.unshift(page);
                 } else {
+                    var before_p = p.prevPage();
                     this.pageContainer.replaceChild(page, before_p);
                     if (before_p == this.currentPage)
                         page.setSelected(true, true);
@@ -383,7 +396,7 @@ IWL.Druid.Page = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.druid.pages[this.druid.pages.indexOf(this) - 1];
         },
         /**
-         * @returns The next page
+         * @returns The next page, or undefined if this is the final page
          * */
         nextPage: function() {
             if (this.isFinal()) return;
