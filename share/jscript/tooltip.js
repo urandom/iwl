@@ -237,11 +237,12 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (typeof elements == 'string') {
                 this.content.update(unescape(elements));
             } else if (typeof elements == 'object') {
-                if ($A(elements).length && !(elements.nodeType == 3)) {
-                    $A(elements).each(function($_) {this.content.appendChild($_)}.bind(this));
-                } else {
-                    this.content.appendChild(elements);
-                }
+                if (Object.isElement(elements))
+                    this.content.appendChild(elements)
+                else
+                    $A(elements).each(function($_) {
+                        if (Object.isElement($_)) this.content.appendChild($_)
+                    }.bind(this));
             }
             return this;
         },
