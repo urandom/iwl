@@ -984,6 +984,7 @@ function run_entry_tests() {
 function run_iconbox_tests() {
     var iconbox = $('iconbox_test');
     var className = $A(iconbox.classNames()).first();
+    iconbox.options.multipleSelect = true;
     new Test.Unit.Runner({
         testParts: function() { with(this) {
             assert(Object.isElement(iconbox.statusbar));
@@ -1000,6 +1001,7 @@ function run_iconbox_tests() {
             var jsonIcon1 = {src: IWL.Config.IMAGE_DIR + '/demo/moon.gif', text: 'Moon'};
             var jsonIcon2 = {tag: 'div', children: [{tag: 'img', attributes: {src: IWL.Config.IMAGE_DIR + '/demo/moon.gif'}}, {tag: 'p', text: 'Moon 2'}]};
             var htmlIcon = "<div><img src=\"" + IWL.Config.IMAGE_DIR + '/demo/moon.gif' + "\"/><p>Moon 3</p></div>";
+            var removed = false;
 
             assertEqual(iconbox, iconbox.appendIcon(elementIcon));
             assertEqual(1, iconbox.icons.length);
@@ -1021,25 +1023,79 @@ function run_iconbox_tests() {
             assertEqual(iconbox, iconbox.appendIcon([htmlIcon, htmlIcon]));
             assertEqual(12, iconbox.icons.length);
 
+            iconbox.icons.last().signalConnect('iwl:remove', function() { removed = true });
             assertEqual(iconbox, iconbox.removeIcon(iconbox.icons.last()));
             assertEqual(11, iconbox.icons.length);
 
             var array = [];
             $R(1,20).each(function() {array.push(htmlIcon)});
-            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            benchmark(function() { iconbox.appendIcon(array) }, 1, "HTML insertion");
             array = [];
             $R(1,20).each(function() {array.push(jsonIcon2)});
-            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            benchmark(function() { iconbox.appendIcon(array) }, 1, "IWL JSON insertion");
             array = [];
             $R(1,20).each(function() {array.push(jsonIcon1)});
-            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            benchmark(function() { iconbox.appendIcon(array) }, 1, "JSON insertion");
             array = [];
             $R(1,20).each(function() {array.push(elementIcon.cloneNode(true))});
-            benchmark(function() { iconbox.appendIcon(array) }, 1);
-            benchmark(function() { iconbox.icons.last().remove() }, 80);
+            benchmark(function() { iconbox.appendIcon(array) }, 1, "DOM insertion");
+            if (iconbox.loaded) {
+                benchmark(function() { iconbox._alignIconsVertically() }, 1, "Aligning");
+                benchmark(function() { iconbox.icons.last().remove() }, 80, "Removal");
+            } else {
+                iconbox.signalConnect('iwl:load', function() {
+                    benchmark(function() { iconbox._alignIconsVertically() }, 1, "Aligning");
+                    benchmark(function() { iconbox.icons.last().remove() }, 80, "Removal");
+                    this.proceed();
+                }.bind(this));
+            }
+            if (iconbox.loaded)
+                wait(100, function() { assert(removed) });
+            else
+                delay(function() { assert(removed) });
         }},
-        testIconMethods: function() { with(this) {
+        testSelection: function() { with(this) {
+            var select = false, select_all = false, unselect = false, unselect_all = false, activate = false;
+            iconbox.icons.first().signalConnect('iwl:select', function() { select = true });
+            iconbox.icons[1].signalConnect('iwl:unselect', function() { unselect = true });
+            iconbox.signalConnect('iwl:select_all', function() { select_all = true });
+            iconbox.signalConnect('iwl:unselect_all', function() { unselect_all = true });
+
+            assertEqual(iconbox, iconbox.selectIcon(iconbox.icons.first()));
+            assertEqual(iconbox.icons[1], iconbox.icons[1].setSelected(true, true));
+            assertEqual(iconbox.icons[1], iconbox.getSelectedIcon());
+            assert(iconbox.icons[0].isSelected());
+            assertEqual(2, iconbox.getSelectedIcons().length);
+            assertEqual(iconbox.icons[1], iconbox.icons[1].setSelected(false));
+            assertEqual(1, iconbox.getSelectedIcons().length);
+            assertEqual(iconbox, iconbox.selectAllIcons());
+            assertEqual(iconbox.icons.length, iconbox.getSelectedIcons().length);
+            assertEqual(iconbox, iconbox.unselectAllIcons());
+            assertEqual(0, iconbox.getSelectedIcons().length);
+            assert(!iconbox.getSelectedIcon());
+
+            assertEqual(iconbox.icons[1], iconbox.getNextIcon(iconbox.icons[0]));
+            assertEqual(iconbox.icons[0], iconbox.getPrevIcon(iconbox.icons[1]));
+            assertEqual(iconbox.icons[0], iconbox.getLowerIcon(iconbox.icons[0]).upperIcon());
+
+            wait(400, function() {
+                assert(select);
+                assert(unselect);
+                assert(select_all);
+                assert(unselect_all);
+            });
+        }},
+        testIconParts: function() { with(this) {
+            var icon = iconbox.icons[3];
+            assert(Object.isElement(icon.image));
+            assert(Object.isElement(icon.label));
+            assert(icon.image.hasClassName('icon_image'));
+            assert(icon.label.hasClassName('icon_label'));
+        }},
+        testMiscMethods: function() { with(this) {
             assertEqual('Moon', iconbox.icons[3].getLabel());
+            assertEqual(iconbox, iconbox.statusbarPush('foo'));
+            assertEqual('foo', iconbox.statusbar.getText());
         }}
     }, 'testlog');
 }

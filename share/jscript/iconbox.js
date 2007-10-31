@@ -154,6 +154,7 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 icon.removeClassName("icon_selected");
             });
             this.selectedIcons = [];
+            this.currentIcon = null;
             this.emitSignal('iwl:unselect_all');
             return this;
         },
@@ -339,11 +340,9 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         _iconCountdown: function() {
             if (--this._iconCount <= 0) {
                 if (this._alignDelay) clearTimeout(this._alignDelay);
-                (function() {
-                    this._alignIconsVertically();
-                    if (!this.loaded) this.emitSignal.bind(this, 'iwl:load').delay(0.15);
-                    this.loaded = true;
-                }).bind(this).delay(0.1);
+                this._alignIconsVertically();
+                if (!this.loaded) this.emitSignal.bind(this, 'iwl:load').delay(0.15);
+                this.loaded = true;
                 this._iconCount = 0;
             }
         }
