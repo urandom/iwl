@@ -22,3 +22,9 @@ div.shadowbox div.contentbox_footerr {
 div.iconbox_status_label, .icon_label {
     text-overflow:ellipsis;
 }
+
+/* If the iconbox is in a scrollable static container, the icons will not be clipped in IE7 when the icon container position is relative */
+div.iconbox_icon_container {
+    position: static;
+    _position: relative;
+}
