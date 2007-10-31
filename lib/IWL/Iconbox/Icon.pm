@@ -197,22 +197,6 @@ sub signalConnect {
     return $self;
 }
 
-# Protected
-#
-sub _realize {
-    my $self = shift;
-    my $id = $self->getId;
-
-    $self->SUPER::_realize;
-    $self->signalConnect(load => <<'EOF');
-var iconbox = $(this).up(null, 2);
-if (iconbox && iconbox._iconCountdown)
-    iconbox._iconCountdown();
-else
-    this.up()._loaded = true;
-EOF
-}
-
 # Internal
 #
 sub __init {

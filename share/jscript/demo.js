@@ -986,6 +986,60 @@ function run_iconbox_tests() {
     var className = $A(iconbox.classNames()).first();
     new Test.Unit.Runner({
         testParts: function() { with(this) {
+            assert(Object.isElement(iconbox.statusbar));
+            assert(Object.isElement(iconbox.iconsContainer));
+            assert(iconbox.statusbar.hasClassName(className + '_status_label'));
+            assert(iconbox.iconsContainer.hasClassName(className + '_icon_container'));
+            assertEqual('iconbox_test_status_label', iconbox.statusbar.id);
+            assertEqual('iconbox_test_icon_container', iconbox.iconsContainer.id);
+            assert(Object.isArray(iconbox.icons));
+            assertEqual(0, iconbox.icons.length);
+        }},
+        testIconsCreation: function() { with(this) {
+            var elementIcon = new Element('div').update(new Element('img', {src: IWL.Config.IMAGE_DIR + '/demo/moon.gif'}));
+            var jsonIcon1 = {src: IWL.Config.IMAGE_DIR + '/demo/moon.gif', text: 'Moon'};
+            var jsonIcon2 = {tag: 'div', children: [{tag: 'img', attributes: {src: IWL.Config.IMAGE_DIR + '/demo/moon.gif'}}, {tag: 'p', text: 'Moon 2'}]};
+            var htmlIcon = "<div><img src=\"" + IWL.Config.IMAGE_DIR + '/demo/moon.gif' + "\"/><p>Moon 3</p></div>";
+
+            assertEqual(iconbox, iconbox.appendIcon(elementIcon));
+            assertEqual(1, iconbox.icons.length);
+            assertEqual(iconbox, iconbox.appendIcon([elementIcon.cloneNode(true), elementIcon.cloneNode(true)]));
+            assertEqual(3, iconbox.icons.length);
+
+            assertEqual(iconbox, iconbox.appendIcon(jsonIcon1));
+            assertEqual(4, iconbox.icons.length);
+            assertEqual(iconbox, iconbox.appendIcon([jsonIcon1, jsonIcon1]));
+            assertEqual(6, iconbox.icons.length);
+
+            assertEqual(iconbox, iconbox.appendIcon(jsonIcon2));
+            assertEqual(7, iconbox.icons.length);
+            assertEqual(iconbox, iconbox.appendIcon([jsonIcon2, jsonIcon2]));
+            assertEqual(9, iconbox.icons.length);
+
+            assertEqual(iconbox, iconbox.appendIcon(htmlIcon));
+            assertEqual(10, iconbox.icons.length);
+            assertEqual(iconbox, iconbox.appendIcon([htmlIcon, htmlIcon]));
+            assertEqual(12, iconbox.icons.length);
+
+            assertEqual(iconbox, iconbox.removeIcon(iconbox.icons.last()));
+            assertEqual(11, iconbox.icons.length);
+
+            var array = [];
+            $R(1,20).each(function() {array.push(htmlIcon)});
+            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            array = [];
+            $R(1,20).each(function() {array.push(jsonIcon2)});
+            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            array = [];
+            $R(1,20).each(function() {array.push(jsonIcon1)});
+            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            array = [];
+            $R(1,20).each(function() {array.push(elementIcon.cloneNode(true))});
+            benchmark(function() { iconbox.appendIcon(array) }, 1);
+            benchmark(function() { iconbox.icons.last().remove() }, 80);
+        }},
+        testIconMethods: function() { with(this) {
+            assertEqual('Moon', iconbox.icons[3].getLabel());
         }}
     }, 'testlog');
 }

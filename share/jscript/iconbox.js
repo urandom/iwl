@@ -10,7 +10,8 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 dims.width != this.dimensions.width || 
                 dims.height != this.dimensions.height) {
             restoreIconsHeight.call(this);
-            this._alignIconsVertically();
+            if (this._alignDelay && this.loaded) clearTimeout(this._alignDelay);
+            this._alignIconsVertically.bind(this).delay(0.1);
         }
     }
 
@@ -233,27 +234,46 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var reference = $(arguments[1]);
             if (!json) return;
 
-            if (typeof json === 'string')
+            if (Object.isString(json) || Object.isElement(json))
                 json = [json];
             else {
                 if (typeof json !== 'object') return;
-                if (!json.length)
-                    json = [json];
+                if (!json.length) json = [json];
             }
             for (var i = 0; i < json.length; i++) {
                 var icon_data = json[i];
                 if (!icon_data) continue;
                 var icon = null;
-                if (typeof icon_data === 'string') {
+                var icon_id = 'iconbox_icon_' + Math.random();
+                if (Object.isString(icon_data)) {
                     this.iconsContainer.insert(unescape(icon_data));
                     icon = this.iconsContainer.childElements().last();
-                    if (!icon.id)
-                        icon.id = 'iconbox_icon_' + Math.random();
                     if (reference)
                         this.iconsContainer.insertBefore(icon, reference);
+                } else if (Object.isElement(icon_data)) {
+                    if (reference)
+                        icon = this.iconsContainer.insertBefore(icon_data, reference);
+                    else
+                        icon = this.iconsContainer.appendChild(icon_data);
                 } else {
-                    icon = this.iconsContainer.createHtmlElement(icon_data, reference);
+                    if (icon_data.src) {
+                        icon = new Element('div').update(new Element('img', {id: icon_id + '_image', src: icon_data.src}));
+                        if (icon_data.text)
+                            icon.appendChild(new Element('p', {id: icon_id + '_label'}).update(icon_data.text));
+                        if (reference)
+                            this.iconsContainer.insertBefore(icon, reference);
+                        else
+                            this.iconsContainer.appendChild(icon);
+                    } else {
+                        icon = this.iconsContainer.createHtmlElement(icon_data, reference);
+                    }
                 }
+                if (!icon.id) icon.id = icon_id;
+                icon.addClassName('icon').addClassName($A(this.classNames()).first() + '_icon');
+                icon.select('img').first().addClassName('icon_image');
+                var label = icon.select('p').first();
+                if (label)
+                    label.addClassName('icon_label');
                 this.icons.push(IWL.Iconbox.Icon.create(icon, this));
             }
             return this;
@@ -306,6 +326,7 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 icon.setStyle({height: height + 'px'});
             }.bind(this));
             this.dimensions = this.getDimensions();
+            this._alignDelay = false;
         },
         _refreshResponse: function(json, params, options) {
             if (!json.icons.length) return;
@@ -316,11 +337,14 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.appendIcon(json.icons);
         },
         _iconCountdown: function() {
-            this._iconCount--;
-
-            if (this._iconCount == 0) {
-                this._alignIconsVertically();
-                this.emitSignal.bind(this, 'iwl:load').delay(0.1);
+            if (--this._iconCount <= 0) {
+                if (this._alignDelay) clearTimeout(this._alignDelay);
+                (function() {
+                    this._alignIconsVertically();
+                    if (!this.loaded) this.emitSignal.bind(this, 'iwl:load').delay(0.15);
+                    this.loaded = true;
+                }).bind(this).delay(0.1);
+                this._iconCount = 0;
             }
         }
     }
@@ -456,7 +480,9 @@ IWL.Iconbox.Icon = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.iconbox.icons = this.iconbox.icons.without(this);
             var message = unescape(this.iconbox.messages['delete']).replace(/{TITLE}/, title);
             this.iconbox.statusbarPush(message);
-            this.iconbox._alignIconsVertically();
+            if (this.iconbox._alignDelay && this.iconbox.loaded)
+                clearTimeout(this.iconbox._alignDelay);
+            this.iconbox._alignIconsVertically.bind(this).delay(0.1);
             this.emitSignal('iwl:remove');
             return this;
         },
@@ -464,9 +490,12 @@ IWL.Iconbox.Icon = Object.extend(Object.extend({}, IWL.Widget), (function () {
         _init: function(id, iconbox) {
             this.iconbox = iconbox;
             this.label = this.select('.icon_label')[0];
+            this.image = this.select('img')[0];
             initEvents.call(this);
-            if (this._loaded)
+            if (this.image.complete)
                 this.iconbox._iconCountdown();
+            else
+                this.image.observe('load', this.iconbox._iconCountdown.bind(this.iconbox));
         }
     }
 })());
