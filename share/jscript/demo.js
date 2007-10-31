@@ -980,3 +980,12 @@ function run_entry_tests() {
         }}
     }, 'testlog');
 }
+
+function run_iconbox_tests() {
+    var iconbox = $('iconbox_test');
+    var className = $A(iconbox.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+        }}
+    }, 'testlog');
+}

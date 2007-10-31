@@ -43,7 +43,10 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (!Object.isArray(this.options.autoComplete) || !this.options.autoComplete[0])
             return;
         var url = this.options.autoComplete[0];
-        var options = Object.extend({}, this.options.autoComplete[1]);
+        var options = Object.extend({
+            onShow: receiverOnShow.bind(this),
+            onHide: receiverOnHide.bind(this)
+        }, this.options.autoComplete[1]);
         var receiver = $(this.id + '_receiver');
         if (!receiver)
             receiver = this.appendChild(new Element('div', {
@@ -58,6 +61,30 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             pe.stop();
             callback();
         }
+    }
+
+    function receiverOnShow(element, update) {
+        if(!update.style.position || update.style.position=='absolute') {
+            update.style.position = 'absolute';
+            update.clonePosition(this, {
+                setHeight: false, 
+                setWidth: false,
+                offsetTop: this.offsetHeight
+            });
+            var padding = (parseFloat(update.getStyle('padding-left')) || 0) + (parseFloat(update.getStyle('padding-right')) || 0);
+            var borders = (parseFloat(update.getStyle('border-left-width')) || 0) + (parseFloat(update.getStyle('border-right-width')) || 0);
+            var thisWidth = this.getWidth() - padding - borders;
+            if (update.getWidth() < thisWidth)
+                update.style.width = thisWidth + 'px';
+        }
+        Effect.Appear(update,{duration:0.15});
+    }
+
+    function receiverOnHide(element, update) {
+        new Effect.Fade(update, {
+            duration: 0.15,
+            afterFinish: function() {update.style.width = '';}
+        });
     }
 
     return {

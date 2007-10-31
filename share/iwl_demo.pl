@@ -357,6 +357,7 @@ sub build_tests {
     my $contentbox_test = IWL::Tree::Row->new(id => 'contentbox_test_row');
     my $druid_test      = IWL::Tree::Row->new(id => 'druid_test_row');
     my $entry_test      = IWL::Tree::Row->new(id => 'entry_test_row');
+    my $iconbox_test    = IWL::Tree::Row->new(id => 'iconbox_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -374,8 +375,10 @@ sub build_tests {
     $row->appendRow($druid_test);
     $entry_test->appendTextCell('Entry Test');
     $row->appendRow($entry_test);
+    $iconbox_test->appendTextCell('Iconbox Test');
+    $row->appendRow($iconbox_test);
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test);
 }
 
 sub generate_buttons {
@@ -946,6 +949,17 @@ sub generate_entry_test {
     $entry->addClearButton;
     $script->setScript("run_entry_tests()");
     $container->appendChild($testlog, $entry, $script);
+    return $container;
+}
+
+sub generate_iconbox_test {
+    my $container = IWL::Container->new(id => 'iconbox_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $iconbox   = IWL::Iconbox->new(id => 'iconbox_test');
+    my $script    = IWL::Script->new;
+
+    $script->setScript("run_iconbox_tests()");
+    $container->appendChild($testlog, $iconbox, $script);
     return $container;
 }
 
