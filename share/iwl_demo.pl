@@ -358,6 +358,7 @@ sub build_tests {
     my $druid_test      = IWL::Tree::Row->new(id => 'druid_test_row');
     my $entry_test      = IWL::Tree::Row->new(id => 'entry_test_row');
     my $iconbox_test    = IWL::Tree::Row->new(id => 'iconbox_test_row');
+    my $menu_test       = IWL::Tree::Row->new(id => 'menu_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -377,8 +378,10 @@ sub build_tests {
     $row->appendRow($entry_test);
     $iconbox_test->appendTextCell('Iconbox Test');
     $row->appendRow($iconbox_test);
+    $menu_test->appendTextCell('Menu Test');
+    $row->appendRow($menu_test);
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test);
 }
 
 sub generate_buttons {
@@ -960,6 +963,25 @@ sub generate_iconbox_test {
 
     $script->setScript("run_iconbox_tests()");
     $container->appendChild($testlog, $iconbox, $script);
+    return $container;
+}
+
+sub generate_menu_test {
+    my $container = IWL::Container->new(id => 'menu_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $menubar   = IWL::Menubar->new(id => 'menubar_test');
+    my $menu      = IWL::Menu->new(id => 'menu_test');
+    my $script    = IWL::Script->new;
+
+    $menubar->appendMenuItem('Item 1', 'IWL_STOCK_SAVE', id => 'item_1')->setSubmenu($menu);
+    $menubar->appendMenuSeparator;
+    $menubar->appendMenuItem('Item 2', undef, id => 'item_2');
+    $menu->appendMenuItem('Item 3', undef, id => 'item_3')->setType('check');
+    $menu->appendMenuSeparator;
+    $menu->appendMenuItem('Item 4', 'IWL_STOCK_CANCEL', id => 'item_4');
+
+    $script->setScript("run_menu_tests()");
+    $container->appendChild($testlog, $menubar, $script);
     return $container;
 }
 

@@ -936,10 +936,14 @@ li.menubar_item {
     cursor: pointer;
     color: #545b63;
     line-height: 19px;
+    background: no-repeat scroll 5px;
 }
 span.menubar_item_label {
     padding: 2px 2px 6px 2px;
     cursor: pointer;
+}
+span.menubar_item_label_iconic {
+    padding-left: 22px;
 }
 li.menubar_separator {
     display: inline;

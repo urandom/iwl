@@ -114,9 +114,13 @@ Parameters: B<ICON> - a url, or a stock id for the icon
 sub setIcon {
     my ($self, $icon) = @_;
 
-    $icon = IWL::Stock->new()->getSmallImage($icon) if
-      defined $icon && $icon =~ /^IWL_STOCK_/;
-    $self->setStyle('background-image' => "url('$icon')") if $icon;
+    return unless $icon;
+
+    $icon = IWL::Stock->new()->getSmallImage($icon) if $icon =~ /^IWL_STOCK_/;
+    return unless $icon;
+
+    $self->setStyle('background-image' => "url('$icon')");
+    $self->{__label}->appendClass($self->{__label}{_defaultClass} . '_iconic') if $self->{__parentType} eq 'menubar';
     return $self;
 }
 

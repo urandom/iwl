@@ -347,6 +347,7 @@ sub appendClass {
     if (!$class_list) {
 	return $self->setAttribute(class => $class);
     } else {
+        return $self if $self->hasClass($class);
 	return $self->setAttribute(class => $class_list . ' ' . $class);
     }
 }
@@ -366,6 +367,7 @@ sub prependClass {
     if (!$class_list) {
 	return $self->setAttribute(class => $class);
     } else {
+        return $self if $self->hasClass($class);
 	return $self->setAttribute(class => $class . ' ' . $class_list);
     }
 }

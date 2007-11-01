@@ -198,10 +198,9 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         toggle: function() {
             if (this.popped)
-                this.popDown();
+                return this.popDown();
             else
-                this.popUp();
-            return this;
+                return this.popUp();
         },
         /**
          * Pops down the menu and all its child menus.
@@ -221,7 +220,8 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         bindToWidget: function(element, signal) {
             if (!(element = $(element))) return;
-            return element.signalConnect(signal, bindPop.bindAsEventListener(this, element));
+            element.signalConnect(signal, bindPop.bindAsEventListener(this, element));
+            return this;
         },
         /**
          * Selects the given menu item 
@@ -448,12 +448,12 @@ IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
     return {
         /**
          * Sets whether the menu item is selected
-         * @param {Boolean} selected True if the item should be selected
+         * @param {Boolean} select True if the item should be selected
          * @returns The object
          * */
-        setSelected: function(selected) {
+        setSelected: function(select) {
             if (this.isNotEnabled()) return;
-            if (selected) {
+            if (select) {
                 if (this.isSelected()) return;
                 if (this.menu.currentItem)
                     this.menu.currentItem.setSelected(false);
@@ -489,13 +489,11 @@ IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
         },
         /**
          * Sets whether the menu item is disabled 
-         * @param {Boolean} selected True if the item should be disabled 
+         * @param {Boolean} disable True if the item should be disabled 
          * @returns The object
          * */
-        setDisabled: function(selected) {
-            this.removeClassName('menu_item_disabled');
-            if (selecte)
-                this.addClassName('menu_item_disabled');
+        setDisabled: function(disable) {
+            disable ? this.addClassName('menu_item_disabled') : this.removeClassName('menu_item_disabled');
             return this;
         },
         /**
@@ -541,7 +539,7 @@ IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         activate: function() {
             this.menu.emitSignal('iwl:menu_item_activate', this);
-            this.emitSignal('iwl:activate');
+            return this.emitSignal('iwl:activate');
         },
 
         _init: function(id, menu) {

@@ -1028,16 +1028,16 @@ function run_iconbox_tests() {
             assertEqual(11, iconbox.icons.length);
 
             var array = [];
-            $R(1,20).each(function() {array.push(htmlIcon)});
+            (20).times(function() {array.push(htmlIcon)});
             benchmark(function() { iconbox.appendIcon(array) }, 1, "HTML insertion");
             array = [];
-            $R(1,20).each(function() {array.push(jsonIcon2)});
+            (20).times(function() {array.push(jsonIcon2)});
             benchmark(function() { iconbox.appendIcon(array) }, 1, "IWL JSON insertion");
             array = [];
-            $R(1,20).each(function() {array.push(jsonIcon1)});
+            (20).times(function() {array.push(jsonIcon1)});
             benchmark(function() { iconbox.appendIcon(array) }, 1, "JSON insertion");
             array = [];
-            $R(1,20).each(function() {array.push(elementIcon.cloneNode(true))});
+            (20).times(function() {array.push(elementIcon.cloneNode(true))});
             benchmark(function() { iconbox.appendIcon(array) }, 1, "DOM insertion");
             if (iconbox.loaded) {
                 benchmark(function() { iconbox._alignIconsVertically() }, 1, "Aligning");
@@ -1055,7 +1055,7 @@ function run_iconbox_tests() {
                 delay(function() { assert(removed) });
         }},
         testSelection: function() { with(this) {
-            var select = false, select_all = false, unselect = false, unselect_all = false, activate = false;
+            var select = select_all = unselect = unselect_all = activate = false;
             iconbox.icons.first().signalConnect('iwl:select', function() { select = true });
             iconbox.icons[1].signalConnect('iwl:unselect', function() { unselect = true });
             iconbox.signalConnect('iwl:select_all', function() { select_all = true });
@@ -1099,3 +1099,68 @@ function run_iconbox_tests() {
         }}
     }, 'testlog');
 }
+
+function run_menu_tests() {
+    var menubar = $('menubar_test');
+    var menu = $('menu_test');
+    var className = $A(menubar.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isArray(menubar.menuItems));
+            assert(Object.isArray(menu.menuItems));
+            assertEqual(2, menubar.menuItems.length);
+            assertEqual(2, menu.menuItems.length);
+            assertEqual(menubar, menu.parentMenu);
+            assert(!menu.popped);
+        }},
+        testPop: function() { with(this) {
+            assert(!menubar.popUp());
+            assertEqual(menu, menu.popUp());
+            assert(!menu.popUp());
+            assert(!menubar.popDown());
+            assert(!menu.popDown());
+            assert(!menubar.toggle());
+            assertEqual(menu, menu.toggle());
+            assertEqual(menu, menu.popDown());
+            assertEqual(menu, menu.toggle());
+            assertEqual(menubar, menubar.popDownRecursive());
+            assert(!menu.popDown());
+        }},
+        testSelection: function() { with(this) {
+            var select = unselect = false;
+            menubar.menuItems[0].signalConnect('iwl:select', function() { select = true });
+            menu.menuItems[0].signalConnect('iwl:unselect', function() { unselect = true });
+            assertEqual(menubar, menubar.selectItem(menubar.menuItems[0]));
+            assertEqual(menubar.menuItems[0], menubar.getSelectedMenuItem());
+            assertEqual(menu.menuItems[0], menu.menuItems[0].setSelected(true));
+            assertEqual(menu.menuItems[1], menu.menuItems[1].setSelected(true));
+            assert(menu.menuItems[1].isSelected());
+            assert(!menubar.menuItems[1].isSelected());
+            assertEqual(menubar.menuItems[1], menubar.getNextMenuItem(menubar.menuItems[0]));
+            assertEqual(menu.menuItems[0], menu.getPrevMenuItem(menu.menuItems[1]));
+
+            wait(200, function() {
+                assert(select);
+                assert(unselect);
+            });
+        }},
+        testMisc: function() { with(this) {
+            var change = activate = menu_activate = false;
+            menu.menuItems[0].signalConnect('iwl:change', function() { change = true });
+            menu.menuItems[1].signalConnect('iwl:activate', function() { activate = true });
+            menu.signalConnect('iwl:menu_item_activate', function() { menu_activate = true });
+            assertEqual(menu.menuItems[0], menu.menuItems[0].toggle());
+            assertEqual(menu.menuItems[0], menu.menuItems[0].setDisabled(true));
+            assert(menu.menuItems[0].isNotEnabled());
+            assert(!menu.menuItems[0].setSelected(true));
+            assertEqual(menu.menuItems[1], menu.menuItems[1].activate())
+            assertEqual(menu, menu.bindToWidget('testlog', 'click'));
+            wait(200, function() {
+                assert(change);
+                assert(activate);
+                assert(menu_activate);
+            });
+        }}
+    }, 'testlog');
+}
+
