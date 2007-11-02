@@ -362,6 +362,7 @@ sub build_tests {
     my $notebook_test   = IWL::Tree::Row->new(id => 'notebook_test_row');
     my $spinner_test    = IWL::Tree::Row->new(id => 'spinner_test_row');
     my $tooltip_test    = IWL::Tree::Row->new(id => 'tooltip_test_row');
+    my $tree_test       = IWL::Tree::Row->new(id => 'tree_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -389,10 +390,12 @@ sub build_tests {
     $row->appendRow($spinner_test);
     $tooltip_test->appendTextCell('Tooltip Test');
     $row->appendRow($tooltip_test);
+    $tree_test->appendTextCell('Tree Test');
+    $row->appendRow($tree_test);
 
     register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test,
         $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test,
-        $notebook_test, $spinner_test, $tooltip_test);
+        $notebook_test, $spinner_test, $tooltip_test, $tree_test);
 }
 
 sub generate_buttons {
@@ -1026,6 +1029,34 @@ sub generate_tooltip_test {
 
     $script->setScript("run_tooltip_tests()");
     $container->appendChild($testlog, $tooltip, $script);
+    return $container;
+}
+
+sub generate_tree_test {
+    my $container = IWL::Container->new(id => 'tree_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $tree      = IWL::Tree->new(id => 'tree_test');
+    my $row       = IWL::Tree::Row->new;
+    my $script    = IWL::Script->new;
+
+    $row->appendTextHeaderCell('Main')->makeSortable;
+    $row->appendTextHeaderCell('Secondary')->makeSortable;
+    $tree->appendHeader($row);
+    $row = $row->new;
+    $row->appendTextCell('Foo');
+    $row->appendTextCell('Bar');
+    $tree->appendBody($row);
+    $row = $row->new;
+    $row->appendTextCell('Alpha');
+    $row->appendTextCell('Beta');
+    $tree->appendBody($row);
+    my $child = $row->new;
+    $child->appendTextCell('Baz');
+    $child->appendTextCell('A1');
+    $row->appendRow($child);
+
+    $script->setScript("run_tree_tests()");
+    $container->appendChild($testlog, $tree, $script);
     return $container;
 }
 

@@ -1308,3 +1308,20 @@ function run_tooltip_tests() {
         }}
     }, 'testlog');
 }
+
+function run_tree_tests() {
+    var tree = $('tree_test');
+    var className = $A(tree.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(tree.body));
+            assert(!tree.isList);
+            assertEqual(3, tree.body.rows.length);
+            assert(tree.tHead.hasClassName(className + '_header'));
+            assert(tree.body.hasClassName(className + '_body'));
+            $A(tree.body.rows).each(function($_) {
+                assert($_.hasClassName(className + '_row'));
+            });
+        }}
+    }, 'testlog');
+}
