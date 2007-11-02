@@ -406,14 +406,6 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             return this;
         },
-        ajaxSort: function(cell, url) {
-            new Ajax.Updater(this.body, url, {
-                onLoading:  IWL.disableView.bind(this, {noCover: true}),
-                onComplete: IWL.enableView,
-                parameters: {cell_id: cell.id},
-                onException: IWL.exceptionHandler
-            });
-        },
         /**
          * Sorts the tree, based on the column-provided algorithm
          * @param cell The cell, which will provide the sorting algorithm

@@ -59,19 +59,19 @@ sub new {
 
 =over 4
 
-=item B<makeSortable> ([B<CALLBACK>, B<URL>])
+=item B<makeSortable> ([B<CALLBACK>])
 
 Sorts the tree when the column is clicked. Should only be used for header row cells
 
-Parameters: B<CALLBACK> - an optional callback to be called instead of the default, B<URL> - URL of an ajax script to sort the tree and return the new content (with getContent()), B<CALLBACK> has no effect if B<URL> is set.
+Parameters: B<CALLBACK> - an optional callback to be called instead of the default
 
 =cut
 
 sub makeSortable {
-    my ($self, $callback, $url) = @_;
+    my ($self, $callback) = @_;
 
     $self->setStyle(cursor => 'pointer');
-    $self->{_sortable} = {enabled => 1, callback => $callback, url => $url};
+    $self->{_sortable} = {enabled => 1, callback => $callback};
     return $self;
 }
 
@@ -82,10 +82,8 @@ sub _realize {
 
     if ($self->{_sortable}{enabled} && $self->{_row} && $self->{_row}{_tree}) {
         my $tree_id = $self->{_row}{_tree}->getId;
-	my $callback = $self->{_sortable}{url} ?
-	  "\$('$tree_id').ajaxSort(this, '$self->{_sortable}{url}')" :
-	  $self->{_sortable}{callback} ?
-	  $self->{_sortable}{callback} : "\$('$tree_id').sort(this)";
+	my $callback = $self->{_sortable}{callback}
+          ? $self->{_sortable}{callback} : "\$('$tree_id').sort(this)";
         $self->signalConnect(click => $callback);
     }
 }
