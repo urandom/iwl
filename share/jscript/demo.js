@@ -1164,3 +1164,61 @@ function run_menu_tests() {
     }, 'testlog');
 }
 
+function run_notebook_tests() {
+    var notebook = $('notebook_test');
+    var className = $A(notebook.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(notebook.tabContainer));
+            assert(Object.isElement(notebook.pageContainer));
+            assert(Object.isArray(notebook.tabs));
+            assert(notebook.tabContainer.hasClassName(className + '_mainnav'));
+            assert(notebook.pageContainer.hasClassName(className + '_content'));
+        }},
+        testTabCreation: function() { with(this) {
+            var tab = notebook.appendTab('first', 'Foo');
+            assertEqual(notebook.tabs[0], tab, "1");
+            assertEqual(1, notebook.tabs.length, "2");
+            tab = notebook.appendTab('2', new Element('div').update('Bar'), true);
+            assertEqual(notebook.tabs[1], tab, "3");
+            assertEqual(2, notebook.tabs.length, "4");
+            assertEqual(notebook.tabs[1], notebook.currentTab, "5");
+            tab = notebook.appendTab('removal');
+            assertEqual(notebook.tabs[2], tab, "6");
+            assertEqual(3, notebook.tabs.length, "7");
+            tab = notebook.prependTab('0', {tag: 'span', text: 'alpha'});
+            assertEqual(notebook.tabs.first(), tab, "8");
+            assertEqual(4, notebook.tabs.length, "9");
+            tab = notebook.prependTab('-1');
+            assertEqual(notebook.tabs.first(), tab, "10");
+            assertEqual(5, notebook.tabs.length, "11");
+
+            assertEqual('removal', notebook.tabs.last().getLabel(), "12");
+            assert(!notebook.tabs.include(notebook.tabs.last().remove()), "13");
+            assertEqual(4, notebook.tabs.length, "14");
+        }},
+        testMisc: function() { with(this) {
+            assertEqual(notebook, notebook.selectTab(notebook.tabs.first()), "1");
+            assertEqual(notebook.tabs.first(), notebook.currentTab, "2");
+            assertEqual(notebook.tabs[1], notebook.tabs[1].setSelected(true), "3");
+            assert(notebook.tabs[1].isSelected(), "4");
+            assertEqual(notebook.tabs[0], notebook.tabs[1].prevTab(), "5");
+            assertEqual(notebook.tabs[2], notebook.tabs[1].nextTab(), "6");
+            assertEqual('-1', notebook.tabs.first().getLabel(), "7");
+            assertEqual(notebook.tabs.first(), notebook.tabs.first().setLabel('--1'), "8");
+            assertEqual('--1', notebook.tabs.first().getLabel(), "9");
+
+            assert(notebook.tabs.first().page.innerHTML.blank());
+            assert(!notebook.tabs[1].page.innerHTML.blank());
+            assertEqual("alpha", notebook.tabs[1].page.select('span')[0].getText());
+            assertEqual(1, notebook.tabs[1].page.childElements().length);
+            assert(!notebook.tabs[2].page.innerHTML.blank());
+            assertEqual("Foo", notebook.tabs[2].page.innerHTML);
+            assertEqual(0, notebook.tabs[2].page.childElements().length);
+            assert(!notebook.tabs[3].page.innerHTML.blank());
+            assertEqual("Bar", notebook.tabs[3].page.select('div')[0].getText());
+            assertEqual(1, notebook.tabs[3].page.childElements().length);
+        }}
+    }, 'testlog');
+}
+

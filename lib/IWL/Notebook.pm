@@ -118,7 +118,7 @@ sub _realize {
     foreach my $tab (@{$self->{__tabs}}) {
         last if $selected = $tab->isSelected;
     }
-    $self->{__tabs}[0]->setSelected(1) if !$selected;
+    $self->{__tabs}[0]->setSelected(1) if !$selected && @{$self->{__tabs}};
     $self->_appendInitScript("IWL.Notebook.create('$id');");
 }
 

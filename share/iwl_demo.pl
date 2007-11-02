@@ -359,6 +359,7 @@ sub build_tests {
     my $entry_test      = IWL::Tree::Row->new(id => 'entry_test_row');
     my $iconbox_test    = IWL::Tree::Row->new(id => 'iconbox_test_row');
     my $menu_test       = IWL::Tree::Row->new(id => 'menu_test_row');
+    my $notebook_test   = IWL::Tree::Row->new(id => 'notebook_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -380,8 +381,10 @@ sub build_tests {
     $row->appendRow($iconbox_test);
     $menu_test->appendTextCell('Menu Test');
     $row->appendRow($menu_test);
+    $notebook_test->appendTextCell('Notebook Test');
+    $row->appendRow($notebook_test);
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test, $notebook_test);
 }
 
 sub generate_buttons {
@@ -982,6 +985,17 @@ sub generate_menu_test {
 
     $script->setScript("run_menu_tests()");
     $container->appendChild($testlog, $menubar, $script);
+    return $container;
+}
+
+sub generate_notebook_test {
+    my $container = IWL::Container->new(id => 'notebook_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $notebook  = IWL::Notebook->new(id => 'notebook_test');
+    my $script    = IWL::Script->new;
+
+    $script->setScript("run_notebook_tests()");
+    $container->appendChild($testlog, $notebook, $script);
     return $container;
 }
 

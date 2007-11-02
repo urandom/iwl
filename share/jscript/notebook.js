@@ -16,11 +16,11 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
         });
         page.style.display = 'none';
 
-        var anchor = new Element('a', text);
+        var anchor = new Element('a').update(text || '&nbsp;');
         tab.appendChild(anchor);
         IWL.Notebook.Tab.create(tab, this, page);
-        this.tabs.push(tab);
-        if (typeof data === 'string')
+        arguments[2] ? this.tabs.unshift(tab) : this.tabs.push(tab);
+        if (Object.isString(data) || Object.isElement(data))
             page.update(data);
         else if (typeof data === 'object')
             page.createHtmlElement(data);
@@ -34,8 +34,7 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         selectTab: function(tab) {
-            tab = $(tab);
-            if (!tab) return;
+            if (!(tab = $(tab))) return;
             tab.setSelected(true);
             return this;
         },
@@ -45,8 +44,7 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         removeTab: function(tab) {
-            tab = $(tab) || this.currentTab;
-            if (!tab) return;
+            if (!(tab = $(tab)) && !(tab = this.currentTab)) return;
             tab.remove();
             return this;
         },
@@ -72,7 +70,7 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The created tab
          * */
         prependTab: function(text, data, selected) {
-            var tab = createTab.call(this, text, data);
+            var tab = createTab.call(this, text, data, true);
             this.tabContainer.insertBefore(tab, this.tabContainer.firstChild);
             this.pageContainer.insertBefore(tab.page, this.pageContainer.firstChild);
             tab.setSelected(selected);
