@@ -80,7 +80,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
     function inputFocus(event) {
         this.input.addClassName('spinner_text_selected');
         var value = this.preciseValue;
-        if (!isNaN(this.options.precision))
+        if (Object.isNumber(this.options.precision) && !isNaN(this.options.precision))
             value = value.toFixed(this.options.precision);
         this.input.value = value;
     }
@@ -91,7 +91,6 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         switch (Event.getKeyCode(event)) {
             case Event.KEY_RETURN:
                 this.setValue(value);
-                this.emitSignal("iwl:change");
             case Event.KEY_ESC:
                 this.input.blur();
                 break;
@@ -130,14 +129,14 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         new_value = this.spinDirection == 'left' ? new_value - this.speed : new_value + this.speed;
         new_value = wrapValue.call(this, new_value);
         if (!isNaN(new_value)) {
-            if (!isNaN(this.options.precision))
+            if (Object.isNumber(this.options.precision) && !isNaN(this.options.precision))
                 new_value = new_value.toFixed(this.options.precision);
             this.input.value = new_value;
         }
     }
 
     function wrapValue(number) {
-        if (typeof number != 'number' || isNaN(number)) {
+        if (!Object.isNumber(number) || isNaN(number)) {
             if (this.options.snap)
                 number = parseFloat(number) || 0;
             else return NaN;
@@ -190,11 +189,11 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (isNaN(number)) return;
 
             this.preciseValue = number;
-            if (!isNaN(this.options.precision))
+            if (Object.isNumber(this.options.precision) && !isNaN(this.options.precision))
                 number = number.toFixed(this.options.precision);
             this.value = parseFloat(number);
             this.input.value = this.mask ? this.mask.evaluate({number: number}) : number;
-            return this;
+            return this.emitSignal("iwl:change");
         },
         /**
          * @returns The current value of the spinner 

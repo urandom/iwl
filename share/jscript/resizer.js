@@ -154,8 +154,7 @@ var Resizer = Class.create((function() {
 
     if (this.resizeType.indexOf('t') >= 0) {
       if (this.outline) {
-        var outlineTop = parseInt(this.outline.style.top);
-        if (isNaN(outlineTop)) outlineTop = 0;
+        var outlineTop = parseFloat(this.outline.style.top) || 0;
         this.outline.style.top  = dY + outlineTop + 'px';
       }
 
@@ -169,8 +168,7 @@ var Resizer = Class.create((function() {
 
     if (this.resizeType.indexOf('l') >= 0) {
       if (this.outline) {
-        var outlineLeft = parseInt(this.outline.style.left);
-        if (isNaN(outlineLeft)) outlineLeft = 0;
+        var outlineLeft = parseFloat(this.outline.style.left) || 0;
         this.outline.style.left = dX + outlineLeft + 'px';
       }
 
@@ -223,10 +221,8 @@ var Resizer = Class.create((function() {
     var dimensions = this.element.getDimensions();
     this.elementPosition.w = dimensions.width;
     this.elementPosition.h = dimensions.height;
-    this.elementPosition.x = parseInt(this.element.style.left);
-    this.elementPosition.y = parseInt(this.element.style.top);
-    if (isNaN(this.elementPosition.x)) this.elementPosition.x = 0;
-    if (isNaN(this.elementPosition.y)) this.elementPosition.y = 0;
+    this.elementPosition.x = parseFloat(this.element.style.left) || 0;
+    this.elementPosition.y = parseFloat(this.element.style.top)  || 0;
 
     if (this.outline) {
       this.outline.style.width = this.handlerHolder.style.width =

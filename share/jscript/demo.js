@@ -1176,6 +1176,7 @@ function run_notebook_tests() {
             assert(notebook.pageContainer.hasClassName(className + '_content'));
         }},
         testTabCreation: function() { with(this) {
+            var removed = false;
             var tab = notebook.appendTab('first', 'Foo');
             assertEqual(notebook.tabs[0], tab, "1");
             assertEqual(1, notebook.tabs.length, "2");
@@ -1184,6 +1185,7 @@ function run_notebook_tests() {
             assertEqual(2, notebook.tabs.length, "4");
             assertEqual(notebook.tabs[1], notebook.currentTab, "5");
             tab = notebook.appendTab('removal');
+            tab.signalConnect('iwl:remove', function () { removed = true });
             assertEqual(notebook.tabs[2], tab, "6");
             assertEqual(3, notebook.tabs.length, "7");
             tab = notebook.prependTab('0', {tag: 'span', text: 'alpha'});
@@ -1196,8 +1198,18 @@ function run_notebook_tests() {
             assertEqual('removal', notebook.tabs.last().getLabel(), "12");
             assert(!notebook.tabs.include(notebook.tabs.last().remove()), "13");
             assertEqual(4, notebook.tabs.length, "14");
+
+            wait(100, function() { assert(removed) });
         }},
         testMisc: function() { with(this) {
+            var selected = unselected = global_selected = false;
+
+            notebook.tabs[0].signalConnect('iwl:unselect', function() { unselected = true });
+            notebook.tabs[1].signalConnect('iwl:select', function() { selected = true });
+            notebook.signalConnect('iwl:current_tab_change', function() {
+                if (arguments[1] == notebook.tabs[0])
+                    global_selected = true ;
+            });
             assertEqual(notebook, notebook.selectTab(notebook.tabs.first()), "1");
             assertEqual(notebook.tabs.first(), notebook.currentTab, "2");
             assertEqual(notebook.tabs[1], notebook.tabs[1].setSelected(true), "3");
@@ -1218,6 +1230,45 @@ function run_notebook_tests() {
             assert(!notebook.tabs[3].page.innerHTML.blank());
             assertEqual("Bar", notebook.tabs[3].page.select('div')[0].getText());
             assertEqual(1, notebook.tabs[3].page.childElements().length);
+
+            wait(300, function() {
+                assert(selected);
+                assert(unselected);
+                assert(global_selected);
+            });
+        }}
+    }, 'testlog');
+}
+
+function run_spinner_tests() {
+    var spinner = $('spinner_test');
+    var className = $A(spinner.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(spinner.leftSpinner));
+            assert(Object.isElement(spinner.rightSpinner));
+            assert(Object.isElement(spinner.input));
+            assert(spinner.leftSpinner.hasClassName(className + '_left'));
+            assert(spinner.rightSpinner.hasClassName(className + '_right'));
+            assert(spinner.input.hasClassName(className + '_text'));
+            assertEqual('spinner_test_left', spinner.image1.id);
+            assertEqual('spinner_test_right', spinner.image2.id);
+            assertEqual('spinner_test_text', spinner.control.id);
+        }},
+        testMethods: function() { with(this) {
+            var changed = false;
+            spinner.signalConnect('iwl:change', function() { changed = true });
+
+            assertEqual(0, spinner.value);
+            assertEqual(spinner.value, spinner.getValue());
+            assertEqual(spinner, spinner.setValue(962.12562 / 17.2623));
+            assertEqual(962.12562 / 17.2623, spinner.getValue());
+            spinner.options.precision = 2;
+            assertEqual(spinner, spinner.setValue(962.12562 / 17.2623));
+            assertNotEqual(962.12562 / 17.2623, spinner.getValue());
+            assertEqual(962.12562 / 17.2623, spinner.preciseValue);
+            assertEqual(55.74, spinner.getValue());
+            wait(100, function() { assert(changed) });
         }}
     }, 'testlog');
 }

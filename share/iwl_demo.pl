@@ -360,6 +360,7 @@ sub build_tests {
     my $iconbox_test    = IWL::Tree::Row->new(id => 'iconbox_test_row');
     my $menu_test       = IWL::Tree::Row->new(id => 'menu_test_row');
     my $notebook_test   = IWL::Tree::Row->new(id => 'notebook_test_row');
+    my $spinner_test    = IWL::Tree::Row->new(id => 'spinner_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -383,8 +384,10 @@ sub build_tests {
     $row->appendRow($menu_test);
     $notebook_test->appendTextCell('Notebook Test');
     $row->appendRow($notebook_test);
+    $spinner_test->appendTextCell('Spinner Test');
+    $row->appendRow($spinner_test);
 
-    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test, $notebook_test);
+    register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test, $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test, $notebook_test, $spinner_test);
 }
 
 sub generate_buttons {
@@ -392,20 +395,24 @@ sub generate_buttons {
     my $normal_button = IWL::Button->new(style => {float => 'none'}, id => 'normal_button');
     my $stock_button = IWL::Button->newFromStock('IWL_STOCK_APPLY', style => {float => 'none'}, id => 'stock_button', size => 'medium');
     my $image_button = IWL::Button->new(style => {float => 'none'}, id => 'image_button', size => 'small')->setHref('iwl_demo.pl');
-    my $disabled_button = IWL::Button->new(style => {float => 'none'}, id => 'disabled_button');
+    my $disabled_button = IWL::Button->new(style => {float => 'none', margin => '12px 5px 8px 4px'}, id => 'disabled_button');
+    my $disabled_button2 = IWL::Button->new(style => {float => 'left', margin => '4px 15px 3px 9px'}, id => 'disabled_button2');
+    my $disabled_button3 = IWL::Button->new(style => {float => 'right', margin => '1px 8px 6px 14px'}, id => 'disabled_button3');
     my $input_button = IWL::InputButton->new(id => 'input_button');
     my $check = IWL::Checkbox->new;
     my $radio1 = IWL::RadioButton->new;
     my $radio2 = IWL::RadioButton->new;
     my $form = IWL::Form->new(target => '_blank', action => 'iwl_demo.pl', name => 'some_form');
 
-    $container->appendChild($normal_button, $stock_button, $image_button, $disabled_button,
+    $container->appendChild($normal_button, $stock_button, $image_button, $disabled_button, $disabled_button2, $disabled_button3,
         $input_button, $check, IWL::Break->new, $radio1, $radio2, $form);
     $normal_button->setTitle('This is a title')->setSubmit(image => 'DELETE', 'some_form');
     $image_button->setImage('IWL_STOCK_DELETE');
     $normal_button->setLabel('Labeled button')->setClass('demo');
     $stock_button->signalConnect(load => "displayStatus('Stock button loaded')");
     $disabled_button->setLabel('Disabled button')->setDisabled(1);
+    $disabled_button2->setLabel('Disabled button')->setDisabled(1);
+    $disabled_button3->setLabel('Disabled button')->setDisabled(1);
     $input_button->setLabel('Input Button');
     $check->setLabel('A check button');
     $radio1->setLabel('A radio button');
@@ -996,6 +1003,17 @@ sub generate_notebook_test {
 
     $script->setScript("run_notebook_tests()");
     $container->appendChild($testlog, $notebook, $script);
+    return $container;
+}
+
+sub generate_spinner_test {
+    my $container = IWL::Container->new(id => 'spinner_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $spinner   = IWL::Spinner->new(id => 'spinner_test');
+    my $script    = IWL::Script->new;
+
+    $script->setScript("run_spinner_tests()");
+    $container->appendChild($testlog, $spinner, $script);
     return $container;
 }
 

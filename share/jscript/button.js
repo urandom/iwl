@@ -97,7 +97,10 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.disabledLayer = new Element('div', {
                 className: $A(this.classNames()).first() + '_disabled_layer'
             });
-        this.parentNode.appendChild(this.disabledLayer);
+        if (this.nextSibling)
+            this.parentNode.insertBefore(this.disabledLayer, this.nextSibling);
+        else
+            this.parentNode.appendChild(this.disabledLayer);
         this.disabledLayer.signalConnect('click', function(event) {event.stop()});
 
         return this;
@@ -106,26 +109,27 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function positionDisabledLayer() {
         if (!this.disabledLayer) return;
 
-        var position     = this.cumulativeOffset();
+        var floatStyle   = this.getStyle('float');
         var dims         = this.getDimensions();
-        var marginTop    = parseInt(this.getStyle('margin-top'));
-        var marginRight  = parseInt(this.getStyle('margin-right'));
-        var marginBottom = parseInt(this.getStyle('margin-bottom'));
-        var marginLeft   = parseInt(this.getStyle('margin-left'));
+        var marginTop    = parseFloat(this.getStyle('margin-top'))    || 0;
+        var marginRight  = parseFloat(this.getStyle('margin-right'))  || 0;
+        var marginBottom = parseFloat(this.getStyle('margin-bottom')) || 0;
+        var marginLeft   = parseFloat(this.getStyle('margin-left'))   || 0;
         var zIndex       = parseInt(this.getStyle('z-index'));
-        if (isNaN(marginTop))    marginTop    = 0;
-        if (isNaN(marginRight))  marginRight  = 0;
-        if (isNaN(marginBottom)) marginBottom = 0;
-        if (isNaN(marginLeft))   marginLeft   = 0;
-        if (isNaN(zIndex))       zIndex       = 0;
+
+        if (!floatStyle || floatStyle == 'none')
+            this.disabledLayer.style.margin = '-' + (dims.height + marginBottom) + 'px ' + marginRight + 'px ' + marginBottom + 'px ' + marginRight + 'px';
+        else if (floatStyle == 'left')
+            this.disabledLayer.style.margin = marginTop + 'px ' + marginRight + 'px ' + marginBottom + 'px ' + '-' + (dims.width + marginRight) + 'px';
+        else
+            this.disabledLayer.style.margin = marginTop + 'px ' + '-' + (dims.width + marginLeft) + 'px ' + marginBottom + 'px ' + marginLeft + 'px';
 
         this.disabledLayer.setStyle({
-                opacity: 0.01, position: 'absolute',
-                width: dims.width + marginRight + marginLeft + 'px',
-                height: dims.height + marginTop + marginBottom + 'px',
-                zIndex: zIndex + 1, backgroundColor: 'white',
-                left: position[0] - marginLeft + 'px',
-                top: position[1] - marginTop + 'px'
+                width: dims.width + 'px',
+                height: dims.height + 'px',
+                zIndex: zIndex + 1, position: 'relative',
+                'float': floatStyle, background: 'white',
+                opacity: 0.01
             });
     }
 
@@ -187,9 +191,9 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!label.getText()) {
                 var text;
                 if (image) {
-                    var ml = parseInt(image.getStyle('margin-left')) || 0;
-                    var mr = parseInt(image.getStyle('margin-right')) || 0;
-                    var ih = parseInt(image.getStyle('height')) || image.height;
+                    var ml = parseFloat(image.getStyle('margin-left')) || 0;
+                    var mr = parseFloat(image.getStyle('margin-right')) || 0;
+                    var ih = parseFloat(image.getStyle('height')) || image.height;
                     if (ml != mr)
                         image.setStyle({marginLeft: ml + 'px', marginRight: ml + 'px'});
                 }
@@ -360,14 +364,19 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setDisabled: function(disabled) {
             if (disabled == this._disabled)
                 return;
+            if (!document.loaded) {
+                document.observe('dom:loaded', this.setDisabled.bind(this, disabled));
+                return this;
+            }
             if (!this.loaded)
                 return this.signalConnect('iwl:load', this.setDisabled.bind(this, disabled));
+
             if (disabled) {
                 this.addClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = true;
                 disabledImageChange.call(this);
                 createDisabledLayer.call(this);
-                positionDisabledLayer.bind(this).delay(0.5);
+                positionDisabledLayer.call(this);
                 this.signalConnect('iwl:adjust', disableButton);
                 this.adjust();
             } else {

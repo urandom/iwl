@@ -107,7 +107,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * */
         setValue: function(value) {
             this.value = this.control.value = value;
-            return this;
+            return this.emitSignal("iwl:change");
         },
         /**
          * @returns The current value of the entry 
