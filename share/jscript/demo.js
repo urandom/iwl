@@ -1273,3 +1273,38 @@ function run_spinner_tests() {
     }, 'testlog');
 }
 
+function run_tooltip_tests() {
+    var tooltip = $('tooltip_test');
+    var className = $A(tooltip.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(tooltip.content));
+            assert(Object.isArray(tooltip.bubbles));
+            assertEnumEqual([true, true, true],
+                [Object.isElement(tooltip.bubbles[0]), Object.isElement(tooltip.bubbles[1]), Object.isElement(tooltip.bubbles[2])]);
+            assert(tooltip.content.hasClassName(className + '_content'));
+            assertEnumEqual([true, true, true],
+                [!!tooltip.bubbles[0].hasClassName(className + '_bubble'),
+                 !!tooltip.bubbles[1].hasClassName(className + '_bubble'),
+                 !!tooltip.bubbles[2].hasClassName(className + '_bubble')]);
+        }},
+        testMethods: function() { with(this) {
+            var s = $('testlog').appendChild(new Element('div', {style: 'width 20px; height 20px; background: #ddd'}));
+            assertEqual(tooltip, tooltip.bindToWidget(s, 'click', true), "1");
+            assertEqual(s, tooltip.element, "2");
+            assertEqual(tooltip, tooltip.setContent('Foo bar baz'), "3");
+            assertEqual('Foo bar baz', tooltip.content.getText(), "4");
+            assert(!tooltip.visible(), "5");
+            assertEqual(tooltip, tooltip.showTooltip(), "6");
+            wait(100, function() {
+                assert(tooltip.visible(), "7");
+                assertEqual(tooltip, tooltip.hideTooltip(), "8");
+                wait(1000, function() {
+                    assert(!tooltip.visible(), "9");
+                    assertEqual(tooltip, tooltip.remove(), "10");
+                    assert(!tooltip.element, "11");
+                });
+            });
+        }}
+    }, 'testlog');
+}

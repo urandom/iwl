@@ -173,6 +173,8 @@ sub _realize {
 
     $self->{__content} = escape($self->{__contentObject}->getContent) if $self->{__contentObject};
 
+    $self->{_options}{parent} = UNIVERSAL::isa($self->{__parent}, 'IWL::Widget')
+      ? $self->{__parent}->getId : $self->{__parent};
     $self->{_options}{hidden} = 1;
     $self->{_options}{content} = $self->{__content} if $self->{__content};
     $self->{_options}{bind} =
@@ -195,7 +197,7 @@ sub __init {
     $self->{_options} = {style => {}};
     $self->{_options}{centerOnElement} = $args{centerOnElement} ? 1 : 0 if defined $args{centerOnElement};
     $self->{_options}{followMouse}     = $args{followMouse}     ? 1 : 0 if defined $args{followMouse};
-    $self->{_options}{parent}          = $args{parent}                  if defined $args{parent};
+    $self->{__parent}                  = $args{parent}                  if defined $args{parent};
 
     $args{id} ||= randomize('tooltip');
     $self->{_tag} = "script";

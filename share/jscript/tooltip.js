@@ -195,6 +195,16 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         return pos;
     }
 
+    function bindEvent(event, toggle) {
+        if (!this.visible() || this.__fade) {
+            this.showTooltip();
+            Event.stop(event);
+        } else if (toggle && (this.visible() || this.__appear)) {
+            this.hideTooltip();
+            Event.stop(event);
+        }
+    }
+
     return {
         /**
          * Shows the tooltip
@@ -206,7 +216,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 this.__fade.cancel();
                 this.__fade = undefined;
             }
-            this.__appear = Effect.Appear(this, {
+            this.__appear = new Effect.Appear(this, {
                     duration: 0.25,
                     afterFinish: function() { this.__appear = undefined }.bind(this)
             });
@@ -221,7 +231,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 this.__appear.cancel();
                 this.__appear = undefined;
             }
-            this._fade = Effect.Fade(this, {
+            this._fade = new Effect.Fade(this, {
                     duration: 0.5,
                     afterFinish: function() { this.__fade = undefined }.bind(this)
             });
@@ -266,15 +276,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         bindToWidget: function(element, signal, toggle) {
             this.element = $(element);
             if (!this.element) return;
-            this.element.signalConnect(signal, function (event) {
-                if (!this.visible() || this.__fade) {
-                    this.showTooltip();
-                    Event.stop(event);
-                } else if (toggle && (this.visible() || this.__appear)) {
-                    this.hideTooltip();
-                    Event.stop(event);
-                }
-            }.bind(this));
+            this.element.signalConnect(signal, bindEvent.bindAsEventListener(this, toggle));
             if (!this.options.hidden)
                 this.showTooltip();
             return this;
