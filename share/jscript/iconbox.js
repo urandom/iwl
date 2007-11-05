@@ -11,7 +11,7 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 dims.height != this.dimensions.height) {
             restoreIconsHeight.call(this);
             if (this._alignDelay && this.loaded) clearTimeout(this._alignDelay);
-            this._alignIconsVertically.bind(this).delay(0.1);
+            this._alignDelay = this._alignIconsVertically.bind(this).delay(0.1);
         }
     }
 
@@ -481,7 +481,7 @@ IWL.Iconbox.Icon = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.iconbox.statusbarPush(message);
             if (this.iconbox._alignDelay && this.iconbox.loaded)
                 clearTimeout(this.iconbox._alignDelay);
-            this.iconbox._alignIconsVertically.bind(this).delay(0.1);
+            this.iconbox._alignDelay = this.iconbox._alignIconsVertically.bind(this.iconbox).delay(0.1);
             this.emitSignal('iwl:remove');
             return this;
         },

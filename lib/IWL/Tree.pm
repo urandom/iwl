@@ -273,14 +273,14 @@ sub prependFooter {
 sub _realize {
     my $self    = shift;
     my $cell    = IWL::Tree::Cell->new;
-    my $b       = escape($cell->_blank_indent->getContent);
-    my $i       = escape($cell->_row_indent->getContent);
-    my $l       = escape($cell->_l_junction->getContent);
-    my $l_e     = escape($cell->_l_expand->getContent);
-    my $l_c     = escape($cell->_l_collapse->getContent);
-    my $t       = escape($cell->_t_junction->getContent);
-    my $t_e     = escape($cell->_t_expand->getContent);
-    my $t_c     = escape($cell->_t_collapse->getContent);
+    my $b       = escape($cell->_blank_indent->getJSON);
+    my $i       = escape($cell->_row_indent->getJSON);
+    my $l       = escape($cell->_l_junction->getJSON);
+    my $l_e     = escape($cell->_l_expand->getJSON);
+    my $l_c     = escape($cell->_l_collapse->getJSON);
+    my $t       = escape($cell->_t_junction->getJSON);
+    my $t_e     = escape($cell->_t_expand->getJSON);
+    my $t_c     = escape($cell->_t_collapse->getJSON);
     my $id      = $self->getId;
     my $options = {};
     my $script;

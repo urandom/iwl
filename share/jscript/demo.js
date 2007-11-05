@@ -1003,7 +1003,7 @@ function run_iconbox_tests() {
             var htmlIcon = "<div><img src=\"" + IWL.Config.IMAGE_DIR + '/demo/moon.gif' + "\"/><p>Moon 3</p></div>";
             var removed = false;
 
-            assertEqual(iconbox, iconbox.appendIcon(elementIcon));
+            assertEqual(iconbox, iconbox.appendIcon(elementIcon.cloneNode(true)));
             assertEqual(1, iconbox.icons.length);
             assertEqual(iconbox, iconbox.appendIcon([elementIcon.cloneNode(true), elementIcon.cloneNode(true)]));
             assertEqual(3, iconbox.icons.length);
@@ -1312,6 +1312,7 @@ function run_tooltip_tests() {
 function run_tree_tests() {
     var tree = $('tree_test');
     var className = $A(tree.classNames()).first();
+    tree.options.multipleSelect = true;
     new Test.Unit.Runner({
         testParts: function() { with(this) {
             assert(Object.isElement(tree.body));
@@ -1321,6 +1322,91 @@ function run_tree_tests() {
             assert(tree.body.hasClassName(className + '_body'));
             $A(tree.body.rows).each(function($_) {
                 assert($_.hasClassName(className + '_row'));
+            });
+        }},
+        testRowCreation: function() { with(this) {
+            var elementRow = new Element('tr').update(new Element('td').update('element')).insert(new Element('td').update('row'));
+            var jsonRow = {tag: 'tr', children: [{tag: 'td', text: 'object'}, {tag: 'td', text: 'row'}]};
+            var htmlRow = "<tr><td>html</td><td>string</td></tr>";
+            var removed = false;
+
+            assertEqual(tree, tree.appendRow(tree.body.rows[0], elementRow.cloneNode(true)), "1");
+            assertEqual(4, tree.body.rows.length, "2");
+            assertEqual(tree, tree.appendRow(tree.body.rows[0], [elementRow.cloneNode(true), elementRow.cloneNode(true)]), "3");
+            assertEqual(6, tree.body.rows.length, "4");
+
+            assertEqual(tree, tree.appendRow(tree.body.rows[0], jsonRow), "5");
+            assertEqual(7, tree.body.rows.length, "6");
+            assertEqual(tree, tree.appendRow(tree.body.rows[0], [jsonRow, jsonRow]), "7");
+            assertEqual(9, tree.body.rows.length, "8");
+
+            assertEqual(tree, tree.appendRow(tree.body.rows[0], htmlRow), "9");
+            assertEqual(10, tree.body.rows.length, "10");
+            assertEqual(tree, tree.appendRow(tree.body.rows[0], [htmlRow, htmlRow]), "11");
+            assertEqual(12, tree.body.rows.length, "12");
+
+            $A(tree.body.rows).last().signalConnect('iwl:remove', function() { removed = true });
+            assertEqual(tree, tree.removeRow($A(tree.body.rows).last()), "13");
+            assertEqual(11, tree.body.rows.length, "14");
+
+            var array = [];
+            (20).times(function() {array.push(htmlRow)});
+            benchmark(function() { tree.appendRow(tree.body.rows[0], array) }, 1, "HTML insertion");
+            array = [];
+            (20).times(function() {array.push(jsonRow)});
+            benchmark(function() { tree.appendRow(tree.body.rows[0], array) }, 1, "IWL JSON insertion");
+            array = [];
+            (20).times(function() {array.push(elementRow.cloneNode(true))});
+            benchmark(function() { tree.appendRow(tree.body.rows[0], array) }, 1, "DOM insertion");
+            benchmark(function() { tree.body.rows[0].expand()}, 1, "Expanding");
+            benchmark(function() { tree.body.rows[0].collapse()}, 1, "Collapsing");
+            benchmark(function() { $A(tree.body.rows).last().remove() }, 60, "Removal");
+            wait(100, function() { assert(removed, "15") });
+        }},
+        testExpanding: function() { with(this) {
+            var parentRow = tree.body.rows[0];
+            assert(parentRow.collapsed, "1");
+            assertEqual(parentRow, parentRow.expand(), "2");
+            assert(!parentRow.expand(), "3");
+            assertEqual(parentRow, parentRow.collapse(), "4");
+            assert(!parentRow.collapse(), "5");
+            assertEqual(tree, tree.expandRow(parentRow), "6");
+        }},
+        testSelection: function() { with(this) {
+            var select = select_all = unselect = unselect_all = activate = false;
+            $A(tree.body.rows).first().signalConnect('iwl:select', function() { select = true });
+            tree.body.rows[1].signalConnect('iwl:unselect', function() { unselect = true });
+            tree.signalConnect('iwl:select_all', function() { select_all = true });
+            tree.signalConnect('iwl:unselect_all', function() { unselect_all = true });
+
+            assertEqual(tree, tree.unselectAllRows());
+            assertEqual(tree, tree.selectRow($A(tree.body.rows).first()));
+            assertEqual(tree.body.rows[1], tree.body.rows[1].setSelected(true, true));
+            assertEqual(tree.body.rows[1], tree.getSelectedRow());
+            assert(tree.body.rows[0].isSelected());
+            assertEqual(2, tree.getSelectedRows().length);
+            assertEqual(tree.body.rows[1], tree.body.rows[1].setSelected(false));
+            assertEqual(1, tree.getSelectedRows().length);
+            assertEqual(tree, tree.selectAllRows());
+            assertEqual(tree.body.rows.length, tree.getSelectedRows().length);
+            assertEqual(tree, tree.unselectAllRows());
+            assertEqual(0, tree.getSelectedRows().length);
+            assert(!tree.getSelectedRow());
+
+            assertEqual(tree.body.rows[1], tree.getNextRow(tree.body.rows[0]));
+            assertEqual(tree.body.rows[0], tree.getPrevRow(tree.body.rows[1]));
+            assertEqual(tree.body.rows[1], tree.body.rows[0].firstChildRow());
+            assertEqual($A(tree.body.rows).last(), tree.body.rows[0].lastChildRow());
+            assertEqual(tree.body.rows[0], tree.body.rows[1].parentRow());
+            assertEqual(10, tree.body.rows[0].childRows().length);
+            assertEqual(tree.body.rows[0], tree.getRowByPath([0]));
+            assertEqual(tree.body.rows[1], tree.getRowByPath([0,0]));
+
+            wait(400, function() {
+                assert(select);
+                assert(unselect);
+                assert(select_all);
+                assert(unselect_all);
             });
         }}
     }, 'testlog');
