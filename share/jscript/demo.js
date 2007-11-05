@@ -1,12 +1,12 @@
 document.observe('dom:loaded', demo_init);
 
 function demo_init () {
-    IWL.displayStatus('To display a widget demo, double click its row');
+    IWL.Status.display('To display a widget demo, double click its row');
 }
 
 function activate_widgets_response(json) {
     if (!json) return;
-    IWL.enableView();
+    IWL.View.enable();
     if (!json.data) return;
     var content = $('content');
     content.update();
@@ -451,38 +451,38 @@ function run_base_tests() {
             });
         }},
         testView: function() { with(this) {
-            IWL.disableView({opacity: 0.9});
+            IWL.View.disable({opacity: 0.9});
             assert($('disabled_view_rail'));
             assertEqual(0.9, $('disabled_view_rail').getOpacity());
-            IWL.enableView();
+            IWL.View.enable();
             assert(!$('disabled_view_rail'));
 
-            IWL.disableView({noCover: true});
+            IWL.View.disable({noCover: true});
             assert(!$('disabled_view_rail'));
             assertEqual('wait', document.body.style.cursor);
-            IWL.enableView();
+            IWL.View.enable();
             assertEqual('', document.body.style.cursor);
 
-            IWL.disableView({fullCover: true, opacity: 0.3});
+            IWL.View.disable({fullCover: true, opacity: 0.3});
             assert($('disabled_view_rail'));
             assert($('disabled_view'));
             assertEqual(0.3, $('disabled_view').getOpacity());
             assertEqual(1, $('disabled_view_rail').getOpacity());
-            IWL.enableView();
+            IWL.View.enable();
             assert(!$('disabled_view'));
             assert(!$('disabled_view_rail'));
         }},
         testStatus: function() { with(this) {
-            IWL.displayStatus('foo');
+            IWL.Status.display('foo');
             assert($('status_bar'), 'First status');
             assertEqual('foo', $('status_bar').getText(), 'It has text');
-            IWL.displayStatus('bar');
+            IWL.Status.display('bar');
             assert(/foo[\r\n]*bar/.test($('status_bar').getText()), 'Another text added');
-            IWL.removeStatus();
-            IWL.removeStatus();
+            IWL.Status.remove();
+            IWL.Status.remove();
             wait(1150, function() {
                 assert(!$('status_bar'), 'First removed status');
-                IWL.displayStatus('alpha', {duration:0.2});
+                IWL.Status.display('alpha', {duration:0.2});
                 assert($('status_bar'), 'Duration status');
                 wait(1600, function() {
                     assert(!$('status_bar'), 'Removed duration status');
@@ -497,7 +497,7 @@ function run_base_tests() {
             assert($('status_bar'));
             assertEqual('Error message: Some error', $('status_bar').firstChild.nodeValue);
             [1,2,3].each(function() {
-                IWL.removeStatus();
+                IWL.Status.remove();
             });
             window.console = console;
         }},
@@ -1411,3 +1411,41 @@ function run_tree_tests() {
         }}
     }, 'testlog');
 }
+
+function run_upload_tests() {
+    var upload = $('upload_test');
+    var className = $A(upload.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert('tooltip' in upload);
+            assert(Object.isElement(upload.file));
+            assert(Object.isElement(upload.frame));
+            assert(Object.isElement(upload.button));
+            assert(Object.isString(upload.messages.uploading));
+
+            assert(upload.file.hasClassName(className + '_file'));
+            assert(upload.frame.hasClassName(className + '_frame'));
+            assert(upload.button.hasClassName(className + '_button'));
+
+            assertEqual('upload_test_file', upload.file.id);
+            assertEqual('upload_test_frame', upload.frame.id);
+            assertEqual('upload_test_button', upload.button.id);
+        }},
+        testUpload: function() { with(this) {
+            var uploaded = false, filename = '';
+            upload.signalConnect('iwl:upload', function(event, data) {
+                uploaded = data.uploaded;
+                filename = data.filename;
+                this.proceed();
+            }.bind(this));
+            IWL.Status.display('************************************************');
+            IWL.Status.display('* Please click on the button and upload a file *');
+            IWL.Status.display('************************************************');
+            delay(function() {
+                assert(uploaded);
+                info('Uploaded file: ' + filename);
+            });
+        }}
+    }, 'testlog');
+}
+

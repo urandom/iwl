@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 use IWL::Upload;
 
@@ -8,4 +8,3 @@ is($up->setAccept('*.pl'), $up);
 is($up->getAccept, '*.pl');
 is($up->setLabel('Some label'), $up);
 is($up->getLabel, 'Some label');
-is($up->setUploadCallback('alert'), $up);

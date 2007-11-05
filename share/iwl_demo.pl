@@ -138,7 +138,7 @@ EOF
                 $label = IWL::Label->new->setText('The third page');
             } else {
                 $label = IWL::Label->new->setText('Please confirm!');
-                %deter = (deter => 1, expression => "displayStatus('Fix it!')");
+                %deter = (deter => 1, expression => "IWL.Status.display('Fix it!')");
             }
 	    return [$label], {
 		newId => 'third_page',
@@ -168,7 +168,7 @@ $rpc->handleEvent(
 
 if (my $file = $form{upload_file}) {
     my $name = $file->[1];
-    IWL::Upload::printMessage("$name uploaded.");
+    IWL::Upload::printMessage("$name uploaded.", {filename => $name, uploaded => 1});
     exit 0;
 } elsif (my $text = $form{text}) {
     IWL::Object::printHTMLHeader;
@@ -363,6 +363,7 @@ sub build_tests {
     my $spinner_test    = IWL::Tree::Row->new(id => 'spinner_test_row');
     my $tooltip_test    = IWL::Tree::Row->new(id => 'tooltip_test_row');
     my $tree_test       = IWL::Tree::Row->new(id => 'tree_test_row');
+    my $upload_test     = IWL::Tree::Row->new(id => 'upload_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -392,10 +393,12 @@ sub build_tests {
     $row->appendRow($tooltip_test);
     $tree_test->appendTextCell('Tree Test');
     $row->appendRow($tree_test);
+    $upload_test->appendTextCell('Upload Test');
+    $row->appendRow($upload_test);
 
     register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test,
         $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test,
-        $notebook_test, $spinner_test, $tooltip_test, $tree_test);
+        $notebook_test, $spinner_test, $tooltip_test, $tree_test, $upload_test);
 }
 
 sub generate_buttons {
@@ -415,7 +418,7 @@ sub generate_buttons {
     $normal_button->setTitle('This is a title')->setSubmit(image => 'DELETE', 'some_form');
     $image_button->setImage('IWL_STOCK_DELETE');
     $normal_button->setLabel('Labeled button')->setClass('demo');
-    $stock_button->signalConnect(load => "displayStatus('Stock button loaded')");
+    $stock_button->signalConnect(load => "IWL.Status.display('Stock button loaded')");
     $disabled_button->setLabel('Disabled button')->setDisabled(1);
     $input_button->setLabel('Input Button');
     $check->setLabel('A check button');
@@ -445,7 +448,7 @@ sub generate_entries {
 	    'entries_container', 'iwl_demo.pl',
 	    parameters => "text: \$F('image_entry_text') || false",
 	    insertion => 'bottom',
-	    onComplete => q|displayStatus.bind(this, 'Completed')|,
+	    onComplete => q|IWL.Status.display.bind(this, 'Completed')|,
     ));
     $label->setText("The following entry provides completion capabilities. Try searching for 'gtk' or 'IWL'.");
     $completion->setAutoComplete('iwl_demo.pl', paramName => 'completion');
@@ -563,7 +566,7 @@ sub generate_iconbox {
     my $iconbox = IWL::Iconbox->new(id => 'iconbox', width => '310px', height => '200px');
 
     $container->appendChild($iconbox);
-    $iconbox->signalConnect(load => "displayStatus('Iconbox fully loaded')");
+    $iconbox->signalConnect(load => "IWL.Status.display('Iconbox fully loaded')");
     foreach (1 .. 10) {
         my $icon = IWL::Iconbox::Icon->new;
         $iconbox->appendIcon($icon);
@@ -572,7 +575,7 @@ sub generate_iconbox {
 	if ($_ == 5) {
 	    $icon->setText('Irregular icon title');
 	    $icon->signalConnect(select =>
-		  "displayStatus('This callback was activated when icon $_ was selected')");
+		  "IWL.Status.display('This callback was activated when icon $_ was selected')");
 	    $icon->setClass('demo');
 	}
         $icon->setDimensions('80px', '80px');
@@ -597,7 +600,7 @@ sub generate_menus {
     $menubar->appendMenuItem('Edit', undef, id => 'edit_mi')->setSubmenu($edit_menu);
     $menubar->appendMenuSeparator;
     $menubar->appendMenuItem('Help', undef, id => 'help_mi', class => 'demo')->
-      signalConnect('activate' => q|displayStatus('Don\\'t panic!')|);
+      signalConnect('activate' => q|IWL.Status.display('Don\\'t panic!')|);
 
     $file_menu->appendMenuItem('Open')->setClass('demo');
     $file_menu->appendMenuItem('Save', 'IWL_STOCK_SAVE');
@@ -608,7 +611,7 @@ sub generate_menus {
 
     $button->setLabel('Click me!');
     $button_menu->bindToWidget($button, 'click');
-    $button_menu->appendMenuItem("Check item 1", undef)->setType('check')->signalConnect(change => q|displayStatus('Check item 1 changed')|);
+    $button_menu->appendMenuItem("Check item 1", undef)->setType('check')->signalConnect(change => q|IWL.Status.display('Check item 1 changed')|);
     $button_menu->appendMenuItem("Check item 2", undef)->setType('check')->toggle(1);
     $button_menu->appendMenuSeparator;
     $button_menu->appendMenuItem("Radio item 1", undef)->setType('radio')->toggle(1);
@@ -617,7 +620,7 @@ sub generate_menus {
     $button_menu->appendMenuItem("Submenu")->setSubmenu($submenu);
 
     $submenu->setMaxHeight(200)->signalConnect(menu_item_activate => q{
-        displayStatus('Received item ' + arguments[1].id);
+        IWL.Status.display('Received item ' + arguments[1].id);
     });
     $submenu->appendMenuItem("Submenu item $_")->setType('check')->setId($_) foreach (1 .. 20);
 
@@ -754,7 +757,7 @@ sub generate_contentbox {
     $contentbox->appendContent(IWL::Break->new, $chooser, IWL::Break->new, $outline);
     $contentbox->appendFooterText('The footer of the contentbox');
     $contentbox->setShadows(1);
-    $contentbox->signalConnect(close => q|displayStatus("The contentbox has been closed.")|);
+    $contentbox->signalConnect(close => q|IWL.Status.display("The contentbox has been closed.")|);
     $chooser->appendOption('none');
     $chooser->appendOption('drag');
     $chooser->appendOption('resize');
@@ -772,7 +775,7 @@ sub generate_druid {
     my $label1 = IWL::Label->new;
 
     $container->appendChild($druid);
-    my $page = $druid->appendPage($label1)->signalConnect(remove => "displayStatus('Page 1 removed.')");;
+    my $page = $druid->appendPage($label1)->signalConnect(remove => "IWL.Status.display('Page 1 removed.')");;
     $page->registerEvent(
 	'IWL-Druid-Page-previous', 'iwl_demo.pl', {where => 'going back...'}
     )->registerEvent(
@@ -791,7 +794,7 @@ sub generate_notebook {
 
     $container->appendChild($notebook);
     $notebook->appendTab('Page 1', $label1);
-    $notebook->appendTab('Page 2', $label2)->signalConnect(select => "displayStatus(this.getLabel() + ' selected.')");
+    $notebook->appendTab('Page 2', $label2)->signalConnect(select => "IWL.Status.display(this.getLabel() + ' selected.')");
     $label1->setText('This is page 1');
     $label2->setText('This is page 2');
 
@@ -850,11 +853,11 @@ sub generate_rpc_events {
 	    insertion => 'bottom',
     });
     $button->registerEvent('IWL-Button-click', 'iwl_demo.pl', {}, {
-            onComplete => "displayStatus(arguments[0].data.text)",
+            onComplete => "IWL.Status.display(arguments[0].data.text)",
             emitOnce => 1
     });
     $combo->registerEvent('IWL-Combo-change', 'iwl_demo.pl', {}, {
-            onComplete => "displayStatus(arguments[0].data.text)",
+            onComplete => "IWL.Status.display(arguments[0].data.text)",
             collectData => 1
     });
 
@@ -1057,6 +1060,17 @@ sub generate_tree_test {
 
     $script->setScript("run_tree_tests()");
     $container->appendChild($testlog, $tree, $script);
+    return $container;
+}
+
+sub generate_upload_test {
+    my $container = IWL::Container->new(id => 'upload_test_container');
+    my $testlog   = IWL::Container->new(id => 'testlog');
+    my $upload    = IWL::Upload->new(id => 'upload_test', name => 'upload_file', showTooltip => '');
+    my $script    = IWL::Script->new;
+
+    $script->setScript("run_upload_tests()");
+    $container->appendChild($testlog, $upload, $script);
     return $container;
 }
 

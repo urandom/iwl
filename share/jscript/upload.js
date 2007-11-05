@@ -22,9 +22,11 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function uploadFile() {
         this.submit();
-        this.tooltip = IWL.Tooltip.create(this.id + '_tooltip', {centerOnElement: false, pivot: this});
-        this.tooltip.bindToWidget(this.button);
-        this.tooltip.setContent(this.messages.uploading);
+        if (this.options.showTooltip) {
+            this.tooltip = IWL.Tooltip.create(this.id + '_tooltip', {centerOnElement: false, pivot: this});
+            this.tooltip.bindToWidget(this.button);
+            this.tooltip.setContent(this.messages.uploading);
+        }
 
         Event.observe(this.frame, 'load', frameLoad.bind(this));
         Event.observe(this.frame, 'readystatechange', frameReadyStateChange.bind(this));
@@ -42,19 +44,20 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (doc.document) doc = doc.document;
         var json = eval('(' + unescape(doc.body.firstChild.nodeValue) + ')');
 
-        if (json && json.message)
-            this.tooltip.setContent(json.message);
-        setTimeout(function() {
-            Effect.Fade(this.tooltip, {duration: 1,
-                queue: {position: 'start', scope: 'upload_queue'}});
-            setTimeout(function() {
-                if (!this.tooltip) return;
-                this.tooltip.remove();
-                this.tooltip = null;
-            }.bind(this), 1000);
-        }.bind(this), 2000);
-        if (this.options.uploadCallback && this.options.uploadCallback.apply)
-            this.options.uploadCallback.apply(this, [json]);
+        if (json) {
+            if (json.message && this.options.showTooltip)
+                this.tooltip.setContent(json.message);
+            this.emitSignal('iwl:upload', json.data);
+        }
+        if (this.options.showTooltip)
+            (function() {
+                Effect.Fade(this.tooltip, {duration: 1});
+                (function() {
+                    if (!this.tooltip) return;
+                    this.tooltip.remove();
+                    this.tooltip = null;
+                }).bind(this).delay(1);
+            }).bind(this).delay(2);
     }
 
     function frameReadyStateChange() {
@@ -71,7 +74,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 return;
             }
             this.options = Object.extend({
-                uploadCallback: Prototype.emptyFunction
+                showTooltip: true
             }, arguments[2] || {});
             this.messages = Object.extend({}, arguments[3]);
             button.createHtmlElement(form);

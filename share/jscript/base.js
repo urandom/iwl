@@ -24,7 +24,7 @@ Object.extend(IWL, {RPC: (function() {
 
   function eventFinalize (element, eventName, options) {
       if (options.disableView)
-          IWL.enableView();
+          IWL.View.enable();
       element['handlers'][eventName].ajaxRequest = null
       if (options.emitOnce)
           delete element['handlers'][eventName];
@@ -47,7 +47,7 @@ Object.extend(IWL, {RPC: (function() {
               var options = Object.extend(Object.extend({}, originalOptions), arguments[1]);
               if (options.onStart)
                   eventStart(options.onStart).call(element, params);
-              var disable = options.disableView ? IWL.disableView.bind(element, options.disableView) : Prototype.emptyFunction;
+              var disable = options.disableView ? IWL.View.disable.bind(element, options.disableView) : Prototype.emptyFunction;
 
               if ('update' in options) {
                   var updatee = $(options.update) || document.body;
@@ -249,14 +249,14 @@ Object.extend(IWL, (function() {
 Object.extend(IWL, (function() {
     var disabled_view_cnt = 0;
 
-    return {
+    return {View: {
         /**
          * Used for the purpose of faking a 'busy' screen
          * @param options A options hash. The following keys are recognised:
          * 	noCover: boolean (default: true). True if the screen should be covered
          * 	opacity: number (default: 0.8). The opacity of the covering element
          * */
-        disableView: function() {
+        disable: function() {
             var options = Object.extend({
                 fullCover: false,
                 noCover: false,
@@ -301,9 +301,9 @@ Object.extend(IWL, (function() {
         },
         /**
          * Restores the screen after it was disabled
-         * @see IWL.disableView
+         * @see IWL.View.disable
          * */
-        enableView: function() {
+        enable: function() {
             disabled_view_cnt--;
             if (disabled_view_cnt <= 0) {
                 document.body.setStyle({cursor: ''});
@@ -317,7 +317,7 @@ Object.extend(IWL, (function() {
                     container.remove();
             }
         }
-    };
+    }};
 })());
 
 Object.extend(IWL, (function() {
@@ -326,15 +326,15 @@ Object.extend(IWL, (function() {
     
     function hideStatus(options) {
         if (options.duration)
-            IWL.removeStatus.delay(options.duration);
+            IWL.Status.remove.delay(options.duration);
     }
 
-    return {
+    return {Status: {
         /**
          * Shows a message in an animated status bar at the bottom of the screen
          * @param {String} text The text to be displayed
          * */
-        displayStatus: function(text) {
+        display: function(text) {
             var options = Object.extend({
                 duration: 10
             }, arguments[1]);
@@ -343,7 +343,7 @@ Object.extend(IWL, (function() {
                 var status_bar = $('status_bar');
                 if (!status_bar) {
                     display_status_cnt = 0;
-                    IWL.displayStatus(text);
+                    IWL.Status.display(text);
                     return;
                 }
                 status_bar.appendChild(new Element('br'));
@@ -356,10 +356,10 @@ Object.extend(IWL, (function() {
                 appear = Effect.Appear(status_bar,
                     {duration: 0.2, afterFinish: hideStatus.bind(this, options)});
                 document.body.appendChild(status_bar);
-                status_bar.signalConnect('click', IWL.removeStatus);
+                status_bar.signalConnect('click', IWL.Status.remove);
             }
         },
-        removeStatus: function() {
+        remove: function() {
             var status_bar = $('status_bar');
             if (!status_bar) return;
             if (display_status_cnt >= 2) {
@@ -377,7 +377,7 @@ Object.extend(IWL, (function() {
                     }});
             }
         }
-    };
+    }};
 })());
 
 /**
@@ -386,14 +386,14 @@ Object.extend(IWL, (function() {
  * @param error The error being thrown
  * */
 IWL.exceptionHandler = function() {
-    IWL.enableView();
+    IWL.View.enable();
     var error = arguments[1];
     if (window.console) {
 	console.dir(error);
     } else {
-	IWL.displayStatus("Error message: " + error.message);
-	IWL.displayStatus(error.number & 0xFFFF);
-	IWL.displayStatus(error.name);
+	IWL.Status.display("Error message: " + error.message);
+	IWL.Status.display(error.number & 0xFFFF);
+	IWL.Status.display(error.name);
     }
 };
 
@@ -485,12 +485,17 @@ IWL.keyLogger = function(element, callback) {
     h.addClassName(class_name);
 })();
 
+Object.extend(document.viewport, {
+    disable: IWL.View.disable,
+    enable: IWL.View.enable
+});
+
 /* Deprecated */
 var createHtmlElement = IWL.createHtmlElement;
-var disableView = IWL.disableView;
-var enableView = IWL.enableView;
-var displayStatus = IWL.displayStatus;
-var displayStatusRemove = IWL.removeStatus;
+var disableView = IWL.View.disable;
+var enableView = IWL.View.enable;
+var displayStatus = IWL.Status.display;
+var displayStatusRemove = IWL.Status.remove;
 var checkElementValue = Element.checkValue;
 var IWLRPC = IWL.RPC;
 var IWLConfig = IWL.Config;
