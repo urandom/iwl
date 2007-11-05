@@ -362,10 +362,11 @@ Object.extend(IWL, (function() {
         remove: function() {
             var status_bar = $('status_bar');
             if (!status_bar) return;
-            if (display_status_cnt >= 2) {
-                status_bar.removeChild(status_bar.firstChild);
-                status_bar.removeChild(status_bar.firstChild);
-            }
+            if (display_status_cnt >= 2)
+                (2).times(function() {
+                    if (status_bar.firstChild)
+                        status_bar.removeChild(status_bar.firstChild); 
+                });
             if (display_status_cnt-- <= 1) {
                 if (appear) {
                     appear.cancel();

@@ -7,7 +7,9 @@ li.menu_separator {
 span.menubar_item_label {
     padding: 2px 2px 3px 2px;
 }
-
+span.menubar_item_label_iconic {
+    padding-left: 22px;
+}
 li.menubar_item_selected {
     padding: 0 5px 0 5px;
 }

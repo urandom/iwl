@@ -644,18 +644,15 @@ if (Prototype.Browser.IE)
       tagName = tagName.toLowerCase();
       var cache = Element.cache;
       if (Prototype.Browser.IE) {
-        var conflicts = $H(attributes).keys().grep(/(?:name|on\w+)/);
-        if (conflicts.length) {
-          var attributeString = '';
-          conflicts.each(function (key) {
-              if (typeof attributes[key] == 'string') {
-                attributeString += key + '="' + attributes[key] + '"';
-                delete attributes[key];
-              }
-            });
-          tagName = '<' + tagName + ' ' + attributeString + '>';
-          return Element.writeAttribute(document.createElement(tagName), attributes);
+        var attributeString = '';
+        for (var key in attributes) {
+          if (typeof attributes[key] == 'string') {
+            attributeString += key + '="' + attributes[key] + '"';
+            delete attributes[key];
+          }
         }
+        tagName = '<' + tagName + ' ' + attributeString + '>';
+        return Element.writeAttribute(document.createElement(tagName), attributes);
       }
       if (!cache[tagName]) cache[tagName] = Element.extend(document.createElement(tagName));
       return Element.writeAttribute(cache[tagName].cloneNode(false), attributes);

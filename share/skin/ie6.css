@@ -53,6 +53,9 @@ li.menu_item {
 span.menubar_item_label {
     padding: 3px 2px 2px 2px;
 }
+span.menubar_item_label_iconic {
+    padding-left: 22px;
+}
 
 iframe.qframe {
     z-index: 2;
