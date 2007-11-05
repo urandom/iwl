@@ -1,4 +1,4 @@
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 use IWL::Object;
 
@@ -41,8 +41,13 @@ use IWL::Object;
 	$object->setAttribute(one => 'two three', 'uri');
 	$object->setAttribute(tango => 'фокс <трот>', 'none');
 
-	is($object->getContent,
-		'< one="two%20three" alpha="&lt;beta&gt;" tango="фокс <трот>" foo="bar"></>' . "\n");
+    is_deeply($object->getObject, {attributes => {
+        one => "two%20three",
+        alpha => "&lt;beta&gt;",
+        tango => "фокс <трот>",
+        foo => "bar"
+            }});
+    like($object->getContent, qr(^< (?:(?:one="two%20three"|alpha="&lt;beta&gt;"|tango="фокс <трот>"|foo="bar")\s*){4}></>\n$));
 	ok($object->hasAttribute('foo'), 'Exists attribute "foo"');
 	ok(!$object->hasAttribute('bar'), 'Exists attribute "bar"');
 

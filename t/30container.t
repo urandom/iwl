@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 3;
 
 use IWL::Container;
 
@@ -13,5 +13,4 @@ use IWL::Container;
 				id => 'foo'
 			}
 	});
-	is($span->getJSON, '{"tag": "span", "attributes": {"class": "bar"}}');
 }
