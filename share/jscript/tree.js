@@ -444,14 +444,14 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     parentRow.childList.push(row);
                     if (parentRow.collapsed) row.hide();
                 }
-                new_rows.push(row);
+                row.path = [0, 0];       // Fake this, so that the row won't get added to the body's childList. The path is rebuilt later
+                new_rows.push(IWL.Tree.Row.create(row, this));
             }
             if (this.loadComplete) {
                 rebuildPath.call(this, parentRow);
                 setAlternate.call(this, parentRow);
                 parentRow._rebuildNav();
                 new_rows.each(function(row) {
-                    IWL.Tree.Row.create(row, this);
                     addToPathMap.call(this, row);
                     row._rebuildNav();
                 }.bind(this));
