@@ -433,6 +433,8 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             d.width = Math.max(tw, hw, cw, fw) + 'px';
             if (d.width)
                 this.setStyle(d);
+            if (this.options.positionAtCenter)
+                this.positionAtCenter();
             return this;
         },
         /**
@@ -485,12 +487,13 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         },
         _init: function(id) {
             this.options = Object.extend({
-                auto: false,
                 type: 'none',
                 typeOptions: {},
                 modal: false,
                 hasShadows: false,
+                autoWidth: false,
                 closeModalOnClick: false,
+                positionAtCenter: false,
                 modalOpacity: 0.7
             }, arguments[1] || {});
             this.contentboxTitle = $(id + '_titler');
@@ -506,15 +509,18 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.setType(this.options.type);
 
-            if (this.options.auto) {
+            if (this.options.autoWidth) {
                 var deter_visibility = true;
                 setTimeout(function() {
                     this.autoWidth();
                     removeQuirks.call(this);
                     this.setStyle({visibility: original_visibility});
                 }.bind(this), 250);
-            } else
+            } else {
                 removeQuirks.call(this);
+                if (this.options.positionAtCenter)
+                    this.positionAtCenter();
+            }
             if (this.options.modal)
                 this.setModal(true);
             if (!deter_visibility)

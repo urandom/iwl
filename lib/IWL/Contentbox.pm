@@ -44,19 +44,23 @@ IWL::Contentbox->new ([B<%ARGS>])
 
 =item B<autoWidth>
 
-Makes the content box as wide as the content. Turns off resizing
+If true, makes the content box as wide as the content. Defaults to I<false>
 
-=item B<shadows>
+=item B<positionAtCenter>
 
-Enable shadow classes
+If true, positions the contentbox at the center of the screen. Defaults to I<false>
+
+=item B<hasShadows>
+
+If true, enable shadow classes. Defaults to I<false>
 
 =item B<modal>
 
-Make the window a modal window
+If true, makes the window a modal window. Defaults to I<false>
 
 =item B<closeModalOnClick>
 
-Makes the window close when the user clicks outside of it
+If true, makes the window close when the user clicks outside of it. Defaults to I<false>
 
 =back
 
@@ -355,7 +359,7 @@ Parameters: B<BOOL> - true if the contentbox should try to set it's width accord
 sub setAutoWidth {
     my ($self, $bool) = @_;
 
-    $self->{_options}{auto} = $bool ? 1 : 0;
+    $self->{_options}{autoWidth} = $bool ? 1 : 0;
 
     return $self;
 }
@@ -466,7 +470,7 @@ sub __init {
     my $bottomr = IWL::Container->new;
 
     $self->{_defaultClass} = 'contentbox';
-    $self->{_options} = {auto => 0, modal => 0};
+    $self->{_options}      = {};
 
     $self->{__top}     = $top;
     $self->{__topr}    = $topr;
@@ -501,25 +505,19 @@ sub __init {
     $self->{__titleLabel}{_ignore}= 1;
     $self->{__titler}->appendChild($self->{__titleLabel});
 
-    if ($args{autoWidth}) {
-	$self->{_options}{auto} = 1;
-    }
+    $self->{_options}{autoWidth}        = $args{autoWidth}        if  defined $args{autoWidth};
+    $self->{_options}{hasShadows}       = $args{hasShadows}       if  defined $args{hasShadows};
+    $self->{_options}{positionAtCenter} = $args{positionAtCenter} if  defined $args{positionAtCenter};
+
     if ($args{modal}) {
 	$self->{_options}{modal} = 1;
-	if ($args{closeModalOnClick}) {
-	    $self->{_options}{closeModalOnClick} = 1;
-	}
+        $self->{_options}{closeModalOnClick} = $args{closeModalOnClick} if defined $args{closeModalOnClick};
     }
 
     my $id = $args{id} ? $args{id} : randomize($self->{_defaultClass});
     $self->setId($id);
 
-    if ($args{shadows}) {
-	$self->setShadows(1);
-    } else {
-	$self->setShadows(0);
-    }
-    delete @args{qw(id autoWidth modal closeModalOnClick shadows)};
+    delete @args{qw(id autoWidth modal closeModalOnClick shadows positionAtCenter)};
 
     $self->setType('none');
 
