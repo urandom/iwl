@@ -647,7 +647,8 @@ if (Prototype.Browser.IE)
         var attributeString = '';
         for (var key in attributes) {
           if (typeof attributes[key] == 'string') {
-            attributeString += key + '="' + attributes[key] + '"';
+            var name = key == 'className' ? 'class' : key == 'htmlFor' ? 'for' : key;
+            attributeString += name + '="' + attributes[key] + '"';
             delete attributes[key];
           }
         }

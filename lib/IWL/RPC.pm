@@ -26,6 +26,14 @@ IWL::RPC->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
+=over 4
+
+=item B<parameters>
+
+A hashref of CGI parameters to use, instead of reading for GET/POST parameters.
+
+=back
+
 =cut
 
 sub new {
@@ -34,7 +42,7 @@ sub new {
     my $self  = bless {}, $class;
 
     $self->{__isRead} = undef;
-    $self->{__params}  = undef;
+    $self->{__params} = $args{parameters} if ref $args{parameters} eq 'HASH';
 
     return $self;
 }

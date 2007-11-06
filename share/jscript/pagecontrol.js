@@ -165,8 +165,9 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         getDimensions: function() {
             var dims = {width: 0, height: 0};
-            [this.firstButton, this.prevButton, this.labelContainer, this.nextButton, this.lastButton].each(
+            [this.firstButton, this.prevButton, this.nextButton, this.lastButton].concat(this.labelContainer.childElements()).each(
                 function(n) {
+                    n = Element.extend(n);
                     var d = n.getDimensions();
                     var m = [n.getStyle('margin-top'), n.getStyle('margin-right'), n.getStyle('margin-bottom'), n.getStyle('margin-left')];
                     dims.width += d.width + parseInt(m[1] || 0) + parseInt(m[3] || 0);
@@ -174,20 +175,23 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     dims.height = Math.max(d.height + parseInt(m[0] || 0) + parseInt(m[2] || 0), dims.height);
                 }.bind(this)
             );
-            // FIXME: why does IE need this additional width?
+            /* 3px gap bug */
             if (Prototype.Browser.IE)
-                dims.width += 3;
+                dims.width += 3 * this.labelContainer.select('span').length;
             return dims;
         },
 
         _init: function(id) {
-            var buttonCount = 4;
+            var buttonCount = 5;
+            var visibility = this.getStyle('visibility');
+            this.style.visibility = 'hidden';
             this.loaded = false;
             var buttonLoad = function() {
                 if (--buttonCount === 0) {
                     this.loaded = true;
                     refresh.call(this);
                     alignLabels.call(this);
+                    this.style.visibility = visibility; 
                     this.emitSignal('iwl:load');
                 }
             };
@@ -198,6 +202,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.label = $(this.id + '_page_count');
             this.nextButton = $(this.id + '_next').signalConnect('iwl:load', buttonLoad.bind(this));
             this.lastButton = $(this.id + '_last').signalConnect('iwl:load', buttonLoad.bind(this));
+            $(this.id + '_page_entry').signalConnect('iwl:load', buttonLoad.bind(this));
             this.options = Object.extend({
                 bound: false,
                 page: 1

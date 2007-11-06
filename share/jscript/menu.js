@@ -168,7 +168,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     var dims = this.getDimensions();
                     this.setStyle({width: dims.width + 'px', height: dims.height + 'px'});
                 }
-                removeQuirks.call(this);
+//                removeQuirks.call(this);
                 this.positioned = true;
             }
             return this.setStyle({visibility: 'visible'});
