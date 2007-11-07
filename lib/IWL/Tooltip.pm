@@ -5,7 +5,7 @@ package IWL::Tooltip;
 
 use strict;
 
-use base qw(IWL::Script IWL::Widget);
+use base qw(IWL::Widget);
 
 use IWL::String qw(escape randomize);
 use IWL::JSON qw(toJSON);
@@ -18,7 +18,6 @@ IWL::Tooltip - a tooltip widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Script> -> L<IWL::Tooltip>
 L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Tooltip>
 
 =head1 DESCRIPTION
@@ -77,7 +76,7 @@ Note: The tooltip and widget ids must not be changed after this method is called
 sub bindToWidget {
     my ($self, $widget, $signal, $toggle) = @_;
     my $to = $widget->getId;
-    return $self->_pushError(__x("Invalid id: '{ID}'", ID => $to)) unless $to;
+    return $self->_pushError(__("Invalid id")) unless $to;
 
     $self->{__bound}       = $to;
     $self->{__bindSignal}  = $widget->_namespacedSignalName($signal);
@@ -153,28 +152,20 @@ sub hidingCallback {
     return "\$('$id').hideTooltip()";
 }
 
-# Overrides
-#
-sub setStyle {
-    my ($self, %style) = @_;
-    $self->SUPER::setStyle(%style);
-    $self->{_options}{style} = {
-        %{$self->{_options}{style}},
-        %style
-    };
-}
-
 # Protected
 #
 sub _realize {
-    my $self = shift;
-    my $id   = $self->getId;
+    my $self       = shift;
+    my $id         = $self->getId;
+    my $visibility = $self->getStyle('visibility');
     my $options;
 
-    $self->{__content} = escape($self->{__contentObject}->getContent) if $self->{__contentObject};
+    $self->SUPER::_realize;
 
-    $self->{_options}{parent} = UNIVERSAL::isa($self->{__parent}, 'IWL::Widget')
-      ? $self->{__parent}->getId : $self->{__parent};
+    $self->{__content} = escape($self->{__contentObject}->getContent)
+      if $self->{__contentObject};
+    $self->{_options}{parent} = UNIVERSAL::isa($self->{_options}{parent}, 'IWL::Widget')
+      ? $self->{_options}{parent}->getId : $self->{_options}{parent};
     $self->{_options}{hidden} = 1;
     $self->{_options}{content} = $self->{__content} if $self->{__content};
     $self->{_options}{bind} =
@@ -182,11 +173,10 @@ sub _realize {
     $self->{_options}{bindHide} =
       [$self->{__boundHide}, $self->{__bindHideSignal}] if $self->{__boundHide};
 
+    $self->{_options}{visibility} = $visibility if $visibility;
+    $self->setStyle(visibility => 'hidden');
     $options = toJSON($self->{_options});
-    $self->setId($id . '_script');
-    $self->IWL::Widget::_realize;
-    $self->setScript("IWL.Tooltip.create('$id', $options);");
-    $self->IWL::Script::_realize;
+    $self->_appendInitScript("IWL.Tooltip.create('$id', $options);");
 }
 
 # Internal
@@ -197,12 +187,13 @@ sub __init {
     $self->{_options} = {style => {}};
     $self->{_options}{centerOnElement} = $args{centerOnElement} ? 1 : 0 if defined $args{centerOnElement};
     $self->{_options}{followMouse}     = $args{followMouse}     ? 1 : 0 if defined $args{followMouse};
-    $self->{__parent}                  = $args{parent}                  if defined $args{parent};
+    $self->{_options}{parent}          = $args{parent}                  if defined $args{parent};
 
-    $args{id} ||= randomize('tooltip');
-    $self->{_tag} = "script";
+    $self->{_defaultClass} = 'tooltip';
+    $args{id} ||= randomize($self->{_defaultClass});
+    $self->{_tag} = "div";
 
-    delete @args{qw(centerOnElement followMouse)};
+    delete @args{qw(centerOnElement followMouse parent)};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'tooltip.js');
 

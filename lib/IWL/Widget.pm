@@ -475,9 +475,10 @@ sub getTitle {
 sub _realize {
     my $self = shift;
 
+    $self->IWL::Object::_realize;
     if ($self->{_customSignals}) {
 	my $id = $self->getId;
-	my $parent = $self->__findTopParent || $self;
+	my $parent = $self->_findTopParent || $self;
 
 	if ($id) {
 	    foreach my $signal (keys %{$self->{_customSignals}}) {
@@ -575,17 +576,6 @@ sub __setStyle {
     $self->{_style}{$attr} = $value;
 
     return $self;
-}
-
-sub __findTopParent {
-    my $self = shift;
-    my $parent = $self->{parentNode};
-
-    while ($parent) {
-	last if !$parent->{parentNode} || $parent->{parentNode}->isa('IWL::Page::Body');
-	$parent = $parent->{parentNode};
-    }
-    return $parent;
 }
 
 1;

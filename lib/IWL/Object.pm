@@ -391,6 +391,7 @@ sub getContent {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
+        $self->__addInitScripts;
     }
 
     return '' if $self->{__objectErrorBad};
@@ -446,7 +447,6 @@ sub getContent {
         $content .= "</" . $self->{_tag} . ">\n";
     }
 
-    unshift @{$self->{_tailObjects}}, @{$self->{_initScripts}};
     foreach (@{$self->{_tailObjects}}) {
         $content .= $_->getContent;
     }
@@ -498,6 +498,7 @@ sub getObject {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
+        $self->__addInitScripts;
     }
 
     return {} if $self->{__objectErrorBad};
@@ -520,7 +521,6 @@ sub getObject {
         push @$children, $child->getObject if $child;
     }
 
-    unshift @{$self->{_tailObjects}}, @{$self->{_initScripts}};
     foreach (@{$self->{_tailObjects}}) {
 	push @$objects, $_->getObject;
     }
@@ -1050,13 +1050,22 @@ sub _appendAfter {
 sub _appendInitScript {
     my ($self, @scripts) = @_;
 
-    my $script = IWL::Script->new->setScript(join '; ', @scripts);
-    push @{$self->{_initScripts}}, $script;
+    push @{$self->{_initScripts}}, @scripts;
     return $self;
 }
 
 sub _realize {
-# called when the object is realized
+}
+
+sub _findTopParent {
+    my $self = shift;
+    my $parent = $self->{parentNode};
+
+    while ($parent) {
+	last if !$parent->{parentNode} || $parent->{parentNode}->isa('IWL::Page::Body');
+	$parent = $parent->{parentNode};
+    }
+    return $parent;
 }
 
 # Internal
@@ -1091,6 +1100,28 @@ sub __iterateForm {
 
     return $self;
 }
+
+sub __addInitScripts {
+    my $self = shift;
+    if (@{$self->{_initScripts}}) {
+        require IWL::Script;
+
+        my $parent = $self->_findTopParent || $self;
+        my $expr = join '; ', @{$self->{_initScripts}};
+
+        if ($expr) {
+            $parent->{_initScriptElement} = IWL::Script->new
+              unless $parent->{_initScriptElement};
+            $parent->{_initScriptElement}->appendScript($expr . ';');
+        }
+        if ($parent->{_initScriptElement} && !$parent->{_initScriptElement}{_added}) {
+            unshift @{$parent->{_tailObjects}}, $parent->{_initScriptElement}
+              if $parent->{_initScriptElement};
+            $parent->{_initScriptElement}{_added} = 1;
+            $parent->{_initScriptElement}->setAttribute('iwl:initScript');
+        }
+    }
+};
 
 1;
 

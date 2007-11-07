@@ -20,42 +20,31 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             changeBackground.call(this, this.buttonParts[i], "default")
     }
 
-    function createElements(image, label) {
+    function createElements() {
         var id = this.id;
         var className = $A(this.classNames()).first();
-
-        this.update(
-            '<div id="' + id + '_tl" class="'      + className + '_tl"></div>'      + 
-            '<div id="' + id + '_top" class="'     + className + '_top"></div>'     + 
-            '<div id="' + id + '_tr" class="'      + className + '_tr"></div>'      + 
-            '<div id="' + id + '_l" class="'       + className + '_l"></div>'       + 
-            '<div id="' + id + '_content" class="' + className + '_content"></div>' + 
-            '<div id="' + id + '_r" class="'       + className + '_r"></div>'       + 
-            '<div id="' + id + '_bl" class="'      + className + '_bl"></div>'      + 
-            '<div id="' + id + '_bottom" class="'  + className + '_bottom"></div>'  + 
-            '<div id="' + id + '_br" class="'      + className + '_br"></div>'
-        );
 
         this.buttonParts = this.childElements();
         this.buttonContent = $(id + '_content');
 
-        image = image ? unescape(image) : '';
         var classNames = className + '_label ' + className + '_label_' + this.options.size;
-        this.buttonContent.update(
-            image + '<span id="' + id + '_label" class="' + classNames + '">' +
-                unescape(label) + '</span>'
+        this.buttonContent.insert(
+            '<span id="' + id + '_label" class="' + classNames + '">' +
+                unescape(this.options.label) + '</span>'
         );
         this.buttonImage = $(id + '_image');
         this.buttonLabel = $(id + '_label');
     }
 
     function checkComplete() {
-        if (!this.buttonImage) {
+        if (!this.buttonImage || this.buttonImage.complete) {
             if (this.buttonLabel.getText()
                     && !this.buttonContent.clientWidth)
                 checkComplete.bind(this).delay(0.1);
             else
-                this.adjust();
+                adjust.call(this);
+        } else {
+            this.buttonImage.signalConnect('load', checkComplete.bind(this));
         }
     }
 
@@ -155,140 +144,127 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.hidden.remove();
     }
 
-    function init(json) {
-        createElements.call(this, json.image, json.label);
-        checkComplete.call(this);
-        this.observe('mousedown', clickImageChange.bindAsEventListener(this));
-        this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
-        if (this.options.disabled)
-            this.setDisabled(true);
-        if (this.options.submit)
-            this.setSubmit.apply(this, Object.isArray(this.options.submit) ? this.options.submit : []);
+    function adjust() {
+        var square = 6;
+        var corner_size = 6;
+        var image = this.buttonImage;
+        var label = this.buttonLabel;
+        var topleft = this.buttonParts[0];
+        var top = this.buttonParts[1];
+        var topright = this.buttonParts[2];
+        var left = this.buttonParts[3];
+        var content = this.buttonParts[4];
+        var right = this.buttonParts[5];
+        var bottomleft = this.buttonParts[6];
+        var bottom = this.buttonParts[7];
+        var bottomright = this.buttonParts[8];
+        var state = visibilityToggle.call(this);
+
+        if (!content) return;
+        if (!label.getText()) {
+            var text;
+            if (image) {
+                var ml = parseFloat(image.getStyle('margin-left')) || 0;
+                var mr = parseFloat(image.getStyle('margin-right')) || 0;
+                var ih = parseFloat(image.getStyle('height')) || image.height;
+                if (ml != mr)
+                    image.setStyle({marginLeft: ml + 'px', marginRight: ml + 'px'});
+            }
+            label.appendChild(text = 'M'.createTextNode());
+            var height = content.getHeight();
+            label.removeChild(text);
+            if (height)
+                content.style.height = height + 'px';
+            if (image)
+                image.style.marginTop = (height - ih)/2 + 'px';
+        }
+
+        if (this.options.size == 'medium') {
+            square = 3;
+        } else if (this.options.size == 'small') {
+            square = 1;
+            corner_size = 4;
+            if (topleft) {
+                topleft.style.width = corner_size + "px";
+                topleft.style.height = corner_size + "px";
+            }
+            if (topright) {
+                topright.style.width = corner_size + "px";
+                topright.style.height = corner_size + "px";
+            }
+            if (bottomleft) {
+                bottomleft.style.width = corner_size + "px";
+                bottomleft.style.height = corner_size + "px";
+            }
+            if (bottomright) {
+                bottomright.style.width = corner_size + "px";
+                bottomright.style.height = corner_size + "px";
+            }
+            if (image && image.width && image.height) {
+                if (image.width > 10)
+                    image.width = 10;
+                if (image.height > 10)
+                    image.height = 10;
+            }
+        }
+
+        var dims = content.getDimensions();
+        var width = dims.width;
+        height = height || dims.height;
+
+        if (state) visibilityToggle.call(this, state);
+        if (!width || !height) {
+            adjust.bind(this).delay(0.5);
+            return;
+        }
+
+        if (top) {
+            top.style.left = corner_size + 'px';
+            top.style.width = width + 'px';
+            top.style.height = square + 'px';
+        }
+        if (topright) {
+            topright.style.left = corner_size + width + 'px';
+        }
+        if (left) {
+            left.style.top = corner_size + 'px';
+            left.style.width = corner_size + 'px';
+            left.style.height = 2 * square + height - (2 * corner_size) + 'px';
+        }
+        content.style.top = square + 'px';
+        content.style.left = corner_size + 'px';
+        if (right) {
+            right.style.top = corner_size + 'px';
+            right.style.left = corner_size + width + 'px';
+            right.style.width = corner_size + 'px';
+            right.style.height = 2 * square + height - (2 * corner_size) + 'px';
+        }
+        if (bottomleft) {
+            bottomleft.style.top = 2 * square + height - corner_size + 'px';
+        }
+        if (bottom) {
+            bottom.style.left = corner_size + 'px';
+            bottom.style.top = square + height + 'px';
+            bottom.style.width = width + 'px';
+            bottom.style.height = square + 'px';
+        }
+        if (bottomright) {
+            bottomright.style.left = corner_size + width + 'px';
+            bottomright.style.top = 2 * square + height - corner_size + 'px';
+        }
+        this.style.width = 2 * corner_size + width + 'px';
+        this.style.height = 2 * square + height + 'px';
+
+        if (!this.loaded) {
+            this.style.visibility = this.options.visibility || '';
+            this.loaded = true;
+            this.emitSignal('iwl:load');
+        }
+
+        return this.emitSignal('iwl:adjust');
     }
 
     return {
-        /**
-         * Adjusts the button. Should be called if the button was hidden when created
-         * @returns The object
-         * */
-        adjust: function() {
-            var square = 6;
-            var corner_size = 6;
-            var image = this.buttonImage;
-            var label = this.buttonLabel;
-            var topleft = this.buttonParts[0];
-            var top = this.buttonParts[1];
-            var topright = this.buttonParts[2];
-            var left = this.buttonParts[3];
-            var content = this.buttonParts[4];
-            var right = this.buttonParts[5];
-            var bottomleft = this.buttonParts[6];
-            var bottom = this.buttonParts[7];
-            var bottomright = this.buttonParts[8];
-            var state = visibilityToggle.call(this);
-
-            if (!content) return;
-            if (!label.getText()) {
-                var text;
-                if (image) {
-                    var ml = parseFloat(image.getStyle('margin-left')) || 0;
-                    var mr = parseFloat(image.getStyle('margin-right')) || 0;
-                    var ih = parseFloat(image.getStyle('height')) || image.height;
-                    if (ml != mr)
-                        image.setStyle({marginLeft: ml + 'px', marginRight: ml + 'px'});
-                }
-                label.appendChild(text = 'M'.createTextNode());
-                var height = content.getHeight();
-                label.removeChild(text);
-                if (height)
-                    content.style.height = height + 'px';
-                if (image)
-                    image.style.marginTop = (height - ih)/2 + 'px';
-            }
-
-            if (this.options.size == 'medium') {
-                square = 3;
-            } else if (this.options.size == 'small') {
-                square = 1;
-                corner_size = 4;
-                if (topleft) {
-                    topleft.style.width = corner_size + "px";
-                    topleft.style.height = corner_size + "px";
-                }
-                if (topright) {
-                    topright.style.width = corner_size + "px";
-                    topright.style.height = corner_size + "px";
-                }
-                if (bottomleft) {
-                    bottomleft.style.width = corner_size + "px";
-                    bottomleft.style.height = corner_size + "px";
-                }
-                if (bottomright) {
-                    bottomright.style.width = corner_size + "px";
-                    bottomright.style.height = corner_size + "px";
-                }
-                if (image && image.width && image.height) {
-                    if (image.width > 10)
-                        image.width = 10;
-                    if (image.height > 10)
-                        image.height = 10;
-                }
-            }
-
-            var dims = content.getDimensions();
-            var width = dims.width;
-            height = height || dims.height;
-
-            if (state) visibilityToggle.call(this, state);
-            if (!width || !height) {
-                this.adjust.bind(this).delay(0.5);
-                return;
-            }
-
-            if (top) {
-                top.style.left = corner_size + 'px';
-                top.style.width = width + 'px';
-                top.style.height = square + 'px';
-            }
-            if (topright) {
-                topright.style.left = corner_size + width + 'px';
-            }
-            if (left) {
-                left.style.top = corner_size + 'px';
-                left.style.width = corner_size + 'px';
-                left.style.height = 2 * square + height - (2 * corner_size) + 'px';
-            }
-            content.style.top = square + 'px';
-            content.style.left = corner_size + 'px';
-            if (right) {
-                right.style.top = corner_size + 'px';
-                right.style.left = corner_size + width + 'px';
-                right.style.width = corner_size + 'px';
-                right.style.height = 2 * square + height - (2 * corner_size) + 'px';
-            }
-            if (bottomleft) {
-                bottomleft.style.top = 2 * square + height - corner_size + 'px';
-            }
-            if (bottom) {
-                bottom.style.left = corner_size + 'px';
-                bottom.style.top = square + height + 'px';
-                bottom.style.width = width + 'px';
-                bottom.style.height = square + 'px';
-            }
-            if (bottomright) {
-                bottomright.style.left = corner_size + width + 'px';
-                bottomright.style.top = 2 * square + height - corner_size + 'px';
-            }
-            this.style.width = 2 * corner_size + width + 'px';
-            this.style.height = 2 * square + height + 'px';
-
-            if (!this.loaded) {
-                this.loaded = true;
-                this.emitSignal('iwl:load');
-            }
-
-            return this.emitSignal('iwl:adjust');
-        },
         /**
          * Gets the label of the button
          * @returns The text
@@ -303,7 +279,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         setLabel: function(text) {
             this.buttonLabel.update(text && text.toString ? text.toString() : '');
-            return this.adjust();
+            return adjust.call(this);
         },
         /**
          * Gets the image of the button
@@ -330,13 +306,12 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     );
                 else
                     this.buttonImage.src = source;
-                this.buttonImage.observe('load', this.adjust.bind(this));
+                this.buttonImage.observe('load', adjust.bind(this));
             } else {
                 this.buttonImage.remove();
                 this.buttonImage = undefined;
             }
-            this.adjust();
-            return this;
+            return adjust.call(this);
         },
         /**
          * Sets the button as a form submit button
@@ -364,10 +339,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setDisabled: function(disabled) {
             if (disabled == this._disabled)
                 return;
-            if (!document.loaded) {
-                document.observe('dom:loaded', this.setDisabled.bind(this, disabled));
-                return this;
-            }
             if (!this.loaded)
                 return this.signalConnect('iwl:load', this.setDisabled.bind(this, disabled));
 
@@ -378,16 +349,15 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 createDisabledLayer.call(this);
                 positionDisabledLayer.call(this);
                 this.signalConnect('iwl:adjust', disableButton);
-                this.adjust();
+                return adjust.call(this);
             } else {
                 this.removeClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = false;
                 defaultImageChange.call(this);
                 removeDisabledLayer.call(this);
                 this.signalDisconnect('iwl:adjust', disableButton);
-                this.adjust();
+                return adjust.call();
             }
-            return this;
         },
         /**
          * Checks whether the button is disabled
@@ -399,19 +369,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this._disabled;
         },
 
-        _preInit: function(id, json) {
-            var script = $(id + '_noscript');
-            if (!script) {
-                this.create.bind(this, id, json, arguments[2]).delay(0.5);
-                return false;
-            }
-            var container = script.up().createHtmlElement(json.container, script);
-            script.remove();
-            if (!container) return;
-            this.current = $(container);
-            return true;
-        },
-        _init: function(id, json) {
+        _init: function(id) {
             this.buttonParts = new Array;
             this.buttonImage = null;
             this.buttonLabel = null;
@@ -419,14 +377,20 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.options = Object.extend({
                 size: 'default',
                 disabled: false,
-                submit: false 
-            }, arguments[2] || {});
+                submit: false,
+                label: ''
+            }, arguments[1] || {});
             this.loaded = false;
-            if (document.loaded)
-                init.call(this, json);
-            else
-                document.observe('dom:loaded', init.bind(this, json));
-        }
+            this.cleanWhitespace();
+            createElements.call(this);
+            checkComplete.call(this);
+            this.observe('mousedown', clickImageChange.bindAsEventListener(this));
+            this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
+            if (this.options.disabled)
+                this.setDisabled(true);
+            if (this.options.submit)
+                this.setSubmit.apply(this, Object.isArray(this.options.submit) ? this.options.submit : []);
+            }
     }
 })());
 

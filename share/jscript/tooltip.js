@@ -6,15 +6,13 @@
 IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
     function build(id) {
         var container;
-        if (container = $(id)) {
-            if (container.setContent)
-                this.current = container;
-            else
-                throw new Error('An element with id "' + id + '" already exists!');
-            return;
+        if ((container = $(id)) && !container.hasClassName('tooltip')) {
+            throw new Error('An element with id "' + id + '" already exists!');
+            return false;
         }
         
-        container = new Element('div', {className: 'tooltip', id: id, style: 'display: none'});
+        if (!container)
+            container = new Element('div', {className: 'tooltip', id: id});
         var content = new Element('div', {className: 'tooltip_content'});
         var bubble1 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_1'});
         var bubble2 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_2'});
@@ -25,35 +23,24 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         container.appendChild(bubble1);
         container.appendChild(content);
         container.style.display = 'none';
+        container.style.visibility = this.options.visibility || '';
 
         if (this.options.followMouse) {
             container.setStyle({marginTop: '5px'});
             Event.observe(document, 'mousemove', move.bindAsEventListener(container), false);
         }
 
-        var contentStyle = {};
-        for (var i in this.options.style)
-            contentStyle[i.camelize()] = this.options.style[i];
-        content.setStyle(contentStyle);
-
         this.current = container;
         this.content = content;
         this.bubbles = new Array(bubble1, bubble2, bubble3);
 
-        return this;
+        return true;
     }
 
     function append() {
-        var script = $(this.id + '_script');
         parentNode = this.options.parent == 'document.body' ? document.body : $(this.options.parent);
-        if (parentNode)
-            var parent_node = parentNode;
-        else if (script)
-            var parent_node = script.parentNode;
-        else
-            var parent_node = document.body;
-
-        parent_node.appendChild(this);
+        if (parentNode || !this.parentNode)
+            (parentNode || document.body).appendChild(this);
         if (this.options.content)
             this.setContent(this.options.content);
         if (this.options.bind)
@@ -96,7 +83,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (y + tooltip_dims.height > viewport_dims.height + scroll_offset.top - margins)
             top = element_top
                 ? element_top - tooltip_dims.height
-                : viewport_dims.height + scroll_offset.top - margins - element_height - tooltip_dims.height;
+                : viewport_dims.height + scroll_offset.top - margins - tooltip_dims.height;
 
         /* Vertical offset */
         if (top < y) {
@@ -307,12 +294,10 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 followMouse: false,
                 content: false,
                 bind: false,
-                bindHide: false,
-                style: {}
+                bindHide: false
             }, arguments[1] || {})
-            if (!id) id = 'tooltip' + Math.random();
-            build.call(this, id);
-            return true;
+            if (!id) id = 'tooltip_' + Math.random();
+            return build.call(this, id);
         },
         _init: function() {
             if (parseInt(this.options.width))

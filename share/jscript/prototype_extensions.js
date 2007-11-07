@@ -73,7 +73,7 @@ Object.extend(Event, (function() {
       real: 'mouseover',
       callback: function(event, element, callback) {
         var target = event.relatedTarget || Event.relatedTarget(event);
-        try { target.parentNode } catch(e) { target = null }
+        try { target && target.parentNode } catch(e) { target = null }
         if (!target || target == element || Element.descendantOf(target, element)) return;
         callback.call(target, event)
       }
@@ -82,7 +82,7 @@ Object.extend(Event, (function() {
       real: 'mouseout',
       callback: function(event, element, callback) {
         var target = event.relatedTarget || Event.relatedTarget(event);
-        try { target.parentNode } catch(e) { target = null }
+        try { target && target.parentNode } catch(e) { target = null }
         if (!target || target == element || Element.descendantOf(target, element)) return;
         callback.call(target, event)
       }

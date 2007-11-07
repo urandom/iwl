@@ -107,7 +107,7 @@ Parameters: B<TEXT> - the text for the label
 sub setLabel {
     my ($self, $text) = @_;
 
-    $self->{__button}{label} = $text;
+    $self->{_options}{label} = $text;
     return $self;
 }
 
@@ -118,7 +118,7 @@ Returns the text of the button label
 =cut
 
 sub getLabel {
-    return shift->{__button}{label};
+    return shift->{_options}{label};
 }
 
 =item B<setImage> (B<SRC>, [B<ALT>])
@@ -132,7 +132,7 @@ Parameters: B<SRC> - the url for the image. If the B<SRC> begins with I<IWL_STOC
 sub setImage {
     my ($self, $src, $alt) = @_;
 
-    my $image = $self->{__button}{image};
+    my $image = $self->{image};
     $image->{_ignore} = 0;
     if ($src =~ /^IWL_STOCK_/) {
         $image->setFromStock($src);
@@ -157,7 +157,7 @@ Returns the button image
 =cut
 
 sub getImage {
-    return shift->{__button}{image};
+    return shift->{image};
 }
 
 =item B<setFromStock> (B<STOCK_ID>)
@@ -251,137 +251,37 @@ sub isDisabled {
 
 # Overrides
 #
-sub setStyle {
-    my ($self, %style) = @_;
-
-    $self->{__button}->setStyle(%style);
-    return $self;
-}
-
-sub getStyle {
-    my ($self, $attr) = @_;
-    return $self->{__button}->getStyle($attr);
-}
-
-sub deleteStyle {
-    my ($self, $attr) = @_;
-    $self->{__button}->deleteStyle($attr);
-    return $self;
-}
-
 sub setId {
     my ($self, $id) = @_;
-    $self->SUPER::setId($id . '_noscript');
-    $self->{__button}->setId($id);
-    $self->{__button}{image}->setId($id . '_image');
+    $self->SUPER::setId($id);
+    $self->{image}->setId($id . '_image');
+    my $index = 0;
+    foreach (qw(tl top tr l content r bl bottom br)) {
+        $self->{__parts}[$index++]->setId($id . '_' . $_);
+    }
     return $self;
-}
-
-sub getId {
-    return shift->{__button}->getId;
-}
-
-sub setClass {
-    my ($self, $class) = @_;
-
-    $self->{__button}->setClass($class);
-    return $self;
-}
-
-sub appendClass {
-    my ($self, $class) = @_;
-
-    $self->{__button}->appendClass($class);
-    return $self;
-}
-
-sub prependClass {
-    my ($self, $class) = @_;
-
-    $self->{__button}->prependClass($class);
-    return $self;
-}
-
-sub hasClass {
-    my ($self, $class) = @_;
-
-    $self->{__button}->hasClass($class);
-    return $self;
-}
-
-sub removeClass {
-    my ($self, $class) = @_;
-
-    $self->{__button}->removeClass($class);
-    return $self;
-}
-
-sub getClass {
-    return shift->{__button}->getClass;
-}
-
-sub signalConnect {
-    my ($self, $signal, $handler) = @_;
-
-    $self->{__button}->signalConnect($signal, $handler);
-    return $self;
-}
-
-sub signalDisconnect {
-    my ($self, $signal, $handler) = @_;
-
-    $self->{__button}->signalDisconnect($signal, $handler);
-    return $self;
-}
-
-sub signalDisconnectAll {
-    my ($self, $signal) = @_;
-
-    $self->{__button}->signalDisconnectAll($signal);
-    return $self;
-}
-
-sub setTitle {
-    my ($self, $title) = @_;
-
-    $self->{__button}->setTitle($title);
-    return $self;
-}
-
-sub getTitle {
-    return shift->{__button}->getTitle;
-}
-
-sub setName {
-    my ($self, $name) = @_;
-    $self->{__button}->setName($name);
-    return $self;
-}
-
-sub getName {
-    return shift->{__button}->getName;
 }
 
 sub setAlt {
     my ($self, $alt) = @_;
 
-    $self->{__button}{image}->setAlt($alt);
+    $self->{image}->setAlt($alt);
     return $self;
 }
 
 sub getAlt {
-    return shift->{__button}{image}->getAlt;
+    return shift->{image}->getAlt;
 }
 
 sub set {
     my ($self, $src) = @_;
 
-    $self->{__button}{image}->set($src);
+    $self->{image}->set($src);
     return $self;
 }
 
 sub getSrc {
-    return shift->{__button}{image}->getSrc;
+    return shift->{image}->getSrc;
 }
 
 sub getHref {
@@ -391,29 +291,29 @@ sub getHref {
 # Protected
 #
 sub _realize {
-    my $self    = shift;
-    my $id      = $self->{__button}->getId;
-    my $options = {};
+    my $self       = shift;
+    my $id         = $self->getId;
+    my $visibility = $self->getStyle('visibility');
+    my $options    = {};
 
     $self->SUPER::_realize;
 
-    $self->{__button}{image}->signalConnect(load => "\$('$id').adjust()");
-    $self->{__button}{_handlers} = $self->{_handlers};
-
-    my $container = $self->{__button}->getJSON;
-    my $image     = escape($self->{__button}{image}->getContent);
-    my $label     = escape($self->{__button}{label});
-    my $json      = qq|{container:$container,image:"$image",label:"$label"}|;
-
+    $self->{_options}{visibility} = $visibility if $visibility;
+    $self->setStyle(visibility => 'hidden');
     $options = toJSON($self->{_options});
-    $self->_appendInitScript("IWL.Button.create('$id', $json, $options);");
+    $self->_appendInitScript("IWL.Button.create('$id', $options);");
 }
 
 sub _setupDefaultClass {
     my $self = shift;
-    $self->SUPER::prependClass($self->{_defaultClass} . '_noscript');
-    $self->{__button}->prependClass($self->{_defaultClass});
-    return $self->{__button}{image}->prependClass($self->{_defaultClass} . '_image');
+    $self->SUPER::prependClass($self->{_defaultClass});
+    $self->{image}->prependClass($self->{_defaultClass} . '_image');
+    my $index = 0;
+    foreach (qw(tl top tr l content r bl bottom br)) {
+        $self->{__parts}[$index++]->prependClass(
+            $self->{_defaultClass} . '_' . $_);
+    }
+    return $self;
 }
 
 # Internal
@@ -427,27 +327,31 @@ sub __init {
     $self->{_defaultClass}     = 'button';
     $image->{_ignore}          = 1;
 
-    $self->{__button}          = IWL::Container->new;
-    $self->{__button}{image}   = $image;
-    $self->{__button}{label}   = '';
+    $self->{image}             = $image;
     $self->{__nsAnchor}        = $anchor;
     $self->{__nsAnchor}{added} = 0;
+    $self->{__parts}           = [IWL::Widget->newMultiple(9)];
 
     $id = randomize($self->{_defaultClass}) unless $id;
-    $self->{_tag} = "noscript";
+    $self->{_tag} = 'div';
+    foreach (@{$self->{__parts}}) {
+        $_->{_tag} = 'div';
+        $self->appendChild($_);
+    }
+    $self->{__parts}[4]->appendChild($image);
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
     $self->{_options}{disabled} = $args{disabled} ? 1 : 0;
 
     delete @args{qw(size id)};
-    $self->{__button}->_constructorArguments(%args);
+    $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'button.js');
 
     # Callbacks
     # Hides the dashed focus border in IE. For firefox, this is done by css
     $self->signalConnect(focus => "this.hideFocus = true");
-    $self->{__button}{_customSignals} = {load => [], adjust => []};
+    $self->{_customSignals} = {load => [], adjust => []};
 
     return $self;
 }
