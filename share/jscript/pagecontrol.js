@@ -64,6 +64,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.prevButton.setStyle(hidden);
             this.nextButton.setStyle(hidden);
             this.lastButton.setStyle(hidden);
+            this.labelContainer.setStyle(hidden);
         } else {
             var dims = this.getDimensions();
             this.setStyle({width: dims.width + 'px', height: dims.height + 'px', visibility: 'visible'});
