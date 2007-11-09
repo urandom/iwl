@@ -45,5 +45,5 @@ like($cb->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effe
 <div (?:(?:class="contentbox_bottom"|id="cb_bottom")\s*){2}><div (?:(?:class="contentbox_bottomr"|id="cb_bottomr")\s*){2}></div>
 </div>
 </div>
-<script type="text/javascript">IWL.Contentbox.create.'cb', {.*}.;</script>
+<script (?:(?:type="text/javascript"|iwl:initScript)\s*){2}>IWL.Contentbox.create.'cb', {.*}.;*</script>
 )s);
