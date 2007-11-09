@@ -17,12 +17,6 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
         return IWL.Druid.Page.create(page, this);
     }
 
-    function buttonLoad(count) {
-        if (--count > 0) return;
-        this.nextText = this.nextButton.getLabel();
-        this._refreshButtons();
-    }
-
     return {
         /**
          * Selects the given page
@@ -202,9 +196,15 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }.bind(this));
             
             var count = 3;
-            this.okButton.signalConnect('iwl:init', buttonLoad.bind(this, count));
-            this.backButton.signalConnect('iwl:init', buttonLoad.bind(this, count));
-            this.nextButton.signalConnect('iwl:init', buttonLoad.bind(this, count));
+            function buttonLoad() {
+                if (--count > 0) return;
+                this.nextText = this.nextButton.getLabel();
+                this._refreshButtons();
+            }
+
+            this.okButton.signalConnect('iwl:init', buttonLoad.bind(this));
+            this.backButton.signalConnect('iwl:init', buttonLoad.bind(this));
+            this.nextButton.signalConnect('iwl:init', buttonLoad.bind(this));
 
             this.nextButton.signalConnect('click', function() {
                 if (this.currentPage.isFinal()) {
