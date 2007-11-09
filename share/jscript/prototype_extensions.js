@@ -558,7 +558,7 @@ document.insertScript = (function () {
     }
     scripts.push(url);
     if (options.skipCache) {
-      var query = $H({_: Math.random()});
+      var query = $H({_: (new Date).valueOf()});
       var index = url.indexOf('?');
       if (index != -1) {
         query.merge(url.substr(index).toQueryParams());
@@ -621,6 +621,7 @@ Object.extend(String.prototype, (function() {
         }
       });
       this.extractScripts().each(function(script) {
+        if (!script) return;
         if (urlCount)
           codeSnippets.push(script) 
         else
@@ -689,51 +690,3 @@ Object.extend(document.viewport, {
     return size;
   }
 });
-
-/* Abort works correctly in 1.6
-// Overload this, for aborting the request
-Object.extend(Ajax.Request.prototype, {
-  respondToReadyState: function(readyState) {
-    var state = Ajax.Request.Events[readyState];
-    var transport = this.transport, json = this.evalJSON();
-    var aborted = false;
-
-    if (state == 'Complete') {
-      try {
-	// raise an exception when transport is abort()ed
-	if (transport.status) 1;
-      } catch (e) {
-	aborted = true;
-      }
-    }
-
-    if (state == 'Complete' && !aborted) {
-      try {
-        this._complete = true;
-        (this.options['on' + this.transport.status]
-         || this.options['on' + (this.success() ? 'Success' : 'Failure')]
-         || Prototype.emptyFunction)(transport, json);
-      } catch (e) {
-        this.dispatchException(e);
-      }
-
-      var contentType = this.getHeader('Content-type');
-      if (contentType && contentType.strip().
-        match(/^(text|application)\/(x-)?(java|ecma)script(;.*)?$/i))
-          this.evalResponse();
-    }
-
-    try {
-      (this.options['on' + state] || Prototype.emptyFunction)(transport, json);
-      Ajax.Responders.dispatch('on' + state, this, transport, json);
-    } catch (e) {
-      this.dispatchException(e);
-    }
-
-    if (state == 'Complete' && !aborted) {
-      // avoid memory leak in MSIE: clean up
-      this.transport.onreadystatechange = Prototype.emptyFunction;
-    }
-  }
-});
-*/

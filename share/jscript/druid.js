@@ -17,6 +17,12 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
         return IWL.Druid.Page.create(page, this);
     }
 
+    function buttonLoad(count) {
+        if (--count > 0) return;
+        this.nextText = this.nextButton.getLabel();
+        this._refreshButtons();
+    }
+
     return {
         /**
          * Selects the given page
@@ -187,7 +193,6 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.currentPage = this.pageContainer.select('.' +
                     $A(this.classNames()).first() + '_page_selected')[0];
             this.finishText = unescape(text);
-            this.nextText = this.nextButton.getLabel();
             this.errorPage = new Element('div', {className: $A(this.classNames()).first() + '_page_error'});
             this.pageContainer.appendChild(this.errorPage);
             this.pages = [];
@@ -196,7 +201,11 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     this.pages.push(IWL.Druid.Page.create($_, this));
             }.bind(this));
             
-            this._refreshButtons();
+            var count = 3;
+            this.okButton.signalConnect('iwl:init', buttonLoad.bind(this, count));
+            this.backButton.signalConnect('iwl:init', buttonLoad.bind(this, count));
+            this.nextButton.signalConnect('iwl:init', buttonLoad.bind(this, count));
+
             this.nextButton.signalConnect('click', function() {
                 if (this.currentPage.isFinal()) {
                     if (this.nextButton.finish)
