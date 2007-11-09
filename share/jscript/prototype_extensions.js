@@ -665,6 +665,13 @@ Object.extend(document.viewport, {
   getMaxDimensions: function() {
     var width = Prototype.Browser.WebKit ? document.body.scrollWidth : document.documentElement.scrollWidth;
     var height = Prototype.Browser.WebKit ? document.body.scrollHeight : document.documentElement.scrollHeight;
+    if (Prototype.Browser.Gecko || Prototype.Browser.IE) {
+      var scrollbarSize = document.viewport.getScrollbarSize();
+      if (width != document.viewport.getWidth())
+        width -= scrollbarSize;
+      if (height != document.viewport.getHeight())
+        height -= scrollbarSize;
+    }
     return Object.extend([width, height], {width: width, height: height});
   },
   getMaxWidth: function() {
@@ -672,6 +679,14 @@ Object.extend(document.viewport, {
   },
   getMaxHeight: function() {
     return this.getMaxDimensions().height;
+  },
+  getScrollbarSize: function() {
+    var testDiv = document.body.appendChild(new Element('div',
+        {style: "position: absolute; top: -1000px; left: -1000px; overflow: scroll; width: 50px; height: 50px"}));
+    var size = (50 - testDiv.clientWidth) || (50 - testDiv.clientHeight);
+
+    testDiv.remove();
+    return size;
   }
 });
 

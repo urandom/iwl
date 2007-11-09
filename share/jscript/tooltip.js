@@ -76,6 +76,13 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         var margins = 5;
         var left = x;
         var top = y;
+        if (Prototype.Browser.Gecko) {
+            var max_dims = document.viewport.getMaxDimensions();
+            var scroll_size = document.viewport.getScrollbarSize();
+            viewport_dims.width -= max_dims.height > viewport_dims.height ? scroll_size : 0;
+            viewport_dims.height -= max_dims.width > viewport_dims.width ? scroll_size : 0;
+        }
+
         if (x < margins + scroll_offset.left) left = margins + scroll_offset.left;
         if (x + tooltip_dims.width > viewport_dims.width + scroll_offset.left - margins)
             left = viewport_dims.width + scroll_offset.left - margins - tooltip_dims.width;
