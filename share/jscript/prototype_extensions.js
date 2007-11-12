@@ -357,6 +357,12 @@ Object.extend(String.prototype, {
     var div = document.createElement('div');
     div.innerHTML = this.stripTags();
     return div.firstChild;
+  },
+  parseInt: function() {
+    return parseInt(this);
+  },
+  parseFloat: function() {
+    return parseFloat(this);
   }
 });
 
@@ -666,13 +672,6 @@ Object.extend(document.viewport, {
   getMaxDimensions: function() {
     var width = Prototype.Browser.WebKit ? document.body.scrollWidth : document.documentElement.scrollWidth;
     var height = Prototype.Browser.WebKit ? document.body.scrollHeight : document.documentElement.scrollHeight;
-    if (Prototype.Browser.Gecko || Prototype.Browser.IE) {
-      var scrollbarSize = document.viewport.getScrollbarSize();
-      if (width != document.viewport.getWidth())
-        width -= scrollbarSize;
-      if (height != document.viewport.getHeight())
-        height -= scrollbarSize;
-    }
     return Object.extend([width, height], {width: width, height: height});
   },
   getMaxWidth: function() {

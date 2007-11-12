@@ -187,7 +187,8 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var visibility = this.getStyle('visibility');
             this.style.visibility = 'hidden';
             this.loaded = false;
-            var buttonLoad = function() {
+            var buttonLoad = function(event) {
+                event.stop();
                 if (--buttonCount === 0) {
                     this.loaded = true;
                     refresh.call(this);
@@ -196,14 +197,14 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     this.emitSignal('iwl:load');
                 }
             };
-            this.firstButton = $(this.id + '_first').signalConnect('iwl:load', buttonLoad.bind(this));
-            this.prevButton = $(this.id + '_prev').signalConnect('iwl:load', buttonLoad.bind(this));
+            this.firstButton = $(this.id + '_first').signalConnect('iwl:load', buttonLoad.bindAsEventListener(this));
+            this.prevButton = $(this.id + '_prev').signalConnect('iwl:load', buttonLoad.bindAsEventListener(this));
             this.labelContainer = $(this.id + '_label');
             this.input = $(this.id + '_page_entry_text');
             this.label = $(this.id + '_page_count');
-            this.nextButton = $(this.id + '_next').signalConnect('iwl:load', buttonLoad.bind(this));
-            this.lastButton = $(this.id + '_last').signalConnect('iwl:load', buttonLoad.bind(this));
-            $(this.id + '_page_entry').signalConnect('iwl:load', buttonLoad.bind(this));
+            this.nextButton = $(this.id + '_next').signalConnect('iwl:load', buttonLoad.bindAsEventListener(this));
+            this.lastButton = $(this.id + '_last').signalConnect('iwl:load', buttonLoad.bindAsEventListener(this));
+            $(this.id + '_page_entry').signalConnect('iwl:load', buttonLoad.bindAsEventListener(this));
             this.options = Object.extend({
                 bound: false,
                 page: 1

@@ -23,7 +23,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         this.input.signalConnect('keydown', inputKeyDown.bindAsEventListener(this));
         this.input.signalConnect('keyup', inputKeyUp.bindAsEventListener(this));
 
-        this.signalConnect('mousedown', spinnerMouseDown.bindAsEventListener(this));
+        this.input.signalConnect('mousedown', spinnerMouseDown.bindAsEventListener(this));
         Event.observe(document, "mousemove", documentMouseMove.bindAsEventListener(this));
         Event.observe(document, "mouseup", documentMouseUp.bindAsEventListener(this));
     }

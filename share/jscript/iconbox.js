@@ -51,25 +51,20 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function restoreIconsHeight() {
         if (!this.icons) return;
         this.icons.each(function(icon) {
-            if (!icon.default_height)
+            if (!icon._defaultHeight)
                 return;
-            icon.setStyle({height: icon.default_height + 'px'});
+            icon.setStyle({height: icon._defaultHeight + 'px'});
         }.bind(this));
     }
 
-    function findMaxHeightOnSameRow(icon) {
+    function setMaxHeightOnSameRow(icon) {
         var offset_top = icon.offsetTop;
-        var height = parseInt(icon.getStyle('height'));
-        for (var i = 0; i < this.icons.length; i++) {
-            var testicon = this.icons[i];
-            if (icon == testicon) continue;
-            if (testicon.offsetTop == offset_top) {
-                var testheight = parseInt(testicon.getStyle('height'));
-                if (testheight > height)
-                    height = testheight;
-            }
-        }
-        return height;
+        var row_icons = this.icons.select(function(icon) {
+            if (!icon._defaultHeight) icon._defaultHeight = icon.getStyle('height').parseFloat(); return icon.offsetTop == offset_top;
+        });
+        var max_height = {height: (Math.max.apply(Math, row_icons.invoke('getStyle', 'height').invoke('parseFloat'))) + 'px'};
+        row_icons.invoke('setStyle', max_height);
+        return row_icons.last().nextIcon();
     }
 
     function keyEventsCB(event) {
@@ -303,10 +298,8 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }, arguments[1] || {});
             this.messages = Object.extend({}, arguments[2]);
 
-            var childElements = [];
-            this.iconsContainer.childElements().each(function(e) {
-                if (e.hasClassName('icon'))
-                    childElements.push(e);
+            var childElements = this.iconsContainer.childElements().select(function(e) {
+                return e.hasClassName('icon');
             });
             this._iconCount = childElements.length;
             childElements.each(function(e) {
@@ -320,14 +313,11 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         },
         _alignIconsVertically: function() {
             if (!this.icons) return;
-            this.icons.each(function(icon) {
-                if (!icon.default_height)
-                    icon.default_height = parseInt(icon.getStyle('height'));
-                var height = findMaxHeightOnSameRow.call(this, icon);
-                icon.setStyle({height: height + 'px'});
-            }.bind(this));
+            for (var icon = this.icons[0]; icon;)
+                icon = setMaxHeightOnSameRow.call(this, icon);
             this.dimensions = this.getDimensions();
             this._alignDelay = false;
+            return this;
         },
         _refreshResponse: function(json, params, options) {
             if (!json.icons.length) return;
