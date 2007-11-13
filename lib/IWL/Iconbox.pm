@@ -178,8 +178,9 @@ sub _refreshEvent {
     my ($event, $handler) = @_;
 
     IWL::Object::printJSONHeader;
-    my ($list, $extras) = $handler->($event->{params})
-        if 'CODE' eq ref $handler;
+    my ($list, $extras) = ('CODE' eq ref $handler)
+      ? $handler->($event->{params})
+      : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
 
     print '{icons: ['

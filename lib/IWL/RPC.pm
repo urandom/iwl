@@ -217,9 +217,10 @@ sub handleEvent {
 sub __defaultEvent {
     my ($self, $event, $handler) = @_;
 
-    my ($data, $extras) = $handler->($event->{params}, $event->{options}{id},
+    my ($data, $extras) = ('CODE' eq ref $handler)
+      ? $handler->($event->{params}, $event->{options}{id},
         $event->{options}{collectData} ? $event->{options}{elementData} : undef)
-      if 'CODE' eq ref $handler;
+      : (undef, undef);
     if (UNIVERSAL::isa($data, 'IWL::Object')) {
         $data = $data->getJSON unless $event->{options}{update};
     } elsif (ref $data eq 'ARRAY' || ref $data eq 'HASH') {

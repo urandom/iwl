@@ -458,8 +458,9 @@ sub _expandEvent {
     my ($event, $handler) = @_;
 
     IWL::Object::printJSONHeader;
-    my ($list, $extras) = $handler->($event->{params}, $event->{options}{all})
-        if 'CODE' eq ref $handler;
+    my ($list, $extras) = ('CODE' eq ref $handler)
+      ? $handler->($event->{params}, $event->{options}{all})
+      : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
 
     print '[' . join(',', map {$_->getJSON} @$list) . ']';

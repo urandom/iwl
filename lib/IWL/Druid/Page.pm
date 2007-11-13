@@ -184,8 +184,9 @@ sub __init {
 
 sub __buttonEvent {
     my ($event, $handler) = @_;
-    my ($list, $extras) = $handler->($event->{params}, $event->{options}{id}, $event->{options}{elementData})
-        if 'CODE' eq ref $handler;
+    my ($list, $extras) = ('CODE' eq ref $handler)
+      ? $handler->($event->{params}, $event->{options}{id}, $event->{options}{elementData})
+      : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
     my $html = escape(join('', map {$_->getContent} @$list));
 
