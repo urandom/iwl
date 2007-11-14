@@ -35,6 +35,10 @@ my $Stock = {
         smallImage => $IWLConfig{ICON_DIR} . "/back." . $IWLConfig{ICON_EXT},
         label       => N__ "Back",
     },
+    IWL_STOCK_CALENDAR => {
+        smallImage => $IWLConfig{ICON_DIR} . "/calendar." . $IWLConfig{ICON_EXT},
+        label       => N__ "Calendar",
+    },
     IWL_STOCK_CANCEL => {
         smallImage => $IWLConfig{ICON_DIR} . "/cancel." . $IWLConfig{ICON_EXT},
         label       => N__ "Cancel",
@@ -51,9 +55,17 @@ my $Stock = {
         smallImage => $IWLConfig{ICON_DIR} . "/delete." . $IWLConfig{ICON_EXT},
         label       => N__ "Delete",
     },
+    IWL_STOCK_DIRECTORY => {
+        smallImage => $IWLConfig{ICON_DIR} . "/directory." . $IWLConfig{ICON_EXT},
+        label       => N__ "Directory",
+    },
     IWL_STOCK_DOWNLOAD => {
         smallImage => $IWLConfig{ICON_DIR} . "/download." . $IWLConfig{ICON_EXT},
         label       => N__ "Download",
+    },
+    IWL_STOCK_DIRECTORY_NEW => {
+        smallImage => $IWLConfig{ICON_DIR} . "/directory_new." . $IWLConfig{ICON_EXT},
+        label       => N__ "Create directory",
     },
     IWL_STOCK_EDIT => {
         smallImage => $IWLConfig{ICON_DIR} . "/edit." . $IWLConfig{ICON_EXT},
@@ -99,10 +111,6 @@ my $Stock = {
         smallImage => $IWLConfig{ICON_DIR} . "/lock." . $IWLConfig{ICON_EXT},
         label       => N__ "Lock",
     },
-    IWL_STOCK_MINIMIZE => {
-        smallImage => $IWLConfig{ICON_DIR} . "/minimize." . $IWLConfig{ICON_EXT},
-        label       => N__ "Minimize",
-    },
     IWL_STOCK_NEW => {
         smallImage => $IWLConfig{ICON_DIR} . "/new." . $IWLConfig{ICON_EXT},
         label       => N__ "New",
@@ -135,72 +143,9 @@ my $Stock = {
         smallImage => $IWLConfig{ICON_DIR} . "/save." . $IWLConfig{ICON_EXT},
         label       => N__ "Save",
     },
-    IWL_STOCK_SAVE_CLOSE => {
-        smallImage => $IWLConfig{ICON_DIR} . "/save_close." . $IWLConfig{ICON_EXT},
-        label       => N__ "Save and close",
-    },
     IWL_STOCK_UPLOAD => {
         smallImage => $IWLConfig{ICON_DIR} . "/upload." . $IWLConfig{ICON_EXT},
         label       => N__ "Upload",
-    },
-
-    IWL_STOCK_DESKTOP_ADD_FILTER => {
-        smallImage => $IWLConfig{ICON_DIR} . "/desktop_add_filter." . $IWLConfig{ICON_EXT},
-        label       => N__ "Add Filter",
-    },
-    IWL_STOCK_DIRECTORY => {
-        smallImage => $IWLConfig{ICON_DIR} . "/directory." . $IWLConfig{ICON_EXT},
-        label       => N__ "Directory",
-    },
-    IWL_STOCK_DIRECTORY_DELETE => {
-        smallImage => $IWLConfig{ICON_DIR} . "/directory_delete." . $IWLConfig{ICON_EXT},
-        label       => N__ "Delete directory",
-    },
-    IWL_STOCK_DIRECTORY_EDIT => {
-        smallImage => $IWLConfig{ICON_DIR} . "/directory_edit." . $IWLConfig{ICON_EXT},
-        label       => N__ "Edit directory",
-    },
-    IWL_STOCK_DIRECTORY_NEW => {
-        smallImage => $IWLConfig{ICON_DIR} . "/directory_new." . $IWLConfig{ICON_EXT},
-        label       => N__ "Create directory",
-    },
-
-    IWL_STOCK_TOOLBAR_BOTTOM => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-bottom." . $IWLConfig{ICON_EXT},
-        label       => N__ "Bottom",
-    },
-    IWL_STOCK_TOOLBAR_HOME => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-home." . $IWLConfig{ICON_EXT},
-        label       => N__ "Main menu",
-    },
-    IWL_STOCK_TOOLBAR_INFO => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-info." . $IWLConfig{ICON_EXT},
-        label       => N__ "Info",
-    },
-    IWL_STOCK_TOOLBAR_MAIL => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-mail." . $IWLConfig{ICON_EXT},
-        label       => N__ "Mail",
-    },
-    IWL_STOCK_TOOLBAR_MENU => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-menu." . $IWLConfig{ICON_EXT},
-        label       => N__ "Main menu",
-    },
-    IWL_STOCK_TOOLBAR_QUIT => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-quit." . $IWLConfig{ICON_EXT},
-        label       => N__ "Quit",
-    },
-    IWL_STOCK_TOOLBAR_ROLES => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-roles." . $IWLConfig{ICON_EXT},
-        label       => N__ "Available roles",
-    },
-    IWL_STOCK_TOOLBAR_TOP => {
-        smallImage => $IWLConfig{ICON_DIR} . "/toolbar-top." . $IWLConfig{ICON_EXT},
-        label       => N__ "Top",
-    },
-
-    IWL_STOCK_CALENDAR => {
-        smallImage => $IWLConfig{ICON_DIR} . "/calendar." . $IWLConfig{ICON_EXT},
-        label       => N__ "Calendar",
     },
 
     IWL_STOCK_TEXT_X_GENERIC => {
@@ -215,7 +160,7 @@ my $Stock = {
 
 sub new {
     my $class = shift;
-    my $self  = bless {}, $class;
+    my $self  = bless {stock => $Stock}, $class;
 
     return $self;
 }
@@ -264,6 +209,33 @@ sub exists {
     my ($self, $stock_id) = @_;
 
     return exists $Stock->{$stock_id};
+}
+
+=item B<add> (B<STOCK_KEY> => B<STOCK_ITEM>, ...)
+
+Adds the given stock items to the list of existing items
+
+Parameters: B<STOCK_KEY> - the stock key of the item, B<STOCK_ITEM> - A stock item to add to the stock repository. It is a hash reference with the following keys:
+
+=over 8
+
+=item B<smallImage>
+
+The URL of the small image, usually with a size of 16x16
+
+=item B<label>
+
+The label for this stock item
+
+=back
+
+=cut
+
+sub add {
+    my ($self, %stock_items) = @_;
+
+    $Stock->{$_} = $stock_items{$_} foreach keys %stock_items;
+    return $self;
 }
 
 1;
