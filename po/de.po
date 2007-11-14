@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-11-08 13:46+0200\n"
-"PO-Revision-Date: 2007-10-05 13:12+0300\n"
+"POT-Creation-Date: 2007-11-14 11:45+0200\n"
+"PO-Revision-Date: 2007-11-14 11:45+0200\n"
 "Last-Translator: Guido Flohr <guido@imperia.net>\n"
 "Language-Team:  <guido@imperia.net>\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "Beenden"
 #: ../lib/IWL/PageControl.pm:166
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
-msgstr "{PAGEENTRY} of {PAGECOUNT}"
+msgstr "{PAGEENTRY} von {PAGECOUNT}"
 
 #: ../lib/IWL/Stock.pm:28
 msgid "Add"

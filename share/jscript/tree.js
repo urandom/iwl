@@ -450,7 +450,8 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (this.loadComplete) {
                 rebuildPath.call(this, parentRow);
                 setAlternate.call(this, parentRow);
-                parentRow._rebuildNav();
+                if (parentRow && parentRow !== this.body)
+                    parentRow._rebuildNav();
                 new_rows.each(function(row) {
                     addToPathMap.call(this, row);
                     row._rebuildNav();
