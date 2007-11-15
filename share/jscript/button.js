@@ -167,6 +167,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 var ml = parseFloat(image.getStyle('margin-left')) || 0;
                 var mr = parseFloat(image.getStyle('margin-right')) || 0;
                 var ih = parseFloat(image.getStyle('height')) || image.height;
+                if (this.options.size == 'small' && ih > 10) ih = 10;
                 if (ml != mr)
                     image.setStyle({marginLeft: ml + 'px', marginRight: ml + 'px'});
             }
@@ -201,10 +202,11 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 bottomright.style.height = corner_size + "px";
             }
             if (image && image.width && image.height) {
-                if (image.width > 10)
-                    image.width = 10;
-                if (image.height > 10)
-                    image.height = 10;
+                var aspect = image.width / image.height;
+                if (image.height > 10) {
+                    image.style.width = 10 * aspect + 'px';
+                    image.style.height = '10px';
+                }
             }
         }
 
