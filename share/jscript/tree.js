@@ -389,7 +389,10 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
             parent_row.childList = parent_row.childList.without(row);
             rebuildPath.call(this, parent_row);
             if (this.__pathMapDelay) clearTimeout(this.__pathMapDelay);
-            this.__pathMapDelay = (function() {createPathMap.call(this); if (parent_row) parent_row._rebuildNav()}).bind(this).delay(0.1);
+            this.__pathMapDelay = (function() {
+                    createPathMap.call(this);
+                    if (parent_row && parent_row._rebuildNav) parent_row._rebuildNav();
+                }).bind(this).delay(0.1);
             if (prev) {
                 prev._rebuildNav();
                 var prev_children = prev.childRows();

@@ -70,6 +70,7 @@ chmod 0755, $cgibin . '/iwl_demo.pl';
 prefix_replace(
     $full_skindir . '/main.css',
     $full_skindir . '/ie6.css'
+    $full_skindir . '/iepngfix.htc'
 );
 
 #######################################################################

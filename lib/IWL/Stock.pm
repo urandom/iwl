@@ -31,10 +31,6 @@ my $Stock = {
 	smallImage => $IWLConfig{ICON_DIR} . "/apply." . $IWLConfig{ICON_EXT},
         label       => N__ "Apply",
     },
-    IWL_STOCK_BACK => {
-        smallImage => $IWLConfig{ICON_DIR} . "/back." . $IWLConfig{ICON_EXT},
-        label       => N__ "Back",
-    },
     IWL_STOCK_CALENDAR => {
         smallImage => $IWLConfig{ICON_DIR} . "/calendar." . $IWLConfig{ICON_EXT},
         label       => N__ "Calendar",
@@ -59,37 +55,37 @@ my $Stock = {
         smallImage => $IWLConfig{ICON_DIR} . "/directory." . $IWLConfig{ICON_EXT},
         label       => N__ "Directory",
     },
-    IWL_STOCK_DOWNLOAD => {
-        smallImage => $IWLConfig{ICON_DIR} . "/download." . $IWLConfig{ICON_EXT},
-        label       => N__ "Download",
-    },
     IWL_STOCK_DIRECTORY_NEW => {
         smallImage => $IWLConfig{ICON_DIR} . "/directory_new." . $IWLConfig{ICON_EXT},
         label       => N__ "Create directory",
+    },
+    IWL_STOCK_DOWNLOAD => {
+        smallImage => $IWLConfig{ICON_DIR} . "/download." . $IWLConfig{ICON_EXT},
+        label       => N__ "Download",
     },
     IWL_STOCK_EDIT => {
         smallImage => $IWLConfig{ICON_DIR} . "/edit." . $IWLConfig{ICON_EXT},
         label       => N__ "Edit",
     },
-    IWL_STOCK_EXPORT => {
-        smallImage => $IWLConfig{ICON_DIR} . "/export." . $IWLConfig{ICON_EXT},
-        label       => N__ "Export",
-    },
     IWL_STOCK_FULLSCREEN => {
         smallImage => $IWLConfig{ICON_DIR} . "/fullscreen." . $IWLConfig{ICON_EXT},
         label       => N__ "Fullscreen",
-    },
-    IWL_STOCK_GO => {
-        smallImage => $IWLConfig{ICON_DIR} . "/go." . $IWLConfig{ICON_EXT},
-        label       => N__ "Go",
     },
     IWL_STOCK_GO_BACK => {
         smallImage => $IWLConfig{ICON_DIR} . "/go_back." . $IWLConfig{ICON_EXT},
         label       => N__ "Go back",
     },
+    IWL_STOCK_GO_DOWN => {
+        smallImage => $IWLConfig{ICON_DIR} . "/go_down." . $IWLConfig{ICON_EXT},
+        label       => N__ "Go down",
+    },
     IWL_STOCK_GO_FORWARD => {
         smallImage => $IWLConfig{ICON_DIR} . "/go_forward." . $IWLConfig{ICON_EXT},
         label       => N__ "Go forward",
+    },
+    IWL_STOCK_GO_UP => {
+        smallImage => $IWLConfig{ICON_DIR} . "/go_up." . $IWLConfig{ICON_EXT},
+        label       => N__ "Go up",
     },
     IWL_STOCK_GOTO_FIRST => {
         smallImage => $IWLConfig{ICON_DIR} . "/first." . $IWLConfig{ICON_EXT},
@@ -134,6 +130,10 @@ my $Stock = {
     IWL_STOCK_REFRESH => {
         smallImage => $IWLConfig{ICON_DIR} . "/refresh." . $IWLConfig{ICON_EXT},
         label       => N__ "Refresh",
+    },
+    IWL_STOCK_PREVIOUS => {
+        smallImage => $IWLConfig{ICON_DIR} . "/previous." . $IWLConfig{ICON_EXT},
+        label       => N__ "Back",
     },
     IWL_STOCK_REMOVE => {
         smallImage => $IWLConfig{ICON_DIR} . "/remove." . $IWLConfig{ICON_EXT},

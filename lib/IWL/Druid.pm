@@ -154,7 +154,7 @@ sub __init {
     my ($self, %args) = @_;
     my $content     = IWL::Container->new;
     my $back_button =
-      IWL::Button->newFromStock('IWL_STOCK_BACK', size => 'medium');
+      IWL::Button->newFromStock('IWL_STOCK_PREVIOUS', size => 'medium');
     my $next_button =
       IWL::Button->newFromStock('IWL_STOCK_NEXT', size => 'medium');
     my $ok_button =
