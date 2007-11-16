@@ -386,7 +386,7 @@ sub hasClass {
     foreach (split / /, $class_list) {
 	return 1 if $_ eq $class;
     }
-    return 0;
+    return '';
 }
 
 =item B<removeClass> (B<CLASS>)

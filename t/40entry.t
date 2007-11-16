@@ -1,4 +1,4 @@
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 use IWL::Entry;
 
@@ -37,7 +37,7 @@ my $entry = IWL::Entry->new;
 			attributes => {
 				src => 'foo.jpg',
 				id => 'first_image',
-				class => 'entry_left'
+				class => 'image'
 			}
 	});
 	is($entry->setIconFromStock('IWL_STOCK_OK', 'right', 1)->setId('stock_image'), $entry->{image2});
@@ -47,7 +47,7 @@ my $entry = IWL::Entry->new;
 				alt => __('OK'),
 				src => '/my/skin/darkness/tiny/ok.gif',
 				id => 'stock_image',
-				class => 'entry_right',
+				class => 'image',
 				style => {
 					cursor => 'pointer'
 				}
@@ -55,7 +55,10 @@ my $entry = IWL::Entry->new;
 	});
 	is($entry->addClearButton, $entry);
 	my $clear = __("Clear");
-	like($entry->{image2}->getContent, qr(<img (?:(?:alt="$clear"|src="/my/skin/darkness/tiny/clear.gif"|class="entry_right"|class="entry_right"|id="entry_\d+_right"|style="cursor: pointer")\s*){5}/>\n)s);
+	like($entry->{image2}->getContent, qr(<img (?:(?:alt="$clear"|src="/my/skin/darkness/tiny/clear.gif"|class="image"|class="entry_right"|id="entry_\d+_right"|style="cursor: pointer")\s*){5}/>\n)s);
+    $entry->getContent;
+    ok($entry->{image1}->hasClass('entry_left'));
+    ok($entry->{image2}->hasClass('entry_right'));
 }
 
 {
