@@ -71,6 +71,3 @@ iframe.completion {
 ul.completion {
     z-index: 50;
 }
-.image {
-    behavior: url(/iwl/skin/default/images/icons/iepngfix.htc);
-}

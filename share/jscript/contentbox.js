@@ -4,31 +4,31 @@
  * @extends IWL.Widget
  * */
 IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
-    function createResizeElement() {
-        if (this.contentbox_resize) return;
-        var element = new Element('div', {
-            "class": $A(this.classNames()).first() + '_resize', "id": this.id + '_resize'});
-        if (this.contentboxFooter)
-            this.contentboxFooter.appendChild(element);
-        this.contentbox_resize = element;
-    }
-
     function createButtonsElement() {
-        if (this.contentboxButtons) return;
+        if (this.buttons) return;
         var element = new Element('div', {
             "class": $A(this.classNames()).first() + '_buttons', "id": this.id + '_buttons'});
         this.contentboxTitle.appendChild(element);
-        this.contentboxButtons = element;
+        this.buttons = element;
     }
 
     function createCloseElement() {
-        if (this.contentboxClose) return;
-        if (!this.contentboxButtons) createButtonsElement.call(this);
+        if (this.closeButton) return;
+        if (!this.buttons) createButtonsElement.call(this);
         var element = new Element('div', {
             "class": $A(this.classNames()).first() + '_close', "id": this.id + '_close'});
-        this.contentboxButtons.appendChild(element);
-        this.contentboxClose = element;
-        this.contentboxClose.onclick = this.close.bindAsEventListener(this);
+        this.buttons.appendChild(element);
+        this.closeButton = element;
+        this.closeButton.signalConnect('close', this.close.bindAsEventListener(this));
+    }
+
+    function createResizeElement() {
+        if (this.resizeButton) return;
+        if (!this.buttons) createButtonsElement.call(this);
+        var element = new Element('div', {
+            "class": $A(this.classNames()).first() + '_resize', "id": this.id + '_resize'});
+        this.buttons.appendChild(element);
+        this.resizeButton = element;
     }
 
     function calculateWidth(element) {
@@ -79,13 +79,15 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setupResize() {
+        createResizeElement.call(this);
         this._resizer = new Resizer(this, {
             maxHeight: 1000,
             maxWidth: 1000,
             minHeight: 70,
             minWidth: 70,
             outline: this.options.typeOptions.outline,
-            onResize: resizeCallback.bind(this)
+            onResize: resizeCallback.bind(this),
+            togglers: [this.resizeButton]
         });
 
         return this;
@@ -351,8 +353,8 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         setDialog: function() {
             this.setNoType();
-            setupDrag.call(this);
-            return setupResize.call(this);
+            setupResize.call(this);
+            return setupDrag.call(this);
         },
         /**
          * Enables dragging, resizing and closing of the contentbox
@@ -361,8 +363,8 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setWindow: function() {
             this.setNoType();
             setupClose.call(this);
-            setupDrag.call(this);
-            return setupResize.call(this);
+            setupResize.call(this);
+            return setupDrag.call(this);
         },
         /**
          * Enables dragging and closing of the contentbox
@@ -380,9 +382,9 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setNoType: function() {
             this.contentboxTitle.style.cursor = 'default';
             this.contentboxTitle.parentNode.style.cursor = 'default';
-            if (this.contentboxClose) {
-                this.contentboxClose.parentNode.removeChild(this.contentboxClose);
-                this.contentboxClose = null;
+            if (this.closeButton) {
+                this.closeButton.parentNode.removeChild(this.closeButton);
+                this.closeButton = null;
             }
             if (this._draggable)
                 this._draggable.destroy();

@@ -265,14 +265,12 @@ sub setIcon {
         $self->{image1}->set($src);
         $self->{image1}->setAlt($alt);
 	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
-	$self->{image1}->{_defaultClass} = $self->{_defaultClass} . '_left';
 	return $self->{image1};
     } elsif ($position eq 'right') {
         $self->{image2}{_ignore} = 0;
         $self->{image2}->set($src);
         $self->{image2}->setAlt($alt);
 	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-	$self->{image2}->{_defaultClass} = $self->{_defaultClass} . '_right';
 	return $self->{image2};
     }
 }
@@ -294,13 +292,11 @@ sub setIconFromStock {
         $self->{image2}->setFromStock($stock_id) or return;
         $self->{image2}{_ignore} = 0;
 	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-	$self->{image2}->{_defaultClass} = $self->{_defaultClass} . '_right';
 	return $self->{image2};
     } elsif (!$position || $position eq 'left') {
         $self->{image1}->setFromStock($stock_id) or return;
         $self->{image1}{_ignore} = 0;
 	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
-	$self->{image1}->{_defaultClass} = $self->{_defaultClass} . '_left';
 	return $self->{image1};
     }
 }
@@ -316,7 +312,6 @@ sub addClearButton {
 
     $self->setIconFromStock(IWL_STOCK_CLEAR => 'right', 1);
     $self->{image2}->setAttribute(id => $self->getId . '_right');
-    $self->{image2}->{_defaultClass} = $self->{_defaultClass} . '_right';
     $self->{_options}{clearButton} = 1;
     return $self;
 }
@@ -460,10 +455,10 @@ sub _setupDefaultClass {
 #
 sub __init {
     my ($self, %args) = @_;
-    my $entry  = IWL::Input->new;
-    my $image1 = IWL::Image->new;
-    my $image2 = IWL::Image->new;
-    my $receiver   = IWL::Container->new;
+    my $entry         = IWL::Input->new;
+    my $image1        = IWL::Image->new;
+    my $image2        = IWL::Image->new;
+    my $receiver      = IWL::Container->new;
 
     $self->{image1}        = $image1;
     $self->{image2}        = $image2;

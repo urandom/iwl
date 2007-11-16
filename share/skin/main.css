@@ -563,26 +563,27 @@ div.contentbox_bottomr_alt2 {
 }
 
 
-div.contentbox_buttons {
+.contentbox_buttons {
     text-align: right;
     position: absolute;
     top: 4px;
     right: 14px;
 }
-div.contentbox_close {
+.contentbox_close {
     cursor: pointer;
-    background: transparent url('/iwl/skin/default/images/icons/close15x15.gif') no-repeat;
-    width: 15px;
-    height: 15px;
-    margin-top: 2px;
+    background: transparent url('/iwl/skin/default/images/icons/close.gif') no-repeat;
+    margin: 1px;
+    width: 16px;
+    height: 16px;
+    float: right;
 }
 
-div.contentbox_resize {
-    cursor: se-resize;
+.contentbox_resize {
+    cursor: pointer;
     background: transparent url('/iwl/skin/default/images/icons/resize.gif') no-repeat bottom left;
-    padding-right: 15px;
-    min-height: 15px;
-    display: inline;
+    margin: 1px;
+    width: 16px;
+    height: 16px;
     float: right;
 }
 

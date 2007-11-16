@@ -44,7 +44,7 @@ The directory, containing the icons. It is relative to the current skin director
 
 =item B<ICON_EXT>
 
-The extension of the image icons. Default value: I<'png'>
+The extension of the image icons. Default value: I<'gif'>
 
 =item B<JS_DIR>
 
@@ -110,7 +110,7 @@ if (!exists $IWLConfig{JS_DIR}) {
 	SKIN_DIR     => '/iwl/skin',
 	IMAGE_DIR    => '/images',
 	ICON_DIR     => '/images/icons',
-	ICON_EXT     => 'png',
+	ICON_EXT     => 'gif',
 	JS_DIR       => '/iwl/jscript',
 	STRICT_LEVEL => 1,
         DEBUG        => '',
