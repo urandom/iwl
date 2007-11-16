@@ -142,7 +142,8 @@ IWL.Widget = {
 	if (this.current._init)
 	    this.current._init.apply(this.current, arguments);
      
-        return this.current.emitSignal('iwl:init');
+        this.current.emitSignal('iwl:init');
+        return this.current;
     },
     _abortEvent: function(collection, eventName, exception) {
 	if (!collection || !collection.each || !eventName) return;
