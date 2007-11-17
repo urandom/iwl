@@ -20,6 +20,10 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.buttons.appendChild(element);
         this.closeButton = element;
         this.closeButton.signalConnect('close', this.close.bindAsEventListener(this));
+        if (this.resizeButton) {
+            this.resizeButton.remove();
+            this.buttons.appendChild(this.resizeButton);
+        }
     }
 
     function createResizeElement() {
@@ -383,8 +387,12 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.contentboxTitle.style.cursor = 'default';
             this.contentboxTitle.parentNode.style.cursor = 'default';
             if (this.closeButton) {
-                this.closeButton.parentNode.removeChild(this.closeButton);
+                this.closeButton.remove();
                 this.closeButton = null;
+            }
+            if (this.resizeButton) {
+                this.resizeButton.remove();
+                this.resizeButton = null;
             }
             if (this._draggable)
                 this._draggable.destroy();

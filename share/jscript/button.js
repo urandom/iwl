@@ -358,7 +358,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 defaultImageChange.call(this);
                 removeDisabledLayer.call(this);
                 this.signalDisconnect('iwl:adjust', disableButton);
-                return adjust.call();
+                return adjust.call(this);
             }
         },
         /**

@@ -783,24 +783,24 @@ function run_contentbox_tests() {
             assertInstanceOf(Resizer, contentbox._resizer);
             assert($H(contentbox._resizer.handlers).keys().length > 0);
             assert(Object.isElement(contentbox.contentboxButtons));
-            assert(Object.isElement(contentbox.contentboxClose));
-            assert(contentbox.contentboxClose.hasClassName(className + '_close'));
-            assert('contentbox_test_close', contentbox.contentboxClose.id);
+            assert(Object.isElement(contentbox.closeButton));
+            assert(contentbox.closeButton.hasClassName(className + '_close'));
+            assert('contentbox_test_close', contentbox.closeButton.id);
             contentbox.setType('none')
             assert($H(contentbox._resizer.handlers).keys().length == 0);
             assert(!Draggables.drags.include(contentbox._draggable));
-            assert(!contentbox.contentboxClose);
+            assert(!contentbox.closeButton);
 
             assertEqual(contentbox, contentbox.setType('noresize'));
             assertEqual('noresize', contentbox.options.type);
             assertEqual('move', contentbox.contentboxTitle.style.cursor);
             assert(Draggables.drags.include(contentbox._draggable));
-            assert(Object.isElement(contentbox.contentboxClose));
-            assert(contentbox.contentboxClose.hasClassName(className + '_close'));
-            assert('contentbox_test_close', contentbox.contentboxClose.id);
+            assert(Object.isElement(contentbox.closeButton));
+            assert(contentbox.closeButton.hasClassName(className + '_close'));
+            assert('contentbox_test_close', contentbox.closeButton.id);
             contentbox.setType('none')
             assert(!Draggables.drags.include(contentbox._draggable));
-            assert(!contentbox.contentboxClose);
+            assert(!contentbox.closeButton);
         }},
         testModal: function() {with(this) {
             assert(!contentbox.options.modal);
