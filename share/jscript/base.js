@@ -339,7 +339,6 @@ Object.extend(IWL, (function() {
             var options = Object.extend({
                 duration: 10
             }, arguments[1]);
-            text = text.toString();
             if (display_status_cnt++) {
                 var status_bar = $('status_bar');
                 if (!status_bar) {
@@ -348,12 +347,12 @@ Object.extend(IWL, (function() {
                     return;
                 }
                 status_bar.appendChild(new Element('br'));
-                status_bar.appendChild(text.createTextNode());
+                status_bar.appendChild(new Element('div').update(text));
                 hideStatus(options);
             } else {
                 var status_bar = new Element('div', {id: 'status_bar'});
                 Element.hide(status_bar);
-                status_bar.appendChild(text.createTextNode());
+                status_bar.appendChild(new Element('div').update(text));
                 appear = Effect.Appear(status_bar,
                     {duration: 0.2, afterFinish: hideStatus.bind(this, options)});
                 document.body.appendChild(status_bar);

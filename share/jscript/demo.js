@@ -495,7 +495,7 @@ function run_base_tests() {
 
             IWL.exceptionHandler(null, new Error('Some error'));
             assert($('status_bar'));
-            assertEqual('Error message: Some error', $('status_bar').firstChild.nodeValue);
+            assertEqual('Error message: Some error', $('status_bar').firstChild.firstChild.nodeValue);
             [1,2,3].each(function() {
                 IWL.Status.remove();
             });
@@ -747,34 +747,34 @@ function run_contentbox_tests() {
             });
         }},
         testType: function() { with(this) {
-            assertEqual('none', contentbox.options.type);
+            assertEqual('none', contentbox.options.type, "1");
 
-            assertEqual(contentbox, contentbox.setType('drag'));
-            assertEqual('drag', contentbox.options.type);
-            assertEqual('move', contentbox.contentboxTitle.style.cursor);
-            assertInstanceOf(Draggable, contentbox._draggable);
-            assert(Draggables.drags.include(contentbox._draggable));
+            assertEqual(contentbox, contentbox.setType('drag'), "2");
+            assertEqual('drag', contentbox.options.type, "3");
+            assertEqual('move', contentbox.contentboxTitle.style.cursor, "4");
+            assertInstanceOf(Draggable, contentbox._draggable, "5");
+            assert(Draggables.drags.include(contentbox._draggable), "6");
 
-            assertEqual(contentbox, contentbox.setType('none'));
-            assertEqual('none', contentbox.options.type);
-            assert(!Draggables.drags.include(contentbox._draggable));
-            assertEqual('default', contentbox.contentboxTitle.style.cursor);
+            assertEqual(contentbox, contentbox.setType('none'), "7");
+            assertEqual('none', contentbox.options.type, "8");
+            assert(!Draggables.drags.include(contentbox._draggable), "9");
+            assertEqual('default', contentbox.contentboxTitle.style.cursor, "10");
 
-            assertEqual(contentbox, contentbox.setType('resize'));
-            assertEqual('resize', contentbox.options.type);
-            assertInstanceOf(Resizer, contentbox._resizer);
+            assertEqual(contentbox, contentbox.setType('resize'), "11");
+            assertEqual('resize', contentbox.options.type, "12");
+            assertInstanceOf(Resizer, contentbox._resizer, "13");
             contentbox.setType('none')
-            assert($H(contentbox._resizer.handlers).keys().length == 0);
+            assert($H(contentbox._resizer.handlers).keys().length == 0, "14");
 
-            assertEqual(contentbox, contentbox.setType('dialog'));
-            assertEqual('dialog', contentbox.options.type);
-            assertEqual('move', contentbox.contentboxTitle.style.cursor);
-            assert(Draggables.drags.include(contentbox._draggable));
-            assertInstanceOf(Resizer, contentbox._resizer);
-            assert($H(contentbox._resizer.handlers).keys().length > 0);
-            contentbox.setType('none')
-            assert($H(contentbox._resizer.handlers).keys().length == 0);
-            assert(!Draggables.drags.include(contentbox._draggable));
+            assertEqual(contentbox, contentbox.setType('dialog'), "15");
+            assertEqual('dialog', contentbox.options.type, "16");
+            assertEqual('move', contentbox.contentboxTitle.style.cursor, "17");
+            assert(Draggables.drags.include(contentbox._draggable), "18");
+            assertInstanceOf(Resizer, contentbox._resizer, "19");
+            assert($H(contentbox._resizer.handlers).keys().length > 0, "20");
+            contentbox.setType('none', "21")
+            assert($H(contentbox._resizer.handlers).keys().length == 0, "22");
+            assert(!Draggables.drags.include(contentbox._draggable), "23");
 
             assertEqual(contentbox, contentbox.setType('window'));
             assertEqual('window', contentbox.options.type);
@@ -782,7 +782,7 @@ function run_contentbox_tests() {
             assert(Draggables.drags.include(contentbox._draggable));
             assertInstanceOf(Resizer, contentbox._resizer);
             assert($H(contentbox._resizer.handlers).keys().length > 0);
-            assert(Object.isElement(contentbox.contentboxButtons));
+            assert(Object.isElement(contentbox.buttons));
             assert(Object.isElement(contentbox.closeButton));
             assert(contentbox.closeButton.hasClassName(className + '_close'));
             assert('contentbox_test_close', contentbox.closeButton.id);
@@ -984,7 +984,6 @@ function run_entry_tests() {
 function run_iconbox_tests() {
     var iconbox = $('iconbox_test');
     var className = $A(iconbox.classNames()).first();
-    iconbox.options.multipleSelect = true;
     new Test.Unit.Runner({
         testParts: function() { with(this) {
             assert(Object.isElement(iconbox.statusbar));
@@ -1056,6 +1055,7 @@ function run_iconbox_tests() {
         }},
         testSelection: function() { with(this) {
             var select = select_all = unselect = unselect_all = activate = false;
+            iconbox.options.multipleSelect = true;
             iconbox.icons.first().signalConnect('iwl:select', function() { select = true });
             iconbox.icons[1].signalConnect('iwl:unselect', function() { unselect = true });
             iconbox.signalConnect('iwl:select_all', function() { select_all = true });
@@ -1290,16 +1290,21 @@ function run_tooltip_tests() {
         }},
         testMethods: function() { with(this) {
             var s = $('testlog').appendChild(new Element('div', {style: 'width 20px; height 20px; background: #ddd'}));
+            var show = hide = false;
+            assertEqual(tooltip, tooltip.signalConnect('iwl:show', function() { show = true; this.proceed()}.bind(this)));
+            assertEqual(tooltip, tooltip.signalConnect('iwl:hide', function() { hide = true; this.proceed()}.bind(this)));
             assertEqual(tooltip, tooltip.bindToWidget(s, 'click', true), "1");
             assertEqual(s, tooltip.element, "2");
             assertEqual(tooltip, tooltip.setContent('Foo bar baz'), "3");
             assertEqual('Foo bar baz', tooltip.content.getText(), "4");
             assert(!tooltip.visible(), "5");
             assertEqual(tooltip, tooltip.showTooltip(), "6");
-            wait(100, function() {
+            delay(function() {
+                assert(show);
                 assert(tooltip.visible(), "7");
                 assertEqual(tooltip, tooltip.hideTooltip(), "8");
-                wait(1000, function() {
+                delay(function() {
+                    assert(hide);
                     assert(!tooltip.visible(), "9");
                     assertEqual(tooltip, tooltip.remove(), "10");
                     assert(!tooltip.element, "11");
@@ -1312,7 +1317,6 @@ function run_tooltip_tests() {
 function run_tree_tests() {
     var tree = $('tree_test');
     var className = $A(tree.classNames()).first();
-    tree.options.multipleSelect = true;
     new Test.Unit.Runner({
         testParts: function() { with(this) {
             assert(Object.isElement(tree.body));
@@ -1374,6 +1378,7 @@ function run_tree_tests() {
         }},
         testSelection: function() { with(this) {
             var select = select_all = unselect = unselect_all = activate = false;
+            tree.options.multipleSelect = true;
             $A(tree.body.rows).first().signalConnect('iwl:select', function() { select = true });
             tree.body.rows[1].signalConnect('iwl:unselect', function() { unselect = true });
             tree.signalConnect('iwl:select_all', function() { select_all = true });
@@ -1438,9 +1443,10 @@ function run_upload_tests() {
                 filename = data.filename;
                 this.proceed();
             }.bind(this));
-            IWL.Status.display('************************************************');
-            IWL.Status.display('* Please click on the button and upload a file *');
-            IWL.Status.display('************************************************');
+            IWL.Status.display('************************************************<br/>' +
+                               '* Please click on the button and upload a file *<br/>' +
+                               '************************************************'
+            );
             delay(function() {
                 assert(uploaded);
                 info('Uploaded file: ' + filename);

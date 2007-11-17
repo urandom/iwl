@@ -186,7 +186,7 @@ sub _realize {
     my $file = $self->{__file}->getJSON;
     my $options = toJSON($self->{_options});
     my $uploading = __"Uploading ...";
-    $self->{__button}->signalConnect(load => "IWL.Upload.create('$id', $file, $options, {uploading: '$uploading'})");
+    $self->_appendInitScript("IWL.Upload.create('$id', $file, $options, {uploading: '$uploading'})");
 }
 
 sub _setupDefaultClass {

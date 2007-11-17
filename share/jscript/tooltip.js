@@ -212,7 +212,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             }
             this.__appear = new Effect.Appear(this, {
                     duration: 0.25,
-                    afterFinish: function() { this.__appear = undefined; this.emit('iwl:show') }.bind(this)
+                    afterFinish: function() { this.__appear = undefined; this.emitSignal('iwl:show') }.bind(this)
             });
             return this;
         },
@@ -227,7 +227,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             }
             this._fade = new Effect.Fade(this, {
                     duration: 0.5,
-                    afterFinish: function() { this.__fade = undefined; this.emit('iwl:hide') }.bind(this)
+                    afterFinish: function() { this.__fade = undefined; this.emitSignal('iwl:hide') }.bind(this)
             });
             return this;
         },
