@@ -428,10 +428,10 @@ div.button_disabled span.button_label {
     font-weight: normal;
 }
 
-span.button_label_medium {
+.button_medium span.button_label {
     font-size: 10px;
 }
-span.button_label_small {
+.button_small span.button_label {
     font-size: 8px;
     font-weight: normal;
     color: black;

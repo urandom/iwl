@@ -306,6 +306,7 @@ sub _realize {
 
 sub _setupDefaultClass {
     my $self = shift;
+    $self->SUPER::prependClass($self->{_defaultClass} . '_' . $self->{_options}{size});
     $self->SUPER::prependClass($self->{_defaultClass});
     $self->{image}->prependClass($self->{_defaultClass} . '_image');
     my $index = 0;
