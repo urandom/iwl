@@ -11,11 +11,15 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function connectSpinnerSignals() {
+        mouseOutEvent = spinnerMouseOut.bindAsEventListener(this);
+
         this.leftSpinner.signalConnect('mousedown', leftSpinnerMouseDown.bindAsEventListener(this));
         this.leftSpinner.signalConnect('mouseup', leftSpinnerMouseUp.bindAsEventListener(this));
+        this.leftSpinner.signalConnect('mouseout', mouseOutEvent);
 
         this.rightSpinner.signalConnect('mousedown', rightSpinnerMouseDown.bindAsEventListener(this));
         this.rightSpinner.signalConnect('mouseup', rightSpinnerMouseUp.bindAsEventListener(this));
+        this.rightSpinner.signalConnect('mouseout', mouseOutEvent);
 
         this.input.signalConnect('blur', inputBlur.bindAsEventListener(this));
         this.input.signalConnect('focus', inputFocus.bindAsEventListener(this));
@@ -42,10 +46,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         spinnerPeriodical.call(this);
     }
     function leftSpinnerMouseUp(event) {
-        if (this.periodical) {
-            this.periodical.stop();
-            this.periodical = null;
-        }
+        stopSpinning.call(this);
     }
 
     function rightSpinnerMouseDown(event) {
@@ -62,6 +63,15 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         spinnerPeriodical.call(this);
     }
     function rightSpinnerMouseUp(event) {
+        stopSpinning.call(this);
+    }
+
+    function spinnerMouseOut(event) {
+        if (this.dragging) return;
+        stopSpinning.call(this);
+    }
+
+    function stopSpinning() {
         if (this.periodical) {
             this.periodical.stop();
             this.periodical = null;
