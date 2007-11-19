@@ -181,6 +181,9 @@ function run_prototype_tests() {
             assertEqual("", text_node.nodeValue);
             text_node = "&lt;tag attribute=\"foo &amp; бар\"&gt;".createTextNode();
             assertEqual("<tag attribute=\"foo & бар\">", text_node.nodeValue);
+            assertEqual(123, "123a".parseInt());
+            assertEqual(123, "123.51b".parseInt());
+            assertEqual(123.51, "123.51b".parseFloat());
 
             window.evalScriptsCounter = 0;
             ('foo <script>evalScriptsCounter++<'+'/script>bar').evalScripts();
@@ -195,6 +198,20 @@ function run_prototype_tests() {
             ('foo <script src="' + IWL.Config.JS_DIR + '/menu.js"><'+'/script>bar').evalScripts();
             wait(2000, function() { assertEqual('object', typeof IWL.Menu); });
             window.evalScriptsCounter = undefined;
+        }},
+        testArrays: function() { with(this) {
+            var array = [1,2,3,4,5,6];
+            assertEnumEqual([2,3,4], array.slice(1, 3), "1");
+            assertEnumEqual([1,2,3,4,5,6], array, "2");
+            assertEnumEqual([5], array.slice(-2), "3");
+            assertEnumEqual([], array.slice(-2, 0), "4");
+            assertEnumEqual([], array.slice(0, 0), "5");
+            assertEnumEqual([3], array.slice(2), "6");
+            assertEnumEqual([3], array.slice(2, 1), "7");
+            assertEnumEqual([2,3,4], array.slice($R(1,3)), "8");
+            assertEnumEqual([6,1,2,3,4], array.slice($R(-1,3)), "9");
+            assertEnumEqual([4,5,6], array.slice($R(-3,-1)), "10");
+            assertEnumEqual([1], array.slice(0), "11");
         }},
         testPeriodicalAccelerator: function() { with(this) {
             var paEventCount = 0;
