@@ -162,7 +162,7 @@ sub shiftValue {
     my ($self, $key) = @_;
     my $state = $self->{__state};
 
-    return unless exists $state->{$key};
+    return unless defined $key && exists $state->{$key};
 
     my $value = shift @{$state->{$key}};
     delete $state->{$key} unless @{$state->{$key}};
