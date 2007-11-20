@@ -4,22 +4,6 @@
  * @extends IWL.Widget
  * */
 IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
-    function disabledImageChange() {
-        for (var i = 0; i < this.buttonParts.length; i++)
-            changeBackground.call(this, this.buttonParts[i], "disabled");
-    }
-
-    function clickImageChange() {
-        IWL.removeSelection();
-        for (var i = 0; i < this.buttonParts.length; i++)
-            changeBackground.call(this, this.buttonParts[i], "click");
-    }
-
-    function defaultImageChange(id) {
-        for (var i = 0; i < this.buttonParts.length; i++)
-            changeBackground.call(this, this.buttonParts[i], "default")
-    }
-
     function createElements() {
         var id = this.id;
         var className = $A(this.classNames()).first();
@@ -46,13 +30,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         } else {
             this.buttonImage.signalConnect('load', checkComplete.bind(this));
         }
-    }
-
-    function changeBackground(part, stat) {
-        if (!part) return;
-        var url = IWL.Config.IMAGE_DIR + "/button/" + stat + part.id.substr(part.id.lastIndexOf("_"))
-            + ".gif";
-        part.style.backgroundImage = "url(" + url + ")";
     }
 
     function visibilityToggle(state) {
@@ -266,6 +243,30 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         return this.emitSignal('iwl:adjust');
     }
 
+    function mouseOverCallback() {
+        if (this._disabled) return;
+        var className = $A(this.classNames()).first();
+        this.addClassName(className + '_hover ' + className + '_' + this.options.size + '_hover')
+    }
+
+    function mouseOutCallback() {
+        if (this._disabled) return;
+        var className = $A(this.classNames()).first();
+        this.removeClassName(className + '_hover ' + className + '_' + this.options.size + '_hover')
+    }
+
+    function mouseDownCallback() {
+        if (this._disabled) return;
+        var className = $A(this.classNames()).first();
+        this.addClassName(className + '_press ' + className + '_' + this.options.size + '_press')
+    }
+
+    function mouseUpCallback() {
+        if (this._disabled) return;
+        var className = $A(this.classNames()).first();
+        this.removeClassName(className + '_press ' + className + '_' + this.options.size + '_press')
+    }
+
     return {
         /**
          * Gets the label of the button
@@ -344,18 +345,17 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!this.loaded)
                 return this.signalConnect('iwl:load', this.setDisabled.bind(this, disabled));
 
+            var className = $A(this.classNames()).first();
             if (disabled) {
-                this.addClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = true;
-                disabledImageChange.call(this);
+                this.addClassName(className + '_disabled ' + className + '_' + this.options.size + '_disabled');
                 createDisabledLayer.call(this);
                 positionDisabledLayer.call(this);
                 this.signalConnect('iwl:adjust', disableButton);
                 return adjust.call(this);
             } else {
-                this.removeClassName($A(this.classNames()).first() + '_disabled');
                 this._disabled = false;
-                defaultImageChange.call(this);
+                this.removeClassName(className + '_disabled ' + className + '_' + this.options.size + '_disabled');
                 removeDisabledLayer.call(this);
                 this.signalDisconnect('iwl:adjust', disableButton);
                 return adjust.call(this);
@@ -386,8 +386,10 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.cleanWhitespace();
             createElements.call(this);
             checkComplete.call(this);
-            this.observe('mousedown', clickImageChange.bindAsEventListener(this));
-            this.observe('mouseup', defaultImageChange.bindAsEventListener(this));
+            this.observe('mouseover', mouseOverCallback.bind(this));
+            this.observe('mouseout', mouseOutCallback.bind(this));
+            this.observe('mousedown', mouseDownCallback.bind(this));
+            this.observe('mouseup', mouseUpCallback.bind(this));
             if (this.options.disabled)
                 this.setDisabled(true);
             if (this.options.submit)
