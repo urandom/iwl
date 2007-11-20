@@ -1140,7 +1140,7 @@ ul.menubar {
     border-top: 1px solid #dedee0;
     border-bottom: 3px solid #f3f4f5;
     background: #d3d6dd;*/
-    background: url(/iwl/skin/default/images/menu/bg_menu7x24.png) repeat-x top left;
+    background: url(/iwl/skin/default/images/menu/menu_bg.png) repeat-x top left;
     height:24px;
     color: black;
 }
