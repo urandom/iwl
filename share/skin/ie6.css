@@ -83,16 +83,16 @@ ul.completion {
 }
 
 li.menu_radio_item {
-    background: url(/iwl/skin/default/images/menu/menu_radio.gif) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_radio.gif) no-repeat 2px center;
 }
 li.menu_radio_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_radio_active.gif) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_radio_active.gif) no-repeat 2px center;
 }
 li.menu_check_item {
-    background: url(/iwl/skin/default/images/menu/menu_checkbox.gif) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_checkbox.gif) no-repeat 2px center;
 }
 li.menu_check_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_checkbox_active.gif) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_checkbox_active.gif) no-repeat 2px center;
 }
 li.menu_item_label_parent {
     background: url(/iwl/skin/default/images/menu/menu_next.gif) no-repeat right;

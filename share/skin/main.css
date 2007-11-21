@@ -1192,16 +1192,16 @@ div.tooltip_content {
     padding-right: 4px;
 }
 .menu_radio_item {
-    background: url(/iwl/skin/default/images/menu/menu_radio.png) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_radio.png) no-repeat 2px center;
 }
 .menu_radio_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_radio_active.png) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_radio_active.png) no-repeat 2px center;
 }
 .menu_check_item {
-    background: url(/iwl/skin/default/images/menu/menu_checkbox.png) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_checkbox.png) no-repeat 2px center;
 }
 .menu_check_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_checkbox_active.png) no-repeat 2px 2px;
+    background: url(/iwl/skin/default/images/menu/menu_checkbox_active.png) no-repeat 2px center;
 }
 
 .menu_item_selected, .menubar_item_selected {
