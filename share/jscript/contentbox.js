@@ -19,7 +19,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             "class": $A(this.classNames()).first() + '_close', "id": this.id + '_close'});
         this.buttons.appendChild(element);
         this.closeButton = element;
-        this.closeButton.signalConnect('close', this.close.bindAsEventListener(this));
+        this.closeButton.signalConnect('click', this.close.bindAsEventListener(this));
         if (this.resizeButton) {
             this.resizeButton.remove();
             this.buttons.appendChild(this.resizeButton);

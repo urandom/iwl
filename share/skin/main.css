@@ -1235,7 +1235,7 @@ li.menu_separator {
 }
 
 /* Slider */
-div.slider {
+.slider {
     position: relative;
     width: 80px;
     background-color: #fff;
@@ -1243,7 +1243,7 @@ div.slider {
     height: 20px;
     font-size: 1px; 
 }
-div.slider_rail {
+.slider_rail {
     position: relative;
     margin: 7px 1px;
     background-color: #333;
@@ -1251,7 +1251,7 @@ div.slider_rail {
     height: 6px;
     font-size: 1px; 
 }
-div.slider_handle {
+.slider_handle {
     position: absolute;
     width: 11px;
     height: 19px;
@@ -1259,26 +1259,41 @@ div.slider_handle {
     margin: 0;
     top: 1px;
     left: 0px;
-    background: url(/iwl/skin/default/images/slider/handle.gif) no-repeat;
-    cursor: move;
+    background: url(/iwl/skin/default/images/slider/handle.gif) no-repeat 0px 0px;
+    cursor: pointer;
 }
 
-div.vertical_slider {
+.slider_handle_hover {
+    background: url(/iwl/skin/default/images/slider/handle.gif) no-repeat -11px 0px;
+}
+
+.slider_handle_press {
+    background: url(/iwl/skin/default/images/slider/handle.gif) no-repeat -22px 0px;
+}
+
+.vertical_slider {
     width: 20px;
     height: 80px;
 }
-div.vertical_slider div.slider_rail {
+.vertical_slider .slider_rail {
     margin: 1px 7px;
     height: 100%;
     width: 6px;
     font-size: 1px; 
 }
-div.vertical_slider div.slider_handle {
+.vertical_slider .slider_handle {
     height: 11px;
     width: 19px;
     left: 0px;
     top: 0px;
-    background: url(/iwl/skin/default/images/slider/vertical_handle.gif) no-repeat;
+    background: url(/iwl/skin/default/images/slider/vertical_handle.gif) no-repeat 0px 0px;
+}
+.vertical_slider .slider_handle_hover {
+    background: url(/iwl/skin/default/images/slider/vertical_handle.gif) no-repeat -19px 0px;
+}
+
+.vertical_slider .slider_handle_press {
+    background: url(/iwl/skin/default/images/slider/vertical_handle.gif) no-repeat -38px 0px;
 }
 
 /* Page control */

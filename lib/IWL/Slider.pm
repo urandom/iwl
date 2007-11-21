@@ -301,6 +301,11 @@ sub __init {
     $self->{_options}{axis} = $args{vertical} ? 'vertical' : '';
     $self->{__sliderSignals} = {slide => [], change => []};
     delete @args{qw(disabled value)};
+
+    $self->{__handle}->signalConnect('mouseover', qq{\$(this).addClassName('$self->{_defaultClass}_handle_hover')});
+    $self->{__handle}->signalConnect('mouseout', qq{\$(this).removeClassName('$self->{_defaultClass}_handle_hover')});
+    $self->{__handle}->signalConnect('mousedown', qq{\$(this).addClassName('$self->{_defaultClass}_handle_press')});
+    $self->{__handle}->signalConnect('mouseup', qq{\$(this).removeClassName('$self->{_defaultClass}_handle_press')});
     $self->requiredJs('base.js', 'dist/slider.js');
     $self->_constructorArguments(%args);
 
