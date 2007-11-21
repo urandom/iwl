@@ -50,6 +50,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             for (var i = 0; i < element.childNodes.length; i++) {
                 var child = Element.extend(element.childNodes[i]);
                 var width = child.getDimensions().width;
+                if (child.getStyle('position') == 'absolute') continue;
                 if (child.tagName != 'BR' && (
                         child.getStyle('display') == 'inline' ||
                         child.getStyle('float') != 'none')
