@@ -267,7 +267,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         show: function() {
-            if (!this.parentNode)
+            if (!this.parentNode || !this.parentNode.tagName)
                 ($(arguments[0]) || document.body).appendChild(this);
             else
                 this.style.display = '';

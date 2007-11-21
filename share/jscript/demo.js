@@ -440,7 +440,7 @@ function run_base_tests() {
 
             assert(Object.isElement(element));
             assertEqual('DIV', element.tagName);
-            assert(/bar[\r\n]*Lorem ipsum, Нещо/.test(element.getText()));
+            assert(/barLorem ipsum, Нещо/.test(element.getText()));
             assertEqual('foo', element.className);
             assertEqual('bar', element.id);
             assertEqual('alpha', element.readAttribute('iwl:fooBar'));
@@ -748,19 +748,19 @@ function run_contentbox_tests() {
             contentbox.signalConnect('iwl:show', function() { show = true });
             contentbox.signalConnect('iwl:hide', function() { hide = true });
             contentbox.signalConnect('iwl:close', function() { close = true });
-            assertEqual(contentbox, contentbox.hide());
-            assert(!contentbox.visible());
-            assertEqual(contentbox, contentbox.show());
-            assert(contentbox.visible());
-            assertEqual(contentbox, contentbox.close());
-            assert(!contentbox.parentNode);
-            assertEqual(contentbox, contentbox.show('testlog'));
-            assert(contentbox.parentNode == $('testlog'));
-            assert(contentbox.visible());
+            assertEqual(contentbox, contentbox.hide(), "1");
+            assert(!contentbox.visible(), "2");
+            assertEqual(contentbox, contentbox.show(), "3");
+            assert(contentbox.visible(), "4");
+            assertEqual(contentbox, contentbox.close(), "5");
+            assert(!$('testlog').select('.contentbox').length, "6");
+            assertEqual(contentbox, contentbox.show('testlog'), "7");
+            assert(contentbox.parentNode == $('testlog'), "8");
+            assert(contentbox.visible(),"9");
             wait(500, function() {
-                assert(show);
-                assert(hide);
-                assert(close);
+                assert(show, "10");
+                assert(hide, "11");
+                assert(close, "12");
             });
         }},
         testType: function() { with(this) {
@@ -841,23 +841,23 @@ function run_contentbox_tests() {
         }},
         testAutoWidth: function() { with(this) {
             var dims = contentbox.getDimensions();
-            assertEqual(contentbox, contentbox.autoWidth());
-            assertEqual(dims.height, contentbox.getHeight());
-            assert(contentbox.getWidth() < dims.width);
+            assertEqual(contentbox, contentbox.autoWidth(), "1");
+            assertEqual(dims.height, contentbox.getHeight(), "2");
+            assert(contentbox.getWidth() < dims.width, "3");
         }},
         testTitle: function() { with(this) {
             assertEqual('Tango', contentbox.getTitle());
             var elements = contentbox.getTitleElements();
-            assertEqual(1, elements.length);
-            assertEqual('Tango', elements[0].nodeValue);
-            assertEqual(contentbox, contentbox.setTitle('Foxtrot'));
-            assertEqual('Foxtrot', contentbox.getTitle());
-            assertEqual(contentbox, contentbox.setTitle('<span>Beta</span>'));
-            assertEqual('Beta', contentbox.getTitle());
-            assertEqual('SPAN', contentbox.getTitleElements().reduce().tagName);
-            assertEqual(contentbox, contentbox.setTitle(new Element('div').update('Orange')));
-            assertEqual('Orange', contentbox.getTitle());
-            assertEqual('DIV', contentbox.getTitleElements().reduce().tagName);
+            assertEqual(1, elements.length, "1");
+            assertEqual('Tango', elements[0].nodeValue, "2");
+            assertEqual(contentbox, contentbox.setTitle('Foxtrot'), "3");
+            assertEqual('Foxtrot', contentbox.getTitle(), "4");
+            assertEqual(contentbox, contentbox.setTitle('<span>Beta</span>'), "5");
+            assertEqual('Beta', contentbox.getTitle(), "6");
+            assertEqual('SPAN', contentbox.getTitleElements().reduce().tagName, "7");
+            assertEqual(contentbox, contentbox.setTitle(new Element('div').update('Orange')), "8");
+            assertEqual('Orange', contentbox.getTitle(), "9");
+            assertEqual('DIV', contentbox.getTitleElements().reduce().tagName, "10");
         }}
     }, 'testlog');
 }
@@ -898,45 +898,45 @@ function run_druid_tests() {
             var new_page = druid.appendPage();
             var removed = false;
 
-            assert(new_page.hasClassName(className + '_page'));
-            assertEqual(2, druid.pages.length);
-            assert(visibleButton(druid.nextButton));
-            assertEqual(new_page, druid.pages[1]);
+            assert(new_page.hasClassName(className + '_page'), "1");
+            assertEqual(2, druid.pages.length, "2");
+            assert(visibleButton(druid.nextButton), "3");
+            assertEqual(new_page, druid.pages[1], "4");
             new_page = druid.prependPage(true).update('Final page');
-            assert(new_page.hasClassName(className + '_page'));
-            assertEqual(3, druid.pages.length);
-            assert(visibleButton(druid.backButton));
-            assertEqual(new_page, druid.pages[0]);
-            assert(druid.pageIsFinal(new_page));
-            assert(new_page.isFinal());
+            assert(new_page.hasClassName(className + '_page'), "5");
+            assertEqual(3, druid.pages.length, "6");
+            assert(visibleButton(druid.backButton), "7");
+            assertEqual(new_page, druid.pages[0], "8");
+            assert(druid.pageIsFinal(new_page), "9");
+            assert(new_page.isFinal(), "10");
             new_page = druid.replacePageBefore(false, druid.pages[0]);
-            assert(new_page.hasClassName(className + '_page'));
-            assertEqual(4, druid.pages.length);
-            assertEqual(new_page, druid.pages[0]);
-            assert(druid.pages[1].isFinal());
+            assert(new_page.hasClassName(className + '_page'), "11");
+            assertEqual(4, druid.pages.length, "12");
+            assertEqual(new_page, druid.pages[0], "13");
+            assert(druid.pages[1].isFinal(), "14");
             var new_page2 = druid.replacePageBefore(false, druid.pages[1]);
-            assert(new_page2.hasClassName(className + '_page'));
-            assertEqual(4, druid.pages.length);
-            assertEqual(new_page2, druid.pages[0]);
-            assertNotEqual(new_page, new_page2);
-            assert(!new_page.parentNode);
-            new_page = druid.replacePageAfter(false, druid.pages.last());
-            assert(new_page.hasClassName(className + '_page'));
-            assertEqual(5, druid.pages.length);
-            assertEqual(new_page, druid.pages.last());
+            assert(new_page2.hasClassName(className + '_page'), "15");
+            assertEqual(4, druid.pages.length, "16");
+            assertEqual(new_page2, druid.pages[0], "17");
+            assertNotEqual(new_page, new_page2, "18");
+            assert(!new_page.parentNode || !new_page.parentNode.tagName, "19");
+            new_page = druid.replacePageAfter(false, druid.pages.last(), "20");
+            assert(new_page.hasClassName(className + '_page'), "21");
+            assertEqual(5, druid.pages.length, "22");
+            assertEqual(new_page, druid.pages.last(), "23");
             new_page = druid.pages[3];
             new_page2 = druid.replacePageAfter(false);
-            assert(new_page2.hasClassName(className + '_page'));
-            assertEqual(5, druid.pages.length);
-            assertEqual(new_page2, druid.pages[3]);
-            assertNotEqual(new_page, new_page2);
-            assert(!new_page.parentNode);
-            assertEqual(druid, druid.setFinish(function() {}));
+            assert(new_page2.hasClassName(className + '_page'), "24");
+            assertEqual(5, druid.pages.length, "25");
+            assertEqual(new_page2, druid.pages[3], "26");
+            assertNotEqual(new_page, new_page2, "27");
+            assert(!new_page.parentNode || !new_page.parentNode.tagName, "28");
+            assertEqual(druid, druid.setFinish(function() {}), "29");
             druid.pages[3].signalConnect('iwl:remove', function() {removed = true});
-            assertEqual(druid, druid.removePage(druid.pages[3]));
-            assertEqual(4, druid.pages.length);
+            assertEqual(druid, druid.removePage(druid.pages[3]), "30");
+            assertEqual(4, druid.pages.length, "31");
             wait(100, function() {
-                assert(removed)
+                assert(removed, "32")
             });
         }},
         testPageSelection: function() { with(this) {
@@ -1336,11 +1336,11 @@ function run_tree_tests() {
     var className = $A(tree.classNames()).first();
     new Test.Unit.Runner({
         testParts: function() { with(this) {
-            assert(Object.isElement(tree.body));
-            assert(!tree.isList);
-            assertEqual(3, tree.body.rows.length);
-            assert(tree.tHead.hasClassName(className + '_header'));
-            assert(tree.body.hasClassName(className + '_body'));
+            assert(Object.isElement(tree.body), "1");
+            assert(!tree.isList, "2");
+            assertEqual(3, tree.body.rows.length, "3");
+            assert(tree.select('thead')[0].hasClassName(className + '_header'), "4");
+            assert(tree.body.hasClassName(className + '_body'), "5");
             $A(tree.body.rows).each(function($_) {
                 assert($_.hasClassName(className + '_row'));
             });

@@ -165,9 +165,9 @@ Object.extend(Event, (function() {
     getText: function(element) {
       element = $(element);
       if (element.textContent)
-          return element.textContent;
+        return element.textContent;
       else if (element.innerText)
-          return element.innerText;
+        return element.innerText.replace(/\r\n/, "");
     },
     positionAtCenter: function(element, relative) {
       element = $(element);
