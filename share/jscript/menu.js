@@ -354,7 +354,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
  * */
 IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function toggleCheckItem() {
-	if (!this.hasClassName('menu_check_item')) return;
+	if (!this.hasClassName('menu_check_item') || this.isNotEnabled()) return;
 	if (this.hasClassName('menu_check_item_checked')) {
 	    this.checked = false;
 	    this.removeClassName('menu_check_item_checked');
@@ -369,7 +369,7 @@ IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function toggleRadioItem() {
 	var paren = this.up();
 	
-	if (!this.hasClassName('menu_radio_item')) return;
+        if (!this.hasClassName('menu_radio_item') || this.isNotEnabled()) return;
 	if (this.hasClassName('menu_radio_item_checked')) return;
 	paren.childElements().each(function($_) {
 	    if (this.name) {
@@ -538,6 +538,7 @@ IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         activate: function() {
+            if (this.isNotEnabled()) return;
             this.menu.emitSignal('iwl:menu_item_activate', this);
             return this.emitSignal('iwl:activate');
         },

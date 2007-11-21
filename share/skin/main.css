@@ -1131,7 +1131,7 @@ div.tooltip_content {
 }
 
 /* Menu */
-ul.menubar {
+.menubar {
     display: block;
     position: relative;
     margin: 0;
@@ -1144,7 +1144,7 @@ ul.menubar {
     height:24px;
     color: black;
 }
-li.menubar_item {
+.menubar_item {
     display: inline;
     list-style: none;
     padding: 0 5px;
@@ -1153,21 +1153,21 @@ li.menubar_item {
     line-height: 19px;
     background: no-repeat scroll 5px;
 }
-span.menubar_item_label {
+.menubar_item_label {
     padding: 2px 2px 6px 2px;
     cursor: pointer;
 }
-span.menubar_item_label_iconic {
+.menubar_item_label_iconic {
     padding-left: 22px;
 }
-li.menubar_separator {
+.menubar_separator {
     display: inline;
     list-style: none;
     width: 1px;
     border-left: 1px solid gray;
 }
 
-ul.menu {
+.menu {
     position: absolute;
     display: none;
     border: 1px solid #aeab9d;
@@ -1178,12 +1178,10 @@ ul.menu {
     z-index: 99;
     cursor: pointer;
 }
-ul.scrolling_menu {
-}
-ul.submenu {
+.submenu {
     margin-top: -20px;
 }
-li.menu_item {
+.menu_item {
     list-style: none;
     background: no-repeat scroll 5px;
     height: auto;
@@ -1193,25 +1191,31 @@ li.menu_item {
     cursor: pointer;
     padding-right: 4px;
 }
-li.menu_radio_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_bullet.gif) no-repeat 2px 2px;
+.menu_radio_item {
+    background: url(/iwl/skin/default/images/menu/menu_radio.png) no-repeat 2px 2px;
 }
-li.menu_check_item_checked {
-    background: url(/iwl/skin/default/images/menu/menu_tick.gif) no-repeat 2px 2px;
+.menu_radio_item_checked {
+    background: url(/iwl/skin/default/images/menu/menu_radio_active.png) no-repeat 2px 2px;
+}
+.menu_check_item {
+    background: url(/iwl/skin/default/images/menu/menu_checkbox.png) no-repeat 2px 2px;
+}
+.menu_check_item_checked {
+    background: url(/iwl/skin/default/images/menu/menu_checkbox_active.png) no-repeat 2px 2px;
 }
 
-li.menu_item_selected, li.menubar_item_selected {
+.menu_item_selected, .menubar_item_selected {
     background-color: #8b9fbb;
     color: white;
 }
-li.menubar_item_selected {
+.menubar_item_selected {
     padding: 2px 5px 3px 5px;
 }
-li.menu_item_disabled {
+.menu_item_disabled {
     color: #aaaaaa;
 }
 
-span.menu_item_label, span.menu_item_label_parent {
+.menu_item_label, .menu_item_label_parent {
     padding-left: 24px;
     padding-right: 0;
     display: block;
@@ -1219,13 +1223,16 @@ span.menu_item_label, span.menu_item_label_parent {
     white-space: nowrap;
     font-size: 9pt;
 }
-span.menu_item_label_parent {
-    background: url(/iwl/skin/default/images/menu/menu_next.gif) no-repeat right;
+.menu_item_label_parent {
+    background: url(/iwl/skin/default/images/menu/menu_next.png) no-repeat right;
     cursor: default;
     margin-right: 5px;
     padding-right: 10px;
 }
-li.menu_separator {
+.menu_item_selected .menu_item_label_parent {
+    background: url(/iwl/skin/default/images/menu/menu_next_hover.png) no-repeat right;
+}
+.menu_separator {
     height: 1px;
     list-style: none;
     line-height: 1px;
