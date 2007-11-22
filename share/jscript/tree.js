@@ -442,13 +442,18 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!(row = $(row))) return;
                 if (!row.id) row.id = row_id;
                 row.addClassName($A(this.classNames()).first() + '_row');
+                var old_parent = parentRow;
+                if (row.hasAttribute('iwl:treeRowParent'))
+                    parentRow = $(unescape(row.readAttribute('iwl:treeRowParent')));
+                row.path = [0, 0];       // Fake this, so that the row won't get added to the body's childList. The path is rebuilt later
+                new_rows.push(IWL.Tree.Row.create(row, this));
                 if (parentRow && parentRow !== this.body && parentRow.childList) {
                     parentRow.isParent = true;
                     parentRow.childList.push(row);
                     if (parentRow.collapsed) row.hide();
+                    if (row.isParent && parentRow.collapsed) row.collapsed = true;
                 }
-                row.path = [0, 0];       // Fake this, so that the row won't get added to the body's childList. The path is rebuilt later
-                new_rows.push(IWL.Tree.Row.create(row, this));
+                parentRow = old_parent;
             }
             if (this.loadComplete) {
                 rebuildPath.call(this, parentRow);
@@ -741,13 +746,15 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * Expands the row
          * @returns The object
          * */
-        expand: function(all) {
+        expand: function() {
             if (this.tree.isList || !this.collapsed) return;
             var child_rows = this.childRows(true);
             if (child_rows.length) {
+                var all = arguments[0];
                 child_rows.each(function(child) {
                     child.show()
-                    if (all && child.childList.length) child.expand(all);
+                    if (all && child.isParent)
+                        child.expand(all);
                     else child._rebuildNav();
                 });
                 this.collapsed = false;
@@ -757,7 +764,15 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
             } else {
                 if (this._expanding) return;
                 this._expanding = true;
-                this.emitEvent('IWL-Tree-Row-expand', {}, {all: all});
+                var params = {}, options = {};
+                if (Object.isObject(arguments[0])) {
+                    params = Object.extend({}, arguments[0]);
+                    options = Object.isObject(arguments[1])
+                        ? Object.extend({}, arguments[1]) : {all: arguments[1]};
+                } else {
+                    options = {all: arguments[0]};
+                }
+                this.emitEvent('IWL-Tree-Row-expand', params, options);
             }
             return this;
         },
@@ -792,10 +807,10 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.childList = [];
 
             var row_data = unescape(this.readAttribute('iwl:treeRowData') || '{}').evalJSON();
-            if (row_data.childList)
+            if (row_data.childList && row_data.childList.length)
                 row_data.childList = row_data.childList.map(function($_) {
                     return $($_);
-                });
+                }).compact();
             Object.extend(this, row_data);
             if (!(this.path) || !this.path.length || this.path.length == 1)
                 this.tree.body.childList.push(this);

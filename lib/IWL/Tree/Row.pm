@@ -168,7 +168,7 @@ sub prependRow {
 
 Returns a list of the row objects appended or empty list if no rows have been appended.
 
-Parameters: B<FLAT> - flase if the method should return all the subrows on all levels
+Parameters: B<FLAT> - false if the method should return all the subrows on all levels
 
 =cut
 
@@ -442,14 +442,16 @@ sub _realize {
     $data->{isParent}   = $self->{_isParent};
     $data->{collapsed}  = $self->{_collapsed};
 
-    $self->setAttribute('iwl:treeRowData' => toJSON($data), 'uri');
+    $self->setAttribute('iwl:treeRowData' => toJSON($data), 'escape');
+    $self->setAttribute('iwl:treeRowParent' => $self->{_parentRow}->getId, 'escape')
+      if $self->{_parentRow} && $self->{__ignoreChildren};
 
     if ($self->{_parentRow} && $self->{_parentRow}{_collapsed}) {
         $self->setStyle(display => 'none');
     }
     if ($tree) {
 	$tree->{_body}->insertAfter($self, @{$self->{_children}});
-    } else {
+    } elsif (!$self->{__ignoreChildren}) {
 	$self->appendAfter(@{$self->{_children}});
     }
 }
@@ -463,7 +465,7 @@ sub _expandEvent {
       : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
 
-    print '[' . join(',', map {$_->getJSON} @$list) . ']';
+    print '[' . join(',', map {$_->{__ignoreChildren} = 1; $_->getJSON} @$list) . ']';
 }
 
 sub _registerEvent {

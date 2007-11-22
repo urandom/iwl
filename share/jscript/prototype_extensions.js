@@ -385,6 +385,15 @@ Object.extend(Array.prototype, {
   }
 });
 
+Object.extend(Object, {
+  isObject: function(object) {
+    return object && object.constructor === Object;
+  },
+  isBoolean: function(object) {
+    return typeof object == "boolean";
+  }
+});
+
 var PeriodicalAccelerator = Class.create((function () {
   function onTimerEvent() {
     if (!this.callback) return;

@@ -213,6 +213,16 @@ function run_prototype_tests() {
             assertEnumEqual([4,5,6], array.slice($R(-3,-1)), "10");
             assertEnumEqual([1], array.slice(0), "11");
         }},
+        testObjects: function() { with(this) {
+            assert(!Object.isObject([]));
+            assert(!Object.isObject($('testlog')));
+            assert(!Object.isObject(true));
+            assert(Object.isObject({}));
+            assert(!Object.isBoolean(1));
+            assert(!Object.isBoolean(0));
+            assert(Object.isBoolean(true));
+            assert(Object.isBoolean(false));
+        }},
         testPeriodicalAccelerator: function() { with(this) {
             var paEventCount = 0;
             paEventFired = function(pa) {
