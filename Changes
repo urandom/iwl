@@ -1,25 +1,50 @@
+Release: 0.52 - 22/11/07
+      . External dependency to JSON removed. IWL::JSON has been included, and
+          is a perl implementation of prototype's JSON parsing.
+      . New IWL::IFrame and IWL::VBox widgets
+      . Workaround for IE's 'Operation Aborted' error
+      . Javascript:
+        * Prototype 1.6 and Scriptaculous 1.8
+        * Custom signals through JavaScript are namespaced with 'iwl'
+        * JavaScript test cases
+        * window namespace cleanup. Every IWL function has been moved to a
+            gloal IWL object, or as an element method. Old names will be
+            removed in a later version
+      . Visual:
+        * IWL::Entry and IWL::Spinner are now BLOCK elements. They might appear
+            in vertical arrangement, depending on their parent widget
+        * Tango icons are used instead of rusty ones
+        * Better icons for IWL::Menu::Item
+        * IWL::Button skin is more flexible
+        * Improved IWL::Contentbox
+      . Improvements to IWL::Entry completion
+      . Various bugfixes
+      . Removal of non-stock Stock items. Method for adding custom stock items
+
+
 Release: 0.51 - 10/10/07
-        Menu keyboard navigation
-        New spinner widget
-        Workaround for nasty JSON bug, which caused tests (and unexpected behavior) to fail with newer versions of JSON
+      . Menu keyboard navigation
+      . New spinner widget
+      . Workaround for nasty JSON bug, which caused tests (and unexpected
+          behavior) to fail with newer versions of JSON
 
 Release: 0.50 - 08/10/07
-        Improvements to the Contentbox, Tooltip and Druid
-        New widgets: Accordion and Calendar
-        Improved IWL::RPC, with API changes for event registration
-        Various fixes and improvements
-        Fix the typo of Test::Weaken to Task::Weaken
+      . Improvements to the Contentbox, Tooltip and Druid
+      . New widgets: Accordion and Calendar
+      . Improved IWL::RPC, with API changes for event registration
+      . Various fixes and improvements
+      . Fix the typo of Test::Weaken to Task::Weaken
 
 Release: 0.47 - 03/07/07
-	Speedups in Internet Explorer. Internally escape every string that is
-	passed to the browser using an 'escape' compatible function.
-	Complete test coverage
-	Documentation improvements
-	More methods
+      . Speedups in Internet Explorer. Internally escape every string that is
+      . passed to the browser using an 'escape' compatible function.
+      . Complete test coverage
+      . Documentation improvements
+      . More methods
 
 Release: 0.46 - 25/06/07
-	Changed the order of the parameter passing in handleEvent
-	And some minor issues
+      . Changed the order of the parameter passing in handleEvent
+      . And some minor issues
 
 Initial release: version 0.45 - 24/06/07
 
