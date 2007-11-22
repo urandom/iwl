@@ -107,7 +107,7 @@ Parameters: B<TEXT> - the text for the label
 sub setLabel {
     my ($self, $text) = @_;
 
-    $self->{_options}{label} = $text;
+    $self->{_options}{label} = $text || '';
     return $self;
 }
 
@@ -131,6 +131,7 @@ Parameters: B<SRC> - the url for the image. If the B<SRC> begins with I<IWL_STOC
 
 sub setImage {
     my ($self, $src, $alt) = @_;
+    return if !$src;
 
     my $image = $self->{image};
     $image->{_ignore} = 0;
