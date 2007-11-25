@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More tests => 7;
 
 use IWL::RPC;
 
@@ -12,6 +12,14 @@ use IWL::RPC;
 			foo => 1,
 			bar => 'baz',
 			alpha => 'echo 1',
+	});
+    $ENV{QUERY_STRING} = '';
+    is($rpc, $rpc->clearParams);
+    is_deeply({$rpc->getParams}, {});
+    is($rpc, $rpc->setParams(foo => 2, alpha => 'две'));
+    is_deeply({$rpc->getParams}, {
+			foo => 2,
+			alpha => 'две',
 	});
 }
 

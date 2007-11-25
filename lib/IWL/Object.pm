@@ -4,6 +4,9 @@
 package IWL::Object;
 
 use strict;
+
+use base 'IWL::Error';
+
 use constant JSON_HEADER => "Content-type: application/json\nX-IWL: 1\n\n";
 use constant HTML_HEADER => "Content-type: text/html; charset=utf-8\n\n";
 use constant TEXT_HEADER => "Content-type: text/plain\n\n";
@@ -394,7 +397,7 @@ sub getContent {
         $self->__addInitScripts;
     }
 
-    return '' if $self->{__objectErrorBad};
+    return '' if $self->bad;
 
     return ''
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
@@ -501,7 +504,7 @@ sub getObject {
         $self->__addInitScripts;
     }
 
-    return {} if $self->{__objectErrorBad};
+    return {} if $self->bad;
 
     return
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
@@ -860,101 +863,6 @@ sub cleanStateful {
     %initialized_js = ();
 }
 
-# These are more or less copied from the Imperia ErrorSaver module.
-=item B<errorList>
-
-In scalar context returns the newline separated contents of the
-error stack.  In list context it returns the error stack as a
-list.
-
-=cut
-
-sub errorList {
-    my $self = shift;
-
-    unless (defined $self->{__objectErrorList}) {
-	return wantarray ? () : '';
-    }
-
-    if (wantarray) {
-	return @{$self->{__objectErrorList}};
-    } else {
-	join "\n", @{$self->{__objectErrorList}}, '';
-    }
-}
-
-=item B<errorSuck>
-
-Like errorList() but empties the error stack and resets the bad state.
-
-=cut
-
-sub errorSuck {
-    my $self = shift;
-
-    unless (defined $self->{__objectErrorList}) {
-	return wantarray ? () : '';
-    }
-
-    $self->_setBad (0);
-    if (wantarray) {
-	my @errors = @{$self->{__objectErrorList}};
-	$self->clearErrors;
-	return @errors;
-    } else {
-	my $errors = join "\n", @{$self->{__objectErrorList}}, '';
-	$self->clearErrors;
-	return $errors;
-    }
-}
-
-=item B<chompErrors>
-
-Removes trailing newlines from the messages on the error stack.
-
-=cut
-
-sub chompErrors {
-    my $self = shift;
-    my $errlist = $self->{__objectErrorList};
-
-    @{$self->{__objectErrorList}} = map { chomp; $_ } @$errlist;
-    return $self;
-}
-
-=item B<clearErrors>
-
-Empties the error stack.
-
-=cut
-
-sub clearErrors {
-    shift->{__objectErrorList} = [];
-}
-
-=item B<bad>
-
-Returns the current bad state.
-
-=cut
-
-sub bad {
-    shift->{__objectErrorBad};
-}
-
-=item B<errors>
-
-Returns the number of messages on the error stack.
-
-=cut
-
-sub errors {
-    my $self = shift;
-    return 0 unless $self->{__objectErrorList};
-
-    return scalar @{$self->{__objectErrorList}};
-}
-
 =item B<getState>
 
 Returns the current state of the form as an IWL::Stash(3pm) object.
@@ -997,47 +905,7 @@ sub applyState {
 The following methods should only be used by classes that inherit
 from B<IWL::Object>.
 
-=item B<_pushFatalError (STRINGLIST)>
-
-Combines B<_pushError> and B<_setBad> to produce a fatal error
-
 =cut
-
-sub _pushFatalError {
-    my ($self, @errlist) = @_;
-
-    $self->_setBad(1);
-    return $self->_pushError(@errlist);
-}
-
-=item B<_pushError (STRINGLIST)>
-
-Push all strings in C<STRINGLIST> onto the error stack and returns
-false (can be used to return with an error from arbitrary functions).
-
-=cut
-
-sub _pushError {
-    my ($self, @errlist) = @_;
-
-    push @{$self->{__objectErrorList}}, @errlist;
-
-    # Return false so that derived classes may do something like
-    # return $self->_pushError;
-    return;
-}
-
-
-=item B<_setBad (STATE)>
-
-Sets the current bad state.
-
-=cut
-
-sub _setBad {
-    my ($self, $newstate) = @_;
-    $self->{__objectErrorBad} = $newstate;
-}
 
 sub _appendAfter {
     my ($self, @objects) = @_;
@@ -1047,6 +915,14 @@ sub _appendAfter {
     return $self;
 }
 
+=item B<_appendInitScript> (B<SCRIPTS>)
+
+Appends B<SCRIPTS> to the list of the object's initialization scripts
+
+Parameters: B<SCRIPTS> - JavaScript code, which will be inserted into an L<IWL::Script> widget upon realization
+
+=cut
+
 sub _appendInitScript {
     my ($self, @scripts) = @_;
 
@@ -1054,8 +930,20 @@ sub _appendInitScript {
     return $self;
 }
 
+=item B<_realize>
+
+Realizes the object. It is right before the object is serialized into HTML or JSON
+
+=cut
+
 sub _realize {
 }
+
+=item B<_findTopParent>
+
+Finds the top-most parent of the object and returns it.
+
+=cut
 
 sub _findTopParent {
     my $self = shift;

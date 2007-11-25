@@ -34,6 +34,7 @@ lib/IWL/Contentbox.pm
 lib/IWL/Druid.pm
 lib/IWL/Druid/Page.pm
 lib/IWL/Entry.pm
+lib/IWL/Error.pm
 lib/IWL/File.pm
 lib/IWL/Form.pm
 lib/IWL/Frame.pm
@@ -250,6 +251,7 @@ share/skin/ie6.css
 share/skin/main.css
 t/01use.t
 t/02config.t
+t/02error.t
 t/02json.t
 t/02string.t
 t/03stock.t

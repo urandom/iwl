@@ -5,6 +5,8 @@ package IWL::RPC;
 
 use strict;
 
+use base 'IWL::Error';
+
 use IWL::Object;
 use IWL::JSON qw(toJSON evalJSON);
 
@@ -32,6 +34,10 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 A hashref of CGI parameters to use, instead of reading for GET/POST parameters.
 
+=item B<deferExit>
+
+If true, the IWL::RPC will return, instead of calling the exit(3pm) function.
+
 =back
 
 =cut
@@ -41,8 +47,9 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = bless {}, $class;
 
-    $self->{__isRead} = undef;
-    $self->{__params} = $args{parameters} if ref $args{parameters} eq 'HASH';
+    $self->{__isRead}    = undef;
+    $self->{__params}    = $args{parameters} if ref $args{parameters} eq 'HASH';
+    $self->{__deferExit} = $args{deferExit} if defined $args{deferExit};
 
     return $self;
 }
@@ -143,6 +150,35 @@ sub getParams {
     return %FORM;
 }
 
+=item B<setParams> (B<PARAMETERS>)
+
+Adds the given parameters to the parameter list of the RPC
+
+Parameters: B<PARAMETERS> - a hash of parameters to add
+
+=cut
+
+sub setParams {
+    my ($self, %parameters) = @_;
+
+    $self->{__params}{$_} = $parameters{$_} foreach keys %parameters;
+
+    return $self;
+}
+
+=item B<clearParams>
+
+Clears the internal parameter list of the RPC
+
+=cut
+
+sub clearParams {
+    my $self = shift;
+
+    $self->{__params} = undef;
+    return $self;
+}
+
 =item B<queryStringToCGIForm> (B<QUERY>, B<FORM>)
 
 The function splits a query string and fills out the given hash reference
@@ -196,7 +232,9 @@ sub handleEvent {
 	    $name =~ s/-/::/g;
 	    my ($package, $func) = $name =~ /(.*)::([^:]*)$/;
 	    eval "require $package";
-	    exit 255 if $@;
+            ($self->{__deferExit}
+                ? return $self->_pushFatalError($@)
+                : exit 255) if $@;
 	    my $method;
 	    {
 		no strict 'refs';
@@ -207,9 +245,10 @@ sub handleEvent {
 	    } else {
 		$self->__defaultEvent($form{IWLEvent}, $handler);
 	    }
-	    exit 0;
+            $self->{__deferExit} ? return $self : exit 0;
 	}
     }
+    return;
 }
 
 # Internal
