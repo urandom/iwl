@@ -47,7 +47,6 @@ package PRINT_TEST;
 sub TIEHANDLE {
 	my $self = {};
 	bless $self, shift;
-	$self->{_content} = undef;
 
 	return $self;
 }
