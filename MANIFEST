@@ -257,6 +257,7 @@ t/02json.t
 t/02string.t
 t/03stock.t
 t/10object.t
+t/10response.t
 t/10stash.t
 t/20comment.t
 t/20page_link.t

@@ -61,8 +61,11 @@ sub send {
     my $content = $args{content};
 
     if ($IWLConfig{RESPONSE_CLASS}) {
-        eval "require $IWLConfig{RESPONSE_CLASS}";
-        return $self->_pushFatalError($@) if $@;
+        {
+            no strict 'refs';
+            eval "require $IWLConfig{RESPONSE_CLASS}" unless *{$IWLConfig{RESPONSE_CLASS} . "::new"}{CODE};
+            return $self->_pushFatalError($@) if $@;
+        }
         my $response = $IWLConfig{RESPONSE_CLASS}->new;
         $response->send(header => $header, content => $content);
         return $self;
