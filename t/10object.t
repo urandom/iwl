@@ -1,4 +1,4 @@
-use Test::More tests => 30;
+use Test::More tests => 31;
 
 use IWL::Object;
 
@@ -28,6 +28,7 @@ use IWL::Object;
 {
 	my $object = IWL::Object->new;
 
+    isa_ok($object->getResponseObject, 'IWL::Response');
 	is($object->getContent, "<></>\n");
 	is_deeply($object->getObject, {});
 	is($object->getJSON, '{}');

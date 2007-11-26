@@ -318,16 +318,19 @@ sub _registerEvent {
 
 sub _refreshEvent {
     my ($event, $handler) = @_;
+    my $response = IWL::Response->new;
 
-    IWL::Object::printJSONHeader;
     my ($list, $extras) = ('CODE' eq ref $handler)
       ? $handler->($event->{params})
       : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
 
-    print '{rows: ['
+    $response->send(
+        content => '{rows: ['
            . join(',', map {'"' . escape($_->getContent) . '"'} @$list)
-           . '], extras: ' . (toJSON($extras) || 'null'). '}';
+           . '], extras: ' . (toJSON($extras) || 'null'). '}',
+        header => IWL::Object::getJSONHeader,
+    );
 }
 
 # Internal

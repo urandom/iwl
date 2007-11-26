@@ -458,14 +458,17 @@ sub _realize {
 
 sub _expandEvent {
     my ($event, $handler) = @_;
+    my $response = IWL::Response->new;
 
-    IWL::Object::printJSONHeader;
     my ($list, $extras) = ('CODE' eq ref $handler)
       ? $handler->($event->{params}, $event->{options}{all})
       : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
 
-    print '[' . join(',', map {$_->{__ignoreChildren} = 1; $_->getJSON} @$list) . ']';
+    $response->send(
+        content => '[' . join(',', map {$_->{__ignoreChildren} = 1; $_->getJSON} @$list) . ']',
+        header => IWL::Object::getJSONHeader,
+    );
 }
 
 sub _registerEvent {

@@ -11,9 +11,10 @@ use constant JSON_HEADER => "Content-type: application/json\nX-IWL: 1\n\n";
 use constant HTML_HEADER => "Content-type: text/html; charset=utf-8\n\n";
 use constant TEXT_HEADER => "Content-type: text/plain\n\n";
 
+use IWL::Response;
 use IWL::Config qw(%IWLConfig);
-use IWL::JSON qw(toJSON);
 use IWL::String qw(encodeURI escapeHTML escape);
+use IWL::JSON qw(toJSON);
 
 use Scalar::Util qw(weaken isweak);
 
@@ -22,6 +23,9 @@ use vars qw(%cloneCache);
 
 # A hash to keep track of initialized js.
 my %initialized_js;
+
+# The IWL::Response object
+my $response;
 
 =head1 NAME
 
@@ -414,7 +418,6 @@ sub getContent {
 	}
     }
 
-    $content .= $self->{_HTTPHeader} . "\n\n" if $self->{_HTTPHeader};
     $content .= "<!" . $self->{_declaration} . ">\n" if $self->{_declaration};
     $content .= "<" . $self->{_tag};
 
@@ -461,12 +464,14 @@ sub getContent {
 
 Prints the current object and all of it's children.
 
+L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
+
 =cut
 
 sub print {
     my $self = shift;
 
-    print $self->getContent;
+    $self->getResponseObject->send(content => $self->getContent);
     return $self;
 }
 
@@ -474,13 +479,14 @@ sub print {
 
 Prints the HTML content of current object and all of its children, along with an HTML header.
 
+L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
+
 =cut
 
 sub printHTML {
     my $self = shift;
 
-    $self->printHTMLHeader unless $self->isa('IWL::Page');
-    print $self->getContent;
+    $self->getResponseObject->send(content => $self->getContent, header => IWL::Object::getHTMLHeader());
     return $self;
 }
 
@@ -582,19 +588,22 @@ sub getJSON {
 
 Prints the JSON of current object and all of its children, along with a javascript header.
 
+L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
+
 =cut
 
 sub printJSON {
     my $self = shift;
 
-    $self->printJSONHeader;
-    print $self->getJSON;
+    $self->getResponseObject->send(content => $self->getJSON, header => IWL::Object::getJSONHeader());
     return $self;
 }
 
 =item B<printJSONHeader>
 
 Prints the JSON Header which is used by IWL
+
+L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
 
 =cut
 
@@ -606,6 +615,8 @@ sub printJSONHeader {
 
 Prints the HTML Header which is used by IWL
 
+L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
+
 =cut
 
 sub printHTMLHeader {
@@ -616,10 +627,42 @@ sub printHTMLHeader {
 
 Prints the Text Header which is used by IWL
 
+L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
+
 =cut
 
 sub printTextHeader {
     return print TEXT_HEADER;
+}
+
+=item B<getJSONHeader>
+
+Returns the JSON Header which is used by IWL
+
+=cut
+
+sub getJSONHeader {
+    return {"Content-type" => "application/json", "X-IWL" => "1"};
+}
+
+=item B<getHTMLHeader>
+
+Returns the HTML Header which is used by IWL
+
+=cut
+
+sub getHTMLHeader {
+    return {"Content-type" => "text/html; charset=utf-8"};
+}
+
+=item B<getTextHeader>
+
+Returns the Text Header which is used by IWL
+
+=cut
+
+sub getTextHeader {
+    return {"Content-type" => "text/plain"};
 }
 
 =item B<setAttribute> (B<ATTR>, B<VALUE>, B<ESCAPING>)
@@ -900,6 +943,70 @@ sub applyState {
     return $self;
 }
 
+=item B<getResponseObject>
+
+Returns the final response object, used by every L<IWL::Object>
+
+=cut
+
+sub getResponseObject {
+    $response = IWL::Response->new unless $response;
+    return $response;
+}
+
+=item B<send> (B<%ARGS>)
+
+Serializes and sends the object using IWL::Response::send(3pm)
+
+Parameters: %ARGS - a hash of arguments. The following keys are supported:
+
+=over 8
+
+=item I<type>
+
+Serializes the object to the given type, and sends the corresponding header. The following types are supported:
+
+=over 12
+
+=item I<html>
+
+Serializes the object to HTML and sends it with a text/html header
+
+=item I<json>
+
+Serializes the object to JSON and sends it with an application/json header
+
+=item I<text>
+
+Serializes the object to HTML and sends it with a text/plain header
+
+=back
+
+=back
+
+=cut
+
+sub send {
+    my ($self, %args) = @_;
+    my ($header, $content);
+
+    if ($args{type} eq 'html') {
+        $header = IWL::Object::getHTMLHeader;
+        $content = $self->getContent;
+    } elsif ($args{type} eq 'json') {
+        $header = IWL::Object::getJSONHeader;
+        $content = $self->getJSON;
+    } elsif ($args{type} eq 'text') {
+        $header = IWL::Object::getTextHeader;
+        $content = $self->getContent;
+    } else {
+        return;
+    }
+
+    $self->getResponseObject->send(header => $header, content => $content);
+    return $self;
+}
+
 =head1 PROTECTED METHODS
 
 The following methods should only be used by classes that inherit
@@ -1009,7 +1116,7 @@ sub __addInitScripts {
             $parent->{_initScriptElement}->setAttribute('iwl:initScript');
         }
     }
-};
+}
 
 1;
 

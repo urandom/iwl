@@ -74,8 +74,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->{_tag}         = "html";
-    $self->{_HTTPHeader} = "Content-type: text/html; charset=utf-8";
+    $self->{_tag} = "html";
     $self->setDeclaration('xhtml1');
     $self->setAttribute(xmlns => "http://www.w3c.org/1999/xhtml");
     $self->setAttribute('xmlns:iwl' => "http://namespace.bloka.org/iwl");
@@ -162,35 +161,6 @@ Returns the title text of the page
 sub getTitle {
     my $self = shift;
     return $self->{_head}{_title} ? $self->{_head}{_title}->getText : '';
-}
-
-=item B<setHTTPHeader> (B<HEADER>)
-
-Sets the header of the page. The default one is:
-  Content-type: text/html; charset=utf-8
-
-The two final new lines are not required
-
-Parameters: B<HEADER> - the header string
-
-=cut
-
-sub setHTTPHeader {
-    my ($self, $header) = @_;
-    return unless $header;
-
-    $self->{_HTTPHeader} = $header;
-    return $self;
-}
-
-=item B<getHTTPHeader>
-
-Returns the HTTP header
-
-=cut
-
-sub getHTTPHeader {
-    return shift->{_HTTPHeader};
 }
 
 =item B<setDeclaration> (B<DECLARATION>)

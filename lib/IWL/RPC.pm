@@ -255,6 +255,7 @@ sub handleEvent {
 #
 sub __defaultEvent {
     my ($self, $event, $handler) = @_;
+    my $response = IWL::Response->new;
 
     my ($data, $extras) = ('CODE' eq ref $handler)
       ? $handler->($event->{params}, $event->{options}{id},
@@ -269,15 +270,16 @@ sub __defaultEvent {
     }
 
     if ($event->{options}{update}) {
-        IWL::Object::printHTMLHeader;
         if (UNIVERSAL::isa($data, 'IWL::Object')) {
-            $data->print;
+            $data->send(type => 'html');
         } else {
-            print $data;
+            $response->send(content => $data, header => IWL::Object::getHTMLHeader);
         }
     } else {
-        IWL::Object::printJSONHeader;
-        print '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}';
+        $response->send(
+            content => '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}',
+            header => IWL::Object::getJSONHeader
+        );
     }
 }
 

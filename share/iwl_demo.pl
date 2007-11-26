@@ -171,9 +171,11 @@ if (my $file = $form{upload_file}) {
     IWL::Upload::printMessage("$name uploaded.", {filename => $name, uploaded => 1});
     exit 0;
 } elsif (my $text = $form{text}) {
-    IWL::Object::printHTMLHeader;
-    print "The following text was received: $text";
-    print IWL::Break->new()->getContent;
+    my $response = IWL::Response->new;
+    $response->send(
+        content => "The following text was received: $text" . IWL::Break->new()->getContent,
+        header => IWL::Object::getHTMLHeader
+    );
     exit 0;
 } elsif ($form{completion} && (my $search = quotemeta $form{completion})) {
     my @completions;
@@ -185,8 +187,8 @@ if (my $file = $form{upload_file}) {
     IWL::Entry::printCompletions(@completions);
     exit 0;
 } elsif ($text = $form{image}) {
-    IWL::Object::printHTMLHeader;
-    print "The following text was received: $text";
+    my $response = IWL::Response->new;
+    $response->send(content => "The following text was received: $text", header => IWL::Object::getHTMLHeader);
     exit 0;
 } else {
     my $page = IWL::Page->new;
@@ -221,7 +223,7 @@ EOF
 
     build_tree($tree);
     $page->setTitle('Widget Library');
-    $page->print;
+    $page->send(type => 'html');
 }
 
 sub build_tree {

@@ -366,8 +366,7 @@ sub printCompletions {
     my $list = IWL::List->new->setClass('entry_completion_list');
     $list->appendListItemText($_) foreach @completions;
 
-    IWL::Object::printTextHeader;
-    return $list->print;
+    return $list->send(type => 'text');
 }
 
 # Overrides

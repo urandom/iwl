@@ -184,15 +184,18 @@ sub __init {
 
 sub __buttonEvent {
     my ($event, $handler) = @_;
+    my $response = IWL::Response->new;
     my ($list, $extras) = ('CODE' eq ref $handler)
       ? $handler->($event->{params}, $event->{options}{id}, $event->{options}{elementData})
       : (undef, undef);
     $list = [] unless ref $list eq 'ARRAY';
     my $html = escape(join('', map {$_->getContent} @$list));
 
-    IWL::Object::printJSONHeader;
-    print '{data: "' . $html . '", extras: '
-      . (toJSON($extras) || 'null') . '}';
+    $response->send(
+        content => '{data: "' . $html . '", extras: '
+          . (toJSON($extras) || 'null') . '}',
+        header => IWL::Object::getJSONHeader,
+    );
 }
 
 1;

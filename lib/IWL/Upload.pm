@@ -144,7 +144,7 @@ sub printMessage {
     my $page = IWL::Page->new(simple => 1);
     $json->setContent(toJSON({message => $message, data => $data}));
     $page->appendChild($json);
-    $page->print;
+    $page->send(type => 'html');
 }
 
 # Overrides

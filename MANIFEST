@@ -66,6 +66,7 @@ lib/IWL/Page/Meta.pm
 lib/IWL/Page/Title.pm
 lib/IWL/PageControl.pm
 lib/IWL/Parser.pm
+lib/IWL/Response.pm
 lib/IWL/RPC.pm
 lib/IWL/RPC/Request.pm
 lib/IWL/RadioButton.pm
