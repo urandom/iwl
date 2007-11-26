@@ -46,6 +46,7 @@ use IWL::Page::Meta;
 use IWL::Page;
 use IWL::PageControl;
 use IWL::RadioButton;
+use IWL::Response;
 use IWL::RPC;
 use IWL::Script;
 use IWL::Slider;
@@ -110,7 +111,7 @@ This documentation refers to B<IWL> version 0.52
     $page->appendChild($frame);
 
     # Finally printing the page
-    $page->print;
+    $page->send(type => 'html');
 
 
 
@@ -124,6 +125,8 @@ The widgets themselves can be used either as standalone object in an already exi
 
 The following widgets have so far been written. They have extensive documentation for their methods
 
+ IWL::Accordion - An accordion container widget
+ IWL::Accordion::Page - A page widget for an accordion
  IWL::Anchor - An anchor widget ("<a>")
  IWL::Break - A break widget ("<br>")
  IWL::Button - A graphic button widget
@@ -136,6 +139,7 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::Container - A basic container widget ("<div>")
  IWL::Contentbox - A generic window-like contentbox
  IWL::Druid - A step-based druid widget
+ IWL::Druid::Page - A page widget for a druid
  IWL::Entry - An entry widget with support for icons
  IWL::File - A file upload widget ("<input type="file">")
  IWL::Form - A form widget ("<form>")
@@ -144,6 +148,7 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::Hbox - A container widget for positioning widgets horizontally
  IWL::Iconbox - An iconbox widget (holds icons and has keyboard navigation)
  IWL::Iconbox::Icon - An icon widget for the iconbox
+ IWL::IFrame - An iframe container
  IWL::Image - An image widget ("<img>")
  IWL::Input - A generic input widget ("<input>")
  IWL::InputButton - A generic button widget ("<input type="button">")
@@ -179,6 +184,7 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::Tree::Cell - A tree cell widget
  IWL::Tree::Row - A tree row widget
  IWL::Upload - A theme-able upload widget
+ IWL::VBox - A vertical box container
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

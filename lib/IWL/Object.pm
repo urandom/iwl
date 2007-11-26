@@ -982,6 +982,10 @@ Serializes the object to HTML and sends it with a text/plain header
 
 =back
 
+=item B<header>
+
+A hash reference, representing an HTTP header, can be passed, if the I<type> option is either I<html> or I<json>. It will override the default header for those types.
+
 =back
 
 =cut
@@ -991,10 +995,10 @@ sub send {
     my ($header, $content);
 
     if ($args{type} eq 'html') {
-        $header = IWL::Object::getHTMLHeader;
+        $header = $args{header} || IWL::Object::getHTMLHeader;
         $content = $self->getContent;
     } elsif ($args{type} eq 'json') {
-        $header = IWL::Object::getJSONHeader;
+        $header = $args{header} || IWL::Object::getJSONHeader;
         $content = $self->getJSON;
     } elsif ($args{type} eq 'text') {
         $header = IWL::Object::getTextHeader;

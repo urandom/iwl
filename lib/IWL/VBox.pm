@@ -9,7 +9,7 @@ use base 'IWL::Container';
 
 =head1 NAME
 
-IWL::VBox - A horizontal box container
+IWL::VBox - A vertical box container
 
 =head1 INHERITANCE
 
