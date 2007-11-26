@@ -366,25 +366,6 @@ Object.extend(String.prototype, {
   }
 });
 
-Object.extend(Array.prototype, {
-  slice: function(from, length) {
-    var copy = this.clone();
-    if (arguments.length == 1 && arguments[0] instanceof ObjectRange) {
-      var range = arguments[0];
-      from = range.start;
-      if (from < 0 && range.end >= 0)
-        return copy.splice(from, -1 * from).concat(copy.splice(0, range.end + 1));
-      else if (from < 0 && range.end < 0)
-        return copy.splice(from, range.end + 1 - from);
-      else
-        length = range.end + 1 - from;
-
-    } else if (length === undefined)
-      length = 1;
-    return copy.splice(from, length);
-  }
-});
-
 Object.extend(Object, {
   isObject: function(object) {
     return object && object.constructor === Object;
