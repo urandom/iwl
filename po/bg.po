@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-11-14 11:45+0200\n"
-"PO-Revision-Date: 2007-11-08 13:46+0200\n"
+"POT-Creation-Date: 2007-11-28 16:26+0200\n"
+"PO-Revision-Date: 2007-11-28 17:00+0200\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net,"
 "viktor@imperia.net>\n"
@@ -57,8 +57,8 @@ msgid "Apply"
 msgstr "Прилагане"
 
 #: ../lib/IWL/Stock.pm:36
-msgid "Back"
-msgstr "Обратно"
+msgid "Calendar"
+msgstr "Календар"
 
 #: ../lib/IWL/Stock.pm:40
 msgid "Cancel"
@@ -77,155 +77,107 @@ msgid "Delete"
 msgstr "Изтриване"
 
 #: ../lib/IWL/Stock.pm:56
+msgid "Directory"
+msgstr "Директория"
+
+#: ../lib/IWL/Stock.pm:60
+msgid "Create directory"
+msgstr "Създаване на директория"
+
+#: ../lib/IWL/Stock.pm:64
 msgid "Download"
 msgstr "Сваляне"
 
-#: ../lib/IWL/Stock.pm:60
+#: ../lib/IWL/Stock.pm:68
 msgid "Edit"
 msgstr "Редактиране"
 
-#: ../lib/IWL/Stock.pm:64
-msgid "Export"
-msgstr "Износ"
-
-#: ../lib/IWL/Stock.pm:68
+#: ../lib/IWL/Stock.pm:72
 msgid "Fullscreen"
 msgstr "Цял екран"
-
-#: ../lib/IWL/Stock.pm:72
-msgid "Go"
-msgstr "Отиване"
 
 #: ../lib/IWL/Stock.pm:76
 msgid "Go back"
 msgstr "Назад"
 
 #: ../lib/IWL/Stock.pm:80
+msgid "Go down"
+msgstr "Надолу"
+
+#: ../lib/IWL/Stock.pm:84
 msgid "Go forward"
 msgstr "Напред"
 
-#: ../lib/IWL/Stock.pm:84
+#: ../lib/IWL/Stock.pm:88
+msgid "Go up"
+msgstr "Нагоре"
+
+#: ../lib/IWL/Stock.pm:92
 msgid "Go to first"
 msgstr "Отиване в началото"
 
-#: ../lib/IWL/Stock.pm:88
+#: ../lib/IWL/Stock.pm:96
 msgid "Go to last"
 msgstr "Отиване накрая"
 
-#: ../lib/IWL/Stock.pm:92
+#: ../lib/IWL/Stock.pm:100
 msgid "Help"
 msgstr "Помощ"
 
-#: ../lib/IWL/Stock.pm:96
+#: ../lib/IWL/Stock.pm:104
 msgid "Information"
 msgstr "Информация"
 
-#: ../lib/IWL/Stock.pm:100
+#: ../lib/IWL/Stock.pm:108
 msgid "Lock"
 msgstr "Заключване"
 
-#: ../lib/IWL/Stock.pm:104
-msgid "Minimize"
-msgstr "Намаляване"
-
-#: ../lib/IWL/Stock.pm:108
+#: ../lib/IWL/Stock.pm:112
 msgid "New"
 msgstr "Нов"
 
-#: ../lib/IWL/Stock.pm:112
-msgid "Next"
-msgstr "Следваща страница"
-
 #: ../lib/IWL/Stock.pm:116
+msgid "Next"
+msgstr "Следващ"
+
+#: ../lib/IWL/Stock.pm:120
 msgid "OK"
 msgstr "Добре"
 
-#: ../lib/IWL/Stock.pm:120
+#: ../lib/IWL/Stock.pm:124
 msgid "Preferences"
 msgstr "Предпочитания"
 
-#: ../lib/IWL/Stock.pm:124
+#: ../lib/IWL/Stock.pm:128
 msgid "Preview"
 msgstr "Преглед"
 
-#: ../lib/IWL/Stock.pm:128
+#: ../lib/IWL/Stock.pm:132
+msgid "Previous"
+msgstr "Предишен"
+
+#: ../lib/IWL/Stock.pm:136
 msgid "Refresh"
 msgstr "Обновяване"
 
-#: ../lib/IWL/Stock.pm:132
+#: ../lib/IWL/Stock.pm:140
 msgid "Remove"
 msgstr "Премахване"
 
-#: ../lib/IWL/Stock.pm:136
+#: ../lib/IWL/Stock.pm:144
 msgid "Save"
 msgstr "Запазване"
 
-#: ../lib/IWL/Stock.pm:140
-msgid "Save and close"
-msgstr "Запазване и излизане"
-
-#: ../lib/IWL/Stock.pm:144
+#: ../lib/IWL/Stock.pm:148
 msgid "Upload"
 msgstr "Качване"
 
-#: ../lib/IWL/Stock.pm:149
-msgid "Add Filter"
-msgstr "Добавяне на филтър"
-
 #: ../lib/IWL/Stock.pm:153
-msgid "Directory"
-msgstr "Директория"
-
-#: ../lib/IWL/Stock.pm:157
-msgid "Delete directory"
-msgstr "Изтриване на директория"
-
-#: ../lib/IWL/Stock.pm:161
-msgid "Edit directory"
-msgstr "Редактиране на директория"
-
-#: ../lib/IWL/Stock.pm:165
-msgid "Create directory"
-msgstr "Създаване на директория"
-
-#: ../lib/IWL/Stock.pm:170
-msgid "Bottom"
-msgstr "Най-долу"
-
-#: ../lib/IWL/Stock.pm:174 ../lib/IWL/Stock.pm:186
-msgid "Main menu"
-msgstr "Главно меню"
-
-#: ../lib/IWL/Stock.pm:178
-msgid "Info"
-msgstr "Инфо"
-
-#: ../lib/IWL/Stock.pm:182
-msgid "Mail"
-msgstr "Поща"
-
-#: ../lib/IWL/Stock.pm:190
-msgid "Quit"
-msgstr "Изход"
-
-#: ../lib/IWL/Stock.pm:194
-msgid "Available roles"
-msgstr "Подръчни роли"
-
-#: ../lib/IWL/Stock.pm:198
-msgid "Top"
-msgstr "Най-горе"
-
-#: ../lib/IWL/Stock.pm:203
-msgid "Calendar"
-msgstr "Календар"
-
-#: ../lib/IWL/Stock.pm:208 ../lib/IWL/Stock.pm:212
 msgid "Generic Text"
 msgstr "Общ текст"
 
 #. TRANSLATORS: {TITLE} is a placeholder
-#: ../lib/IWL/Iconbox.pm:140
+#: ../lib/IWL/Iconbox.pm:141
 #, perl-brace-format
 msgid "The icon '{TITLE}' was removed."
 msgstr "Иконата „{TITLE}“ е премахната."
@@ -410,3 +362,48 @@ msgstr "Ноември"
 #: ../lib/IWL/Calendar.pm:30
 msgid "December"
 msgstr "Декември"
+
+#~ msgid "Back"
+#~ msgstr "Обратно"
+
+#~ msgid "Export"
+#~ msgstr "Износ"
+
+#~ msgid "Go"
+#~ msgstr "Отиване"
+
+#~ msgid "Minimize"
+#~ msgstr "Намаляване"
+
+#~ msgid "Save and close"
+#~ msgstr "Запазване и излизане"
+
+#~ msgid "Add Filter"
+#~ msgstr "Добавяне на филтър"
+
+#~ msgid "Delete directory"
+#~ msgstr "Изтриване на директория"
+
+#~ msgid "Edit directory"
+#~ msgstr "Редактиране на директория"
+
+#~ msgid "Bottom"
+#~ msgstr "Най-долу"
+
+#~ msgid "Main menu"
+#~ msgstr "Главно меню"
+
+#~ msgid "Info"
+#~ msgstr "Инфо"
+
+#~ msgid "Mail"
+#~ msgstr "Поща"
+
+#~ msgid "Quit"
+#~ msgstr "Изход"
+
+#~ msgid "Available roles"
+#~ msgstr "Подръчни роли"
+
+#~ msgid "Top"
+#~ msgstr "Най-горе"
