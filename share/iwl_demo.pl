@@ -4,7 +4,6 @@
 
 use strict;
 
-# use CGI qw/:standard/;
 use IWL;
 use IWL::Config qw(%IWLConfig);
 use IWL::Ajax qw(updaterCallback);
