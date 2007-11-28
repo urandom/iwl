@@ -20,15 +20,15 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.buttonLabel = $(id + '_label');
     }
 
-    function checkComplete() {
-        if (!this.buttonImage || this.buttonImage.complete) {
+    function checkComplete(loaded) {
+        if (!this.buttonImage || this.buttonImage.complete || loaded) {
             if (this.buttonLabel.getText()
                     && !this.buttonContent.clientWidth)
                 checkComplete.bind(this).delay(0.1);
             else
                 adjust.call(this);
         } else {
-            this.buttonImage.signalConnect('load', checkComplete.bind(this));
+            this.buttonImage.signalConnect('load', checkComplete.bind(this, true));
         }
     }
 
