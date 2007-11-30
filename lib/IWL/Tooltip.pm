@@ -97,7 +97,7 @@ Note: The tooltip and widget ids must not be changed after this method is called
 sub bindHideToWidget {
     my ($self, $widget, $signal) = @_;
     my $to = $widget->getId;
-    return $self->_pushError(__x("Invalid id: '{ID}'", ID => $to)) unless $to;
+    return $self->_pushError(__("Invalid id")) unless $to;
 
     $self->{__boundHide} = $to;
     $self->{__bindHideSignal} = $widget->_namespacedSignalName($signal);

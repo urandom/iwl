@@ -851,41 +851,6 @@ sub requiredJs {
     return $self;
 }
 
-=item B<requiredConditionalJs> [B<CONDITION>, B<URLS>]
-
-Adds the list of urls inside a conditonal comment (relative to JS_DIR) as required by the object
-
-Parameters: B<CONDITION> - the comment condition, see IWL::Comment(3pm) B<URLS> - a list of required javascript files
-
-=cut
-
-sub requiredConditionalJs {
-    my ($self, $condition, @urls) = @_;
-
-    require IWL::Script;
-    require IWL::Comment;
-
-    foreach my $url (@urls) {
-	if ($url eq 'base.js') {
-	    $self->requiredConditionalJs($condition,
-		'dist/prototype.js',
-		'prototype_extensions.js',
-		'dist/effects.js',
-		'scriptaculous_extensions.js');
-	}
-
-	my $comment = IWL::Comment->new;
-	my $script  = IWL::Script->new;
-	my $src     = $IWLConfig{JS_DIR} . '/' . $url;
-
-	$script->setSrc($src);
-	$comment->setConditional($condition, $script->getContent);
-	push @{$self->{_requiredJs}}, [$src => $comment];
-    }
-
-    return $self;
-}
-
 =item B<cleanStateful>
 
 Class method that initializes all state data of the library.  Stateful

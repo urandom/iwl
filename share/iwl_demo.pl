@@ -339,13 +339,16 @@ sub build_containers {
 }
 
 sub build_misc {
-    my $row       = shift;
-    my $file      = IWL::Tree::Row->new(id => 'file_row');
+    my $row    = shift;
+    my $file   = IWL::Tree::Row->new(id => 'file_row');
+    my $canvas = IWL::Tree::Row->new(id => 'canvas_row');
 
     $file->appendTextCell('File Upload');
     $row->appendRow($file);
+    $canvas->appendTextCell('Canvas');
+    $row->appendRow($canvas);
 
-    register_row_event($file);
+    register_row_event($file, $canvas);
 }
 
 sub build_tests {
@@ -832,6 +835,32 @@ sub generate_file {
     $container->appendChild($label);
     $container->appendChild($file);
     $label->setText('Press the button to upload a file.');
+
+    return $container;
+}
+
+sub generate_canvas {
+    my $container = IWL::Container->new(id => 'canvas_container');
+    my $canvas = IWL::Canvas->new(id => 'canvas');
+    my $moon = IWL::Image->new(id => 'moon')->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif')->setStyle(display => 'none');
+    my $pi = 4 * atan2(1, 1);
+
+    $canvas->setDimensions(400, 400);
+    $canvas->getContext('2d')->globalAlpha(0.8);
+    $canvas->fillStyle('#626fc2')->fillRect(10, 10, 74, 65);
+    $canvas->fillStyle(65, 12, 62, 0.5)->fillRect(15, 15, 40, 40);
+    $canvas->fillStyle('#000000')->fillRect(25,25,100,100)->clearRect(45,45,60,60)->strokeRect(50,50,50,50);
+    $canvas->beginPath->moveTo(175, 150)->lineTo(200, 175)->lineTo(200, 125)->fill;
+    $canvas->beginPath->arc(175, 175, 50, 0, $pi * 2, 1)->moveTo(210, 175)->arc(175, 175, 30, 0, $pi)->moveTo(165, 165)->arc(160, 165, 5, 0, $pi * 2, 1)->moveTo(195, 165)->arc(190, 165, 5, 0, $pi * 2, 1)->stroke;
+    $canvas->beginPath->moveTo(25, 125)->lineTo(105, 125)->lineTo(25, 205)->fill;
+    $canvas->beginPath->moveTo(125, 225)->lineTo(125, 145)->lineTo(45, 225)->closePath->stroke;
+    $canvas->shadowOffsetX(3)->shadowOffsetY(3)->shadowColor('#92ba6f')->shadowBlur(2);
+    $canvas->beginPath->moveTo(275, 25)->quadraticCurveTo(225, 25, 225, 62.5)->quadraticCurveTo(225, 100, 250, 100)->quadraticCurveTo(250, 120, 230, 125)->quadraticCurveTo(260, 120, 265, 100)->quadraticCurveTo(325, 100, 325, 62.5)->quadraticCurveTo(325, 25, 275, 25)->stroke;
+    $canvas->beginPath->moveTo(275, 240)->bezierCurveTo(275, 237, 270, 225, 250, 225)->bezierCurveTo(220, 225, 220, 262.5, 220, 262.5)->bezierCurveTo(220, 280, 240, 302, 275, 320)->bezierCurveTo(310, 302, 330, 280, 330, 262.5)->bezierCurveTo(330, 262.5, 330, 225, 300, 225)->bezierCurveTo(285, 225, 275, 237, 275, 240)->fill;
+    $canvas->beginPath->rect(100, 350, 200, 20)->fill;
+    $canvas->drawImage($moon, 50, 300)->drawImage($moon, 100, 300, 55, 55)->drawImage($moon, 10, 10, 30, 30, 310, 140, 50, 61);
+
+    $container->appendChild($moon, $canvas);
 
     return $container;
 }

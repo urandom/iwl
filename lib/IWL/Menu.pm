@@ -137,7 +137,7 @@ Note: The widget ID must not be changed after this method is called.
 sub bindToWidget {
     my ($self, $widget, $signal) = @_;
     my $id = $widget->getId;
-    return $self->_pushError(__x("Invalid id: '{ID}'", ID => $id)) unless $id;
+    return $self->_pushError(__("Invalid id")) unless $id;
     push @{$self->{__bindWidgets}}, [$id => $widget->_namespacedSignalName($signal)];
 
     return $self;
