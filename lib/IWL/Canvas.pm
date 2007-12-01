@@ -32,7 +32,7 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 =cut
 
-my $no_context = N__ "No context has been given";
+my $no_context = N__ "No context has been given.";
 
 sub new {
     my ($proto, %args) = @_;
@@ -45,6 +45,7 @@ sub new {
     $args{id} ||= randomize('canvas');
 
     $self->{__drawing} = [];
+    $self->{__objectNames} = {};
     $self->requiredJs('dist/prototype.js', 'dist/excanvas.js');
     $self->_constructorArguments(%args);
 
@@ -99,24 +100,23 @@ sub setDimensions {
 
 The names of the following methods reflect the reference names of methods and properties of the HTML5 Canvas element
 
-=item B<getContext> (B<TYPE>, [B<NAME>])
+=item B<getContext> ([B<TYPE>, B<NAME>])
 
 Gets the canvas drawing context for a given type
 
-Parameters:  B<TYPE> - the type of the context. Example: "2d", B<NAME> - optional name for the desired context
+Parameters:  B<TYPE> - the type of the context. Defaults to I<2d>, B<NAME> - optional name for the desired context
 
 =cut
 
 sub getContext {
-    my ($self, $type) = (shift, shift);
-    my $name = shift || 'ctx';
+    my ($self, $type, $name) = (shift, shift || '2d', shift || 'ctx');
     $self->{__currentContext} = $name;
     push @{$self->{__drawing}}, "var $name = canvas.getContext('$type')";
 
     return $self;
 }
 
-=head3 Context properties
+=head2 Context properties
 
 All context properties can optionally receive the current context name as their last parameter
 
@@ -140,19 +140,27 @@ An array, where every element represents a value between 0 - 255
 
 Same as above, but the I<Alpha> is a float number between 0 - 1
 
+=item I<GRADIENT_NAME>/I<PATTERN_NAME>
+
+The name of an existing gradient or pattern object
+
 =back
 
 =cut
 
 sub fillStyle {
     my $self = shift;
-    my $color = (@_ == 1) ? shift 
-      : (@_ == 3) ? "rgb(" . (join ',', (shift, shift, shift)) .")"
-      : (@_ == 4) ? "rgba(" . (join ',', (shift, shift, shift, shift)) .")" : undef;
+    my $color = (@_ == 1 || @_ == 2) ? shift 
+      : ((@_ == 3 || @_ == 4) && $_[3] !~ /^\d/) ? "rgb(" . (join ',', (shift, shift, shift)) .")"
+      : (@_ == 4 || @_ == 5) ? "rgba(" . (join ',', (shift, shift, shift, shift)) .")" : undef;
     return $self->_pushError(__x("Invalid color: '{COLOR}'", COLOR => (join ',', @_))) unless $color;
     my $name = shift || $self->{__currentContext};
     return $self->_pushError(__ $no_context) unless $name;
-    push @{$self->{__drawing}}, "$name.fillStyle = '$color'";
+    if (exists $self->{__objectNames}{$color}) {
+        push @{$self->{__drawing}}, "$name.fillStyle = $color";
+    } else {
+        push @{$self->{__drawing}}, "$name.fillStyle = '$color'";
+    }
     return $self;
 }
 
@@ -342,6 +350,8 @@ Sets the width that a shadow can cover.
 
 Parameters: B<VALUE> - a positive float value, in units of coordinate space
 
+I<Note:> Only supported by Safari
+
 =cut
 
 sub shadowBlur {
@@ -374,13 +384,15 @@ Same as above, but the I<Alpha> is a float number between 0 - 1
 
 =back
 
+I<Note:> Only supported by Safari
+
 =cut
 
 sub shadowColor {
     my $self = shift;
-    my $color = (@_ == 1) ? shift 
-      : (@_ == 3) ? "rgb(" . (join ',', (shift, shift, shift)) .")"
-      : (@_ == 4) ? "rgba(" . (join ',', (shift, shift, shift, shift)) .")" : undef;
+    my $color = (@_ == 1 || @_ == 2) ? shift 
+      : ((@_ == 3 || @_ == 4) && $_[3] !~ /^\d/) ? "rgb(" . (join ',', (shift, shift, shift)) .")"
+      : (@_ == 4 || @_ == 5) ? "rgba(" . (join ',', (shift, shift, shift, shift)) .")" : undef;
     return $self->_pushError(__x("Invalid color: '{COLOR}'", COLOR => (join ',', @_))) unless $color;
     my $name = shift || $self->{__currentContext};
     return $self->_pushError(__ $no_context) unless $name;
@@ -393,6 +405,8 @@ sub shadowColor {
 Sets the X offset of a shadow
 
 Parameters: B<VALUE> - the X offset of the shadow, in units of coordinate space
+
+I<Note:> Only supported by Safari
 
 =cut
 
@@ -409,6 +423,8 @@ sub shadowOffsetX {
 Sets the Y offset of a shadow
 
 Parameters: B<VALUE> - the Y offset of the shadow, in units of coordinate space
+
+I<Note:> Only supported by Safari
 
 =cut
 
@@ -440,31 +456,41 @@ An array, where every element represents a value between 0 - 255
 
 Same as above, but the I<Alpha> is a float number between 0 - 1
 
+=item I<GRADIENT_NAME>/I<PATTERN_NAME>
+
+The name of an existing gradient or pattern object
+
 =back
 
 =cut
 
 sub strokeStyle {
     my $self = shift;
-    my $color = (@_ == 1) ? shift 
-      : (@_ == 3) ? "rgb(" . (join ',', (shift, shift, shift)) .")"
-      : (@_ == 4) ? "rgba(" . (join ',', (shift, shift, shift, shift)) .")" : undef;
+    my $color = (@_ == 1 || @_ == 2) ? shift 
+      : ((@_ == 3 || @_ == 4) && $_[3] !~ /^\d/) ? "rgb(" . (join ',', (shift, shift, shift)) .")"
+      : (@_ == 4 || @_ == 5) ? "rgba(" . (join ',', (shift, shift, shift, shift)) .")" : undef;
     return $self->_pushError(__x("Invalid color: '{COLOR}'", COLOR => (join ',', @_))) unless $color;
     my $name = shift || $self->{__currentContext};
     return $self->_pushError(__ $no_context) unless $name;
-    push @{$self->{__drawing}}, "$name.strokeStyle = '$color'";
+    if (exists $self->{__objectNames}{$color}) {
+        push @{$self->{__drawing}}, "$name.strokeStyle = $color";
+    } else {
+        push @{$self->{__drawing}}, "$name.strokeStyle = '$color'";
+    }
     return $self;
 }
 
-=head3 Context methods
+=head2 Context methods
 
 All context methods can optionally receive the current context name as their last parameter
+
+=head3 Area methods
 
 =item B<fillRect> (B<X>, B<Y>, B<WIDTH>, B<HEIGHT>)
 
 Paints a rectangular area
 
-Parameters: B<X> - the X coordinate of a point of the rectangular area; B<Y> - the Y coordinate; B<WIDTH> - the width of the rectangular area; B<HEIGHT> - the height
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of a point of the rectangular area, B<WIDTH> - the width of the rectangular area, B<HEIGHT> - the height
 
 =cut
 
@@ -480,7 +506,7 @@ sub fillRect {
 
 Paints a rectangular outline
 
-Parameters: B<X> - the X coordinate of a point of the rectangular outline; B<Y> - the Y coordinate; B<WIDTH> - the width of the rectangular outline; B<HEIGHT> - the height
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of a point of the rectangular outline, B<WIDTH> - the width of the rectangular outline, B<HEIGHT> - the height
 
 =cut
 
@@ -496,7 +522,7 @@ sub strokeRect {
 
 Clears a rectangular area and makes it fully transparent
 
-Parameters: B<X> - the X coordinate of a point of the rectangular area; B<Y> - the Y coordinate; B<WIDTH> - the width of the rectangular area; B<HEIGHT> - the height
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of a point of the rectangular area, B<WIDTH> - the width of the rectangular area, B<HEIGHT> - the height
 
 =cut
 
@@ -507,6 +533,8 @@ sub clearRect {
     push @{$self->{__drawing}}, "$name.clearRect($x, $y, $width, $height)";
     return $self;
 }
+
+=head3 Path methods
 
 =item B<beginPath>
 
@@ -568,7 +596,7 @@ sub closePath {
 
 Moves the path position to the given point
 
-Parameters: B<X> - the X coordinate of the point, B<Y> - the Y coordinate of the point
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of the point
 
 =cut
 
@@ -584,7 +612,7 @@ sub moveTo {
 
 Creates a new line from the current path position to the given point
 
-Parameters: B<X> - the X coordinate of the point, B<Y> - the Y coordinate of the point
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of the point
 
 =cut
 
@@ -600,7 +628,7 @@ sub lineTo {
 
 Creates a new arc from the current path position.
 
-Parameters: B<X> - the X coordinate of the center of the arc, B<Y> - the Y coordinate of the center of the arc, B<RADIUS> - the radius of the arc, B<START_ANGLE> - the starting angle, measured in radians, B<END_ANGLE> - the ending angle, measured in radians, B<CLOCKWISE> - boolean, if true, the arc will be drawn in a clockwise direction
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of the center of the arc, B<RADIUS> - the radius of the arc, B<START_ANGLE> - the starting angle, measured in radians, B<END_ANGLE> - the ending angle, measured in radians, B<CLOCKWISE> - boolean, if true, the arc will be drawn in a clockwise direction
 
 =cut
 
@@ -618,7 +646,9 @@ sub arc {
 
 Creates a new arc from the current path position, using a radius and tangent points
 
-Parameters: B<X1> - the X coordinate of the end point of a line between the current position and (B<X1>, B<Y1>), B<Y1> - the Y coordinate of that end point, B<X2> - the X coordinate of the end point of a line between (B<X1>, B<Y1>) and (B<X2>, B<Y2>), B<Y2> - the Y coordinate of that end point, B<RADIUS> - the radius of the arc
+Parameters: (B<X1>, B<Y1>) - the X and Y coordinates of the end point of a line between the it and the current path position, (B<X2>, B<Y2>) - the X and Y coordinates of the end point of a line between it and (B<X2>, B<Y2>), B<RADIUS> - the radius of the arc
+
+I<Note:> Not supported by Internet Explorer
 
 =cut
 
@@ -635,7 +665,7 @@ sub arcTo {
 
 Creates a new rectangle to the path
 
-Parameters: B<X> - the X coordinate of a point of the rectangle; B<Y> - the Y coordinate; B<WIDTH> - the width of the rectangle; B<HEIGHT> - the height
+Parameters: (B<X>, B<Y>) - the X and Y coordinates of a point of the rectangle, B<WIDTH> - the width of the rectangle, B<HEIGHT> - the height
 
 =cut
 
@@ -651,7 +681,7 @@ sub rect {
 
 Creates a new quadratic curve from the current path position
 
-Parameters: B<CPX> - the X coordinate of the control point of the curve, B<CPY> - the Y coordinate of the control point of the curve, B<X> - the X coordinate of the end point of the curve, B<Y> - the Y coordinate of the end point of the curve
+Parameters: (B<CPX>, B<CPY>) - the X and Y coordinates of the control point of the curve, (B<X>, B<Y>) - the X and Y coordinates of the end point of the curve
 
 =cut
 
@@ -667,7 +697,7 @@ sub quadraticCurveTo {
 
 Creates a new bezier curve from the current path position
 
-Parameters: B<CP1X> - the X coordinate of the first control point of the curve, B<CP1Y> - the Y coordinate of the first control point of the curve, B<CP2X> - the X coordinate of the second control point of the curve, B<CP2Y> - the Y coordinate of the second control point of the curve, B<X> - the X coordinate of the end point of the curve, B<Y> - the Y coordinate of the end point of the curve
+Parameters: (B<CP1X>, B<CP1Y>) - the X and Y coordinates of the first control point of the curve, (B<CP2X>, B<CP2Y>) - the X and Y coordinates of the second control point of the curve, (B<X>, B<Y>) - the X and Y coordinates of the end point of the curve
 
 =cut
 
@@ -679,11 +709,29 @@ sub bezierCurveTo {
     return $self;
 }
 
+=item B<clip>
+
+Sets the current path as a clipping path
+
+I<Note:> Not supported by Internet Explorer
+
+=cut
+
+sub clip {
+    my ($self, $name) = @_;
+    $name ||= $self->{__currentContext};
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "$name.clip()";
+    return $self;
+}
+
+=head3 Image methods
+
 =item B<drawImage> (B<IMAGE>, B<X>, B<Y>, [B<WIDTH>, B<HEIGHT>, B<DX>, B<DY>, B<DWIDTH>, B<DHEIGHT>])
 
 Draws an image
 
-Parameters: B<IMAGE> - The image to draw, this can be an L<IWL::Image> or L<IWL::Canvas>, or an image/canvas ID, B<X> - the X coordinate where the image should be placed, B<Y> - the Y coordinate, B<WIDTH> - the desired width of the image, B<HEIGHT> - the desired height. If the following parameters are specified, the previous four parameters describe what portion of the image should be used, and the next four parameters describe the position and size of the slice when set on the canvas
+Parameters: B<IMAGE> - The image to draw, this can be an L<IWL::Image> or L<IWL::Canvas>, or an image/canvas ID, (B<X>, B<Y>) - the X and Y coordinates where the image should be placed, B<WIDTH> - the desired width of the image, B<HEIGHT> - the desired height. If the following parameters are specified, the previous four parameters describe what portion of the image should be used, and the next four parameters describe the position and size of the slice when set on the canvas
 
 =cut
 
@@ -705,6 +753,216 @@ sub drawImage {
     return $self;
 }
 
+=head3 Gradient methods
+
+=item B<createLinearGradient> (B<X1>, B<Y1>, B<X2>, B<Y2>, [B<GRADIENT_NAME>])
+
+Creates a linear gradient object. The object can be assigned as a parameter to the IWL::Canvas::fillStyle(3pm) and IWL::Canvas::strokeStyle(3pm) methods
+
+Parameters: (B<X1>, B<Y1>) and (B<X2>, B<Y2>) represent the X and Y coordinates of the rectangular region, which will be filled by a gradient, B<GRADIENT_NAME> - the optional name of the gradient object. Defaults to I<gradient>
+
+=cut
+
+sub createLinearGradient {
+    my ($self, $x1, $y1, $x2, $y2, $gradient_name, $name) = @_;
+    $gradient_name ||= 'gradient';
+    $name ||= $self->{__currentContext};
+    $self->{__currentGradient} = $gradient_name;
+    $self->{__objectNames}{$gradient_name} = 1;
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "var $gradient_name = $name.createLinearGradient($x1, $y1, $x2, $y2)";
+    return $self;
+}
+
+=item B<createRadialGradient> (B<X1>, B<Y1>, B<R1>, B<X2>, B<Y2>, B<R2>, [B<GRADIENT_NAME>])
+
+Creates a radial gradient object. The object can be assigned as a parameter to the IWL::Canvas::fillStyle(3pm) and IWL::Canvas::strokeStyle(3pm) methods
+
+Parameters: (B<X1>, B<Y1>) and (B<X2>, B<Y2>) represent the X and Y coordinates of the center points of the two circles, which define the radial region to be filled by a gradient, B<R1> and B<R2> - represent the radii of those circles, B<GRADIENT_NAME> - the optional name of the gradient object. Defaults to I<gradient>
+
+I<Note:> Not supported by Internet Explorer
+
+=cut
+
+sub createRadialGradient {
+    my ($self, $x1, $y1, $r1, $x2, $y2, $r2, $gradient_name, $name) = @_;
+    $gradient_name ||= 'gradient';
+    $name ||= $self->{__currentContext};
+    $self->{__currentGradient} = $gradient_name;
+    $self->{__objectNames}{$gradient_name} = 1;
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "var $gradient_name = $name.createRadialGradient($x1, $y1, $r1, $x2, $y2, $r2)";
+    return $self;
+}
+
+=item B<addColorStop> (B<OFFSET>, B<COLOR>, [B<GRADIENT_NAME>])
+
+Sets a color point to the gradient
+
+Parameters: B<OFFSET> - a float value, between 0 - 1, defines the offset of the color within the gradient, B<COLOR> - the point color. Can be one of the following:
+
+I<Note:> This method does not require the context name as a last parameter
+
+=over 8
+
+=item I<#RRGGBB>
+
+A string, representing a hex RGB color
+
+=item I<Red>, I<Green>, I<Blue>
+
+An array, where every element represents a value between 0 - 255
+
+=item I<Red>, I<Green>, I<Blue>, I<Alpha>
+
+Same as above, but the I<Alpha> is a float number between 0 - 1
+
+=back
+
+B<GRADIENT_NAME> - the optional gradient name of a gradient object, which has already been created
+
+=cut
+
+sub addColorStop {
+    my ($self, $offset) = (shift, shift);
+    my ($color, $gradient_name) = (@_ == 1 || @_ == 2) ? (shift, shift)
+      : ((@_ == 3 || @_ == 4) && $_[3] !~ /^\d/) ? ("rgb(" . (join ',', (shift, shift, shift)) .")", shift)
+      : (@_ == 4 || @_ == 5) ? ("rgba(" . (join ',', (shift, shift, shift, shift)) .")", shift) : ();
+    return $self->_pushError(__x("Invalid color: '{COLOR}'", COLOR => (join ',', @_))) unless $color;
+    $gradient_name ||= $self->{__currentGradient};
+    return $self->_pushError(__ "No gradient name has been given.") unless $gradient_name;
+    return $self->_pushError(__x("The gradient object '{GRADIENT}' does not exist.", GRADIENT => $gradient_name))
+      unless $self->{__objectNames}{$gradient_name} == 1;
+    push @{$self->{__drawing}}, "$gradient_name.addColorStop($offset, '$color')";
+    return $self;
+}
+
+=head3 Pattern methods
+
+=item B<createPattern> (B<IMAGE>, B<REPETITION>, [B<PATTERN_NAME>])
+
+Creates a pattern object. The object can be assigned as a parameter to the IWL::Canvas::fillStyle(3pm) and IWL::Canvas::strokeStyle(3pm) methods
+
+Parameters: B<IMAGE> - The image to draw, this can be an L<IWL::Image> or L<IWL::Canvas>, or an image/canvas ID, B<REPETITION> - a string value, can be one of the following:
+
+=over 8
+
+=item I<repeat>
+
+Repeat the image in both the X and Y directions.
+
+=item I<repeat-x>
+
+Repeat the image in the X direction.
+
+=item I<repeat-y>
+
+Repeat the image in the Y direction.
+
+=item I<no-repeat>
+
+Does not repeat the image
+
+=back
+
+B<PATTERN_NAME> - the optional name of the pattern object. Defaults to I<pattern>
+
+I<Note:> Not supported by Internet Explorer
+
+=cut
+
+sub createPattern {
+    my ($self, $image, $repetition, $pattern_name, $name) = @_;
+    $pattern_name ||= 'pattern';
+    $name ||= $self->{__currentContext};
+    $self->{__currentPattern} = $pattern_name;
+    $self->{__objectNames}{$pattern_name} = 2;
+    return $self->_pushError(__ $no_context) unless $name;
+    if (UNIVERSAL::isa($image, 'IWL::Image') || UNIVERSAL::isa($image, 'IWL::Canvas')) {
+        $image = $image->getId;
+    }
+    push @{$self->{__drawing}}, "var $pattern_name = $name.createPattern(\$('$image'), '$repetition')";
+    return $self;
+}
+
+=head3 Canvas state methods
+
+=item B<save>
+
+Saves the canvas state
+
+=cut
+
+sub save {
+    my ($self, $name) = @_;
+    $name ||= $self->{__currentContext};
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "$name.save()";
+    return $self;
+}
+
+=item B<restore>
+
+Restores the canvas state to the most recent saved state
+
+=cut
+
+sub restore {
+    my ($self, $name) = @_;
+    $name ||= $self->{__currentContext};
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "$name.restore()";
+    return $self;
+}
+
+=item B<translate> (B<X>, B<Y>)
+
+Translates the origin of the canvas to a new point
+
+Parameters: (B<X>, B<Y>) - the point where the origin of the canvas should be moved to
+
+=cut
+
+sub translate {
+    my ($self, $x, $y, $name) = @_;
+    $name ||= $self->{__currentContext};
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "$name.translate($x, $y)";
+    return $self;
+}
+
+=item B<rotate> (B<ANGLE>)
+
+Rotates the canvas around the origin
+
+Parameters: B<ANGLE> - the angle of translation, in radians
+
+=cut
+
+sub rotate {
+    my ($self, $angle, $name) = @_;
+    $name ||= $self->{__currentContext};
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "$name.rotate($angle)";
+    return $self;
+}
+
+=item B<scale> (B<X>, B<Y>)
+
+Scales the canvas from  the origin
+
+Parameters: (B<X>, B<Y>) - the horizontal and vertical scaling factors
+
+=cut
+
+sub scale {
+    my ($self, $x, $y, $name) = @_;
+    $name ||= $self->{__currentContext};
+    return $self->_pushError(__ $no_context) unless $name;
+    push @{$self->{__drawing}}, "$name.scale($x, $y)";
+    return $self;
+}
+
 # Protected
 #
 sub _realize {
@@ -712,7 +970,11 @@ sub _realize {
     my $id = $self->getId;
 
     return $self->_pushFatalError(__ $no_context) unless $self->{__currentContext};
-    $self->_appendInitScript("var canvas = \$('$id')", @{$self->{__drawing}});
+    $self->_appendInitScript(
+        "var canvas = \$('$id')",
+        "if (Prototype.Browser.IE) { G_vmlCanvasManager.initElement(canvas); canvas = \$('$id'); }",
+        @{$self->{__drawing}}
+    );
 }
 
 1;

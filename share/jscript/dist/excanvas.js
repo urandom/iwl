@@ -214,6 +214,7 @@ if (!window.CanvasRenderingContext2D) {
     o2.shadowOffsetX = o1.shadowOffsetX;
     o2.shadowOffsetY = o1.shadowOffsetY;
     o2.strokeStyle   = o1.strokeStyle;
+    o2.globalAlpha   = o1.globalAlpha;
     o2.arcScaleX_    = o1.arcScaleX_;
     o2.arcScaleY_    = o1.arcScaleY_;
   }

@@ -841,7 +841,7 @@ sub generate_file {
 
 sub generate_canvas {
     my $container = IWL::Container->new(id => 'canvas_container');
-    my $canvas = IWL::Canvas->new(id => 'canvas');
+    my $canvas = IWL::Canvas->new(id => 'html_canvas');
     my $moon = IWL::Image->new(id => 'moon')->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif')->setStyle(display => 'none');
     my $pi = 4 * atan2(1, 1);
 
@@ -849,12 +849,17 @@ sub generate_canvas {
     $canvas->getContext('2d')->globalAlpha(0.8);
     $canvas->fillStyle('#626fc2')->fillRect(10, 10, 74, 65);
     $canvas->fillStyle(65, 12, 62, 0.5)->fillRect(15, 15, 40, 40);
-    $canvas->fillStyle('#000000')->fillRect(25,25,100,100)->clearRect(45,45,60,60)->strokeRect(50,50,50,50);
+    $canvas->createLinearGradient(0, 0, 0, 150)->addColorStop(0, '#00ABEB')->addColorStop(0.5, '#fff')->addColorStop(0.5, '#26C000')->addColorStop(1, '#fff');
+    $canvas->createLinearGradient(0, 50, 0, 95, 'gradient2')->addColorStop(0.5, '#000')->addColorStop(1, 0, 0, 0, 0);
+    $canvas->fillStyle('gradient')->strokeStyle('gradient2')->fillRect(25,25,100,100)->clearRect(45,45,60,60)->strokeRect(50,50,50,50);
+    $canvas->createRadialGradient(45, 45, 10, 52, 50, 30)->addColorStop(0, '#A7D30C')->addColorStop(0.9, '#019F62')->addColorStop(1, 1, 159, 98, 0)->fillStyle('gradient')->fillRect(0, 0, 150, 150);
+    $canvas->fillStyle('#000')->strokeStyle('#000');
     $canvas->beginPath->moveTo(175, 150)->lineTo(200, 175)->lineTo(200, 125)->fill;
     $canvas->beginPath->arc(175, 175, 50, 0, $pi * 2, 1)->moveTo(210, 175)->arc(175, 175, 30, 0, $pi)->moveTo(165, 165)->arc(160, 165, 5, 0, $pi * 2, 1)->moveTo(195, 165)->arc(190, 165, 5, 0, $pi * 2, 1)->stroke;
     $canvas->beginPath->moveTo(25, 125)->lineTo(105, 125)->lineTo(25, 205)->fill;
     $canvas->beginPath->moveTo(125, 225)->lineTo(125, 145)->lineTo(45, 225)->closePath->stroke;
     $canvas->shadowOffsetX(3)->shadowOffsetY(3)->shadowColor('#92ba6f')->shadowBlur(2);
+    $canvas->fillStyle('#000')->strokeStyle('#000');
     $canvas->beginPath->moveTo(275, 25)->quadraticCurveTo(225, 25, 225, 62.5)->quadraticCurveTo(225, 100, 250, 100)->quadraticCurveTo(250, 120, 230, 125)->quadraticCurveTo(260, 120, 265, 100)->quadraticCurveTo(325, 100, 325, 62.5)->quadraticCurveTo(325, 25, 275, 25)->stroke;
     $canvas->beginPath->moveTo(275, 240)->bezierCurveTo(275, 237, 270, 225, 250, 225)->bezierCurveTo(220, 225, 220, 262.5, 220, 262.5)->bezierCurveTo(220, 280, 240, 302, 275, 320)->bezierCurveTo(310, 302, 330, 280, 330, 262.5)->bezierCurveTo(330, 262.5, 330, 225, 300, 225)->bezierCurveTo(285, 225, 275, 237, 275, 240)->fill;
     $canvas->beginPath->rect(100, 350, 200, 20)->fill;
@@ -1229,6 +1234,8 @@ sub show_the_code_for {
 	$paragraph->appendTextType(read_code("generate_tooltips", 21), 'pre');
     } elsif ($code_for eq 'file_container') {
 	$paragraph->appendTextType(read_code("generate_file", 12), 'pre');
+    } elsif ($code_for eq 'canvas_container') {
+	$paragraph->appendTextType(read_code("generate_canvas", 30), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {
 	$paragraph->appendTextType(read_code("generate_rpc_events", 25), 'pre');
 	$paragraph->appendTextType(read_code("Event row handlers", 21), 'pre');
