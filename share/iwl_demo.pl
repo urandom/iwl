@@ -1244,6 +1244,8 @@ sub show_the_code_for {
     } elsif ($code_for eq 'druid_container') {
 	$paragraph->appendTextType(read_code("generate_druid", 16), 'pre');
 	$paragraph->appendTextType(read_code("Druid handlers", 54), 'pre');
+    } elsif ($code_for eq 'expander_container') {
+	$paragraph->appendTextType(read_code("generate_expander", 12), 'pre');
     } elsif ($code_for eq 'notebook_container') {
 	$paragraph->appendTextType(read_code("generate_notebook", 15), 'pre');
     } elsif ($code_for eq 'tooltips_container') {
