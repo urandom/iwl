@@ -35,6 +35,7 @@ lib/IWL/Druid.pm
 lib/IWL/Druid/Page.pm
 lib/IWL/Entry.pm
 lib/IWL/Error.pm
+lib/IWL/Expander.pm
 lib/IWL/File.pm
 lib/IWL/Form.pm
 lib/IWL/Frame.pm
@@ -183,6 +184,10 @@ share/images/contentbox/tr1100_shadow1.png
 share/images/contentbox/tr3000.gif
 share/images/demo/moon.gif
 share/images/entry/entry_bg.gif
+share/images/expander/expanded.gif
+share/images/expander/expanded.png
+share/images/expander/collapsed.gif
+share/images/expander/collapsed.png
 share/images/loader/loader.gif
 share/images/menu/menu_bg.png
 share/images/menu/menu_next.gif
@@ -294,6 +299,7 @@ t/40combo_option.t
 t/40contentbox.t
 t/40druid_page.t
 t/40entry.t
+t/40expander.t
 t/40file.t
 t/40frame.t
 t/40hbox.t

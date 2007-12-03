@@ -21,6 +21,7 @@ use IWL::Contentbox;
 use IWL::Druid::Page;
 use IWL::Druid;
 use IWL::Entry;
+use IWL::Expander;
 use IWL::File;
 use IWL::Form;
 use IWL::Frame;
@@ -223,6 +224,9 @@ In order to actually use the library, the javascript and css files will also hav
 
   Viktor Kojouharov
 
+=head1 Website
+
+http://code.google.com/p/iwl
 
 =head1 LICENCE AND COPYRIGHT
 

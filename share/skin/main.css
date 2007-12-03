@@ -1497,3 +1497,24 @@ div.tooltip_content {
 .calendar caption {
     font-size: 0.8em;
 }
+
+/* Expander */
+.expander_icon {
+    width: 16px;
+    height: 16px;
+    float: left;
+    margin-right: 2px;
+}
+
+.expander .expander_icon {
+    background: url(/iwl/skin/default/images/expander/expanded.png) no-repeat;
+}
+.expander_collapsed .expander_icon {
+    background: url(/iwl/skin/default/images/expander/collapsed.png) no-repeat;
+}
+.expander_content {
+    clear: both;
+}
+.expander_label {
+    font-size: 13px;
+}

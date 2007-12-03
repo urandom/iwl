@@ -320,9 +320,10 @@ sub build_containers {
     my $row = shift;
     my $accordions = IWL::Tree::Row->new(id => 'accordions_row');
     my $contentbox = IWL::Tree::Row->new(id => 'contentbox_row');
-    my $druid = IWL::Tree::Row->new(id => 'druid_row');
-    my $notebook = IWL::Tree::Row->new(id => 'notebook_row');
-    my $tooltips = IWL::Tree::Row->new(id => 'tooltips_row');
+    my $druid      = IWL::Tree::Row->new(id => 'druid_row');
+    my $expander   = IWL::Tree::Row->new(id => 'expander_row');
+    my $notebook   = IWL::Tree::Row->new(id => 'notebook_row');
+    my $tooltips   = IWL::Tree::Row->new(id => 'tooltips_row');
 
     $accordions->appendTextCell('Accordions');
     $row->appendRow($accordions);
@@ -330,12 +331,14 @@ sub build_containers {
     $row->appendRow($contentbox);
     $druid->appendTextCell('Druid');
     $row->appendRow($druid);
+    $expander->appendTextCell('Expander');
+    $row->appendRow($expander);
     $notebook->appendTextCell('Notebook');
     $row->appendRow($notebook);
     $tooltips->appendTextCell('Tooltips');
     $row->appendRow($tooltips);
 
-    register_row_event($accordions, $contentbox, $druid, $notebook, $tooltips);
+    register_row_event($accordions, $contentbox, $druid, $expander, $notebook, $tooltips);
 }
 
 sub build_misc {
@@ -786,6 +789,19 @@ sub generate_druid {
         'IWL-Druid-Page-next', 'iwl_demo.pl', {}, {emitOnce => 1}
     )->setId('first_page');
     $label1->setText('This is page 1');
+
+    return $container;
+}
+
+sub generate_expander {
+    my $container = IWL::Container->new(id => 'expander_container');
+    my $expander = IWL::Expander->new(id => 'expander');
+    my $image = IWL::Image->new(style => {float => 'left'});
+    my $label = IWL::Label->new(expand => 1);
+
+    $container->appendChild($expander);
+    $expander->appendChild($image->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif'), $label)->setLabel('Moon details');
+    $label->setText('The Moon (Latin: Luna) is Earth\'s only natural satellite and the fifth largest moon in the Solar System. The average centre-to-centre distance from the Earth to the Moon is 384,403 kilometres (238,857 miles),a which is about 30 times the diameter of the Earth. The Moon has a diameter of 3,474 kilometres (2,159 miles)[1] — slightly more than a quarter that of the Earth. This means that the volume of the Moon is only 1/50th that of Earth. The gravitational pull at its surface is about a 1/6th of Earth\'s. The Moon makes a complete orbit around the Earth every 27.3 days, and the periodic variations in the geometry of the Earth–Moon–Sun system are responsible for the lunar phases that repeat every 29.5 days.');
 
     return $container;
 }

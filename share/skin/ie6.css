@@ -103,3 +103,10 @@ li.menu_item_selected .menu_item_label_parent {
 li.menu_item_selected, li.menubar_item_selected {
     background-color: #8b9fbb;
 }
+
+div.expander .expander_icon {
+    background: url(/iwl/skin/default/images/expander/expanded.png) no-repeat;
+}
+div.expander_collapsed .expander_icon {
+    background: url(/iwl/skin/default/images/expander/collapsed.png) no-repeat;
+}
