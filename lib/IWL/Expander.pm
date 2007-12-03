@@ -171,7 +171,7 @@ sub _realize {
         $self->appendClass('expander_collapsed');
     }
     $self->{__header}->signalConnect(click =>
-          "new Effect.toggle(\$(this).next('.expander_content'), 'blind', {duration: 0.5, afterFinish: function() {this.toggleClassName('expander_collapsed')}.bind(\$(this).up())})");
+          "new Effect.toggle(\$(this).next('.expander_content'), 'blind', {duration: 0.25, afterFinish: function() {this.toggleClassName('expander_collapsed')}.bind(\$(this).up())})");
     $self->{__header}->signalConnect(mouseover => "\$(this).addClassName('expander_header_hover')");
     $self->{__header}->signalConnect(mouseout => "\$(this).removeClassName('expander_header_hover')");
 }
