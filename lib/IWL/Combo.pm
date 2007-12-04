@@ -107,7 +107,7 @@ sub isMultiple {
 
 =item B<extractState> (B<STATE>)
 
-Update the IWL::Stash(3pm) B<STATE> according to the combo state,
+Update the L<IWL::Stash> B<STATE> according to the combo state,
 ie. reflect the selected and unselected entries.
 
 Note that this method does not work absolutely correct if you have

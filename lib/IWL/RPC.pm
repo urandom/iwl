@@ -215,7 +215,7 @@ sub queryStringToCGIForm {
 
 =item B<handleEvent> (B<EVENT>, B<CALLBACK>)
 
-Handles IWL::RPC(3pm) widget specific events. Non-library specific handling code comes is passed via the user specified callback.
+Handles L<IWL::RPC> widget specific events. Non-library specific handling code comes is passed via the user specified callback.
 
 Parameters: B<EVENT> - The event name to be handled. B<CALLBACK> - a perl callback to handle the event.
 

@@ -111,7 +111,7 @@ sub setConditional {
   
 Sets a conditional comment with IWL objects
 
-Parameters: B<EXPR> - the conditional expression, without the [if ] (ex: lt IE 7 expands to [if lt IE 7]). The [endif] part will be placed automatically, B<OBJECT> - IWL::Objects(3pm)
+Parameters: B<EXPR> - the conditional expression, without the [if ] (ex: lt IE 7 expands to [if lt IE 7]). The [endif] part will be placed automatically, B<OBJECT> - L<IWL::Objects>
 
 =cut
 

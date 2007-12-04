@@ -19,7 +19,7 @@ L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Accordion::Page>
 
 =head1 DESCRIPTION
 
-The accordion page widget is a helper widget used by the IWL::Accordion(3pm)
+The accordion page widget is a helper widget used by the L<IWL::Accordion>
 
 =head1 CONSTRUCTOR
 
@@ -48,7 +48,7 @@ sub new {
 
 Appends the object to the page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be appended
+Parameter: B<OBJECT> - the L<IWL::Object> to be appended
 
 =cut
 
@@ -63,7 +63,7 @@ sub appendContent {
 
 Prepends the object to the page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be prepended 
+Parameter: B<OBJECT> - the L<IWL::Object> to be prepended 
 
 =cut
 

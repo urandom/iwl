@@ -80,7 +80,7 @@ sub setGroup {
 #
 =item B<applyState> (B<STATE>)
 
-Update the input element according to the IWL::Stash(3pm) B<STATE>
+Update the input element according to the L<IWL::Stash> B<STATE>
 object.  The B<STATE> will get modified, i.e. the "used" element
 will be shifted from the according slot (name attribute) of the
 state.

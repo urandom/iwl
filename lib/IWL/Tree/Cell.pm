@@ -32,7 +32,7 @@ L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell> -> L<IWL::Tree::Cell>
 
 =head1 DESCRIPTION
 
-The Cell widget provides a cell for IWL::Tree(3pm). It shouldn't be used standalone. It inherits from IWL::Table::Cell(3pm)
+The Cell widget provides a cell for L<IWL::Tree>. It shouldn't be used standalone. It inherits from L<IWL::Table::Cell>
 
 =head1 CONSTRUCTOR
 

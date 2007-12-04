@@ -66,7 +66,7 @@ sub new {
 
 Appends the data to the druid as a new page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be appended, B<CALLBACK> - the function to be called when pressing the C<NEXT> button (if it returns true, the druid will proceed to the next page), B<PARAM> the parameter of the callback, B<CURRENT> - a boolean value which lets the appended page be the current one
+Parameter: B<OBJECT> - the L<IWL::Object> to be appended, B<CALLBACK> - the function to be called when pressing the C<NEXT> button (if it returns true, the druid will proceed to the next page), B<PARAM> the parameter of the callback, B<CURRENT> - a boolean value which lets the appended page be the current one
 
 Returns: the page
 
@@ -81,7 +81,7 @@ sub appendPage {
 
 Prepends the data to the druid as a new page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be prepended, B<CALLBACK> - the function to be called when pressing the C<NEXT> button (if it returns true, the druid will proceed to the next page), B<PARAM> the parameter of the callback, B<CURRENT> - a boolean value which lets the appended page be the current one
+Parameter: B<OBJECT> - the L<IWL::Object> to be prepended, B<CALLBACK> - the function to be called when pressing the C<NEXT> button (if it returns true, the druid will proceed to the next page), B<PARAM> the parameter of the callback, B<CURRENT> - a boolean value which lets the appended page be the current one
 
 Returns: the page
 

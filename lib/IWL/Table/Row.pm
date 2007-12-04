@@ -56,7 +56,7 @@ sub new {
 
 Adds a header cell to the row, with B<OBJECT> as it's content.
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
+Parameters: B<OBJECT> - the L<IWL::Object>, B<ATTRS> - hash of attributes for the cell
 
 =cut
 
@@ -70,7 +70,7 @@ sub appendHeaderCell {
 
 Prepends a header cell to the row, with B<OBJECT> as it's content.
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
+Parameters: B<OBJECT> - the L<IWL::Object>, B<ATTRS> - hash of attributes for the cell
 
 =cut
 
@@ -112,7 +112,7 @@ sub prependTextHeaderCell {
 
 Adds a regular cell to the row, with B<OBJECT> as it's content.
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
+Parameters: B<OBJECT> - the L<IWL::Object>, B<ATTRS> - hash of attributes for the cell
 
 =cut
 
@@ -126,7 +126,7 @@ sub appendCell {
 
 Prepends a regular cell to the row, with B<OBJECT> as it's content.
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<ATTRS> - hash of attributes for the cell
+Parameters: B<OBJECT> - the L<IWL::Object>, B<ATTRS> - hash of attributes for the cell
 
 =cut
 

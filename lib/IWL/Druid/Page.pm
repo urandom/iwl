@@ -20,7 +20,7 @@ L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Druid::Page>
 
 =head1 DESCRIPTION
 
-The druid page widget is a helper widget used by the IWL::Druid(3pm)
+The druid page widget is a helper widget used by the L<IWL::Druid>
 
 =head1 CONSTRUCTOR
 

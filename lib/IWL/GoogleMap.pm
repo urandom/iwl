@@ -338,7 +338,7 @@ The constructor takes .
 
 =head1 SEE ALSO
 
-IWL::Widget(3pm), perl(1)
+L<IWL::Widget>, perl(1)
 
 =cut
 

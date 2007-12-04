@@ -103,7 +103,7 @@ sub new {
 
 Sets the title of the content box.
 
-Parameters: B<WIDGET> - the widget of type IWL::Widget(3pm) with which to fill the title
+Parameters: B<WIDGET> - the widget of type L<IWL::Widget> with which to fill the title
 
 =cut
 
@@ -134,7 +134,7 @@ sub appendTitleText {
 
 Sets the header of the content box.
 
-Parameters: B<WIDGET> - the widget of type IWL::Widget(3pm) with which to fill the header 
+Parameters: B<WIDGET> - the widget of type L<IWL::Widget> with which to fill the header 
 
 =cut
 
@@ -171,7 +171,7 @@ sub appendHeaderText {
 
 Sets the content of the content box.
 
-Parameters: B<WIDGET> - the widget of type IWL::Widget(3pm) with which to fill the content
+Parameters: B<WIDGET> - the widget of type L<IWL::Widget> with which to fill the content
 
 =cut
 
@@ -206,7 +206,7 @@ sub appendContentText {
 
 Sets the footer of the content box.
 
-Parameters: B<WIDGET> - the widget of type IWL::Widget(3pm) with which to fill the footer 
+Parameters: B<WIDGET> - the widget of type L<IWL::Widget> with which to fill the footer 
 
 =cut
 

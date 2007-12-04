@@ -109,7 +109,7 @@ sub appendMetaEquiv {
 
 Appends the object to the head of the page
 
-Parameters: B<OBJECT> - IWL::Object(3pm)
+Parameters: B<OBJECT> - L<IWL::Object>
 
 =cut
 
@@ -124,7 +124,7 @@ sub appendHeader {
 
 Prepends the object to the head of the page
 
-Parameters: B<OBJECT> - IWL::Object(3pm)
+Parameters: B<OBJECT> - L<IWL::Object>
 
 =cut
 

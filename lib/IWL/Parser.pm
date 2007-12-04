@@ -51,7 +51,7 @@ Creates an IWL Object from the given HTML file.
 
 Parameters: B<FILE> - the HTML file to be parsed
 
-Returns the parsed IWL::Object(3pm)s in list context, or the first one in scalar context
+Returns the parsed L<IWL::Object>s in list context, or the first one in scalar context
 
 =cut
 
@@ -68,7 +68,7 @@ Creates an IWL Object from the given HTML text.
 
 Parameters: B<TEXT> - the HTML text to be parsed
 
-Returns the parsed IWL::Object(3pm)s in list context, or the first one in scalar context
+Returns the parsed L<IWL::Object>s in list context, or the first one in scalar context
 
 =cut
 

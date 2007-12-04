@@ -873,9 +873,9 @@ sub cleanStateful {
 
 =item B<getState>
 
-Returns the current state of the form as an IWL::Stash(3pm) object.
+Returns the current state of the form as an L<IWL::Stash> object.
 The form state reflects the state of all of its children of
-type IWL::Input(3pm).
+type L<IWL::Input>.
 
 =cut
 
@@ -894,9 +894,9 @@ sub getState {
 
 =item B<applyState> (B<STATE>)
 
-Returns the current state of the form to B<STATE>, an IWL::Stash(3pm) object.
+Returns the current state of the form to B<STATE>, an L<IWL::Stash> object.
 The form state reflects the state of all of its children of
-type IWL::Input(3pm).
+type L<IWL::Input>.
 
 =cut
 

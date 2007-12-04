@@ -40,7 +40,7 @@ L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Calendar>
 
 =head1 DESCRIPTION
 
-The calendar widget provides a graphical calendar. It inherits from IWL::Table(3pm)
+The calendar widget provides a graphical calendar. It inherits from L<IWL::Table>
 
 =head1 CONSTRUCTOR
 

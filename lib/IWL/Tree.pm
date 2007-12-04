@@ -22,7 +22,7 @@ L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Tree>
 
 =head1 DESCRIPTION
 
-The tree widget provides a container that holds cells arranged in a tree layout, with multiple rows. Inherits from IWL::Table(3pm)
+The tree widget provides a container that holds cells arranged in a tree layout, with multiple rows. Inherits from L<IWL::Table>
 
 =head1 CONSTRUCTOR
 
@@ -185,7 +185,7 @@ sub setSortableCallback {
 
 Appends an array of rows to the body to the tree. An alias to the B<appendBody> method.
 
-Parameters: B<ROW> - a row of IWL::Tree::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Tree::Row>
 
 =cut
 
@@ -198,7 +198,7 @@ sub appendRow {
 
 Prepeds an array of rows to the body to the tree. An alias to the B<prependBody> method.
 
-Parameters: B<ROW> - a row of IWL::Tree::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Tree::Row>
 
 =cut
 

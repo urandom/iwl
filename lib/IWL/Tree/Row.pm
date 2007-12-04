@@ -24,7 +24,7 @@ L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Row> -> L<IWL::Tree::Row>
 
 =head1 DESCRIPTION
 
-The Row widget provides a row for IWL::Tree(3pm). It inherits from IWL::Table::Row(3pm).
+The Row widget provides a row for L<IWL::Tree>. It inherits from L<IWL::Table::Row>.
 
 =head1 CONSTRUCTOR
 

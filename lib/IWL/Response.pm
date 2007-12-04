@@ -51,7 +51,7 @@ The response header, as a hashref.
 
 =back
 
-If RESPONSE_CLASS is defined in %IWLConfig, the class is instantiated and its send() method is called.
+If I<RESPONSE_CLASS> is defined in %IWLConfig, the class is instantiated and its send() method is called.
 
 =cut
 

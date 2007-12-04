@@ -57,7 +57,7 @@ sub new {
 
 Appends an object as a list item to the current list
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<%ARGS> - the hash attributes of the list item
+Parameters: B<OBJECT> - the L<IWL::Object>, B<%ARGS> - the hash attributes of the list item
 
 =cut
 
@@ -72,7 +72,7 @@ sub appendListItem {
 
 Prepends an object as a list item to the current list
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<%ARGS> - the hash attributes of the list item
+Parameters: B<OBJECT> - the L<IWL::Object>, B<%ARGS> - the hash attributes of the list item
 
 =cut
 
@@ -119,7 +119,7 @@ sub prependListItemText {
 
 Appends an object as a definition to the current list
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<TYPE> - the type of the definition (key[default]/value), B<%ARGS> - the hash attributes of the list item
+Parameters: B<OBJECT> - the L<IWL::Object>, B<TYPE> - the type of the definition (key[default]/value), B<%ARGS> - the hash attributes of the list item
 
 =cut
 
@@ -134,7 +134,7 @@ sub appendDef {
 
 Prepends an object as a definition to the current list
 
-Parameters: B<OBJECT> - the IWL::Object(3pm), B<TYPE> - the type of the definition (key[default]/value), B<%ARGS> - the hash attributes of the list item
+Parameters: B<OBJECT> - the L<IWL::Object>, B<TYPE> - the type of the definition (key[default]/value), B<%ARGS> - the hash attributes of the list item
 
 =cut
 

@@ -590,7 +590,7 @@ Returns true if an input field with the name 'KEY' exists, false otherwise.
 
 =item B<equals OTHER_STATE>
 
-Compares the object to another IWL::Stash(3pm).  Returns true if the two
+Compares the object to another L<IWL::Stash>.  Returns true if the two
 objects are equal, false otherwise.
 
 =item B<toURIParams>
@@ -604,7 +604,7 @@ The method cannot fail.
 
 =item B<toHiddenInputs>
 
-Returns an IWL::Container(3pm) with hidden input fields that completely
+Returns an L<IWL::Container> with hidden input fields that completely
 represents the object.
 
 The method cannot fail.
@@ -628,7 +628,7 @@ Sets the internal "__state" variable to the reference passed as a parameter of t
 
 =head1 SEE ALSO
 
-IWL::Object(3pm), CGI(3pm), perl(1)
+L<IWL::Object>, CGI(3pm), perl(1)
 
 
 =head1 LICENCE AND COPYRIGHT

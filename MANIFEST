@@ -75,6 +75,7 @@ lib/IWL/Script.pm
 lib/IWL/Slider.pm
 lib/IWL/Spinner.pm
 lib/IWL/Stash.pm
+lib/IWL/Static.pm
 lib/IWL/Stock.pm
 lib/IWL/String.pm
 lib/IWL/Style.pm
@@ -285,6 +286,7 @@ t/30label.t
 t/30notebook_tab.t
 t/30page_body.t
 t/30parser.t
+t/30static.t
 t/30table_cell.t
 t/30table_container.t
 t/30tooltip.t

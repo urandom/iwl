@@ -66,7 +66,7 @@ sub new {
 
 Appends a new tab and adds the object to the tab page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be appended, B<TEXT> - the text for the tab label, B<SELECTED> - true if the tab should be the selected one
+Parameter: B<OBJECT> - the L<IWL::Object> to be appended, B<TEXT> - the text for the tab label, B<SELECTED> - true if the tab should be the selected one
 
 Returns: the newly created tab 
 
@@ -81,7 +81,7 @@ sub appendTab {
 
 Prepends a new tab and adds the object to the tab page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be prepended, B<TEXT> - the text for the tab label, B<SELECTED> - true if the tab should be the selected one
+Parameter: B<OBJECT> - the L<IWL::Object> to be prepended, B<TEXT> - the text for the tab label, B<SELECTED> - true if the tab should be the selected one
 
 Returns: the newly created tab 
 

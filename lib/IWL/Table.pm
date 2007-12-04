@@ -126,7 +126,7 @@ sub getSummary {
 
 Appends an array of rows to the header to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Table::Row>
 
 =cut
 
@@ -143,7 +143,7 @@ sub appendHeader {
 
 Prepends an array of rows to the header to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Table::Row>
 
 =cut
 
@@ -160,7 +160,7 @@ sub prependHeader {
 
 Appends an array of rows to the body to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Table::Row>
 
 =cut
 
@@ -186,7 +186,7 @@ sub appendBody {
 
 Prepends an array of rows to the body to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Table::Row>
 
 =cut
 
@@ -216,7 +216,7 @@ sub prependBody {
 
 Appends an array of rows to the footer to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Table::Row>
 
 =cut
 
@@ -233,7 +233,7 @@ sub appendFooter {
 
 Prepends an array of rows to the footer to the table. 
 
-Parameters: B<ROW> - a row of IWL::Table::Row(3pm)
+Parameters: B<ROW> - a row of L<IWL::Table::Row>
 
 =cut
 

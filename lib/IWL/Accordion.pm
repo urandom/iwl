@@ -75,7 +75,7 @@ sub new {
 
 Appends a new page and adds the object to the page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be appended, B<TEXT> - the text for the page title, B<SELECTED> - true if the page should be the selected one
+Parameter: B<OBJECT> - the L<IWL::Object> to be appended, B<TEXT> - the text for the page title, B<SELECTED> - true if the page should be the selected one
 
 Returns: the newly created page
 
@@ -90,7 +90,7 @@ sub appendPage {
 
 Prepends a new page and adds the object to the page
 
-Parameter: B<OBJECT> - the IWL::Object(3pm) to be prepended, B<TEXT> - the text for the page title, B<SELECTED> - true if the page should be the selected one
+Parameter: B<OBJECT> - the L<IWL::Object> to be prepended, B<TEXT> - the text for the page title, B<SELECTED> - true if the page should be the selected one
 
 Returns: the newly created page
 
