@@ -972,7 +972,7 @@ sub _realize {
     return $self->_pushFatalError(__ $no_context) unless $self->{__currentContext};
     $self->_appendInitScript(
         "var canvas = \$('$id')",
-        "if (Prototype.Browser.IE) { G_vmlCanvasManager.initElement(canvas); canvas = \$('$id'); }",
+        "if (Prototype.Browser.IE) { if (!document.namespaces['g_vml_']) G_vmlCanvasManager.init_(document); G_vmlCanvasManager.initElement(canvas); canvas = \$('$id'); }",
         @{$self->{__drawing}}
     );
 }
