@@ -240,15 +240,10 @@ sub __init {
     delete $args{simple};
 
     $self->_constructorArguments(%args);
-    my $skin = IWL::Page::Link->new(
-        rel   => 'stylesheet',
-        type  => 'text/css',
-	href  => $IWLConfig{SKIN_DIR} . '/main.css',
-        media => 'screen',
-	title => 'Main',
-    );
-    my $ie          = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie.css');
-    my $ie6         = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
+    my $skin = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/main.css', undef, title => 'Main');
+    my $ie   = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie.css');
+    my $ie6  = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
+
     my $conditional = IWL::Comment->new;
     $self->requiredJs('base.js');
 

@@ -57,6 +57,8 @@ Parameter: B<SOURCE> - a URL to a javascript file
 
 sub setSrc {
     my ($self, $source) = @_;
+    require IWL::Static;
+    IWL::Static->addRequest($source);
 
     return $self->setAttribute(src => $source, 'uri');
 }

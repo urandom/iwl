@@ -62,11 +62,11 @@ If true, more debug information will be produced. Default value: I<''>
 
 If defined, this class will be used for sending data to the server. See L<IWL::Response> for more details.
 
-=item B<STATIC_PATHS>
+=item B<STATIC_URIS>
 
-A colon-separated list of paths, containing static files. See L<IWL::Static> for more details.
+A colon-separated list of URIs, containing static files. See L<IWL::Static> for more details.
 
-=item B<STATIC_PATHS_SCRIPT>
+=item B<STATIC_URI_SCRIPT>
 
 A path, relative to the server document root, which points to a script to handle static content via L<IWL::Static>.
 

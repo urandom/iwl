@@ -10,6 +10,7 @@ use base 'IWL::RPC';
 use IWL::Response;
 use IWL::Config '%IWLConfig';
 
+use File::Spec;
 use Locale::TextDomain qw(org.bloka.iwl);
 
 use constant MAX_DEPTH => 64;
@@ -25,6 +26,21 @@ L<IWL::Error> -> L<IWL::RPC> -> L<IWL::Static>
 =head1 DESCRIPTION
 
 IWL::Static provides a simple method for serving static content to a server
+
+=head1 SYNOPSIS
+
+In order to serve static content through I<IWL::Static>, a few steps must be taken.
+
+To use I<IWL::Static> static internally, the I<STATIC_URI_SCRIPT> configuration option must be set in your iwl.conf file. This options points to the script, which will serve the static content. The I<DOCUMENT_ROOT> option should also be set, unless the files to be served use relative URIs (the IWL static files use absolute URIs). If the user wants to include more URIs, along with the default IWL ones, the I<STATIC_URIS> option must also be set.
+
+The Perl script, which is referenced by I<STATIC_URI_SCRIPT>, will have the following code in its most simplest form:
+ 
+ #! /usr/bin/perl
+ use IWL::Static;
+
+ IWL::Static->new->handleRequest;
+
+This simple script will fetch all required content, which is inside the I<STATIC_URIS>, as well as the default IWL static content, and will send it to the server with the appropriate header.
 
 =head1 CONSTRUCTOR
 
@@ -48,34 +64,37 @@ sub new {
 
 =over 4
 
-=item B<addPath> (B<PATH> => B<RECURSIVE>, ...)
+=item B<addURI> (B<URI> => B<RECURSIVE>, ...)
 
-Adds a path for static content to the list of known paths
+Adds a URI for static content to the list of known URIs
 
-Parameters: B<PATH> - a path, can be either a path to a directory, or a file, or a list of those, B<RECURSIVE> - if the path is a directory, whether to to add all of its children
+Parameters: B<URI> - a URI, can be either a URI to a directory, or a file, or a list of those, B<RECURSIVE> - if the URI is a directory, whether to to add all of its children
 
-I<Note:> An initial list of known paths is obtained from a colon (':') separated list of paths in the I<STATIC_PATHS> config parameter of L<IWL::Config>, as well as the installation paths for IWL's own static content
+I<Note:> An initial list of known URIs is obtained from a colon (':') separated list of URIs in the I<STATIC_URIS> config parameter of L<IWL::Config>, as well as the installation URIs for IWL's own static content
 
 =cut
 
-sub addPath {
-    my ($self, %path) = @_;
+sub addURI {
+    my ($self, %uri) = @_;
 
-    foreach my $path (keys %path) {
-        next unless -f $path || -d $path;
+    foreach my $uri (keys %uri) {
+        my $recursive = $uri{$uri};
+        $uri = File::Spec->join($IWLConfig{DOCUMENT_ROOT}, $uri)
+          if substr($uri, 0, 1) eq '/' && $IWLConfig{DOCUMENT_ROOT};
+        next unless -f $uri || -d $uri;
 
-        $path =~ s{/+}{/}g;
-        $path .= '/' if -d $path && substr($path, -1) ne '/';
-        $self->{_staticPaths}{$path} = 1;
-        next if -f $path;
-        $self->__recursiveScan($path, 0) if $path{$path};
+        $uri =~ s{/+}{/}g;
+        $uri .= '/' if -d $uri && substr($uri, -1) ne '/';
+        $self->{_staticURIs}{$uri} = 1;
+        next if -f $uri;
+        $self->__recursiveScan($uri, 0) if $recursive;
     }
     return $self;
 }
 
 =item B<handleRequest> (B<%OPTIONS>)
 
-Handles static file requests by checking whether the user script is invoked with a request for certain file, and if the file exists in one of the predefined static paths, its contents are sent back to the server
+Handles static file requests by checking whether the user script is invoked with a request for certain file, and if the file exists in one of the predefined static URIs, its contents are sent back to the server
 
 Parameters: B<%OPTIONS> - a hash of options. The following key-pairs are recognised:
 
@@ -83,11 +102,11 @@ Parameters: B<%OPTIONS> - a hash of options. The following key-pairs are recogni
 
 =item B<header>
 
-An optional header hashref, which will overwrite the default header parameters
+An optional header hashref, or coderef, which will overwrite the default header parameters. If the parameter is a coderef, it should return a hashref which will be used for overriding. It will receive the content URI and its estimated MIME Type as its two parameters.
 
 =item B<mimeType>
 
-An optional string or coderef. If the value is a string, it will be used as the content's mime type. If the value is a coderef, it will be called with the path as its parameter, and its return value will be used as a mime type for the content
+An optional string or coderef. If the value is a string, it will be used as the content's mime type. If the value is a coderef, it will be called with the URI as its parameter, and its return value will be used as a mime type for the content
 
 =back
 
@@ -96,36 +115,59 @@ An optional string or coderef. If the value is a string, it will be used as the 
 sub handleRequest {
     my ($self, %options) = @_;
     my %form = $self->getParams;
-    my $path = $form{IWLStaticPath};
-    return unless $path;
+    my $uri = $form{IWLStaticURI};
+    return unless $uri;
 
-    $path =~ s{/+}{/}g;
-    require File::Spec;
-    unless ($self->{_staticPaths}{$path}) {
-        my (undef, $directory, undef) = File::Spec->splitpath($path);
+    $uri = File::Spec->join($IWLConfig{DOCUMENT_ROOT}, $uri)
+      if substr($uri, 0, 1) eq '/' && $IWLConfig{DOCUMENT_ROOT};
+
+    $uri =~ s{/+}{/}g;
+    unless ($self->{_staticURIs}{$uri}) {
+        my (undef, $directory, undef) = File::Spec->splitpath($uri);
         return $self->_pushError(
-            __x("The path '{PATH}' does not belong in the predefined list of static paths.", PATH => $path))
-          unless $self->{_staticPaths}{$directory};
+            __x("The URI '{URI}' does not belong in the predefined list of static URIs.", URI => $uri))
+          unless $self->{_staticURIs}{$directory};
     }
 
     local *DATA;
-    open DATA, $path or return $self->_pushError($!);
+    open DATA, $uri or return $self->_pushError($!);
     local $/;
     my $content = <DATA>;
     close DATA;
-    my $modtime = (stat $path)[9];
-    my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($path) : ($options{mimeType} || $self->__getMime($path));
+    my $modtime = (stat $uri)[9];
+    my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
     my $header = {
         'Content-type'   => $mime,
         'Content-length' => length($content),
         'Last-Modified'  => time2str($modtime),
-        'ETag'           => $modtime + (-s $path),
+        'ETag'           => $modtime . '_' . (-s $uri),
     };
-    $header->{$_} = $options{header}{$_} foreach keys %{$options{header} || {}};
+    $header->{$_} = $options{header}{$_} foreach keys %{
+        (ref $options{header} eq 'CODE'
+              ? $options{header}->($uri, $mime)
+              : $options{header}
+        ) || {}
+    };
 
     IWL::Response->new->send(header => $header, content => $content);
 
     return $self;
+}
+
+=item B<addRequest> (B<URI>)
+
+Adds a static request, if the I<STATIC_URI_SCRIPT> option is set in the %IWLConfig. It does not change the B<URI> otherwise.
+This method is used by L<IWL::Widget>s, which use static content, such as an L<IWL::Image>.
+
+Parameters: B<URI> - a URI, or a list of URIs, which will be handled by the static uri handler script
+
+=cut
+
+sub addRequest {
+    my ($self, $script) = (shift, $IWLConfig{STATIC_URI_SCRIPT});
+    return @_ unless $script;
+    $_ = $script . '?IWLStaticURI=' . $_ foreach @_;
+    return @_;
 }
 
 # Internal
@@ -133,47 +175,48 @@ sub handleRequest {
 sub __init {
     my $self = shift;
 
-    $self->{_staticPaths} = {};
+    $self->{_staticURIs} = {};
 
-    my @path = @IWLConfig{qw(JS_DIR SKIN_DIR IMAGE_DIR ICON_DIR)};
-    push @path, (split ':', $IWLConfig{STATIC_PATHS}) if $IWLConfig{STATIC_PATHS};
-    $self->addPath({map {$_ => 1} @path});
+    my @uri = @IWLConfig{qw(JS_DIR SKIN_DIR IMAGE_DIR ICON_DIR)};
+    push @uri, (split ':', $IWLConfig{STATIC_URIS}) if $IWLConfig{STATIC_URIS};
+    $self->addURI(map {$_ => 1} @uri);
 }
 
 sub __recursiveScan {
-    my ($self, $path, $count) = @_;
+    my ($self, $uri, $count) = @_;
     return if $count++ == MAX_DEPTH;
 
     local *DIR;
-    opendir DIR, $path
+    opendir DIR, $uri
       or $self->_pushError(
-        __x("Cannot open directory {PATH}: {ERR}", PATH => $path, ERR => $!)
+        __x("Cannot open directory {URI}: {ERR}", URI => $uri, ERR => $!)
       );
-    my @children = grep { !/^\./ && -d $path . '/' . $_ } readdir DIR;
+    my @children = grep { !/^\./ && -d $uri . '/' . $_ } readdir DIR;
     closedir DIR;
 
     foreach (@children) {
-        my $child = $path . '/' . $_;
+        my $child = $uri . '/' . $_;
         $child =~ s{/+}{/}g;
         $child .= '/' if substr($child, -1) ne '/';
-        next if $self->{_staticPaths}{$child};
-        $self->{_staticPaths}{$child} = 1;
+        next if $self->{_staticURIs}{$child};
+        $self->{_staticURIs}{$child} = 1;
         $self->__recursiveScan($child, $count);
     }
 }
 
 sub __getMime {
-    my ($self, $path) = @_;
-    return (substr $path, -4  eq '.css')   ? 'text/css; charset=utf-8'
-         : (substr $path, -5  eq '.html')  ? 'text/html; charset=utf-8'
-         : (substr $path, -4  eq '.xml')   ? 'text/xml; charset=utf-8'
-         : (substr $path, -3  eq '.js')    ? 'text/javascript; charset=utf-8'
-         : (substr $path, -4  eq '.jpg')   ? 'image/jpeg'
-         : (substr $path, -4 eq '.gif')    ? 'image/gif'
-         : (substr $path, -4 eq '.tif')    ? 'image/tiff'
-         : (substr $path, -4 eq '.png')    ? 'image/png'
-         : (substr $path, -5 eq '.json')   ? 'application/json'
-         : (substr $path, -6 eq '.xhtml')  ? 'application/xhtml+xml'
+    my ($self, $uri) = @_;
+    return (substr $uri, -4  eq '.css')   ? 'text/css; charset=utf-8'
+         : (substr $uri, -5  eq '.html')  ? 'text/html; charset=utf-8'
+         : (substr $uri, -4  eq '.xml')   ? 'text/xml; charset=utf-8'
+         : (substr $uri, -3  eq '.js')    ? 'text/javascript; charset=utf-8'
+         : (substr $uri, -4  eq '.jpg')   ? 'image/jpeg'
+         : (substr $uri, -4 eq '.gif')    ? 'image/gif'
+         : (substr $uri, -4 eq '.tif')    ? 'image/tiff'
+         : (substr $uri, -4 eq '.png')    ? 'image/png'
+         : (substr $uri, -5 eq '.json')   ? 'application/json'
+         : (substr $uri, -6 eq '.xhtml')  ? 'application/xhtml+xml'
+         : (substr $uri, -4 eq '.swf')    ? 'pplication/x-shockwave-flash'
          : 'application/octet-stream';
 }
 

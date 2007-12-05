@@ -85,6 +85,8 @@ Parameters: B<SRC> - the source for the image
 
 sub set {
     my ($self, $src) = @_;
+    require IWL::Static;
+    IWL::Static->addRequest($src);
 
     return $self->setAttribute(src => $src, 'uri');
 }
