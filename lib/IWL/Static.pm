@@ -216,7 +216,7 @@ sub __getMime {
          : (substr $uri, -4 eq '.png')    ? 'image/png'
          : (substr $uri, -5 eq '.json')   ? 'application/json'
          : (substr $uri, -6 eq '.xhtml')  ? 'application/xhtml+xml'
-         : (substr $uri, -4 eq '.swf')    ? 'pplication/x-shockwave-flash'
+         : (substr $uri, -4 eq '.swf')    ? 'application/x-shockwave-flash'
          : 'application/octet-stream';
 }
 
