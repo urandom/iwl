@@ -17,7 +17,7 @@ IWL::Iconbox::Icon - an icon widget for the iconbox
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Iconbox::Icon>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Iconbox::Icon>
 
 =head1 DESCRIPTION
 

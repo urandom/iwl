@@ -13,7 +13,7 @@ IWL::Form - a form object
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Form>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Form>
 
 =head1 DESCRIPTION
 

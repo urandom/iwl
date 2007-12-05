@@ -15,7 +15,7 @@ IWL::Anchor - an anchor widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Anchor>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Anchor>
 
 =head1 DESCRIPTION
 

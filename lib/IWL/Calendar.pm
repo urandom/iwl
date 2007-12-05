@@ -36,7 +36,7 @@ IWL::Calendar - a calendar widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Calendar>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Calendar>
 
 =head1 DESCRIPTION
 

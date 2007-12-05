@@ -15,7 +15,7 @@ IWL::Accordion::Page - a page used in a accordion
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Accordion::Page>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Accordion::Page>
 
 =head1 DESCRIPTION
 

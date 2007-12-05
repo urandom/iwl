@@ -105,8 +105,8 @@ li.menu_item_selected, li.menubar_item_selected {
 }
 
 div.expander .expander_icon {
-    background: url(/iwl/skin/default/images/expander/expanded.png) no-repeat;
+    background: url(/iwl/skin/default/images/expander/arrows.gif) no-repeat -16px 0px;
 }
 div.expander_collapsed .expander_icon {
-    background: url(/iwl/skin/default/images/expander/collapsed.png) no-repeat;
+    background: url(/iwl/skin/default/images/expander/arrows.gif) no-repeat;
 }

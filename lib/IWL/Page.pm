@@ -46,7 +46,7 @@ IWL::Page - The root widget, containing the body and header markup.
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Page>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Page>
 
 =head1 DESCRIPTION
 

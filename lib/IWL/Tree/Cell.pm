@@ -28,7 +28,7 @@ IWL::Tree::Cell - a cell widget for a tree row
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell> -> L<IWL::Tree::Cell>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell> -> L<IWL::Tree::Cell>
 
 =head1 DESCRIPTION
 

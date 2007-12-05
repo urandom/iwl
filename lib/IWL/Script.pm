@@ -15,7 +15,7 @@ IWL::Script - A script object.
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Script>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Script>
 
 =head1 DESCRIPTION
 

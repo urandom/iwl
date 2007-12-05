@@ -17,7 +17,7 @@ IWL::NavBar - a navigation bar
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::NavBar>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::NavBar>
 
 =head1 DESCRIPTION
 

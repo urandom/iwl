@@ -16,7 +16,7 @@ IWL::Spinner - a number spinner widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Entry> -> L<IWL::Spinner>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Entry> -> L<IWL::Spinner>
 
 =head1 DESCRIPTION
 

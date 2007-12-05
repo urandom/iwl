@@ -15,7 +15,7 @@ IWL::InputButton - a input button
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::InputButton>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::InputButton>
 
 =head1 DESCRIPTION
 

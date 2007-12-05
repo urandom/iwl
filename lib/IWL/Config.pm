@@ -58,6 +58,22 @@ The level of strictness. If greater than 1, attribute names will be checked, and
 
 If true, more debug information will be produced. Default value: I<''>
 
+=item B<RESPONSE_CLASS>
+
+If defined, this class will be used for sending data to the server. See L<IWL::Response> for more details.
+
+=item B<STATIC_PATHS>
+
+A colon-separated list of paths, containing static files. See L<IWL::Static> for more details.
+
+=item B<STATIC_PATHS_SCRIPT>
+
+A path, relative to the server document root, which points to a script to handle static content via L<IWL::Static>.
+
+=item B<DOCUMENT_ROOT>
+
+The absolute path to the document root. It is used by L<IWL::Static> to locate the static content.
+
 =item I<EXAMPLE CONFIG FILE>
 
     SKIN = "myskin"

@@ -16,7 +16,7 @@ IWL::Checkbox - a checkbox
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Checkbox>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Checkbox>
 
 =head1 DESCRIPTION
 

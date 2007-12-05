@@ -51,7 +51,7 @@ IWL::Label - a label widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Label>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Label>
 
 =head1 DESCRIPTION
 

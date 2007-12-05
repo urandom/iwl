@@ -18,7 +18,7 @@ IWL::Tree - a tree widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Tree>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table> -> L<IWL::Tree>
 
 =head1 DESCRIPTION
 

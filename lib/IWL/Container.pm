@@ -13,7 +13,7 @@ IWL::Container - a container widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container>
 
 =head1 DESCRIPTION
 

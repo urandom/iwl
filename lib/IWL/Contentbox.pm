@@ -30,7 +30,7 @@ IWL::Contentbox - a content box
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Contentbox>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Contentbox>
 
 =head1 DESCRIPTION
 

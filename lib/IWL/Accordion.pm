@@ -19,7 +19,7 @@ IWL::Accordion - an accordion widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Accordion>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Accordion>
 
 =head1 DESCRIPTION
 

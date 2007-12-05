@@ -18,7 +18,7 @@ IWL::Entry - a text entry widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Entry>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Entry>
 
 =head1 DESCRIPTION
 

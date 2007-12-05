@@ -18,7 +18,7 @@ IWL::Table - a table widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table>
 
 =head1 DESCRIPTION
 

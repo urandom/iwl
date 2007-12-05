@@ -15,7 +15,7 @@ IWL::Textarea - a text area widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Textarea>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Textarea>
 
 =head1 DESCRIPTION
 

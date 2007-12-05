@@ -15,7 +15,7 @@ IWL::Combo - a combo box widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Combo>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Combo>
 
 =head1 DESCRIPTION
 

@@ -16,7 +16,7 @@ IWL::Menubar - a menubar widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List> -> L<IWL::Menubar>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List> -> L<IWL::Menubar>
 
 =head1 DESCRIPTION
 

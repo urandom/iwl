@@ -13,7 +13,7 @@ IWL::IFrame - a B<E<lt>iframeE<gt>> container
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::IFrame>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::IFrame>
 
 =head1 DESCRIPTION
 

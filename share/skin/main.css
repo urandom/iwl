@@ -1507,10 +1507,10 @@ div.tooltip_content {
 }
 
 .expander .expander_icon {
-    background: url(/iwl/skin/default/images/expander/expanded.png) no-repeat;
+    background: url(/iwl/skin/default/images/expander/arrows.png) no-repeat -16px 0px;
 }
 .expander_collapsed .expander_icon {
-    background: url(/iwl/skin/default/images/expander/collapsed.png) no-repeat;
+    background: url(/iwl/skin/default/images/expander/arrows.png) no-repeat;
 }
 .expander_content {
     clear: both;

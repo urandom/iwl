@@ -16,7 +16,7 @@ IWL::RadioButton - a radio button
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Checkbox> -> L<IWL::RadioButton>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Checkbox> -> L<IWL::RadioButton>
 
 =head1 DESCRIPTION
 

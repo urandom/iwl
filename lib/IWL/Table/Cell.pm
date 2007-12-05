@@ -13,7 +13,7 @@ IWL::Table::Cell - a cell widget for a table
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Cell>
 
 =head1 DESCRIPTION
 

@@ -18,7 +18,7 @@ IWL::Tooltip - a tooltip widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Tooltip>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Tooltip>
 
 =head1 DESCRIPTION
 

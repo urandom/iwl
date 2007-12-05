@@ -31,6 +31,10 @@ my $response;
 
 IWL::Object - Base object module for IWL
 
+=head1 INHERITANCE
+
+L<IWL::Error> -> L<IWL::Object>
+
 =head1 DESCRIPTION
 
 This is the base object module for IWL. Every other module will inherit from it.

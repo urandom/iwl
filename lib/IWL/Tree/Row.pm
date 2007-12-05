@@ -20,7 +20,7 @@ IWL::Tree::Row - a row widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Row> -> L<IWL::Tree::Row>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Table::Row> -> L<IWL::Tree::Row>
 
 =head1 DESCRIPTION
 

@@ -18,7 +18,7 @@ IWL::Notebook - a tabbed notebook widget
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Notebook>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::Notebook>
 
 =head1 DESCRIPTION
 

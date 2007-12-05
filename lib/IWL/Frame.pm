@@ -13,7 +13,7 @@ IWL::Frame - a frame object
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Frame>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Frame>
 
 =head1 DESCRIPTION
 

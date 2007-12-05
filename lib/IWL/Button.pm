@@ -20,7 +20,7 @@ IWL::Button - a button with a background
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Button>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Button>
 
 =head1 DESCRIPTION
 

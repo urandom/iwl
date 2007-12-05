@@ -13,7 +13,7 @@ IWL::List::Definition - a defintion list item
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List::Definition>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Container> -> L<IWL::List::Definition>
 
 =head1 DESCRIPTION
 

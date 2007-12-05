@@ -15,7 +15,7 @@ IWL::Combo::Option - an option widget for the combobox
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Combo::Option>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Combo::Option>
 
 =head1 DESCRIPTION
 

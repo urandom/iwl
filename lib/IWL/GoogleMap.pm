@@ -322,7 +322,7 @@ Map API from IWL:
 
 =head1 INHERITANCE
 
-L<IWL::Object> -> L<IWL::Widget> -> L<IWL::GoogleMap>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::GoogleMap>
 
 =head1 CONSTRUCTORS
 
