@@ -156,7 +156,7 @@ sub handleRequest {
 
 =item B<addRequest> (B<URI>)
 
-Adds a static request, if the I<STATIC_URI_SCRIPT> option is set in the %IWLConfig. It does not change the B<URI> otherwise.
+Changes the B<URI> into a static request, if the I<STATIC_URI_SCRIPT> option is set in the %IWLConfig. It does not change the B<URI> otherwise.
 This method is used by L<IWL::Widget>s, which use static content, such as an L<IWL::Image>.
 
 Parameters: B<URI> - a URI, or a list of URIs, which will be handled by the static uri handler script
