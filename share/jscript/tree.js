@@ -411,7 +411,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         appendRow: function(parentRow, json) {
             var parentRow = $(parentRow);
-            var reference = $(arguments[2]) || (parentRow == this.body ? null : this._getNextRow(parentRow));
+            var reference = $(arguments[2]) || (parentRow == this.body ? null : this.getNextRow(parentRow));
             var all_rows = $A(this.body.rows);
             var new_rows = [];
 
