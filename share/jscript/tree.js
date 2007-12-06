@@ -37,7 +37,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
         /* this.sortables = {col_num: [func_ref, [args]]} */
         if (!this.sortables || !this.sortables[col_num] || !this.sortables[col_num][0])
             return rowTextCompare.call(this, col_num);
-        
+
         return this.sortables[col_num][0](col_num);
     }
 
@@ -482,7 +482,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             var row = cell.parentNode;
             var col_num = 0;
-            var dir = arguments[1] != null ? arguments[1] : 
+            var dir = arguments[1] != null ? arguments[1] :
                 cell.readAttribute("iwl:treeCellDescSort") == 1 ? 0 : 1;
             if (!dir) dir = 0;
             for (var i = 0; i < row.cells.length; i++) {
@@ -752,7 +752,7 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (child_rows.length) {
                 var all = arguments[0];
                 child_rows.each(function(child) {
-                    child.show()
+                    child.show();
                     if (all && child.isParent)
                         child.expand(all);
                     else child._rebuildNav();
@@ -844,9 +844,9 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     path.push(this.path[i]);
                     var paren = this.tree.getRowByPath(path);
                     if (paren && !this.tree._getNextRow(paren))
-                        indent.push(this.tree.navImages.b)
+                        indent.push(this.tree.navImages.b);
                     else
-                        indent.push(this.tree.navImages.i)
+                        indent.push(this.tree.navImages.i);
                     type.push(false);
                 }
             }
@@ -854,14 +854,14 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (this.tree._getNextRow(this)) {
                 if (this.isParent) {
                     if (this.collapsed) {
-                        indent.push(this.tree.navImages.t_e)
+                        indent.push(this.tree.navImages.t_e);
                         type.push('expand');
                     } else {
-                        indent.push(this.tree.navImages.t_c)
+                        indent.push(this.tree.navImages.t_c);
                         type.push('collapse');
                     }
                 } else {
-                    indent.push(this.tree.navImages.t)
+                    indent.push(this.tree.navImages.t);
                     type.push(false);
                 }
             } else {
@@ -869,14 +869,14 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (prev) prev._rebuildNav();		// Rebuilds the previous row, in case this one was added after the initial rebuild
                 if (this.isParent) {
                     if (this.collapsed) {
-                        indent.push(this.tree.navImages.l_e)
+                        indent.push(this.tree.navImages.l_e);
                         type.push('expand');
                     } else {
-                        indent.push(this.tree.navImages.l_c)
+                        indent.push(this.tree.navImages.l_c);
                         type.push('collapse');
                     }
                 } else {
-                    indent.push(this.tree.navImages.l)
+                    indent.push(this.tree.navImages.l);
                     type.push(false);
                 }
             }

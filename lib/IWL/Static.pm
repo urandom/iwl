@@ -142,11 +142,11 @@ sub handleRequest {
         'Last-Modified'  => time2str($modtime),
         'ETag'           => $modtime . '_' . (-s $uri),
     };
+    $options{header} = $options{header}->($uri, $mime) if ref $options{header} eq 'CODE';
     $header->{$_} = $options{header}{$_} foreach keys %{
-        (ref $options{header} eq 'CODE'
+        ref $options{header} eq 'CODE'
               ? $options{header}->($uri, $mime)
-              : $options{header}
-        ) || {}
+              : $options{header} || {}
     };
 
     IWL::Response->new->send(header => $header, content => $content);
