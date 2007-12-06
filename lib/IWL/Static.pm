@@ -206,17 +206,17 @@ sub __recursiveScan {
 
 sub __getMime {
     my ($self, $uri) = @_;
-    return (substr $uri, -4 eq '.css')    ? 'text/css; charset=utf-8'
-         : (substr $uri, -5 eq '.html')   ? 'text/html; charset=utf-8'
-         : (substr $uri, -4 eq '.xml')    ? 'text/xml; charset=utf-8'
-         : (substr $uri, -3 eq '.js')     ? 'text/javascript; charset=utf-8'
-         : (substr $uri, -4 eq '.jpg')    ? 'image/jpeg'
-         : (substr $uri, -4 eq '.gif')    ? 'image/gif'
-         : (substr $uri, -4 eq '.tif')    ? 'image/tiff'
-         : (substr $uri, -4 eq '.png')    ? 'image/png'
-         : (substr $uri, -5 eq '.json')   ? 'application/json'
-         : (substr $uri, -6 eq '.xhtml')  ? 'application/xhtml+xml'
-         : (substr $uri, -4 eq '.swf')    ? 'application/x-shockwave-flash'
+    return (substr($uri, -4) eq '.css')    ? 'text/css; charset=utf-8'
+         : (substr($uri, -5) eq '.html')   ? 'text/html; charset=utf-8'
+         : (substr($uri, -4) eq '.xml')    ? 'text/xml; charset=utf-8'
+         : (substr($uri, -3) eq '.js')     ? 'text/javascript; charset=utf-8'
+         : (substr($uri, -4) eq '.jpg')    ? 'image/jpeg'
+         : (substr($uri, -4) eq '.gif')    ? 'image/gif'
+         : (substr($uri, -4) eq '.tif')    ? 'image/tiff'
+         : (substr($uri, -4) eq '.png')    ? 'image/png'
+         : (substr($uri, -5) eq '.json')   ? 'application/json'
+         : (substr($uri, -6) eq '.xhtml')  ? 'application/xhtml+xml'
+         : (substr($uri, -4) eq '.swf')    ? 'application/x-shockwave-flash'
          : 'application/octet-stream';
 }
 
