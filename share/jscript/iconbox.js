@@ -5,6 +5,7 @@
  * */
 IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function resizeEvent(event) {
+        if (!this.loaded) return;
         var dims = this.getDimensions();
         if (!this.dimensions || 
                 dims.width != this.dimensions.width || 
@@ -312,7 +313,7 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.keyLogger(keyEventsCB.bindAsEventListener(this));
         },
         _alignIconsVertically: function() {
-            if (!this.icons) return;
+            if (!this.icons || !this.icons.length) return;
             for (var icon = this.icons[0]; icon;)
                 icon = setMaxHeightOnSameRow.call(this, icon);
             this.dimensions = this.getDimensions();
