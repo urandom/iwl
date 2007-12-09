@@ -546,7 +546,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }.bind(this));
             this.navImages = {};
             for (var i in images) {
-                var image = unescape(images[i]).evalJSON()
+                var image = unescape(images[i]).evalJSON();
                 attributes = [];
                 for (var attr in image.attributes)
                     attributes.push(attr + '="' + image.attributes[attr] + '"');
