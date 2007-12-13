@@ -11,8 +11,8 @@ Object.extend(Effect, {
 	    new Effect.ScrollTo(target);
 	    Event.stop(event);
 	  }
-	}.bindAsEventListener(element))
-      })
+        }.bindAsEventListener(element));
+      });
       window.smoothScroll = true;
     } else {
       Event.observe(window, "load", function () {

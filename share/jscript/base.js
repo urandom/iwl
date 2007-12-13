@@ -13,19 +13,19 @@ Object.extend(IWL, {RPC: (function() {
   function eventStart(str) {
       return function(params) {
           eval(str);
-      }
+      };
   }
 
   function eventCompletion(str) {
       return function(json, params, options) {
           eval(str);
-      }
+      };
   }
 
   function eventFinalize (element, eventName, options) {
       if (options.disableView)
           IWL.View.enable();
-      element['handlers'][eventName].ajaxRequest = null
+      element['handlers'][eventName].ajaxRequest = null;
       if (options.emitOnce)
           delete element['handlers'][eventName];
   }
@@ -65,9 +65,9 @@ Object.extend(IWL, {RPC: (function() {
                       onComplete: function(or) {
                           var json = or.responseJSON;
                           if (!json) return;
-                          if (options.method && options.method in element) 
+                          if (options.method && options.method in element)
                               element[options.method].call(element, json, params, options);
-                          if (options.responseCallback && typeof options.responseCallback === 'function') 
+                          if (options.responseCallback && typeof options.responseCallback === 'function')
                               options.responseCallback.call(element, json, params, options);
                           if (options.onComplete) {
                               var callback = eventCompletion(options.onComplete);
@@ -82,7 +82,7 @@ Object.extend(IWL, {RPC: (function() {
                       onException: IWL.exceptionHandler,
                       onLoading: disable,
                       onComplete: function(or) {
-                          if (options.responseCallback && typeof options.responseCallback === 'function') 
+                          if (options.responseCallback && typeof options.responseCallback === 'function')
                               options.responseCallback.call(element, {}, params, options);
                           if (options.onComplete) {
                               var callback = eventCompletion(options.onComplete);
@@ -95,7 +95,7 @@ Object.extend(IWL, {RPC: (function() {
                       parameters: {IWLEvent: Object.toJSON({eventName: eventName, params: params, options: options})}
                   });
               }
-          }
+          };
           return element;
       },
       prepareEvents: function(element) {
@@ -137,11 +137,11 @@ IWL.Widget = {
 	if (this._preInit)
 	    if (!this._preInit.apply(this, arguments)) return;
 	Object.extend(this.current, this);
-  	if (this.current.prepareEvents)    
+  	if (this.current.prepareEvents)
             this.current.prepareEvents();
 	if (this.current._init)
 	    this.current._init.apply(this.current, arguments);
-     
+
         this.current.emitSignal('iwl:init');
         return this.current;
     },
@@ -149,7 +149,7 @@ IWL.Widget = {
 	if (!collection || !collection.each || !eventName) return;
 	collection.each(function(item) {
 	    if (item === exception) return;
-	    if (item['handlers'] 
+	    if (item['handlers']
 		&& item['handlers'][eventName]
 		&& item['handlers'][eventName].ajaxRequest)
 		item['handlers'][eventName].ajaxRequest.transport.abort();
@@ -160,7 +160,7 @@ IWL.Widget = {
 Object.extend(IWL, (function() {
     var script_urls = 0;
     var scripts     = [];
-    
+
     function evalScript () {
         if (--script_urls > 0) return;
         scripts.each(function(s) {
@@ -208,7 +208,7 @@ Object.extend(IWL, (function() {
                     var textNode = json.text.toString().createTextNode();
                     if (previousElement)
                         parentElement.insertBefore(textNode, previousElement);
-                    else 
+                    else
                         parentElement.appendChild(textNode);
                     return textNode;
                 }
@@ -262,7 +262,7 @@ Object.extend(IWL, (function() {
             var options = Object.extend({
                 fullCover: false,
                 noCover: false,
-                opacity: 0.8 
+                opacity: 0.8
             }, arguments[0] || {});
             disabled_view_cnt++;
 
@@ -325,7 +325,7 @@ Object.extend(IWL, (function() {
 Object.extend(IWL, (function() {
     var display_status_cnt = 0;
     var appear;
-    
+
     function hideStatus(options) {
         if (options.duration)
             IWL.Status.remove.delay(options.duration);
@@ -364,7 +364,7 @@ Object.extend(IWL, (function() {
             if (!status_bar) return;
             if (display_status_cnt >= 2) {
                 if (status_bar.firstChild)
-                    status_bar.removeChild(status_bar.firstChild); 
+                    status_bar.removeChild(status_bar.firstChild);
             }
             if (display_status_cnt-- <= 1) {
                 if (appear) {
@@ -444,15 +444,15 @@ IWL.keyLogger = function(element, callback) {
     var ElementMethods = {
         registerEvent: function(element, eventName, url, params, options) {
             IWL.RPC.registerEvent.apply(Event, arguments);
-            return $A(arguments).first();        
+            return $A(arguments).first();
         },
         prepareEvents: function(element) {
             IWL.RPC.prepareEvents.apply(Event, arguments);
-            return $A(arguments).first();       
+            return $A(arguments).first();
         },
         emitEvent: function(element, eventName, params, options) {
             IWL.RPC.emitEvent.apply(Event, arguments);
-            return $A(arguments).first();  
+            return $A(arguments).first();
         },
         hasEvent: function(element, eventName) {
             return IWL.RPC.hasEvent.apply(Event, arguments);
@@ -462,11 +462,11 @@ IWL.keyLogger = function(element, callback) {
         },
         registerFocus: function(element) {
             IWL.Focus.register.apply(IWL.Focus, arguments);
-            return element;  
+            return element;
         },
         keyLogger: function(element, callback) {
             IWL.keyLogger.apply(IWL, arguments);
-            return element;  
+            return element;
         }
     };
     Element.addMethods(ElementMethods);

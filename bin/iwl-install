@@ -15,7 +15,7 @@ sub recursive(&@);
 
 Getopt::Long::Configure ('no_ignore_case');
 
-my ($opt_docroot, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_help, $opt_jsdir, $opt_cgibin, $opt_static_uri_script);
+my ($opt_docroot, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_help, $opt_jsdir, $opt_cgibin, $opt_static_uri_script, $opt_pack);
 
 GetOptions (
 	'docroot=s'           => \$opt_docroot,
@@ -25,6 +25,7 @@ GetOptions (
 	'jsdir=s'             => \$opt_jsdir,
 	'cgibin=s'            => \$opt_cgibin,
 	'static_uri_script=s' => \$opt_static_uri_script,
+	'packjs'              => \$opt_pack,
 	'help'                => \$opt_help,
 ) or exit 1;
 
@@ -61,6 +62,8 @@ my $sharejs     = $sharedir . '/jscript';
 my $shareskin   = $sharedir . '/skin';
 my $shareimages = $sharedir . '/images';
 my $shareicons  = $sharedir . '/icons';
+
+require Pack if $opt_pack;
 
 mirror $sharedir . '/iwl_demo.pl', $cgibin;
 mirror $sharejs                  , $full_jsdir;
@@ -187,8 +190,13 @@ Usage: $0 [OPTIONS]
         -c, --cgibin=DIR    the cgi-bin directory, relative to the document root
                             /cgi-bin is assumed if none is specified
 
-        --static_uri_script     the static script path, relative to the
-                                document root
+        --static_uri_script=SCRIPT
+                            the static script path, relative to the
+                            document root
+        --packjs            if specified, will packjs all JavaScript files
+                            using Pack. This option is for TESTING purposes only
+                            (http://dean.edwards.name/download/#packer)
+                            
 
 EOF
 	exit 0;
@@ -231,9 +239,32 @@ sub recursive(&@) {
         );
 }
 
+sub packjs {
+    my ($from, $to) = @_;
+    my $old = $/;
+    local *INFILE;
+    local *OUTFILE;
+    open INFILE, "$from" or return;
+    open OUTFILE, "> $to" or return;
+    undef $/;
+    my $js = <INFILE>;
+    close INFILE;
+
+    $/ = $old;
+
+    print OUTFILE Pack::pack($js, 62, 1, 1);
+    close OUTFILE;
+}
+
 sub mirror {
     mkdir_p($_[1]);
-    recursive { -d $_[0] ? do { mkdir($_[1]) unless -d $_[1] } : copy(@_) } @_;
+    recursive {
+        -d $_[0]
+          ? do { mkdir($_[1]) unless -d $_[1] }
+          : $opt_pack && $_[0] =~ m{jscript/[^/]+\.js$}
+            ? packjs(@_)
+            : copy(@_) 
+    } @_;
 }
 #######################################################################
 # File::Mirror }}}

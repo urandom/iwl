@@ -44,10 +44,10 @@ function run_prototype_tests() {
             var results = $H(Prototype.Browser).map(function(engine){
                 return engine;
             }).partition(function(engine){
-                return engine[1] === true
+                return engine[1] === true;
             });
             var trues = results[0], falses = results[1];
-          
+
             // we should have definite trues or falses here
             trues.each(function(result){
                     assert(result[1] === true);
@@ -85,7 +85,7 @@ function run_prototype_tests() {
             if(navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1) {
                 info('Running on Gecko');
                 assert(Prototype.Browser.Gecko);
-            } 
+            }
         }},
         testEventMisc: function() { with(this) {
             assertEqual(32, Event.KEY_SPACE);
@@ -109,7 +109,7 @@ function run_prototype_tests() {
             test_span.emitSignal('test:event');
             assert(!fired1, "Disconnected callback1");
             assert(fired2, "Disconnected callback1");
-            
+
             fired2 = false;
             assertIdentical(test_span, test_span.signalDisconnectAll('test:event'));
             test_span.emitSignal('test:event');
@@ -188,7 +188,7 @@ function run_prototype_tests() {
             window.evalScriptsCounter = 0;
             ('foo <script>evalScriptsCounter++<'+'/script>bar').evalScripts();
             assertEqual(1, evalScriptsCounter);
-            
+
             var stringWithScripts = '';
             (3).times(function(){ stringWithScripts += 'foo <script>evalScriptsCounter++<'+'/script>bar' });
             stringWithScripts.evalScripts();
@@ -346,7 +346,7 @@ function run_base_tests() {
                     {responseCallback: function(json) { eval(json.data); this.proceed() }.bind(this)}));
 
             delay(function() {
-                assertEqual("Test: 1, Foo: bar", res1.innerHTML); 
+                assertEqual("Test: 1, Foo: bar", res1.innerHTML);
                 assert(!cancelled.innerHTML);
 
                 test_span.writeAttribute('iwl:RPCEvents', "%7B%22IWL-Object-testEvent2%22%3A%20%5B%22iwl_demo.pl%22%2C%20%7B%22test%22%3A%201%7D%5D%7D");
@@ -776,7 +776,7 @@ function run_contentbox_tests() {
             assertEqual(contentbox, contentbox.setType('resize'), "11");
             assertEqual('resize', contentbox.options.type, "12");
             assertInstanceOf(Resizer, contentbox._resizer, "13");
-            contentbox.setType('none')
+            contentbox.setType('none');
             assert($H(contentbox._resizer.handlers).keys().length == 0, "14");
 
             assertEqual(contentbox, contentbox.setType('dialog'), "15");
@@ -785,7 +785,7 @@ function run_contentbox_tests() {
             assert(Draggables.drags.include(contentbox._draggable), "18");
             assertInstanceOf(Resizer, contentbox._resizer, "19");
             assert($H(contentbox._resizer.handlers).keys().length > 0, "20");
-            contentbox.setType('none', "21")
+            contentbox.setType('none', "21");
             assert($H(contentbox._resizer.handlers).keys().length == 0, "22");
             assert(!Draggables.drags.include(contentbox._draggable), "23");
 
@@ -799,7 +799,7 @@ function run_contentbox_tests() {
             assert(Object.isElement(contentbox.closeButton));
             assert(contentbox.closeButton.hasClassName(className + '_close'));
             assert('contentbox_test_close', contentbox.closeButton.id);
-            contentbox.setType('none')
+            contentbox.setType('none');
             assert($H(contentbox._resizer.handlers).keys().length == 0);
             assert(!Draggables.drags.include(contentbox._draggable));
             assert(!contentbox.closeButton);
@@ -811,7 +811,7 @@ function run_contentbox_tests() {
             assert(Object.isElement(contentbox.closeButton));
             assert(contentbox.closeButton.hasClassName(className + '_close'));
             assert('contentbox_test_close', contentbox.closeButton.id);
-            contentbox.setType('none')
+            contentbox.setType('none');
             assert(!Draggables.drags.include(contentbox._draggable));
             assert(!contentbox.closeButton);
         }},
@@ -932,7 +932,7 @@ function run_druid_tests() {
             assertEqual(druid, druid.removePage(druid.pages[3]), "30");
             assertEqual(4, druid.pages.length, "31");
             wait(100, function() {
-                assert(removed, "32")
+                assert(removed, "32");
             });
         }},
         testPageSelection: function() { with(this) {
@@ -1166,7 +1166,7 @@ function run_menu_tests() {
             assertEqual(menu.menuItems[0], menu.menuItems[0].setDisabled(true));
             assert(menu.menuItems[0].isNotEnabled());
             assert(!menu.menuItems[0].setSelected(true));
-            assertEqual(menu.menuItems[1], menu.menuItems[1].activate())
+            assertEqual(menu.menuItems[1], menu.menuItems[1].activate());
             assertEqual(menu, menu.bindToWidget('testlog', 'click'));
             wait(200, function() {
                 assert(change);

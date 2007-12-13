@@ -638,7 +638,7 @@ Object.extend(String.prototype, (function() {
       this.extractScripts().each(function(script) {
         if (!script) return;
         if (urlCount)
-          codeSnippets.push(script) 
+          codeSnippets.push(script);
         else
           eval(script);
       });
