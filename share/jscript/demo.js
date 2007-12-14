@@ -30,6 +30,7 @@ function sortTheMoney(col_index) {
 
 function run_prototype_tests() {
     var test_span;
+    document.insertScript(IWL.Config.JS_DIR + '/entry.js', {debug: true});
     new Test.Unit.Runner({
         setup: function() {
             test_span = new Element('span', {style: "display: none", id: 'test_span'});
@@ -135,13 +136,16 @@ function run_prototype_tests() {
             test_span.firstChild.appendChild(new Element('select', {name: 'select'})).appendChild(new Element('option', {value: 'foo'}));
             test_span.down(1).appendChild(new Element('input', {type: 'text', value: 0.17}));
             test_span.down(2).appendChild(new Element('div', {className: 'slider', name: 'slider'})).control = {value: 0.26};
+            test_span.down(2).appendChild(new Element('div', {className: 'entry', name: 'entry', id: 'e'}).update(new Element('input', {className: 'entry_text', value: 15, id: 'e_text'})));
             test_span.firstChild.appendChild(new Element('textarea', {id: 'textarea'})).value = 'Some text';
+            IWL.Entry.create(test_span.select('.entry').first());
             var params = test_span.getControlElementParams();
             assertInstanceOf(Hash, params, 'Params hash');
             assert(!params.values().include(0.17), 'Doesn\'t have unnamed elements');
             assertEqual('Some text', params.get('textarea'), 'Textarea param');
             assertEqual('foo', params.get('select'), 'Select param');
             assertEqual(0.26, params.get('slider'), 'Slider param');
+            assertEqual(15, params.get('entry'), 'Entry param');
 
             assert(test_span.down().childElements()[1].checkValue({reg: /^(?:foo|bar)$/}), 'Regular expression');
             assert(test_span.down(1).childElements()[1].checkValue({range: $R(0,1)}), 'Range');

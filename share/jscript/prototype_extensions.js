@@ -220,7 +220,11 @@ Object.extend(Event, (function() {
       var sliders = element.select('.slider');
       var selects = element.select('select');
       var textareas = element.select('textarea');
-      var inputs = element.select('input');
+      var inputs = element.select('input').findAll(function(el) {
+        return el.hasClassName('entry_text') || el.hasClassName('spinner_text')
+          ? false : true;
+      });
+      var entries = element.select('.entry').concat(element.select('.spinner'));
 
       var valid_name = function(e) {
         return e.hasAttribute('name') ? e.readAttribute('name') : e.readAttribute('id');
@@ -237,6 +241,9 @@ Object.extend(Event, (function() {
       sliders.each(function(s) {
           if ('control' in s)
             push_values(valid_name(s), s.control.value);
+        });
+      entries.each(function(e) {
+          push_values(valid_name(e), e.getValue());
         });
       selects.each(function(s) {
           push_values(valid_name(s), s.value);

@@ -114,7 +114,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * @type Number 
          * */
         getValue: function() {
-            return this.control.value;
+            return this.control.value == this.options.defaultText ? '' : this.control.value;
         },
 
         _init: function(id) {
@@ -125,9 +125,9 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             }, arguments[1] || {});
 
             this.cleanWhitespace();
-            this.image1  = $(id + '_left');
-            this.image2  = $(id + '_right');
-            this.control = $(id + '_text');
+            this.image1  = $(this.id + '_left');
+            this.image2  = $(this.id + '_right');
+            this.control = $(this.id + '_text');
 
             if (this.options.clearButton)
                 this.image2.signalConnect('click', clearButtonCallback.bind(this));
