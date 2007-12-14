@@ -206,13 +206,7 @@ In order to actually use the library, the javascript and css files will also hav
 
 =head2 Perl
 
- - Add more stock items to IWL::Stock
- - Add an EmbedObject (<object>) and IFrame (<iframe>) widgets
-
-=head2 Graphics
-
- - Create prettier icons (use tango gif icons?)
-
+ - Add an EmbedObject (<object>)
 
 =head1 BUGS AND LIMITATIONS
 
