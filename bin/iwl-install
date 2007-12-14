@@ -193,8 +193,9 @@ Usage: $0 [OPTIONS]
         --static_uri_script=SCRIPT
                             the static script path, relative to the
                             document root
-        --packjs            if specified, will packjs all JavaScript files
-                            using Pack. This option is for TESTING purposes only
+
+        --packjs            if specified, will pack all JavaScript files using
+                            Pack. This option is for TESTING purposes only!
                             (http://dean.edwards.name/download/#packer)
                             
 
@@ -261,7 +262,7 @@ sub mirror {
     recursive {
         -d $_[0]
           ? do { mkdir($_[1]) unless -d $_[1] }
-          : $opt_pack && $_[0] =~ m{jscript/[^/]+\.js$}
+          : $opt_pack && substr($_[0], -3) eq '.js'
             ? packjs(@_)
             : copy(@_) 
     } @_;
