@@ -220,7 +220,7 @@ In order to actually use the library, the javascript and css files will also hav
 
 =head1 Website
 
-http://code.google.com/p/iwl
+L<http://code.google.com/p/iwl>
 
 =head1 LICENCE AND COPYRIGHT
 
