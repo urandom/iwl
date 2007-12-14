@@ -24,7 +24,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
             src: "javascript: false", className: "qframe",
             style: "width: " + dims.width + "px; height: " + dims.height + "px;"
         });
-        var mi_top = parseFloat(this.getStyle('top') || 0)
+        var mi_top = parseFloat(this.getStyle('top') || 0);
         if (this.hasClassName('submenu') && mi_top > 0)
             mi_top -= this.menuItems[0].getDimensions().height;
         var style = {left: this.getStyle('left'), top: mi_top + "px"};

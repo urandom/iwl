@@ -175,7 +175,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     function documentMouseMove(event) {
         if (!this.dragging) return;
-        var x = event.pointerX()
+        var x = event.pointerX();
         var offset = event.ctrlKey ? this.options.stepIncrement / this.options.pageIncrement :
         event.shiftKey ? this.options.pageIncrement : this.options.stepIncrement;
         var delta = (x - this.dragStartPosition) * offset;

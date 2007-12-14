@@ -194,7 +194,7 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if ($_.hasClassName('druid_page'))
                     this.pages.push(IWL.Druid.Page.create($_, this));
             }.bind(this));
-            
+
             var count = 3;
             function buttonLoad() {
                 if (--count > 0) return;
@@ -212,12 +212,12 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         this.nextButton.finish.apply(this.nextButton.finish_this);
                     else
                        this.currentPage.emitEvent('IWL-Druid-Page-final', {},
-                           {id: this.currentPage.id}); 
+                           {id: this.currentPage.id});
                     return;
                 }
                 if (this.currentPage.hasEvent('IWL-Druid-Page-next'))
                     this.currentPage.emitEvent('IWL-Druid-Page-next', {},
-                        {id: this.currentPage.id}); 
+                        {id: this.currentPage.id});
                 else {
                     var page = this.currentPage.nextPage();
                     if (page) page.setSelected(true);
@@ -226,7 +226,7 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.backButton.signalConnect('click', function () {
                 if (this.currentPage.hasEvent('IWL-Druid-Page-previous'))
                     this.currentPage.emitEvent('IWL-Druid-Page-previous', {},
-                        {id: this.currentPage.id}); 
+                        {id: this.currentPage.id});
                 else {
                     var page = this.currentPage.prevPage();
                     if (page) page.setSelected(true, true);
@@ -242,12 +242,12 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var pos = this.pages.indexOf(this.currentPage);
             var next = true;
             var back = true;
-           
+
             if (pos == 0 && !this.currentPage.hasEvent('IWL-Druid-Page-previous'))
                 back = false;
             if (pos == this.pages.length - 1 && !this.currentPage.hasEvent('IWL-Druid-Page-next'))
                 next = false;
-            
+
             if (this.currentPage.isFinal()) {
                 next = true;
                 this.nextButton.setLabel(this.finishText);
@@ -285,13 +285,13 @@ IWL.Druid.Page = Object.extend(Object.extend({}, IWL.Widget), (function () {
         ["final", "next", "previous"].each(function(type) {
             if (!(type in extras)) return;
             if (!(extras[type]['url'])) return;
-            var options = Object.extend(extras[type]['options'] || {}, 
-                {method: type == 'next' 
-                         ? '_nextResponse' 
-                         : type == 'previous' 
+            var options = Object.extend(extras[type]['options'] || {},
+                {method: type == 'next'
+                         ? '_nextResponse'
+                         : type == 'previous'
                            ? '_previousResponse' : null
                 });
-            new_page.registerEvent('IWL-Druid-Page-' + type, extras[type]['url'], 
+            new_page.registerEvent('IWL-Druid-Page-' + type, extras[type]['url'],
                 extras[type]['params'], options);
         });
         new_page.setSelected(true);
@@ -430,7 +430,7 @@ IWL.Druid.Page = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 callback: this.readAttribute('iwl:druidCheckCallback'),
                 param: unescape(this.readAttribute('iwl:druidCheckParam') || '[]').evalJSON(),
                 collect: false
-            }
+            };
             if (this.check.param) {
                 this.check.collect = this.check.param.pop();
                 this.check.param = this.check.param.shift();

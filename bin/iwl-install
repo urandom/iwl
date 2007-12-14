@@ -252,7 +252,7 @@ sub packjs {
 
     $/ = $old;
 
-    print OUTFILE Pack::pack($js, 62, 1, 1);
+    print OUTFILE Pack::pack($js, 62, 1, 0);
     close OUTFILE;
 }
 

@@ -67,7 +67,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if(!update.style.position || update.style.position=='absolute') {
             update.style.position = 'absolute';
             update.clonePosition(this, {
-                setHeight: false, 
+                setHeight: false,
                 setWidth: false,
                 offsetTop: this.offsetHeight
             });
@@ -125,9 +125,9 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             }, arguments[1] || {});
 
             this.cleanWhitespace();
-            this.image1 = $(id + '_left');
-            this.image2 = $(id + '_right');
-            this.control   = $(id + '_text');
+            this.image1  = $(id + '_left');
+            this.image2  = $(id + '_right');
+            this.control = $(id + '_text');
 
             if (this.options.clearButton)
                 this.image2.signalConnect('click', clearButtonCallback.bind(this));
@@ -165,7 +165,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 }
             }
 
-            this.control.signalConnect('change', changeCallback.bind(this))
+            this.control.signalConnect('change', changeCallback.bind(this));
             changeCallback.call(this);
         }
     }

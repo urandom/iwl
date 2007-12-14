@@ -738,7 +738,7 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (this.options.startDate instanceof Date)
                 this.startDate = this.date = this.options.startDate;
             else if (typeof this.options.startDate == 'number')
-                this.startDate = this.date = new Date(this.options.startDate)
+                this.startDate = this.date = new Date(this.options.startDate);
             else if (this.options.startDate.join) {
                 var date = this.options.startDate;
                 this.date = new Date();

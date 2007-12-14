@@ -10,7 +10,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             throw new Error('An element with id "' + id + '" already exists!');
             return false;
         }
-        
+
         if (!container)
             container = new Element('div', {className: 'tooltip', id: id});
         var content = new Element('div', {className: 'tooltip_content'});
@@ -242,7 +242,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 this.content.update(unescape(elements));
             } else if (typeof elements == 'object') {
                 if (Object.isElement(elements))
-                    this.content.appendChild(elements)
+                    this.content.appendChild(elements);
                 else
                     $A(elements).each(function($_) {
                         if (Object.isElement($_)) this.content.appendChild($_)
@@ -302,7 +302,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 content: false,
                 bind: false,
                 bindHide: false
-            }, arguments[1] || {})
+            }, arguments[1] || {});
             if (!id) id = 'tooltip_' + Math.random();
             return build.call(this, id);
         },

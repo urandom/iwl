@@ -188,7 +188,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var middle;
         var height = 0;
         var resizerName = this._resizer ? this._resizer.options.className : '';
-        var className =$A(this.classNames()).first(); 
+        var className =$A(this.classNames()).first();
         this.childElements().each(function($_) {
             if ($_.hasClassName(className + '_middle')) {
                 middle = $_;
