@@ -1,5 +1,3 @@
-// script.aculo.us effects.js v1.8.0, Tue Nov 06 15:01:40 +0300 2007
-
 // Copyright (c) 2005-2007 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
 // Contributors:
 //  Justin Palmer (http://encytemedia.com/)
@@ -1092,7 +1090,7 @@ Effect.Methods = {
     return element;
   },
   visualEffect: function(element, effect, options) {
-      element = $(element);
+    element = $(element);
     var s = effect.dasherize().camelize(), klass = s.charAt(0).toUpperCase() + s.substring(1);
     new Effect[klass](element, options);
     return element;
