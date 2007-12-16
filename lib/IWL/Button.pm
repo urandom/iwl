@@ -64,7 +64,7 @@ Where B<STOCK_ID> is the B<IWL::Stock> id.
 
 Fires when the button has finished loading
 
-=item B<load>
+=item B<adjust>
 
 Fires when the button has finished adjusting
 

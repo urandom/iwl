@@ -46,6 +46,7 @@ use IWL::Page::Link;
 use IWL::Page::Meta;
 use IWL::Page;
 use IWL::PageControl;
+use IWL::ProgressBar;
 use IWL::RadioButton;
 use IWL::Response;
 use IWL::RPC;

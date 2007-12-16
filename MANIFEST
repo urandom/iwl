@@ -67,6 +67,7 @@ lib/IWL/Page/Meta.pm
 lib/IWL/Page/Title.pm
 lib/IWL/PageControl.pm
 lib/IWL/Parser.pm
+lib/IWL/ProgressBar.pm
 lib/IWL/Response.pm
 lib/IWL/RPC.pm
 lib/IWL/RPC/Request.pm
@@ -241,6 +242,7 @@ share/jscript/iconbox.js
 share/jscript/menu.js
 share/jscript/notebook.js
 share/jscript/pagecontrol.js
+share/jscript/progressbar.js
 share/jscript/prototype_extensions.js
 share/jscript/resizer.js
 share/jscript/scriptaculous_extensions.js
@@ -309,6 +311,7 @@ t/40inputbutton.t
 t/40list.t
 t/40menu_item.t
 t/40notebook.t
+t/40progressbar.t
 t/40submitimage.t
 t/40textarea.t
 t/40tree_cell.t

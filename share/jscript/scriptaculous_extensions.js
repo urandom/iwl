@@ -52,6 +52,25 @@ Object.extend(Effect, {
         parent_element.scrollLeft = scrollOffsets.left, parent_element.scrollTop = p.round()
       }
     );
+  },
+  Pulsate: function(element) {
+    element = $(element);
+    var options = Object.extend({
+      distance: 20,
+      duration: 0.5,
+      afterFinish: Prototype.emptyFunction
+    }, arguments[1] || {});
+    var distance = parseFloat(options.distance);
+    var split = parseFloat(options.duration) / 10.0;
+    var oldStyle = {
+      top: element.getStyle('top'),
+      left: element.getStyle('left') };
+      return new Effect.Move(element,
+        { x:  distance, y: 0, duration: split, afterFinishInternal: function(effect) {
+      new Effect.Move(effect.element,
+        { x: -distance, y: 0, duration: split*2, afterFinish: options.afterFinish, afterFinishInternal: function(effect) {
+          effect.element.undoPositioned().setStyle(oldStyle);
+    }}) }});
   }
 });
 

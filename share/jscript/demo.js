@@ -28,6 +28,22 @@ function sortTheMoney(col_index) {
     };
 }
 
+function animate_progress_bar(backwards) {
+    var progress = $('progress');
+    var value = progress.getValue();
+    if (value == 1 && !backwards)
+        return animate_progress_bar.bind(this, !backwards).delay(1);
+    if (value == 0 && backwards)
+        return animate_progress_bar.bind(this, !backwards).delay(1);
+
+    if (backwards)
+        value -= 0.01;
+    else
+        value += 0.01;
+    progress.setValue(value);
+    animate_progress_bar.bind(this, backwards).delay(0.1);
+}
+
 function run_prototype_tests() {
     var test_span;
     document.insertScript(IWL.Config.JS_DIR + '/entry.js', {debug: true});

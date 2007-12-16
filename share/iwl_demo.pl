@@ -1,5 +1,4 @@
 #! /usr/local/bin/perl
-#! /usr/local/bin/perl -d:ptkdb
 # vim: set autoindent shiftwidth=4 tabstop=8:
 
 use strict;
@@ -290,6 +289,7 @@ sub build_advanced_widgets {
     my $sliders = IWL::Tree::Row->new(id => 'sliders_row');
     my $iconbox = IWL::Tree::Row->new(id => 'iconbox_row');
     my $menus = IWL::Tree::Row->new(id => 'menus_row');
+    my $progress = IWL::Tree::Row->new(id => 'progress_bars_row');
     my $list = IWL::Tree::Row->new(id => 'list_row');
     my $table = IWL::Tree::Row->new(id => 'table_row');
     my $tree = IWL::Tree::Row->new(id => 'tree_row');
@@ -304,6 +304,8 @@ sub build_advanced_widgets {
     $row->appendRow($iconbox);
     $menus->appendTextCell('Menus');
     $row->appendRow($menus);
+    $progress->appendTextCell('Progress bars');
+    $row->appendRow($progress);
     $tables->appendTextCell('Tables');
     $row->appendRow($tables);
     $list->appendTextCell('List');
@@ -313,7 +315,7 @@ sub build_advanced_widgets {
     $tree->appendTextCell('Tree');
     $tables->appendRow($tree);
 
-    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $list, $table, $tree);
+    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $progress, $list, $table, $tree);
 }
 
 sub build_containers {
@@ -631,6 +633,18 @@ sub generate_menus {
     });
     $submenu->appendMenuItem("Submenu item $_")->setType('check')->setId($_) foreach (1 .. 20);
 
+    return $container;
+}
+
+sub generate_progress_bars {
+    my $container = IWL::Container->new(id => 'menus_container');
+    my $progress  = IWL::ProgressBar->new(id => 'progress');
+    my $pulsating = IWL::ProgressBar->new(pulsate => 1, id => 'pulsating');
+    my $script    = IWL::Script->new->setScript("animate_progress_bar.delay(1)");
+
+    $progress->setText("Overall progress: #{percent}")->setValue(0.37);
+    $pulsating->signalConnect(click => '$(this).isPulsating() ? this.setPulsate(false) : this.setPulsate(true)');
+    $container->appendChild($progress, $pulsating, $script);
     return $container;
 }
 
@@ -1229,6 +1243,8 @@ sub show_the_code_for {
 	$paragraph->appendTextType(read_code("generate_iconbox", 23), 'pre');
     } elsif ($code_for eq 'menus_container') {
 	$paragraph->appendTextType(read_code("generate_menus", 40), 'pre');
+    } elsif ($code_for eq 'progress_bars_container') {
+	$paragraph->appendTextType(read_code("generate_progress_bars", 11), 'pre');
     } elsif ($code_for eq 'list_container') {
 	$paragraph->appendTextType(read_code("generate_list", 45), 'pre');
     } elsif ($code_for eq 'table_container') {

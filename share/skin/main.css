@@ -214,7 +214,7 @@ button.button, input.inputbutton {
     border: 1px solid #7F9DB9;
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
     font-size: 16px;
-    line-height: 16px;
+    height: 16px;
     margin: 1px 0;
 }
 
@@ -1517,4 +1517,25 @@ div.tooltip_content {
 }
 .expander_label {
     font-size: 13px;
+}
+
+/* Progress Bar */
+.progress_bar {
+    border: 1px solid #7F9DB9;
+    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    height: 16px;
+    margin: 1px;
+}
+
+.progress_bar_block {
+    height: 16px;
+    background: #81aec0;
+}
+
+.progress_bar_label {
+    line-height: 14px;
+    font-size: 14px;
+    width: 100%;
+    margin: -16px 0 0 0;
+    text-align: center;
 }
