@@ -68,7 +68,7 @@ Object.extend(Effect, {
       return new Effect.Move(element,
         { x:  distance, y: 0, duration: split, afterFinishInternal: function(effect) {
       new Effect.Move(effect.element,
-        { x: -distance, y: 0, duration: split*2, afterFinish: options.afterFinish, afterFinishInternal: function(effect) {
+        { x: -distance, y: 0, duration: split, afterFinish: options.afterFinish, afterFinishInternal: function(effect) {
           effect.element.undoPositioned().setStyle(oldStyle);
     }}) }});
   }
