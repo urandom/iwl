@@ -1,0 +1,16 @@
+svn-commit.tmp
+~$
+.swp$
+x-.*$
+.svn
+^MANIFEST\.
+^Makefile$
+^blib/
+\.old$
+^#.*#$
+^\.#
+\.tar.gz$
+\.bak$
+IWL-\d.\d+
+^Build$
+^_build/
