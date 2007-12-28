@@ -88,6 +88,7 @@ sub __parser {
             $token->set_content('&&') if $token->content eq 'and';
             $token->set_content('||') if $token->content eq 'or';
             $token->set_content('!')  if $token->content eq 'not';
+            $token->set_content('.')  if $token->content eq '->';
         } elsif ($token->isa('PPI::Token::Word')) {
             $token->set_content('var')     if $token->content =~ /my|our|local/;
             $token->set_content('for')     if $token->content eq 'foreach';
@@ -130,7 +131,7 @@ sub __parseSimpleStatement {
                     $self->__parseToken($_);
                 }
             }
-            if ($assignment) {
+            if ($assignment || $self->__previousIsMethod($child)) {
                 if ($sigil eq '@') {
                     $child->{start}->set_content('[');
                     $child->{finish}->set_content(']');
@@ -138,8 +139,10 @@ sub __parseSimpleStatement {
                     $child->{start}->set_content('{');
                     $child->{finish}->set_content('}');
                     my $operators = $child->find(sub {$_[1]->isa('PPI::Token::Operator') && $_[1] eq ','});
-                    for (my $j = 0; $j < @$operators; $j += 2) {
-                        $operators->[$j]->set_content(':');
+                    if ($operators) {
+                        for (my $j = 0; $j < @$operators; $j += 2) {
+                            $operators->[$j]->set_content(':');
+                        }
                     }
                 }
             } else {
@@ -229,6 +232,15 @@ sub __walker {
         $list->{$names->[$i]} = {value => $values->[$i], string => $padlist->ARRAYelt($depth)->ARRAYelt($i)->isa('B::PV')};
     }
     return $list;
+}
+
+sub __previousIsMethod {
+    my ($self, $element) = @_;
+    return unless $element->sprevious_sibling->isa('PPI::Token::Word')
+      && $element->sprevious_sibling->content ne 'var';
+    my $sprev = $element->sprevious_sibling->sprevious_sibling;
+    return 1 unless $sprev;
+    return 1 if $sprev->isa('PPI::Token::Operator');
 }
 
 1;
