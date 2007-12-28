@@ -137,6 +137,10 @@ sub __parseSimpleStatement {
                 } elsif ($sigil eq '%') {
                     $child->{start}->set_content('{');
                     $child->{finish}->set_content('}');
+                    my $operators = $child->find(sub {$_[1]->isa('PPI::Token::Operator') && $_[1] eq ','});
+                    for (my $j = 0; $j < @$operators; $j += 2) {
+                        $operators->[$j]->set_content(':');
+                    }
                 }
             } else {
                 $child->{start}->set_content(' ');
