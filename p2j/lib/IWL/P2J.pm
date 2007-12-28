@@ -99,7 +99,9 @@ sub __parser {
 
     $self->__parseStatement($_) foreach $document->children;
 
-    return $document->content;
+    my $js = $document->content;
+    $js =~ s/[ ]+/ /g;
+    return $js;
 }
 
 sub __parseStatement {
@@ -202,7 +204,7 @@ sub __parseToken {
               ? $self->{__pad}{$token->content}{string}
                 ? '"' . $self->{__pad}{$token->content}{value} . '"'
                 : $self->{__pad}{$token->content}{value}
-              : $token->content;
+              : $name;
             $token->set_content($pad_value);
         }
     }
