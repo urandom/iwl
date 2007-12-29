@@ -6,6 +6,7 @@ package IWL::P2J;
 use strict;
 
 use B::Deparse;
+use IWL::JSON 'toJSON';
 use PPI::Document;
 
 use vars qw($VERSION);
@@ -214,31 +215,11 @@ sub __parseToken {
             $token->set_content($name);
         } else {
             my $pad_value = $self->{__pad}{$token->content}
-              ? $self->{__pad}{$token->content}{string}
-                ? '"' . $self->{__pad}{$token->content}{value} . '"'
-                : $self->{__pad}{$token->content}{value}
+              ? toJSON($self->{__pad}{$token->content}{value})
               : $name;
             $token->set_content($pad_value);
         }
     }
-}
-
-# Gets all 'outside' local lexical variables for the subref
-sub __walker {
-    my $self    = shift;
-    my $cv      = B::svref_2object(shift);
-    my $depth   = $cv->DEPTH ? $cv->DEPTH : 1;
-    my $padlist = $cv->PADLIST;
-    my %outside = map {$_ => 1} grep {defined $_} @{$cv->OUTSIDE->PADLIST->ARRAYelt(0)->object_2svref};
-    my $names   = $padlist->ARRAYelt(0)->object_2svref;
-    my $values  = $padlist->ARRAYelt($depth)->object_2svref;
-    my $list    = {};
-    for (my $i = 0; $i < @$names; ++$i) {
-        next unless defined $names->[$i];
-        next unless $outside{$names->[$i]};
-        $list->{$names->[$i]} = {value => $values->[$i], string => $padlist->ARRAYelt($depth)->ARRAYelt($i)->isa('B::PV')};
-    }
-    return $list;
 }
 
 # Checks whether the element's previous sibling is a method/function
@@ -249,6 +230,27 @@ sub __previousIsMethod {
     my $sprev = $element->sprevious_sibling->sprevious_sibling;
     return 1 unless $sprev;
     return 1 if $sprev->isa('PPI::Token::Operator');
+}
+
+# Gets all 'outside' local lexical variables for the subref
+sub __walker {
+    my $self    = shift;
+    my $cv      = B::svref_2object(shift);
+    my $depth   = $cv->DEPTH ? $cv->DEPTH : 1;
+    my $padlist = $cv->PADLIST;
+    my %outside = map {$_ => 1} grep {defined $_} @{$cv->OUTSIDE->PADLIST->ARRAYelt(0)->object_2svref};
+    my $names   = $padlist->ARRAYelt(0)->object_2svref;
+    my $values  = [map {$_->object_2svref} $padlist->ARRAYelt($depth)->ARRAY];
+    my $list    = {};
+    for (my $i = 0; $i < @$names; ++$i) {
+        next unless defined $names->[$i];
+        next unless $outside{$names->[$i]};
+        $list->{$names->[$i]} = {
+            value => $values->[$i],
+            type => ref $padlist->ARRAYelt($depth)->ARRAYelt($i),
+        };
+    }
+    return $list;
 }
 
 1;
