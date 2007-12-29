@@ -88,11 +88,17 @@ sub __parser {
             $token->set_content('&&') if $token->content eq 'and';
             $token->set_content('||') if $token->content eq 'or';
             $token->set_content('!')  if $token->content eq 'not';
-            $token->set_content('.')  if $token->content eq '->';
         } elsif ($token->isa('PPI::Token::Word')) {
             $token->set_content('var')     if $token->content =~ /my|our|local/;
             $token->set_content('for')     if $token->content eq 'foreach';
             $token->set_content('else if') if $token->content eq 'elsif';
+            
+            if (index($token->content, '::') != -1) {
+                my $content = $token->content;
+
+                $content =~ s/::/./g;
+                $token->set_content($content);
+            }
         }
 
         return '';
@@ -217,6 +223,7 @@ sub __parseToken {
     }
 }
 
+# Gets all 'outside' local lexical variables for the subref
 sub __walker {
     my $self    = shift;
     my $cv      = B::svref_2object(shift);
@@ -234,6 +241,7 @@ sub __walker {
     return $list;
 }
 
+# Checks whether the element's previous sibling is a method/function
 sub __previousIsMethod {
     my ($self, $element) = @_;
     return unless $element->sprevious_sibling->isa('PPI::Token::Word')
