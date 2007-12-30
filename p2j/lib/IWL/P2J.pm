@@ -8,6 +8,7 @@ use strict;
 use B::Deparse;
 use IWL::JSON 'toJSON';
 use PPI::Document;
+use Scalar::Util qw(blessed);
 
 use vars qw($VERSION);
 
@@ -215,7 +216,14 @@ sub __parseToken {
             $token->set_content($name);
         } else {
             my $pad_value = $self->{__pad}{$token->content}
-              ? toJSON($self->{__pad}{$token->content}{value})
+              ? do {
+                    my $value = $self->{__pad}{$token->content}{value};
+                    if (ref $value eq 'REF' && blessed $$value) {
+                        $self->__getExpressionValue($token, $$value);
+                    } else {
+                        toJSON($value)
+                    }
+                }
               : $name;
             $token->set_content($pad_value);
         }
@@ -227,9 +235,36 @@ sub __previousIsMethod {
     my ($self, $element) = @_;
     return unless $element->sprevious_sibling->isa('PPI::Token::Word')
       && $element->sprevious_sibling->content ne 'var';
-    my $sprev = $element->sprevious_sibling->sprevious_sibling;
-    return 1 unless $sprev;
-    return 1 if $sprev->isa('PPI::Token::Operator');
+    return 1;
+}
+
+# Get the object expression ($example->method()[->method2()...] or $$example{foo}{bar})
+sub __getExpressionValue {
+    my ($self, $element, $value) = @_;
+    my ($start, $ret, $sprev) = ($element->snext_sibling, $value, $element->sprevious_sibling);
+
+    $sprev->remove if $sprev->isa('PPI::Token::Cast') && $sprev->content eq '$';
+    while (1) {
+        $sprev = $start->sprevious_sibling;
+        $sprev->remove unless $sprev == $element;
+        if ($start->isa('PPI::Token::Operator') && $start->content eq '->') {
+            $start = $start->snext_sibling and next;
+        } elsif ($start->isa('PPI::Token::Word') && $sprev->isa('PPI::Token::Operator')) {
+            my $method = $start->content;
+            $ret = $ret->$method;
+        } elsif ($start->isa('PPI::Structure::Subscript') && $start->start->content eq '{') {
+            my $property = ($start->children)[0]->content;
+            $property =~ s/^'// and $property =~ s/'$//;
+            $ret = $ret->{$property};
+        } elsif ($start->isa('PPI::Structure::Subscript') && $start->start->content eq '[') {
+            my $property = ($start->children)[0]->content;
+            $ret = $ret->[$property];
+        } else {
+            last;
+        }
+        $start = $start->snext_sibling;
+    }
+    return toJSON($ret);
 }
 
 # Gets all 'outside' local lexical variables for the subref

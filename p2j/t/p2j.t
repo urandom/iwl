@@ -1,6 +1,7 @@
-use Test::More tests => 30;
+use Test::More tests => 36;
 
-BEGIN { use_ok('IWL::P2J') }
+BEGIN { use_ok('IWL::P2J'); push @INC, "./t"; }
+use Foo;
 
 my $p = IWL::P2J->new;
 
@@ -44,6 +45,7 @@ sub test_lexical {
     my %d = (a => 1, b => $a);
     my $e = [7,8,9];
     my $f = {c => $b , d => $e};
+    my $g = Foo->new;
 
     is($p->convert(sub {my $v = $a}), 'var v = 42;');
     is($p->convert(sub {my $v = $b}), 'var v = "foo";');
@@ -51,6 +53,12 @@ sub test_lexical {
     is($p->convert(sub {my $v = %d}), 'var v = {"a": 1, "b": 42};');
     is($p->convert(sub {my $v = $e}), 'var v = [7, 8, 9];');
     is($p->convert(sub {my $v = $f}), 'var v = {"c": "foo", "d": [7, 8, 9]};');
+    is($p->convert(sub {my $v = $g->printJS}), 'var v = "Hello JS.";');
+    is($p->convert(sub {my $v = $g->overloaded}), 'var v = 1;');
+    is($p->convert(sub {my $v = $g->this->overloaded}), 'var v = 1;');
+    is($p->convert(sub {my $v = $g->{prop1}}), 'var v = 42;');
+    is($p->convert(sub {my $v = $g->this->{prop1}}), 'var v = 42;');
+    is($p->convert(sub {my $v = $g->{prop2}[0]}), 'var v = "am";');
 }
 
 test_general;

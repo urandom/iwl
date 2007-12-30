@@ -14,3 +14,4 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/IWL/P2J.pm
 t/p2j.t
+t/Foo.pm
