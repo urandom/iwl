@@ -102,7 +102,7 @@ sub __parser {
         return '';
     });
 
-    $self->__parseStatement($_) foreach $document->children;
+    $self->__parseStatement($_) foreach $document->schildren;
 
     my $js = $document->content;
     $js =~ s/[ ]+/ /g;
@@ -126,9 +126,9 @@ sub __parseStatement {
 sub __parseSimpleStatement {
     my ($self, $statement) = @_;
     my ($i, $assignment, $operator, $sigil) = (-1, '');
-    foreach my $child ($statement->children) {
+    foreach my $child ($statement->schildren) {
         ++$i;
-        next if $child->isa('PPI::Token::Whitespace') || !$child->parent;
+        next if !$child->parent;
         if ($child->isa('PPI::Structure::List')) {
             my $symbols = $child->find('Token::Symbol');
             if ($symbols) {
@@ -217,9 +217,9 @@ sub __parseSimpleStatement {
 sub __parseCompoundStatement {
     my ($self, $statement) = @_;
     my ($i, $assignment, $operator, $sigil) = (-1, '');
-    foreach my $child ($statement->children) {
+    foreach my $child ($statement->schildren) {
         ++$i;
-        next if $child->isa('PPI::Token::Whitespace') || !$child->parent;
+        next if !$child->parent;
         if ($child->isa('PPI::Token::Word') && {if => 1, unless => 1, while => 1, until => 1, foreach => 1, for => 1}->{$child->content}) {
             if ($child->content eq 'unless' || $child->content eq 'until') {
                 my $list = $child->snext_sibling;
@@ -236,8 +236,8 @@ sub __parseCompoundStatement {
                     $self->__parseToken($_);
                 }
             }
-        } elsif ($child->isa('PPI::Structure::Block')) {
-            $self->__parseStatement($_) foreach $child->children;
+        } elsif ($child->isa('PPI::Structure::Block') || $child->isa('PPI::Structure::ForLoop')) {
+            $self->__parseStatement($_) foreach $child->schildren;
         }
     }
 }
