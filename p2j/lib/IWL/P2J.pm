@@ -93,9 +93,10 @@ sub __parser {
             $token->set_content('||') if $token->content eq 'or';
             $token->set_content('!')  if $token->content eq 'not';
         } elsif ($token->isa('PPI::Token::Word')) {
-            $token->set_content('var')     if $token->content =~ /my|our|local/;
-            $token->set_content('for')     if $token->content eq 'foreach';
-            $token->set_content('else if') if $token->content eq 'elsif';
+            $token->set_content('var')      if $token->content =~ /my|our|local/;
+            $token->set_content('for')      if $token->content eq 'foreach';
+            $token->set_content('else if')  if $token->content eq 'elsif';
+            $token->set_content('function') if $token->content eq 'sub';
         }
 
         return '';
@@ -110,12 +111,14 @@ sub __parser {
 
 sub __parseStatement {
     my ($self, $statement) = @_;
-    my $js = '';
+    my ($ref, $js) = (ref $statement, '');
 
     return $js unless $statement->isa('PPI::Statement');
 
     $self->__parseSimpleStatement($statement)
-      if ref $statement eq 'PPI::Statement' || ref $statement eq 'PPI::Statement::Variable';
+      if $ref eq 'PPI::Statement' || $ref eq 'PPI::Statement::Variable';
+    $self->__parseCompoundStatement($statement)
+      if $ref eq 'PPI::Statement::Compound';
 
     return;
 }
@@ -207,6 +210,34 @@ sub __parseSimpleStatement {
                 $sigil = $child->symbol_type;
             }
             $self->__parseToken($child);
+        }
+    }
+}
+
+sub __parseCompoundStatement {
+    my ($self, $statement) = @_;
+    my ($i, $assignment, $operator, $sigil) = (-1, '');
+    foreach my $child ($statement->children) {
+        ++$i;
+        next if $child->isa('PPI::Token::Whitespace') || !$child->parent;
+        if ($child->isa('PPI::Token::Word') && {if => 1, unless => 1, while => 1, until => 1, foreach => 1, for => 1}->{$child->content}) {
+            if ($child->content eq 'unless' || $child->content eq 'until') {
+                my $list = $child->snext_sibling;
+                $child->set_content('if') if $child->content eq 'unless';
+                $child->set_content('while') if $child->content eq 'until';
+                $list->start->set_content('(!(');
+                $list->finish->set_content('))');
+            }
+        } elsif ($child->isa('PPI::Structure::Condition')) {
+            my $symbols = $child->find('Token::Symbol');
+            if ($symbols) {
+                foreach (@$symbols) {
+                    $sigil = $_->symbol_type;
+                    $self->__parseToken($_);
+                }
+            }
+        } elsif ($child->isa('PPI::Structure::Block')) {
+            $self->__parseStatement($_) foreach $child->children;
         }
     }
 }
