@@ -15,6 +15,10 @@ sub overloaded {
 sub this {
     return shift;
 }
+sub printArgs {
+    shift if ref $_[0] eq __PACKAGE__ || $_[0] eq __PACKAGE__;
+    return join ', ', @_;
+}
 
 package Bar;
 

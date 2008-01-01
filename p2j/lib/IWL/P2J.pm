@@ -6,11 +6,13 @@ package IWL::P2J;
 use strict;
 
 use B::Deparse;
-use IWL::JSON 'toJSON';
+use IWL::JSON;
 use PPI::Document;
 use Scalar::Util qw(blessed);
 
 use vars qw($VERSION);
+
+my $ignore_json = 0;
 
 $VERSION = '0.01';
 
@@ -94,13 +96,6 @@ sub __parser {
             $token->set_content('var')     if $token->content =~ /my|our|local/;
             $token->set_content('for')     if $token->content eq 'foreach';
             $token->set_content('else if') if $token->content eq 'elsif';
-            
-            if (index($token->content, '::') != -1) {
-                my $content = $token->content;
-
-                $content =~ s/::/./g;
-                $token->set_content($content);
-            }
         }
 
         return '';
@@ -130,7 +125,7 @@ sub __parseSimpleStatement {
     my ($i, $assignment, $operator, $sigil) = (-1, '');
     foreach my $child ($statement->children) {
         ++$i;
-        next if $child->isa('PPI::Token::Whitespace');
+        next if $child->isa('PPI::Token::Whitespace') || !$child->parent;
         if ($child->isa('PPI::Structure::List')) {
             my $symbols = $child->find('Token::Symbol');
             if ($symbols) {
@@ -170,7 +165,7 @@ sub __parseSimpleStatement {
             my $brace = PPI::Token->new;
             my @elements = ($child, $brace);
             my $next = $child;
-            $child->previous_sibling->remove if $child->previous_sibling->isa('PPI::Token::Whitespace');
+            $child->previous_sibling->delete if $child->previous_sibling->isa('PPI::Token::Whitespace');
             while ($next = $next->next_sibling) {
                 last if $next->isa('PPI::Token::Structure') && $next->content eq ';';
                 push @elements, $next;
@@ -185,6 +180,25 @@ sub __parseSimpleStatement {
             $brace->set_content($modifier . ') ');
             push @elements, $brace;
             $first->insert_before($_->remove) foreach @elements;
+        } elsif ($child->isa('PPI::Token::Word') && $child->content ne 'var' && $child->snext_sibling->isa('PPI::Structure::List')) {
+            # Functions
+            my @composition = split /::/, $child->content;
+            my $function    = pop @composition;
+            my $package     = (join '::', @composition) || 'main';
+            my $coderef;
+            {
+                no strict 'refs';
+                $coderef = *{"${package}::${function}"}{CODE};
+            }
+            if ($coderef) {
+                $child->set_content($self->__getFunctionValue($child, $coderef));
+            } else {
+                $child->set_content(join '.', @composition, $function);
+            }
+        } elsif ($child->isa('PPI::Token::Quote')
+                 && $child->snext_sibling->isa('PPI::Token::Operator')
+                 && $child->snext_sibling->content eq '->') {
+            $child->set_content($self->__getExpressionValue($child, $child->string));
         } elsif ($child->isa('PPI::Token')) {
             if ($child->isa('PPI::Token::Operator')) {
                 $operator = 1;
@@ -228,6 +242,7 @@ sub __parseToken {
             $token->set_content($pad_value);
         }
     }
+    return $self;
 }
 
 # Checks whether the element's previous sibling is a method/function
@@ -238,20 +253,21 @@ sub __previousIsMethod {
     return 1;
 }
 
-# Get the object expression ($example->method()[->method2()...] or $$example{foo}{bar})
+# Get the object expression ($example->method()[->method2()...], $$example{foo}{bar}, or Example->method())
 sub __getExpressionValue {
     my ($self, $element, $value) = @_;
     my ($start, $ret, $sprev) = ($element->snext_sibling, $value, $element->sprevious_sibling);
 
-    $sprev->remove if $sprev->isa('PPI::Token::Cast') && $sprev->content eq '$';
+    $sprev->delete if $sprev->isa('PPI::Token::Cast') && $sprev->content eq '$';
     while (1) {
         $sprev = $start->sprevious_sibling;
-        $sprev->remove unless $sprev == $element;
+        $sprev->delete unless $sprev == $element;
         if ($start->isa('PPI::Token::Operator') && $start->content eq '->') {
             $start = $start->snext_sibling and next;
         } elsif ($start->isa('PPI::Token::Word') && $sprev->isa('PPI::Token::Operator')) {
             my $method = $start->content;
-            $ret = $ret->$method;
+            my @args = $self->__getArguments($start->snext_sibling);
+            $ret = $ret->$method(@args);
         } elsif ($start->isa('PPI::Structure::Subscript') && $start->start->content eq '{') {
             my $property = ($start->children)[0]->content;
             $property =~ s/^'// and $property =~ s/'$//;
@@ -265,6 +281,39 @@ sub __getExpressionValue {
         $start = $start->snext_sibling;
     }
     return toJSON($ret);
+}
+
+# Returns a perl function value (foo() or Foo::bar())
+sub __getFunctionValue {
+    my ($self, $element, $coderef) = @_;
+    my $list = $element->snext_sibling;
+
+    return toJSON($coderef->($self->__getArguments($list)));
+}
+
+# Returns a list of arguments, which are to be passed to a function/method
+sub __getArguments {
+    my ($self, $list) = @_;
+    return () unless $list->isa('PPI::Structure::List');
+    my ($element, @args) = $list->children ? ((($list->children)[0])->children)[0] : ();
+    $list->delete and return () unless $element;
+
+    $ignore_json = 1;
+    do {{
+        next if $element->isa('PPI::Token::Operator');
+        if ($element->isa('PPI::Token::Symbol')) {
+            $self->__parseToken($element);
+            push @args, $element->content;
+        } elsif ($element->isa('PPI::Token::Quote')) {
+            push @args, $element->string;
+        } else {
+            push @args, $element->content;
+        }
+    }} while ($element = $element->snext_sibling);
+    $ignore_json = 0;
+
+    $list->delete;
+    return @args;
 }
 
 # Gets all 'outside' local lexical variables for the subref
@@ -286,6 +335,17 @@ sub __walker {
         };
     }
     return $list;
+}
+
+# Local toJSON
+sub toJSON {
+    my $data = shift;
+    return IWL::JSON::toJSON($data) unless $ignore_json;
+    my $ref = ref $data;
+    if ($ref eq 'SCALAR' || $ref eq 'REF') {
+        $data = $$data;
+    }
+    return $data;
 }
 
 1;
