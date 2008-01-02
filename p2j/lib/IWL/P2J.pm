@@ -244,16 +244,40 @@ sub __parseCompoundStatement {
             if ($child->schildren == 1) {
                 my $s = ($child->children)[0];
                 my $operator = $s->find_first('Token::Operator');
+                my $elements = $s->find(
+                    sub {
+                        return 1 if $_[1]->isa('PPI::Token::Number');
+                        $self->__parseToken($_[1]) and return 1 if ($_[1]->isa('PPI::Token::Symbol'));
+                    }
+                );
+                my $content = PPI::Token->new;
 
-                # Range
                 if ($operator && $operator->content eq '..') {
-                    my $range = $s->find('Token::Number');
-                    my $content = PPI::Token->new;
+                    # Range
                     $content->set_content(
-                        'var _ = ' . $range->[0]->content . '; _ < ' . ($range->[1]->content + 1) . '; ++_'
+                        'var _ = ' . $elements->[0]->content . '; _ < ' . ($elements->[1]->content + 1) . '; ++_'
                     );
                     $_->delete foreach $s->children;
                     $s->add_element($content);
+                } elsif ($operator && $operator->content eq ',') {
+                    # Anonymous array
+                    my $array = PPI::Token->new;
+                    my $st = PPI::Statement->new;
+                    $array->set_content(
+                        'var _$ = [' . join(',', map {$_->content} @$elements) . '];'
+                    );
+                    $st->add_element($array);
+                    $statement->insert_before($st);
+                    $content->set_content(
+                        'var i = 0, _ = _$[0]; i < _$.length; _ = _$[++i]'
+                    );
+                    $_->delete foreach $s->children;
+                    $s->add_element($content);
+                    $st = PPI::Statement->new;
+                    $array = PPI::Token->new;
+                    $array->set_content('delete _$;');
+                    $st->add_element($array);
+                    $statement->insert_after($st);
                 }
             } else {
                 $self->__parseStatement($_) foreach $child->schildren;

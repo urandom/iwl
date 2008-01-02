@@ -30,11 +30,11 @@ sub test_general {
     is($p->convert(sub {my $a = 12; until ($a) {my $b = $a / 2}}), "var a = 12;while (!(a)) {var b = a / 2;}");
     is($p->convert(sub {my $a = 12; for (my $i = 0; $i < 100; ++$i) {my $b = $a / 2}}), "var a = 12;for (var i = 0; i < 100; ++i) {var b = a / 2;}");
     is($p->convert(sub {my $a = 12; for (1 .. 100) {my $b = $a / 2}}), "var a = 12;for (var _ = 1; _ < 101; ++_) {var b = a / 2;}");
+    is($p->convert(sub {my $a = 12; for (1,6,21,4) {my $b = $a / 2}}), q|var a = 12;var _$ = [1,6,21,4];for (var i = 0, _ = _$[0]; i < _$.length; _ = _$[++i]) {var b = a / 2;}delete _$;|);
 
     TODO: {
         local $TODO = "not implemented";
 
-        is($p->convert(sub {my $a = 12; for (1,6,21,4) {my $b = $a / 2}}), q|var a = 12;var _$ = [1,6,21,4];for (var i = 0, _ = _$[0]; i < _$.length; _ = _$[++i]) {var b = a / 2;}delete _$;|);
         is($p->convert(sub {my %a = (a => 1, b => 2); for (keys %a) {my $b = $a{$_}}}), q|var a = {'a': 1, 'b': 2};for (var _ in a) {var b = a[_];}|);
     }
 }
