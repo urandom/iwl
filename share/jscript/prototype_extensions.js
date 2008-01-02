@@ -580,13 +580,13 @@ document.insertScript = (function () {
     }
     scripts.push(url);
     if (options.skipCache) {
-      var query = $H({_: (new Date).valueOf()});
+      var query = {_: (new Date).valueOf()};
       var index = url.indexOf('?');
       if (index != -1) {
-        query.merge(url.substr(index).toQueryParams());
+        Object.extend(query, url.substr(index).toQueryParams());
         url = url.substr(0, index);
       }
-      url += '?' + query.toQueryString();
+      url += '?' + Object.toQueryString(query);
     }
 
     var script = new Element('script', {type: 'text/javascript', charset: 'utf-8'});
