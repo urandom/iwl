@@ -210,6 +210,15 @@ sub __parseSimpleStatement {
                 $sigil = $child->symbol_type;
             }
             $self->__parseToken($child);
+        } elsif ($child->isa('PPI::Structure::Subscript')) {
+            my $prev = $child->sprevious_sibling;
+            next unless $prev;
+            if ($prev->isa('PPI::Token::Symbol')
+                  && $self->{__currentDocument}{__variables}{$prev} eq '%') {
+                $child->start->set_content('[');
+                $child->finish->set_content(']');
+                $self->__parseToken($_) foreach @{$child->find('Token')};
+            }
         }
     }
 }
@@ -278,6 +287,8 @@ sub __parseCompoundStatement {
                     $array->set_content('delete _$;');
                     $st->add_element($array);
                     $statement->insert_after($st);
+                } elsif (!$operator && $s->first_element->isa('PPI::Token::Word') && $s->first_element->content eq 'keys') {
+                    $s->first_element->set_content('var _ in');
                 }
             } else {
                 $self->__parseStatement($_) foreach $child->schildren;
@@ -293,6 +304,7 @@ sub __parseToken {
     if ($token->isa('PPI::Token::Symbol')) {
         my $assignment;
         my $snext = $token;
+        $snext = $token->parent->parent if $token->parent->isa('PPI::Statement::Expression');
         while ($snext = $snext->snext_sibling) {
             if ($snext->isa('PPI::Token::Operator') && $snext->content eq '=') {
                 $assignment = 1;
@@ -303,7 +315,7 @@ sub __parseToken {
         my $content = $token->content;
         my $name = substr $content, 1;
         if ($assignment) {
-            $self->{__currentDocument}{__variables}{$sigil} = {$name => 1};
+            $self->{__currentDocument}{__variables}{$name} = $sigil;
             $token->set_content($name);
         } else {
             my $pad_value = $self->{__pad}{$token->content}
