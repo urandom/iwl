@@ -236,7 +236,29 @@ sub __parseCompoundStatement {
                     $self->__parseToken($_);
                 }
             }
-        } elsif ($child->isa('PPI::Structure::Block') || $child->isa('PPI::Structure::ForLoop')) {
+        } elsif ($child->isa('PPI::Token::Magic')
+              && $child->sprevious_sibling->isa('PPI::Token::Word')
+              && $child->sprevious_sibling->content eq 'for') {
+            $child->delete;
+        } elsif ($child->isa('PPI::Structure::ForLoop')) {
+            if ($child->schildren == 1) {
+                my $s = ($child->children)[0];
+                my $operator = $s->find_first('Token::Operator');
+
+                # Range
+                if ($operator && $operator->content eq '..') {
+                    my $range = $s->find('Token::Number');
+                    my $content = PPI::Token->new;
+                    $content->set_content(
+                        'var _ = ' . $range->[0]->content . '; _ < ' . ($range->[1]->content + 1) . '; ++_'
+                    );
+                    $_->delete foreach $s->children;
+                    $s->add_element($content);
+                }
+            } else {
+                $self->__parseStatement($_) foreach $child->schildren;
+            }
+        } elsif ($child->isa('PPI::Structure::Block')) {
             $self->__parseStatement($_) foreach $child->schildren;
         }
     }
