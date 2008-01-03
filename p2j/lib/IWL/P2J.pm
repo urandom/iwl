@@ -191,6 +191,13 @@ sub __parseSimpleStatement {
             } else {
                 $child->set_content(join '.', @composition, $function);
             }
+        } elsif ($child->isa('PPI::Token::Word')
+              && $child->sprevious_sibling
+              && $child->sprevious_sibling->isa('PPI::Token::Operator')
+              && $child->sprevious_sibling->content eq '.'
+              && !$child->snext_sibling->isa('PPI::Structure::List')
+        ) {
+            $child->insert_after(PPI::Token->new('()'));
         } elsif ($child->isa('PPI::Token::Quote')
                  && $child->snext_sibling->isa('PPI::Token::Operator')
                  && $child->snext_sibling->content eq '->') {
@@ -199,6 +206,7 @@ sub __parseSimpleStatement {
             if ($child->isa('PPI::Token::Operator')) {
                 $operator = 1;
                 $assignment = $child->content eq '=';
+                $child->set_content('.') if $child->content eq '->' && $child->sprevious_sibling->isa('PPI::Token::Symbol');
             } elsif ($child->isa('PPI::Token::Symbol')) {
                 $sigil = $child->symbol_type;
             }
