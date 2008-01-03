@@ -1,4 +1,4 @@
-use Test::More tests => 41;
+use Test::More tests => 46;
 
 BEGIN { use_ok('IWL::P2J'); push @INC, "./t"; }
 use Foo;
@@ -60,6 +60,10 @@ sub test_lexical {
     is($p->convert(sub {my $v = Foo::printJS}), 'var v = "Hello JS.";');
     is($p->convert(sub {my $v = Foo->printArgs(qw(abs 12 42f))}), 'var v = "abs, 12, 42f";');
     is($p->convert(sub {my $v = Foo::printArgs($a, $b, 'abs')}), 'var v = "42, foo, abs";');
+    is($p->convert(sub {my $v = $_ foreach 1 .. $a}), 'for (var _ = 1; _ < 43; ++_) var v = _;');
+    is($p->convert(sub {my $v = $_ foreach @c}), 'var _$ = [1, 2, 3];for (var i = 0, _ = _$[0]; i < _$.length; _ = _$[++i]) var v = _;delete _$;');
+    is($p->convert(sub {my $v = $a if $a}), 'if ( 42) var v = 42;');
+    is($p->convert(sub {while ($a) { my $v = $b}}), 'while (42) {var v = "foo";}');
 }
 
 test_general;

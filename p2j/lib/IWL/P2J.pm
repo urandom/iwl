@@ -175,12 +175,14 @@ sub __parseSimpleStatement {
             }
             my $first = $child->parent->first_element;
             my $modifier = $child->content eq 'unless' || $child->content eq 'until' ? '!(' : '';
+            my $forloop = $elements[$#elements]->isa('PPI::Structure::ForLoop') ? $elements[$#elements] : undef;
+            $self->__parseForLoop($forloop);
             $child->set_content('if') if $child->content eq 'unless';
             $child->set_content('while') if $child->content eq 'until';
-            $brace->set_content(' (' . $modifier);
+            $brace->set_content(' (' . $modifier) unless $forloop;
             $brace = PPI::Token->new;
             $modifier = ')' if $modifier;
-            $brace->set_content($modifier . ') ');
+            $brace->set_content($forloop ? ' ' : $modifier . ') ');
             push @elements, $brace;
             $first->insert_before($_->remove) foreach @elements;
         } elsif ($child->isa('PPI::Token::Word') && $child->content ne 'var' && $child->snext_sibling->isa('PPI::Structure::List')) {
@@ -250,49 +252,7 @@ sub __parseCompoundStatement {
               && $child->sprevious_sibling->content eq 'for') {
             $child->delete;
         } elsif ($child->isa('PPI::Structure::ForLoop')) {
-            if ($child->schildren == 1) {
-                my $s = ($child->children)[0];
-                my $operator = $s->find_first('Token::Operator');
-                my $elements = $s->find(
-                    sub {
-                        return 1 if $_[1]->isa('PPI::Token::Number');
-                        $self->__parseToken($_[1]) and return 1 if ($_[1]->isa('PPI::Token::Symbol'));
-                    }
-                );
-                my $content = PPI::Token->new;
-
-                if ($operator && $operator->content eq '..') {
-                    # Range
-                    $content->set_content(
-                        'var _ = ' . $elements->[0]->content . '; _ < ' . ($elements->[1]->content + 1) . '; ++_'
-                    );
-                    $_->delete foreach $s->children;
-                    $s->add_element($content);
-                } elsif ($operator && $operator->content eq ',') {
-                    # Anonymous array
-                    my $array = PPI::Token->new;
-                    my $st = PPI::Statement->new;
-                    $array->set_content(
-                        'var _$ = [' . join(',', map {$_->content} @$elements) . '];'
-                    );
-                    $st->add_element($array);
-                    $statement->insert_before($st);
-                    $content->set_content(
-                        'var i = 0, _ = _$[0]; i < _$.length; _ = _$[++i]'
-                    );
-                    $_->delete foreach $s->children;
-                    $s->add_element($content);
-                    $st = PPI::Statement->new;
-                    $array = PPI::Token->new;
-                    $array->set_content('delete _$;');
-                    $st->add_element($array);
-                    $statement->insert_after($st);
-                } elsif (!$operator && $s->first_element->isa('PPI::Token::Word') && $s->first_element->content eq 'keys') {
-                    $s->first_element->set_content('var _ in');
-                }
-            } else {
-                $self->__parseStatement($_) foreach $child->schildren;
-            }
+            $self->__parseForLoop($child);
         } elsif ($child->isa('PPI::Structure::Block')) {
             $self->__parseStatement($_) foreach $child->schildren;
         }
@@ -332,6 +292,57 @@ sub __parseToken {
         }
     }
     return $self;
+}
+
+sub __parseForLoop {
+    my ($self, $child) = @_;
+    return unless $child;
+    my $statement = $child->parent;
+    if ($child->schildren == 1) {
+        my $s = ($child->children)[0];
+        my $operator = $s->find_first('Token::Operator');
+        my $elements = $s->find(
+            sub {
+                return 1 if $_[1]->isa('PPI::Token::Number');
+                $self->__parseToken($_[1]) and return 1 if ($_[1]->isa('PPI::Token::Symbol'));
+            }
+        );
+        my $content = PPI::Token->new;
+
+        if ($operator && $operator->content eq '..') {
+            # Range
+            $content->set_content(
+                'var _ = ' . $elements->[0]->content . '; _ < ' . ($elements->[1]->content + 1) . '; ++_'
+            );
+            $_->delete foreach $s->children;
+            $s->add_element($content);
+        } elsif (!$operator && $s->first_element->isa('PPI::Token::Word') && $s->first_element->content eq 'keys') {
+            $s->first_element->set_content('var _ in');
+        } elsif (($operator && $operator->content eq ',') || $elements->[0]->isa('PPI::Token::Symbol')) {
+            # Array
+            my $array = PPI::Token->new;
+            my $st = PPI::Statement->new;
+            $array->set_content(
+                $operator
+                  ? 'var _$ = [' . join(',', map {$_->content} @$elements) . '];'
+                  : 'var _$ = ' . $elements->[0]->content . ';'
+            );
+            $st->add_element($array);
+            $statement->insert_before($st);
+            $content->set_content(
+                'var i = 0, _ = _$[0]; i < _$.length; _ = _$[++i]'
+            );
+            $_->delete foreach $s->children;
+            $s->add_element($content);
+            $st = PPI::Statement->new;
+            $array = PPI::Token->new;
+            $array->set_content('delete _$;');
+            $st->add_element($array);
+            $statement->insert_after($st);
+        }
+    } else {
+        $self->__parseStatement($_) foreach $child->schildren;
+    }
 }
 
 # Checks whether the element's previous sibling is a method/function
