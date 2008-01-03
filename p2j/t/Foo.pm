@@ -24,4 +24,8 @@ package Bar;
 
 sub new {bless [am => 'bar'], shift}
 
+package Foo::Bar;
+
+sub new {bless{}, shift};
+
 1;

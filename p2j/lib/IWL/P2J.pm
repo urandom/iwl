@@ -156,13 +156,8 @@ sub __parseSimpleStatement {
                 $child->{finish}->set_content(' ');
             }
         } elsif ($child->isa('PPI::Structure::Constructor')) {
-            # Converts ',' to ':' for hashes
-            if ($child->{start}->content eq '{') {
-                my $operators = $child->find(sub {$_[1]->isa('PPI::Token::Operator') && $_[1] eq ','});
-                for (my $j = 0; $j < @$operators; $j += 2) {
-                    $operators->[$j]->set_content(':');
-                }
-            }
+            my $token = PPI::Token->new(toJSON($self->__getConstructor($child, 1)));
+            $child->insert_before($token) and $child->delete;
         } elsif ($child->isa('PPI::Token::Word') && {if => 1, unless => 1, while => 1, until => 1, foreach => 1, for => 1}->{$child->content}) {
             # Statement modifiers
             my $brace = PPI::Token->new;
@@ -190,11 +185,7 @@ sub __parseSimpleStatement {
             my @composition = split /::/, $child->content;
             my $function    = pop @composition;
             my $package     = (join '::', @composition) || 'main';
-            my $coderef;
-            {
-                no strict 'refs';
-                $coderef = *{"${package}::${function}"}{CODE};
-            }
+            my $coderef     = $self->__getPackageAvailability($package, $function);
             if ($coderef) {
                 $child->set_content($self->__getFunctionValue($child, $coderef));
             } else {
@@ -262,18 +253,19 @@ sub __parseCompoundStatement {
 sub __parseToken {
     my ($self, $token) = @_;
     if ($token->isa('PPI::Token::Symbol')) {
+        my $sigil = $token->symbol_type;
+        my $content = $token->content;
+        my $name = substr $content, 1;
         my $assignment;
         my $snext = $token;
-        $snext = $token->parent->parent if $token->parent->isa('PPI::Statement::Expression');
+        $snext = $token->parent->parent if $token->parent->isa('PPI::Statement::Expression') && $sigil eq '%';
         while ($snext = $snext->snext_sibling) {
+            last if $snext->isa('PPI::Token::Symbol') && !$snext->sprevious_sibling->isa('PPI::Token::Operator');
             if ($snext->isa('PPI::Token::Operator') && $snext->content eq '=') {
                 $assignment = 1;
                 last;
             }
         }
-        my $sigil = $token->symbol_type;
-        my $content = $token->content;
-        my $name = substr $content, 1;
         if ($assignment) {
             $self->{__currentDocument}{__variables}{$name} = $sigil;
             $token->set_content($name);
@@ -356,9 +348,9 @@ sub __previousIsMethod {
 # Get the object expression ($example->method()[->method2()...], $$example{foo}{bar}, or Example->method())
 sub __getExpressionValue {
     my ($self, $element, $value) = @_;
-    my ($start, $ret, $sprev) = ($element->snext_sibling, $value, $element->sprevious_sibling);
+    my ($start, $ret, $sprev, $string) = ($element->snext_sibling, $value, $element->sprevious_sibling, 0);
 
-    $sprev->delete if $sprev->isa('PPI::Token::Cast') && $sprev->content eq '$';
+    $sprev->delete if $sprev && $sprev->isa('PPI::Token::Cast') && $sprev->content eq '$';
     while (1) {
         $sprev = $start->sprevious_sibling;
         $sprev->delete unless $sprev == $element;
@@ -367,7 +359,17 @@ sub __getExpressionValue {
         } elsif ($start->isa('PPI::Token::Word') && $sprev->isa('PPI::Token::Operator')) {
             my $method = $start->content;
             my @args = $self->__getArguments($start->snext_sibling);
-            $ret = $ret->$method(@args);
+            my $coderef = ref $ret ? $ret : $self->__getPackageAvailability($ret, $method);
+            if ($coderef) {
+                $ret = $ret->$method(@args);
+            } else {
+                $ret = join '.', split '::', $ret;
+                $ret = ($method eq 'new' ? ('new ' . $ret) : ($ret . '.' . $method))
+                  . '(' . (join ', ', map {
+                    $self->{__currentDocument}{__variables}{$_} ? $_ : toJSON($_)
+                  } @args) . ')';
+                $string = 1;
+            }
         } elsif ($start->isa('PPI::Structure::Subscript') && $start->start->content eq '{') {
             my $property = ($start->children)[0]->content;
             $property =~ s/^'// and $property =~ s/'$//;
@@ -380,7 +382,7 @@ sub __getExpressionValue {
         }
         $start = $start->snext_sibling;
     }
-    return toJSON($ret);
+    return $string ? $ret : toJSON($ret);
 }
 
 # Returns a perl function value (foo() or Foo::bar())
@@ -406,6 +408,8 @@ sub __getArguments {
             push @args, $element->content;
         } elsif ($element->isa('PPI::Token::Quote')) {
             push @args, $element->string;
+        } elsif ($element->isa('PPI::Structure::Constructor')) {
+            push @args, $self->__getConstructor($element);
         } else {
             push @args, $element->content;
         }
@@ -414,6 +418,52 @@ sub __getArguments {
 
     $list->delete;
     return @args;
+}
+
+# Returns the contents of an anonymous hash/array
+sub __getConstructor {
+    my ($self, $constructor, $skip) = @_;
+    return unless $constructor->isa('PPI::Structure::Constructor');
+    my ($element, @args) = $constructor->children ? ((($constructor->children)[0])->children)[0] : ();
+    my ($hash, $odd) = ($constructor->start->content eq '{', 1);
+    ($skip || $constructor->delete) and return $hash ? {} : [] unless $element;
+
+    $ignore_json = 1;
+    do {{
+        next if $element->isa('PPI::Token::Operator');
+        if ($element->isa('PPI::Token::Symbol')) {
+            $self->__parseToken($element);
+            push @args, $element->content;
+        } elsif ($element->isa('PPI::Token::Quote')) {
+            push @args, $element->string;
+        } elsif ($element->isa('PPI::Structure::Constructor')) {
+            push @args, $self->__getConstructor($element, 1);
+        } else {
+            push @args, $element->content;
+        }
+    }} while ($element = $element->snext_sibling);
+    $ignore_json = 0;
+
+    $constructor->delete unless $skip;
+    return $hash ? ${\{@args}} : \@args;
+}
+
+# Returns the package glob reference if the package is available (if it has any methods)
+sub __getPackageAvailability {
+    my ($self, $package, $function) = @_;
+    my $mainref = \%::;
+    $mainref = $mainref->{$_ . '::'} or last foreach split /::/, $package;
+    return unless $mainref;
+
+    if ($function) {
+        my $coderef = exists $mainref->{$function}
+          ? *{$mainref->{$function}}{CODE}
+          : undef;
+        return $coderef if $coderef;
+    } else {
+        *{$mainref->{$_}}{CODE} and return $mainref foreach keys %$mainref;
+    }
+    return;
 }
 
 # Gets all 'outside' local lexical variables for the subref
