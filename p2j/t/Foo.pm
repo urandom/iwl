@@ -9,7 +9,7 @@ sub printJS {
     return "Hello JS.";
 }
 sub overloaded {
-    return 1 if (caller(1))[0] eq 'IWL::P2J';
+    return 1 if (caller(1))[0] eq 'IWL::P2JS';
     return 0;
 }
 sub this {

@@ -1,7 +1,7 @@
 #! /bin/false
 # vim: set autoindent shiftwidth=4 tabstop=8:
 
-package IWL::P2J;
+package IWL::P2JS;
 
 use strict;
 
@@ -18,15 +18,15 @@ $VERSION = '0.01';
 
 =head1 NAME
 
-IWL::P2J - a basic Perl to JavaScript converter
+IWL::P2JS - a basic Perl to JavaScript converter
 
 =head1 DESCRIPTION
 
-IWL::P2J is a class, which provides methods for converting perl subroutines into javascript code. This is a VERY experimental module, whose goal is to provide a way for developers to use Perl code in IWL signal handlers.
+IWL::P2JS is a class, which provides methods for converting perl subroutines into javascript code. This is a VERY experimental module, whose goal is to provide a way for developers to use Perl code in IWL signal handlers.
 
 =head1 CONSTRUCTOR
 
-IWL::P2J->new
+IWL::P2JS->new
 
 =cut
 
@@ -66,6 +66,31 @@ sub convert {
 
     $self->{__pad} = $self->__walker($subref);
     return $self->__parser(join "", @perl);
+}
+
+=item B<signalConnect> (B<SIGNAL>, B<CALLBACK>)
+
+Connects a Perl subroutine to a callback. When the callback is fired, the subroutine will be invoked.
+
+Parameters: B<SIGNAL> - a signal. The following signals are currently supported:
+
+=over 8
+
+=item B<Token::Word>
+
+The signal is fired, whenever a L<PPI::Token::Word> is about to be converted
+
+=back
+
+B<CALLBACK> - a Perl subroutine. It will receive a L<PPI::Element> as its first argument
+
+=cut
+
+sub signalConnect {
+    my ($self, $signal, $callback) = @_;
+
+    push @{$self->{__signals}{$signal}}, $callback;
+    return $self;
 }
 
 # Internal
@@ -181,6 +206,7 @@ sub __parseSimpleStatement {
             push @elements, $brace;
             $first->insert_before($_->remove) foreach @elements;
         } elsif ($child->isa('PPI::Token::Word') && $child->content ne 'var' && $child->snext_sibling->isa('PPI::Structure::List')) {
+            $self->__emitSignal('Token::Word', $child);
             # Functions
             my @composition = split /::/, $child->content;
             my $function    = pop @composition;
@@ -197,6 +223,8 @@ sub __parseSimpleStatement {
               && $child->sprevious_sibling->content eq '.'
               && !$child->snext_sibling->isa('PPI::Structure::List')
         ) {
+            $self->__emitSignal('Token::Word', $child);
+            # Method without arguments
             $child->insert_after(PPI::Token->new('()'));
         } elsif ($child->isa('PPI::Token::Quote')
                  && $child->snext_sibling->isa('PPI::Token::Operator')
@@ -206,7 +234,7 @@ sub __parseSimpleStatement {
             if ($child->isa('PPI::Token::Operator')) {
                 $operator = 1;
                 $assignment = $child->content eq '=';
-                $child->set_content('.') if $child->content eq '->' && $child->sprevious_sibling->isa('PPI::Token::Symbol');
+                $child->set_content('.') if $child->content eq '->';
             } elsif ($child->isa('PPI::Token::Symbol')) {
                 $sigil = $child->symbol_type;
             }
@@ -366,15 +394,16 @@ sub __getExpressionValue {
             $start = $start->snext_sibling and next;
         } elsif ($start->isa('PPI::Token::Word') && $sprev->isa('PPI::Token::Operator')) {
             my $method = $start->content;
-            my @args = $self->__getArguments($start->snext_sibling);
             my $coderef = ref $ret ? $ret : $self->__getPackageAvailability($ret, $method);
             if ($coderef) {
+                my @args = $self->__getArguments($start->snext_sibling);
                 $ret = $ret->$method(@args);
             } else {
+                my @args = $self->__getArguments($start->snext_sibling, 1);
                 $ret = join '.', split '::', $ret;
                 $ret = ($method eq 'new' ? ('new ' . $ret) : ($ret . '.' . $method))
                   . '(' . (join ', ', map {
-                    $self->{__currentDocument}{__variables}{$_} ? $_ : toJSON($_)
+                    ref $_ ? toJSON($_) : $_
                   } @args) . ')';
                 $string = 1;
             }
@@ -403,7 +432,7 @@ sub __getFunctionValue {
 
 # Returns a list of arguments, which are to be passed to a function/method
 sub __getArguments {
-    my ($self, $list) = @_;
+    my ($self, $list, $keep_strings) = @_;
     return () unless $list->isa('PPI::Structure::List');
     my ($element, @args) = $list->children ? ((($list->children)[0])->children)[0] : ();
     $list->delete and return () unless $element;
@@ -415,7 +444,7 @@ sub __getArguments {
             $self->__parseToken($element);
             push @args, $element->content;
         } elsif ($element->isa('PPI::Token::Quote')) {
-            push @args, $element->string;
+            push @args, $keep_strings ? $element->content : $element->string;
         } elsif ($element->isa('PPI::Structure::Constructor')) {
             push @args, $self->__getConstructor($element);
         } else {
@@ -472,6 +501,13 @@ sub __getPackageAvailability {
         *{$mainref->{$_}}{CODE} and return $mainref foreach keys %$mainref;
     }
     return;
+}
+
+# Emits a signal to all registered handlers
+sub __emitSignal {
+    my ($self, $signal, $element) = @_;
+
+    $_->($element) foreach @{$self->{__signals}{$signal}};
 }
 
 # Gets all 'outside' local lexical variables for the subref

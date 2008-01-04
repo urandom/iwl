@@ -1,9 +1,9 @@
-use Test::More tests => 47;
+use Test::More tests => 49;
 
-BEGIN { use_ok('IWL::P2J'); push @INC, "./t"; }
+BEGIN { use_ok('IWL::P2JS'); push @INC, "./t"; }
 use Foo;
 
-my $p = IWL::P2J->new;
+my $p = IWL::P2JS->new;
 
 sub test_general {
     is($p->convert(sub {}), '');
@@ -25,6 +25,8 @@ sub test_general {
     is($p->convert(sub {my $a = 12; alert($a)}), "var a = 12;alert(a);");
     is($p->convert(sub {my $a = 12; Math::max($a, 5)}), "var a = 12;Math.max(a, 5);");
     is($p->convert(sub {my $url = 'foo.pl'; my $ajax = Ajax::Request->new($url, {parameters => {a => 1}, array => [1, 'foo']}); $ajax->abort}), q|var url = 'foo.pl';var ajax = new Ajax.Request(url, {"parameters": {"a": 1}, "array": [1, "foo"]});ajax.abort();|);
+    is($p->convert(sub {my $foo = document->getElementById('foo')->down()->next(2)->down('.class'); $foo->remove();}), q|var foo = document.getElementById('foo').down().next(2).down('.class');foo.remove();|);
+    is($p->convert(sub {my $foo = document::getElementById('foo')->down()->next(2)->down('.class'); $foo->remove();}), q|var foo = document.getElementById('foo').down().next(2).down('.class');foo.remove();|);
 
     is($p->convert(sub {my $a = 12; if ($a) {my $b = $a / 2}}), "var a = 12;if (a) {var b = a / 2;}");
     is($p->convert(sub {my $a = 12; unless ($a) {my $b = $a / 2}}), "var a = 12;if (!(a)) {var b = a / 2;}");
