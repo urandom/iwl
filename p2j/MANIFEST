@@ -13,5 +13,5 @@ inc/Module/Install/Share.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/IWL/P2JS.pm
-t/p2j.t
+t/p2js.t
 t/Foo.pm
