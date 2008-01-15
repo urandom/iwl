@@ -1274,6 +1274,42 @@ function run_notebook_tests() {
     }, 'testlog');
 }
 
+function run_progressbar_tests() {
+    var pb = $('progressbar_test');
+    var className = $A(pb.classNames()).first();
+    new Test.Unit.Runner({
+        testParts: function() { with(this) {
+            assert(Object.isElement(pb.block));
+            assert(Object.isElement(pb.label));
+            assert(pb.block.hasClassName(className + '_block'));
+            assert(pb.label.hasClassName(className + '_label'));
+        }},
+        testMethods: function() { with(this) {
+            var changed = false;
+            pb.signalConnect('iwl:change', function() { changed = true });
+
+            assertEqual(0, pb.value);
+            assertEqual(pb.value, pb.getValue());
+            assertEqual(pb, pb.setValue(0.56));
+            assertEqual(0.56, pb.value);
+            assertEqual(pb, pb.setValue(1.56));
+            assertEqual(1, pb.getValue());
+            assertEqual(pb, pb.setValue(-12));
+            assertEqual(0, pb.value);
+            assertEqual(pb, pb.setText('foo'));
+            assertEqual('foo', pb.getText());
+            assertEqual(pb, pb.setText('bar #{percent}'));
+            assertEqual('bar #{percent}', pb.getText());
+            assert(!pb.isPulsating());
+            assertEqual(pb, pb.setPulsate(true));
+            assert(pb.isPulsating());
+            assertEqual(pb, pb.setValue(0.76));
+            assert(!pb.isPulsating());
+            wait(100, function() { assert(changed) });
+        }}
+    }, 'testlog');
+}
+
 function run_spinner_tests() {
     var spinner = $('spinner_test');
     var className = $A(spinner.classNames()).first();

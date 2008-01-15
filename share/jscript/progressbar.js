@@ -8,7 +8,9 @@ IWL.ProgressBar = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     function updateLabel() {
         if (!this.text) return;
-        this.label.update(this.text.evaluate({percent: (this.value * 100).toFixed(0) + '%'}));
+        this.label.update(this.text.evaluate({
+            percent: this.pulsating ? null : (this.value * 100).toFixed(0) + '%'
+        }));
     }
 
     function updateBlock() {

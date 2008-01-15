@@ -357,22 +357,23 @@ sub build_misc {
 }
 
 sub build_tests {
-    my $row             = shift;
-    my $prototype       = IWL::Tree::Row->new(id => 'prototype_row');
-    my $scriptaculous   = IWL::Tree::Row->new(id => 'scriptaculous_row');
-    my $base            = IWL::Tree::Row->new(id => 'base_row');
-    my $button_test     = IWL::Tree::Row->new(id => 'button_test_row');
-    my $calendar_test   = IWL::Tree::Row->new(id => 'calendar_test_row');
-    my $contentbox_test = IWL::Tree::Row->new(id => 'contentbox_test_row');
-    my $druid_test      = IWL::Tree::Row->new(id => 'druid_test_row');
-    my $entry_test      = IWL::Tree::Row->new(id => 'entry_test_row');
-    my $iconbox_test    = IWL::Tree::Row->new(id => 'iconbox_test_row');
-    my $menu_test       = IWL::Tree::Row->new(id => 'menu_test_row');
-    my $notebook_test   = IWL::Tree::Row->new(id => 'notebook_test_row');
-    my $spinner_test    = IWL::Tree::Row->new(id => 'spinner_test_row');
-    my $tooltip_test    = IWL::Tree::Row->new(id => 'tooltip_test_row');
-    my $tree_test       = IWL::Tree::Row->new(id => 'tree_test_row');
-    my $upload_test     = IWL::Tree::Row->new(id => 'upload_test_row');
+    my $row              = shift;
+    my $prototype        = IWL::Tree::Row->new(id => 'prototype_row');
+    my $scriptaculous    = IWL::Tree::Row->new(id => 'scriptaculous_row');
+    my $base             = IWL::Tree::Row->new(id => 'base_row');
+    my $button_test      = IWL::Tree::Row->new(id => 'button_test_row');
+    my $calendar_test    = IWL::Tree::Row->new(id => 'calendar_test_row');
+    my $contentbox_test  = IWL::Tree::Row->new(id => 'contentbox_test_row');
+    my $druid_test       = IWL::Tree::Row->new(id => 'druid_test_row');
+    my $entry_test       = IWL::Tree::Row->new(id => 'entry_test_row');
+    my $iconbox_test     = IWL::Tree::Row->new(id => 'iconbox_test_row');
+    my $menu_test        = IWL::Tree::Row->new(id => 'menu_test_row');
+    my $notebook_test    = IWL::Tree::Row->new(id => 'notebook_test_row');
+    my $progressbar_test = IWL::Tree::Row->new(id => 'progressbar_test_row');
+    my $spinner_test     = IWL::Tree::Row->new(id => 'spinner_test_row');
+    my $tooltip_test     = IWL::Tree::Row->new(id => 'tooltip_test_row');
+    my $tree_test        = IWL::Tree::Row->new(id => 'tree_test_row');
+    my $upload_test      = IWL::Tree::Row->new(id => 'upload_test_row');
 
     $prototype->appendTextCell('Prototype extesions');
     $row->appendRow($prototype);
@@ -396,6 +397,8 @@ sub build_tests {
     $row->appendRow($menu_test);
     $notebook_test->appendTextCell('Notebook Test');
     $row->appendRow($notebook_test);
+    $progressbar_test->appendTextCell('Progress bar Test');
+    $row->appendRow($progressbar_test);
     $spinner_test->appendTextCell('Spinner Test');
     $row->appendRow($spinner_test);
     $tooltip_test->appendTextCell('Tooltip Test');
@@ -407,7 +410,7 @@ sub build_tests {
 
     register_row_event($prototype, $scriptaculous, $base, $button_test, $calendar_test,
         $contentbox_test, $druid_test, $entry_test, $iconbox_test, $menu_test,
-        $notebook_test, $spinner_test, $tooltip_test, $tree_test, $upload_test);
+        $notebook_test, $progressbar_test, $spinner_test, $tooltip_test, $tree_test, $upload_test);
 }
 
 sub generate_buttons {
@@ -1075,6 +1078,17 @@ sub generate_notebook_test {
 
     $script->setScript("run_notebook_tests()");
     $container->appendChild($testlog, $notebook, $script);
+    return $container;
+}
+
+sub generate_progressbar_test {
+    my $container   = IWL::Container->new(id => 'progressbar_test_container');
+    my $testlog     = IWL::Container->new(id => 'testlog');
+    my $progressbar = IWL::ProgressBar->new(id => 'progressbar_test');
+    my $script      = IWL::Script->new;
+
+    $script->setScript("run_progressbar_tests()");
+    $container->appendChild($testlog, $progressbar, $script);
     return $container;
 }
 
