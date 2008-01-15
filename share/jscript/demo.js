@@ -30,6 +30,7 @@ function sortTheMoney(col_index) {
 
 function animate_progress_bar(backwards) {
     var progress = $('progress');
+    if (!progress) return;
     var value = progress.getValue();
     if (value == 1 && !backwards)
         return animate_progress_bar.bind(this, !backwards).delay(1);

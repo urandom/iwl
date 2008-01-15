@@ -78,8 +78,8 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
         },
 
         _init: function (id) {
-            this.tabContainer = this.down(null, 1);
-            this.pageContainer = this.down().next(null, 1);
+            this.tabContainer = this.down(1);
+            this.pageContainer = this.down().next(1);
 
             this.tabs = [];
             this.currentTab = this.tabContainer.select('.' +

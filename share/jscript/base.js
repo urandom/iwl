@@ -2,9 +2,8 @@
 var loaded = false;
 document.loaded = false;
 
-Event.signalConnect(window, "load", function () { loaded = true; });
+Event.signalConnect(window, "load", function () { window.loaded = true; });
 document.observe("dom:loaded", function() {
-    document.loaded = true;
     Event.signalConnect(document.body, "click", IWL.Focus.loseFocusCallback);
 });
 
