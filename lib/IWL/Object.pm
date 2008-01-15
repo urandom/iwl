@@ -16,7 +16,7 @@ use IWL::Config qw(%IWLConfig);
 use IWL::String qw(encodeURI escapeHTML escape);
 use IWL::JSON qw(toJSON);
 
-use Scalar::Util qw(weaken isweak);
+use Scalar::Util qw(weaken isweak blessed reftype);
 
 # Used to detect looped networks and avoid infinite recursion.
 use vars qw(%cloneCache);
@@ -210,6 +210,7 @@ Parameter: B<OBJECT> - the object to be appended (can be an array of objects)
 sub appendChild {
     my ($self, @objects) = @_;
 
+    @objects = grep {$_ && $_ ne $self} @objects;
     return if !@objects;
     return if $self->{_noChildren};
 
@@ -232,6 +233,7 @@ Parameter: B<OBJECT> - the object to be prepended (can be an array of objects)
 sub prependChild {
     my ($self, @objects) = @_;
 
+    @objects = grep {$_ && $_ ne $self} @objects;
     return if !@objects;
     return if $self->{_noChildren};
 
@@ -239,34 +241,6 @@ sub prependChild {
         foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
 
     unshift @{$self->{childNodes}}, @objects;
-
-    return $self;
-}
-
-=item B<insertAfter> (B<REFERENCE>, B<OBJECT>)
-
-Inserts B<OBJECT> after B<REFERENCE>.
-
-Parameter: B<OBJECT> - the object to be inserted (can be an array of objects)
-
-=cut
-
-sub insertAfter {
-    my ($self, $reference, @objects) = @_;
-
-    return if !@objects;
-    return if $self->{_noChildren};
-
-    $_->{parentNode} = $self and weaken $_->{parentNode}
-        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
-
-    my $i;
-    for ($i = 0; $i < @{$self->{childNodes}}; $i++) {
-	if ($self->{childNodes}[$i] == $reference) {
-	    last;
-	}
-    }
-    splice @{$self->{childNodes}}, $i + 1, 0, @objects;
 
     return $self;
 }
@@ -282,6 +256,7 @@ Parameter: B<OBJECT> - the object to be set (can be an array of objects)
 sub setChild {
     my ($self, @objects) = @_;
 
+    @objects = grep {$_ && $_ ne $self} @objects;
     return if !@objects;
     return if $self->{_noChildren};
 
@@ -290,6 +265,35 @@ sub setChild {
 
     $self->{childNodes} = [];
     push @{$self->{childNodes}}, @objects;
+
+    return $self;
+}
+
+=item B<insertAfter> (B<REFERENCE>, B<OBJECT>)
+
+Inserts B<OBJECT> after B<REFERENCE>.
+
+Parameter: B<OBJECT> - the object to be inserted (can be an array of objects)
+
+=cut
+
+sub insertAfter {
+    my ($self, $reference, @objects) = @_;
+
+    @objects = grep {$_ && $_ ne $self} @objects;
+    return if !@objects;
+    return if $self->{_noChildren};
+
+    $_->{parentNode} = $self and weaken $_->{parentNode}
+        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+
+    my $i;
+    for ($i = 0; $i < @{$self->{childNodes}}; $i++) {
+	if ($self->{childNodes}[$i] == $reference) {
+	    last;
+	}
+    }
+    splice @{$self->{childNodes}}, $i + 1, 0, @objects;
 
     return $self;
 }
@@ -316,17 +320,14 @@ sub clone {
     return $cloneCache{$self} if exists $cloneCache{$self};
 
     # Non-reference values are copied shallowly
-    my $ref_type = ref $self or return $self;
+    my $ref_type = reftype $self or return $self;
 
     # Extract both the structure type and the class name of referent
-    my $class_name;
-    if ("$self" =~ /^\Q$ref_type\E\=([A-Z]+)\(0x[0-9a-f]+\)$/) {
-        $class_name = $ref_type;
-        $ref_type = $1;
-        # Some objects would prefer to clone themselves
-        return $cloneCache{$self} = $self->_IWLClone()
-          if $self->can('_IWLClone');
-    }
+    my $class_name = blessed $self;
+
+    # Some objects would prefer to clone themselves
+    return $cloneCache{$self} = $self->_IWLClone()
+      if $class_name && $self->can('_IWLClone');
 
     # To make a copy:
     # - Prepare a reference to the same type of structure;

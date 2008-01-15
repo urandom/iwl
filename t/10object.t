@@ -1,4 +1,4 @@
-use Test::More tests => 31;
+use Test::More tests => 35;
 
 use IWL::Object;
 
@@ -23,6 +23,10 @@ use IWL::Object;
 
 	isa_ok($object->setChild(IWL::Object->new), 'IWL::Object', 'Returns itself');
 	is(scalar @{$object->{childNodes}}, 1, 'setChild');
+    ok(!$object->prependChild($object));
+    ok(!$object->appendChild($object));
+    ok(!$object->setChild($object));
+    ok(!$object->insertAfter($child1, $object));
 }
 
 {
