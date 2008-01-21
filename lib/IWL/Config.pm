@@ -122,29 +122,31 @@ sub parse_conf {
 if (!exists $IWLConfig{JS_DIR}) {
     # Default values
     %IWLConfig = (
-	SKIN         => 'default',
-	SKIN_DIR     => '/iwl/skin',
-	IMAGE_DIR    => '/images',
-	ICON_DIR     => '/images/icons',
-	ICON_EXT     => 'gif',
-	JS_DIR       => '/iwl/jscript',
-	STRICT_LEVEL => 1,
+        SKIN         => 'default',
+        SKIN_DIR     => '/iwl/skin',
+        IMAGE_DIR    => '/images',
+        ICON_DIR     => '/images/icons',
+        ICON_EXT     => 'gif',
+        JS_DIR       => '/iwl/jscript',
+        STRICT_LEVEL => 1,
         DEBUG        => '',
     );
 
     if ($ENV{IWL_CONFIG_FILE} && -s $ENV{IWL_CONFIG_FILE}) {
-	parse_conf($ENV{IWL_CONFIG_FILE});
+        parse_conf($ENV{IWL_CONFIG_FILE});
+    } elsif (-s 'iwl.conf') {
+        parse_conf('iwl.conf');
     } else {
-	require Cwd;
-	import Cwd qw(abs_path);
+        require Cwd;
+        import Cwd qw(abs_path);
 
-	my $script_path = abs_path($0);
-	my $conf;
+        my $script_path = abs_path($0);
+        my $conf;
 
-	$script_path =~ s/[^\/]+$//;
-	$conf = $script_path . 'iwl.conf';
+        $script_path =~ s/[^\/]+$//;
+        $conf = $script_path . 'iwl.conf';
 
-	parse_conf($conf) if (-s $conf);
+        parse_conf($conf) if (-s $conf);
     }
     $IWLConfig{SKIN_DIR} .= '/' . $IWLConfig{SKIN};
     $IWLConfig{IMAGE_DIR} = $IWLConfig{SKIN_DIR} . $IWLConfig{IMAGE_DIR};
