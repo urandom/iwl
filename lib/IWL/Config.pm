@@ -58,6 +58,10 @@ The level of strictness. If greater than 1, attribute names will be checked, and
 
 If true, more debug information will be produced. Default value: I<''>
 
+=item B<JS_WHITELIST>
+
+A comma separated list of config elements, which are allowed to make it into the JavaScript IWL.Config object. The default value includes the previously mentioned config elements.
+
 =item B<RESPONSE_CLASS>
 
 If defined, this class will be used for sending data to the server. See L<IWL::Response> for more details.
@@ -101,6 +105,10 @@ It is mutated to I<SKIN_DIR> + '/' + I<SKIN> + I<IMAGE_DIR>
 
 It is mutated to I<SKIN_DIR> + '/' + I<SKIN> + I<ICON_DIR>
 
+=item B<JS_WHITELIST>
+
+It is mutated to an array reference, by splitting the value by a I<','>
+
 =back
 
 =cut
@@ -130,6 +138,7 @@ if (!exists $IWLConfig{JS_DIR}) {
         JS_DIR       => '/iwl/jscript',
         STRICT_LEVEL => 1,
         DEBUG        => '',
+        JS_WHITELIST => 'SKIN,SKIN_DIR,IMAGE_DIR,ICON_DIR,ICON_EXT,JS_DIR,STRICT_LEVEL,DEBUG',
     );
 
     if ($ENV{IWL_CONFIG_FILE} && -s $ENV{IWL_CONFIG_FILE}) {
@@ -148,9 +157,10 @@ if (!exists $IWLConfig{JS_DIR}) {
 
         parse_conf($conf) if (-s $conf);
     }
-    $IWLConfig{SKIN_DIR} .= '/' . $IWLConfig{SKIN};
-    $IWLConfig{IMAGE_DIR} = $IWLConfig{SKIN_DIR} . $IWLConfig{IMAGE_DIR};
-    $IWLConfig{ICON_DIR}  = $IWLConfig{SKIN_DIR} . $IWLConfig{ICON_DIR};
+    $IWLConfig{SKIN_DIR}    .= '/' . $IWLConfig{SKIN};
+    $IWLConfig{IMAGE_DIR}    = $IWLConfig{SKIN_DIR} . $IWLConfig{IMAGE_DIR};
+    $IWLConfig{ICON_DIR}     = $IWLConfig{SKIN_DIR} . $IWLConfig{ICON_DIR};
+    $IWLConfig{JS_WHITELIST} = [split ',', $IWLConfig{JS_WHITELIST}];
 }
 
 @EXPORT_OK = qw(%IWLConfig);

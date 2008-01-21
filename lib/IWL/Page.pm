@@ -249,7 +249,8 @@ sub __init {
 
     my $script = IWL::Script->new;
     $script->appendScript("if (!window.IWL) var IWL = {};" .
-                          "IWL.Config = " . toJSON(\%IWLConfig) . ";");
+                          "IWL.Config = " .
+        toJSON({map {$_ => $IWLConfig{$_}} @{$IWLConfig{JS_WHITELIST}}}) . ";");
     $head->appendChild($script);
 
     $head->appendChild($skin);
