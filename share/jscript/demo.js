@@ -153,7 +153,7 @@ function run_prototype_tests() {
             test_span.firstChild.appendChild(new Element('select', {name: 'select'})).appendChild(new Element('option', {value: 'foo'}));
             test_span.down(1).appendChild(new Element('input', {type: 'text', value: 0.17}));
             test_span.down(2).appendChild(new Element('div', {className: 'slider', name: 'slider'})).control = {value: 0.26};
-            test_span.down(2).appendChild(new Element('div', {className: 'entry', name: 'entry', id: 'e'}).update(new Element('input', {className: 'entry_text', value: 15, id: 'e_text'})));
+            test_span.down(2).appendChild(new Element('div', {className: 'entry', id: 'e'}).update(new Element('input', {className: 'entry_text', value: 15, id: 'e_text', name: 'entry'})));
             test_span.firstChild.appendChild(new Element('textarea', {id: 'textarea'})).value = 'Some text';
             IWL.Entry.create(test_span.select('.entry').first());
             var params = test_span.getControlElementParams();

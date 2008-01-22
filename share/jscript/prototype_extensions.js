@@ -243,7 +243,11 @@ Object.extend(Event, (function() {
             push_values(valid_name(s), s.control.value);
         });
       entries.each(function(e) {
-          push_values(valid_name(e), e.getValue());
+          push_values(
+            e.control.hasAttribute('name')
+              ? e.control.readAttribute('name')
+              : e.id,
+            e.getValue());
         });
       selects.each(function(s) {
           push_values(valid_name(s), s.value);
