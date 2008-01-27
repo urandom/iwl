@@ -1538,4 +1538,5 @@ div.tooltip_content {
     width: 100%;
     margin: -16px 0 0 0;
     text-align: center;
+    color: #000 !important;
 }
