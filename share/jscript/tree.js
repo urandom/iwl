@@ -812,7 +812,7 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     return $($_);
                 }).compact();
             Object.extend(this, row_data);
-            if (!(this.path) || !this.path.length || this.path.length == 1)
+            if (!(this.path) || !this.path.length || this.path.length == 1 || this.tree.isList)
                 this.tree.body.childList.push(this);
             initEvents.call(this);
         },
