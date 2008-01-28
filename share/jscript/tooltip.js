@@ -39,7 +39,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     function append() {
         parentNode = this.options.parent == 'document.body' ? document.body : $(this.options.parent);
-        if (parentNode || !this.parentNode)
+        if (parentNode || !this.parentNode || this.parentNode.nodeType != Node.ELEMENT_NODE)
             (parentNode || document.body).appendChild(this);
         if (this.options.content)
             this.setContent(this.options.content);
