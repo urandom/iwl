@@ -110,3 +110,6 @@ div.expander .expander_icon {
 div.expander_collapsed .expander_icon {
     background: url(/iwl/skin/default/images/expander/arrows.gif) no-repeat;
 }
+.progress_bar_label {
+    margin: -16px 0 0 0;
+}
