@@ -24,7 +24,7 @@ GetOptions (
 	'icondir=s'           => \$opt_icondir,
 	'jsdir=s'             => \$opt_jsdir,
 	'cgibin=s'            => \$opt_cgibin,
-    'absolute_cgibin=s'   => \$opt_absolute_cgibin;
+    'absolute_cgibin=s'   => \$opt_absolute_cgibin,
 	'static_uri_script=s' => \$opt_static_uri_script,
 	'packjs'              => \$opt_pack,
 	'help'                => \$opt_help,
