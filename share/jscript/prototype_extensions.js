@@ -171,10 +171,10 @@ Object.extend(Event, (function() {
     },
     positionAtCenter: function(element, relative) {
       element = $(element);
-      var dims = element.getDimensions();
-      var page_dim = document.viewport.getDimensions();
       if (!relative)
         element.style.position = "absolute";
+      var dims = element.getDimensions();
+      var page_dim = document.viewport.getDimensions();
       element.style.left = (page_dim.width - dims.width)/2 + 'px';
       if ((page_dim.height - dims.height) < 0)
         element.style.top = '10px';
