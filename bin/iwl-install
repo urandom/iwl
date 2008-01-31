@@ -15,7 +15,7 @@ sub recursive(&@);
 
 Getopt::Long::Configure ('no_ignore_case');
 
-my ($opt_docroot, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_help, $opt_jsdir, $opt_cgibin, $opt_static_uri_script, $opt_pack);
+my ($opt_docroot, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_help, $opt_jsdir, $opt_cgibin, $opt_absolute_cgibin, $opt_static_uri_script, $opt_pack);
 
 GetOptions (
 	'docroot=s'           => \$opt_docroot,
@@ -24,6 +24,7 @@ GetOptions (
 	'icondir=s'           => \$opt_icondir,
 	'jsdir=s'             => \$opt_jsdir,
 	'cgibin=s'            => \$opt_cgibin,
+    'absolute_cgibin=s'   => \$opt_absolute_cgibin;
 	'static_uri_script=s' => \$opt_static_uri_script,
 	'packjs'              => \$opt_pack,
 	'help'                => \$opt_help,
@@ -36,9 +37,9 @@ usage_error("The option '--docroot' is mandatory.") unless $opt_docroot;
 my $docroot = File::Spec->rel2abs($opt_docroot);
 die "$docroot: $!" unless -d $docroot;
 
-sanitize($opt_cgibin, $opt_jsdir, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_static_uri_script);
+sanitize($opt_cgibin, $opt_absolute_cgibin, $opt_jsdir, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_static_uri_script);
 
-my $cgibin = $docroot . ($opt_cgibin || '/cgi-bin');
+my $cgibin = $opt_absolute_cgibin || $docroot . ($opt_cgibin || '/cgi-bin');
 
 my $jsdir    = $opt_jsdir    || '/iwl/jscript';
 my $skindir  = $opt_skindir  || '/iwl/skin';
@@ -182,13 +183,16 @@ Usage: $0 [OPTIONS]
     -h, --help              print this help message
 
     Optional:
-        -j, --jsdir=DIR     the javascript dir, relative to the document root
-        --skindir=DIR       the skins dir, relative to the document root
-        --imagedir=DIR      the image dir, relative to the default skin dir
-        --icondir=DIR       the icon dir, relative to the default icon dir
+        -j, --jsdir=URI     the javascript dir, relative to the document root
+        --skindir=URI       the skins dir, relative to the document root
+        --imagedir=URI      the image dir, relative to the default skin dir
+        --icondir=URI       the icon dir, relative to the default icon dir
 
-        -c, --cgibin=DIR    the cgi-bin directory, relative to the document root
+        -c, --cgibin=URI    the cgi-bin directory, relative to the document root
                             /cgi-bin is assumed if none is specified
+
+        --absolute_cgibin=DIR
+                            the absolute path to the server's cgi-bin directory
 
         --static_uri_script=SCRIPT
                             the static script path, relative to the
