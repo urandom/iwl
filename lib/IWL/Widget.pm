@@ -187,21 +187,36 @@ sub signalConnect {
     } else {
 	$callbacks .= "; $callback";
     }
-    $self->setAttribute("on$signal" => $callbacks, 'none');
+    $self->setAttribute("on$signal" => $callbacks);
 
     return $self;
 }
 
-=item B<signalDisconnect> (B<SIGNAL>, B<EXPR>)
+=item B<signalDisconnect> ([B<SIGNAL>], [B<EXPR>])
 
 Disconnects the expression from the signal handler
 
-Parameters: B<SIGNAL> - the signal, B<EXPR> - the javascript expression to be disconnected
+Parameters: B<SIGNAL> - the signal. If omitted, all signal handlers wil be removed, B<EXPR> - the javascript expression to be disconnected. If omitted, all expressions for the given signal will be removed.
 
 =cut
 
 sub signalDisconnect {
     my ($self, $signal, $callback) = @_;
+
+    if ($signal && !$callback) {
+        if ($self->{_customSignals}{$signal}) {
+            $self->{_customSignals}{$signal} = [];
+            return $self;
+        } elsif (exists $self->{_signals}{$signal}) {
+            $self->deleteAttribute("on$signal");
+            return $self;
+        }
+        return;
+    } elsif (!$signal) {
+        $self->{_customSignals}{$_} = [] foreach keys %{$self->{_customSignals}};
+        $self->deleteAttribute("on$_") foreach keys %{$self->{_signals}};
+        return $self;
+    }
 
     if ($self->{_customSignals}{$signal}) {
 	foreach my $cb (@{$self->{_customSignals}{$signal}}) {
@@ -217,7 +232,7 @@ sub signalDisconnect {
     return if $index == -1;
 
     substr $callbacks, $index, length $callback, '';
-    $self->setAttribute("on$signal" => $callbacks, 'none');
+    $self->setAttribute("on$signal" => $callbacks);
 
     return $self;
 }
@@ -227,6 +242,8 @@ sub signalDisconnect {
 Disconnects all of the expressions from the signal handler
 
 Parameters: B<SIGNAL> - the signal
+
+B<DEPRECATED> - use L<IWL::Widget::signalConnect> without an expression parameter instead.
 
 =cut
 

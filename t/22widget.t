@@ -1,4 +1,4 @@
-use Test::More tests => 28;
+use Test::More tests => 32;
 
 use IWL::Widget;
 
@@ -15,12 +15,19 @@ use IWL::Widget;
 {
 	my $widget = IWL::Widget->new;
 	is($widget->signalConnect(click => 'alert(1)'), $widget);
-	is($widget->signalConnect('mousewheel'), $widget);
+    is($widget->signalConnect('mousewheel'), $widget);
 	ok(!$widget->signalConnect('some_signal'));
 
 	$widget->signalConnect(click => 'alert(this)');
 	is($widget->signalDisconnect(click => 'alert(1)'), $widget);
 	is($widget->getContent, '< onclick="; alert(this)"></>' . "\n");
+	$widget->signalConnect(click => 'window.alert(2)');
+	$widget->signalConnect(click => 'window.alert(this)');
+	$widget->signalConnect(mouseover => 'alert("this")');
+	is($widget->signalDisconnect('click'), $widget);
+	is($widget->getContent, '< onmouseover="alert(&quot;this&quot;)"></>' . "\n");
+	is($widget->signalDisconnect, $widget);
+	is($widget->getContent, '<></>' . "\n");
 }
 
 {
