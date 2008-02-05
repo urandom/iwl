@@ -117,6 +117,7 @@ Returns the script string from the object
 sub getScript {
     my $self = shift;
     my $string = join '; ', @{$self->{__scripts}};
+    $string =~ s/;+/;/g;
     $string .= ';' if $string && $string !~ /;\s*$/;
 
     return $string;
