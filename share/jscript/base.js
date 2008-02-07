@@ -212,7 +212,13 @@ Object.extend(IWL, (function() {
                     return textNode;
                 }
             } else {
-                var attributes = Object.extend({}, json.attributes);
+                var attributes = {};
+		for (var attr in json.attributes) {
+		    var value = json.attributes[attr];
+		    if (Object.isString(value))
+			value = value.unescapeHTML();
+		    attributes[attr] = value;
+		}
                 if (attributes.style) {
                     var time = new Date;
                     var style = $H(attributes.style);
