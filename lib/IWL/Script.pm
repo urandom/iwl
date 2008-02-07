@@ -8,6 +8,7 @@ use strict;
 use base qw(IWL::Object);
 
 use IWL::Text;
+use IWL::Config qw(%IWLConfig);
 
 =head1 NAME
 
@@ -110,7 +111,8 @@ sub setScript {
 
 =item B<getScript>
 
-Returns the script string from the object
+Returns the script string from the object.
+If the I<STRICT_LEVEL> value of L<IWL::Config> is greater than I<1>, the script will be encapsulated by B<E<lt>![CDATA[ ... ]]E<gt>>
 
 =cut
 
@@ -120,7 +122,11 @@ sub getScript {
     $string =~ s/;+/;/g;
     $string .= ';' if $string && $string !~ /;\s*$/;
 
-    return $string;
+    return $string
+      ? $IWLConfig{STRICT_LEVEL} > 1
+        ? "\n//<![CDATA[\n" . $string . "\n//]]>"
+        : $string
+      : '';
 }
 
 # Protected

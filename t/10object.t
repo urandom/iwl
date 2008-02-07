@@ -1,6 +1,9 @@
 use Test::More tests => 35;
 
 use IWL::Object;
+use IWL::Config '%IWLConfig';
+
+$IWLConfig{STRICT_LEVEL} = 2;
 
 {
 	my $object = IWL::Object->new;

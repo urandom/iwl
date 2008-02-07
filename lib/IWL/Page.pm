@@ -76,7 +76,7 @@ sub new {
 
     $self->{_tag} = "html";
     $self->setDeclaration('xhtml1');
-    $self->setAttribute(xmlns => "http://www.w3c.org/1999/xhtml");
+    $self->setAttribute(xmlns => "http://www.w3.org/1999/xhtml");
     $self->setAttribute('xmlns:iwl' => "http://namespace.bloka.org/iwl");
 
     $self->__init(%args);

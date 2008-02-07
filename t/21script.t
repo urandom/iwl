@@ -1,6 +1,7 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use IWL::Script;
+use IWL::Config '%IWLConfig';
 
 {
 	my $script = IWL::Script->new;
@@ -22,4 +23,7 @@ use IWL::Script;
 
 	$script->setScript('console.debug(1)');
 	is($script->getScript, 'console.debug(1);');
+
+    $IWLConfig{STRICT_LEVEL} = 2;
+	is($script->getScript, "\n//<![CDATA[\nconsole.debug(1);\n//]]>");
 }

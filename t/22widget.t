@@ -1,6 +1,9 @@
 use Test::More tests => 32;
 
 use IWL::Widget;
+use IWL::Config '%IWLConfig';
+
+$IWLConfig{STRICT_LEVEL} = 2;
 
 {
 	my @widgets = IWL::Widget->newMultiple(10);
