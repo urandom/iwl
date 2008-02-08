@@ -155,10 +155,10 @@ sub getAlt {
 #
 sub _realize {
     my $self = shift;
+    my $src;
     
     $self->SUPER::_realize;
-    if (!$self->getAlt) {
-        my $src = $self->getSrc;
+    if (!$self->getAlt && ($src = $self->getSrc)) {
         my $name = pop @{[split '/', $src]};
         $name =~ s/_/ /g;
         $name =~ s/\.\w+?$//;

@@ -36,6 +36,7 @@ my $entry = IWL::Entry->new;
 			tag => 'img',
 			attributes => {
 				src => 'foo.jpg',
+                alt => 'foo',
 				id => 'first_image',
 				class => 'image'
 			}
