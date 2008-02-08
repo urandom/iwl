@@ -151,6 +151,21 @@ sub getAlt {
     shift->getAttribute('alt', 1);
 }
 
+# Protected
+#
+sub _realize {
+    my $self = shift;
+    
+    $self->SUPER::_realize;
+    if (!$self->getAlt) {
+        my $src = $self->getSrc;
+        my $name = pop @{[split '/', $src]};
+        $name =~ s/_/ /g;
+        $name =~ s/\.\w+?$//;
+        $self->setAlt($name);
+    }
+}
+
 1;
 
 =head1 LICENCE AND COPYRIGHT
