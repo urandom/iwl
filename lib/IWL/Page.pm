@@ -236,8 +236,7 @@ sub __init {
     $self->SUPER::appendChild($head);
     $self->SUPER::appendChild($body);
 
-    return 1 if $args{simple};
-    delete $args{simple};
+    do { $self->{__simple} = delete $args{simple}; return 1 } if $args{simple};
 
     $self->_constructorArguments(%args);
     my $skin = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/main.css', undef, title => 'Main');

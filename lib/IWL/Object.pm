@@ -80,6 +80,8 @@ sub new {
     # The initialization scripts
     $self->{_initScripts} = [];
 
+    $self->{_tailObjects} = [];
+
     return $self;
 }
 
@@ -458,9 +460,7 @@ sub getContent {
         $content .= "</" . $self->{_tag} . ">\n";
     }
 
-    foreach (@{$self->{_tailObjects}}) {
-        $content .= $_->getContent;
-    }
+    $content .= $_->getContent foreach @{$self->{_tailObjects}};
 
     return $content;
 }
@@ -535,9 +535,7 @@ sub getObject {
         push @$children, $child->getObject if $child;
     }
 
-    foreach (@{$self->{_tailObjects}}) {
-	push @$objects, $_->getObject;
-    }
+    push @$objects, $_->getObject foreach @{$self->{_tailObjects}};
 
     my $attributes = {};
     foreach my $key (keys %{$self->{_attributes}}) {
