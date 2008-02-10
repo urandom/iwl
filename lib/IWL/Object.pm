@@ -113,7 +113,7 @@ sub lastChild {
 =item B<nextChild> (B<CURRENT_CHILD>)
 
 Obtains the next child of the object.
-Parameter: B<CURRENT_CHILD> - it's sibling
+Parameter: B<CURRENT_CHILD> - its sibling
 Returns the child object, or null if there is no next child.
 
 =cut
@@ -136,7 +136,7 @@ sub nextChild {
 =item B<prevChild> (B<CURRENT_CHILD>)
 
 Obtains the previous child of the object.
-Parameter: B<CURRENT_CHILD> - it's sibling
+Parameter: B<CURRENT_CHILD> - its sibling
 Returns the child object, or null if there is no previous child.
 
 =cut
@@ -394,7 +394,7 @@ sub clone {
 
 =item B<getContent>
 
-Returns the markup for the current object and it's children.
+Returns the markup for the current object and its children.
 
 =cut
 
@@ -467,7 +467,7 @@ sub getContent {
 
 =item B<print>
 
-Prints the current object and all of it's children.
+Prints the current object and all of its children.
 
 L<Warning>: Deprecated. Please see IWL::Object::send(3pm)
 
@@ -497,7 +497,7 @@ sub printHTML {
 
 =item B<getObject>
 
-Returns the object and it's children as a new object, with a structure needed for JSON
+Returns the object and its children as a new object, with a structure needed for JSON
 
 =cut
 
@@ -566,7 +566,7 @@ sub getObject {
 
 =item B<getJSON>
 
-Returns a JSON object for the current object and it's children.
+Returns a JSON object for the current object and its children.
 
 If the html looks like this:
   <div attr1="1" attr2="2" style="display: none;">
