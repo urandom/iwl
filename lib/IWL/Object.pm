@@ -306,7 +306,7 @@ sub insertAfter {
 
 Clones itself and optionally, its children
 
-Parameters: B<DEPTH> - The optional depth limit of the cloining
+Parameters: B<DEPTH> - The optional depth limit of the cloning
 
 Note: Copied the implementation from Clone::PP(3pm). Weak pointers are discarded, and not cloned. This is done to ensure that objects, such as the parent node of an object, are not cloned.
 
