@@ -123,6 +123,7 @@ sub nextChild {
     my $current = shift;
     my $next;
 
+    return unless $current;
     for (my $i = 0; $i < @{$self->{childNodes}}; $i++) {
         if ($current == $self->{childNodes}->[$i]) {
             $next = $self->{childNodes}->[$i + 1];
@@ -146,6 +147,7 @@ sub prevChild {
     my $current = shift;
     my $prev;
 
+    return unless $current;
     for (my $i = @{$self->{childNodes}} - 1; $i >= 0; $i--) {
         last if $i == 0;
         if ($current == $self->{childNodes}->[$i]) {
