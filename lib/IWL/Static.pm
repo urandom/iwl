@@ -134,13 +134,15 @@ sub handleRequest {
     local $/;
     my $content = <DATA>;
     close DATA;
-    my $modtime = (stat $uri)[9];
+    my @stat = stat $uri;
+    my ($inode, $modtime) = @stat[1,9];
+    my $clength = length($content);
     my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
     my $header = {
         'Content-type'   => $mime,
-        'Content-length' => length($content),
+        'Content-length' => $clength,
         'Last-Modified'  => time2str($modtime),
-        'ETag'           => $modtime . '_' . (-s $uri),
+        'ETag'           => sprintf('"%x-%x-%x"', $inode, $clength, $modtime),
     };
     $options{header} = $options{header}->($uri, $mime) if ref $options{header} eq 'CODE';
     $header->{$_} = $options{header}{$_} foreach keys %{

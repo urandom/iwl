@@ -14,7 +14,7 @@ ok(exists $output->{header});
 ok(exists $output->{header}{'Last-Modified'});
 like($output->{header}{'Content-length'}, qr(^\d+$));
 like($output->{header}{'Content-type'}, qr(^[\w\-.+]+/[\w\-.+]+(;.*)?$));
-like($output->{header}{ETag}, qr(^\d+_\d+$));
+like($output->{header}{ETag}, qr(^"[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+"$));
 my @scripts = qw(/foo/bar.js alpha.css);
 is_deeply([$s->addRequest(@scripts)], [qw(/foo/bar.js alpha.css)]);
 $IWLConfig{STATIC_URI_SCRIPT} = 'foo';
