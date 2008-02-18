@@ -31,7 +31,7 @@ IWL::Static provides a simple method for serving static content to a server
 
 In order to serve static content through I<IWL::Static>, a few steps must be taken.
 
-To use I<IWL::Static> static internally, the I<STATIC_URI_SCRIPT> configuration option must be set in your iwl.conf file. This options points to the script, which will serve the static content. The I<DOCUMENT_ROOT> option should also be set, unless the files to be served use relative URIs (the IWL static files use absolute URIs). If the user wants to include more URIs, along with the default IWL ones, the I<STATIC_URIS> option must also be set.
+To use I<IWL::Static> static internally, either the I<STATIC_URI_SCRIPT>, or I<STATIC_LABEL> configuration options must be set in your iwl.conf file. The I<STATIC_URI_SCRIPT> option points to the script, which will serve the static content. The I<DOCUMENT_ROOT> option should also be set, unless the files to be served use relative URIs (the IWL static files use absolute URIs). If the user wants to include more URIs, along with the default IWL ones, the I<STATIC_URIS> option must also be set.
 
 The Perl script, which is referenced by I<STATIC_URI_SCRIPT>, will have the following code in its most simplest form:
  
@@ -41,6 +41,8 @@ The Perl script, which is referenced by I<STATIC_URI_SCRIPT>, will have the foll
  IWL::Static->new->handleRequest;
 
 This simple script will fetch all required content, which is inside the I<STATIC_URIS>, as well as the default IWL static content, and will send it to the server with the appropriate header.
+
+If the I<STATIC_LABEL> option is set to a true value, the static content files will be labeled with a unique GET parameter, and the web server will be responsible for serving them.
 
 =head1 CONSTRUCTOR
 
@@ -116,12 +118,11 @@ sub handleRequest {
     my ($self, %options) = @_;
     my %form = $self->getParams;
     my $uri = $form{IWLStaticURI};
+    my $etag;
     return unless $uri;
 
-    $uri = File::Spec->join($IWLConfig{DOCUMENT_ROOT}, $uri)
-      if substr($uri, 0, 1) eq '/' && $IWLConfig{DOCUMENT_ROOT};
+    ($etag, $uri) = $self->__getETag($uri);
 
-    $uri =~ s{/+}{/}g;
     unless ($self->{_staticURIs}{$uri}) {
         my (undef, $directory, undef) = File::Spec->splitpath($uri);
         return $self->_pushError(
@@ -135,14 +136,13 @@ sub handleRequest {
     my $content = <DATA>;
     close DATA;
     my @stat = stat $uri;
-    my ($inode, $modtime) = @stat[1,9];
-    my $clength = length($content);
+    my ($inode, $clength, $modtime) = @stat[1,7,9];
     my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
     my $header = {
         'Content-type'   => $mime,
         'Content-length' => $clength,
         'Last-Modified'  => time2str($modtime),
-        'ETag'           => sprintf('"%x-%x-%x"', $inode, $clength, $modtime),
+        'ETag'           => qq|"$etag"|,
     };
     $options{header} = $options{header}->($uri, $mime) if ref $options{header} eq 'CODE';
     $header->{$_} = $options{header}{$_} foreach keys %{
@@ -166,9 +166,19 @@ Parameters: B<URI> - a URI, or a list of URIs, which will be handled by the stat
 =cut
 
 sub addRequest {
-    my ($self, $script) = (shift, $IWLConfig{STATIC_URI_SCRIPT});
-    return @_ unless $script;
-    $_ = $script . '?IWLStaticURI=' . $_ foreach @_;
+    my ($self, $script, $label) = (shift, $IWLConfig{STATIC_URI_SCRIPT}, $IWLConfig{STATIC_LABEL});
+    return @_ unless $script || $label;
+    if ($script) {
+        $_ = $script . '?IWLStaticURI=' . $_ foreach @_;
+    } else {
+        foreach (@_) {
+            if (index($_, '?') > -1) {
+                $_ .= '&' . $self->__getETag($_);
+            } else {
+                $_ .= '?' . $self->__getETag($_);
+            }
+        }
+    }
     return @_;
 }
 
@@ -182,6 +192,19 @@ sub __init {
     my @uri = @IWLConfig{qw(JS_DIR SKIN_DIR IMAGE_DIR ICON_DIR)};
     push @uri, (split ':', $IWLConfig{STATIC_URIS}) if $IWLConfig{STATIC_URIS};
     $self->addURI(map {$_ => 1} @uri);
+}
+
+sub __getETag {
+    my ($self, $uri) = @_;
+    $uri = File::Spec->join($IWLConfig{DOCUMENT_ROOT}, $uri)
+      if substr($uri, 0, 1) eq '/' && $IWLConfig{DOCUMENT_ROOT};
+
+    $uri =~ s{/+}{/}g;
+
+    my @stat = stat $uri;
+    my ($inode, $clength, $modtime) = @stat[1,7,9];
+    my $etag = sprintf('%x-%x-%x', $inode, $clength, $modtime);
+    return wantarray ? ($etag, $uri) : $etag;
 }
 
 sub __recursiveScan {
