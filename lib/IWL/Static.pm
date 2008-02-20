@@ -172,10 +172,12 @@ sub addRequest {
         $_ = $script . '?IWLStaticURI=' . $_ foreach @_;
     } else {
         foreach (@_) {
+            my $tag = $self->__getETag($_);
+            next unless $tag;
             if (index($_, '?') > -1) {
-                $_ .= '&' . $self->__getETag($_);
+                $_ .= '&' . $tag;
             } else {
-                $_ .= '?' . $self->__getETag($_);
+                $_ .= '?' . $tag;
             }
         }
     }
@@ -203,7 +205,7 @@ sub __getETag {
 
     my @stat = stat $uri;
     my ($inode, $clength, $modtime) = @stat[1,7,9];
-    my $etag = sprintf('%x-%x-%x', $inode, $clength, $modtime);
+    my $etag = $inode ? sprintf('%x-%x-%x', $inode, $clength, $modtime) : '';
     return wantarray ? ($etag, $uri) : $etag;
 }
 
