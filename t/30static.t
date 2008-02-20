@@ -14,15 +14,15 @@ ok(exists $output->{header});
 ok(exists $output->{header}{'Last-Modified'});
 like($output->{header}{'Content-length'}, qr(^\d+$));
 like($output->{header}{'Content-type'}, qr(^[\w\-.+]+/[\w\-.+]+(;.*)?$));
-like($output->{header}{ETag}, qr(^"[0-9a-fA-F]+-[0-9a-fA-F]+-[0-9a-fA-F]+"$));
-my @scripts = qw(/foo/bar.js alpha.css);
-is_deeply([$s->addRequest(@scripts)], [qw(/foo/bar.js alpha.css)]);
+like($output->{header}{ETag}, qr(^[0-9a-fA-F]+-[0-9a-fA-F]+$));
+my @scripts = qw(/foo/bar.js ./t/iwl.conf);
+is_deeply([$s->addRequest(@scripts)], [@scripts]);
 $IWLConfig{STATIC_URI_SCRIPT} = 'foo';
 is_deeply([$s->addRequest(@scripts)], [
-    'foo?IWLStaticURI=/foo/bar.js', 'foo?IWLStaticURI=alpha.css'
+    '/foo/bar.js', 'foo?IWLStaticURI=./t/iwl.conf'
 ]);
-my $script = '/foo/bar.js';
-is_deeply([$s->addRequest($script)], ['foo?IWLStaticURI=/foo/bar.js']);
+my $script = './t/iwl.conf';
+is_deeply([$s->addRequest($script)], ['foo?IWLStaticURI=./t/iwl.conf']);
 
 package FooBar;
 

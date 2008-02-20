@@ -130,20 +130,27 @@ sub handleRequest {
           unless $self->{_staticURIs}{$directory};
     }
 
-    local *DATA;
-    open DATA, $uri or return $self->_pushError($!);
-    local $/;
-    my $content = <DATA>;
-    close DATA;
-    my @stat = stat $uri;
-    my ($inode, $clength, $modtime) = @stat[1,7,9];
+    my ($header, $content) = ({}, '');
     my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
-    my $header = {
-        'Content-type'   => $mime,
-        'Content-length' => $clength,
-        'Last-Modified'  => time2str($modtime),
-        'ETag'           => qq|"$etag"|,
-    };
+
+    if (exists $ENV{HTTP_IF_NONE_MATCH} && $ENV{HTTP_IF_NONE_MATCH} eq $etag) {
+        $header->{Status} = 304;
+    } else {
+        local *DATA;
+        open DATA, $uri or return $self->_pushError($!);
+        local $/;
+        $content = <DATA>;
+        close DATA;
+        my @stat = stat $uri;
+        my ($inode, $clength, $modtime) = @stat[1,7,9];
+        $header = {
+            'Content-type'   => $mime,
+            'Content-length' => $clength,
+            'Last-Modified'  => time2str($modtime),
+            'ETag'           => $etag,
+        };
+    }
+
     $options{header} = $options{header}->($uri, $mime) if ref $options{header} eq 'CODE';
     $header->{$_} = $options{header}{$_} foreach keys %{
         ref $options{header} eq 'CODE'
@@ -168,12 +175,12 @@ Parameters: B<URI> - a URI, or a list of URIs, which will be handled by the stat
 sub addRequest {
     my ($self, $script, $label) = (shift, $IWLConfig{STATIC_URI_SCRIPT}, $IWLConfig{STATIC_LABEL});
     return @_ unless $script || $label;
-    if ($script) {
-        $_ = $script . '?IWLStaticURI=' . $_ foreach @_;
-    } else {
-        foreach (@_) {
-            my $tag = $self->__getETag($_);
-            next unless $tag;
+    foreach (@_) {
+        my $tag = $self->__getETag($_);
+        next unless $tag;
+        if ($script) {
+            $_ = $script . '?IWLStaticURI=' . $_;
+        } else {
             if (index($_, '?') > -1) {
                 $_ .= '&' . $tag;
             } else {
@@ -205,7 +212,7 @@ sub __getETag {
 
     my @stat = stat $uri;
     my ($inode, $clength, $modtime) = @stat[1,7,9];
-    my $etag = $inode ? sprintf('%x-%x-%x', $inode, $clength, $modtime) : '';
+    my $etag = $inode ? sprintf('%x-%x', $clength, $modtime) : '';
     return wantarray ? ($etag, $uri) : $etag;
 }
 
