@@ -1,4 +1,4 @@
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use IWL::Static;
 use IWL::Config '%IWLConfig';
@@ -23,6 +23,12 @@ is_deeply([$s->addRequest(@scripts)], [
 ]);
 my $script = './t/iwl.conf';
 is_deeply([$s->addRequest($script)], ['foo?IWLStaticURI=./t/iwl.conf']);
+
+$IWLConfig{STATIC_URI_SCRIPT} = '';
+$IWLConfig{STATIC_LABEL} = 1;
+$script = './t/iwl.conf';
+$s->addRequest($script);
+like($script, qr|\./t/iwl\.conf\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
 
 package FooBar;
 
