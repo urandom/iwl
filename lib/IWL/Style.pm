@@ -81,9 +81,8 @@ Parameter: B<FILE> - the css file
 sub appendStyleImport {
     my ($self, $style) = @_;
     require IWL::Static;
-    IWL::Static->addRequest($style);
 
-    my $import = IWL::Text->new('@import "' . $style . '";' . "\n");
+    my $import = IWL::Text->new('@import "' . IWL::Static->addRequest($style) . '";' . "\n");
 
     return $self->appendChild($import);
 }

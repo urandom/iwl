@@ -56,11 +56,10 @@ sub newLinkToCSS {
     my ($self, $url, $media, %args) = @_;
     return unless $url;
     require IWL::Static;
-    IWL::Static->addRequest($url);
     return IWL::Page::Link->new(
         rel   => 'stylesheet',
         type  => 'text/css',
-        href  => $url,
+        href  => IWL::Static->addRequest($url),
         media => $media || 'screen',
 	%args,
     );

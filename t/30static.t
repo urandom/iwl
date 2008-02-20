@@ -26,9 +26,7 @@ is_deeply([$s->addRequest($script)], ['foo?IWLStaticURI=./t/iwl.conf']);
 
 $IWLConfig{STATIC_URI_SCRIPT} = '';
 $IWLConfig{STATIC_LABEL} = 1;
-$script = './t/iwl.conf';
-$s->addRequest($script);
-like($script, qr|\./t/iwl\.conf\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
+like($s->addRequest('./t/iwl.conf'), qr|\./t/iwl\.conf\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
 
 package FooBar;
 

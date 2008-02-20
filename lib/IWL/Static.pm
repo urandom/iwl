@@ -168,14 +168,14 @@ sub handleRequest {
 Changes the B<URI> into a static request, if the I<STATIC_URI_SCRIPT> option is set in the %IWLConfig. It does not change the B<URI> otherwise.
 This method is used by L<IWL::Widget>s, which use static content, such as an L<IWL::Image>.
 
-Parameters: B<URI> - a URI, or a list of URIs, which will be handled by the static uri handler script. This parameter will be mutated.
+Parameters: B<URI> - a URI, or a list of URIs, which will be handled by the static uri handler script
 
 =cut
 
 sub addRequest {
-    my ($self, $script, $label) = (shift, $IWLConfig{STATIC_URI_SCRIPT}, $IWLConfig{STATIC_LABEL});
-    return @_ unless $script || $label;
-    foreach (@_) {
+    my ($self, $script, $label, @uris) = (shift, $IWLConfig{STATIC_URI_SCRIPT}, $IWLConfig{STATIC_LABEL}, @_);
+    return wantarray ? @uris : $uris[0] unless $script || $label;
+    foreach (@uris) {
         my $tag = $self->__getETag($_);
         next unless $tag;
         if ($script) {
@@ -188,7 +188,7 @@ sub addRequest {
             }
         }
     }
-    return @_;
+    return wantarray ? @uris : $uris[0];
 }
 
 # Internal
