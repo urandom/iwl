@@ -1,19 +1,9 @@
-use Test::More tests => 32;
+use Test::More tests => 28;
 
 use IWL::Widget;
 use IWL::Config '%IWLConfig';
 
 $IWLConfig{STRICT_LEVEL} = 2;
-
-{
-	my @widgets = IWL::Widget->newMultiple(10);
-	is (scalar @widgets, 10);
-	isa_ok($widgets[7], 'IWL::Widget');
-
-	@widgets = IWL::Widget->newMultiple({id => 'foo'}, {id => 'bar', class => 'foo'});
-	is (scalar @widgets, 2);
-	isa_ok($widgets[0], 'IWL::Widget');
-}
 
 {
 	my $widget = IWL::Widget->new;

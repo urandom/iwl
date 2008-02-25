@@ -27,12 +27,6 @@ IWL::Widget->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-value options.
 
-IWL::Widget->newMultiple (B<ARGS>, B<ARGS>, ...)
-
-Returns an array of multiple widgets, one for each B<ARGS>.
-
-Parameters: B<ARGS> - a hash ref of arguments, or a integer, specifying how many widgets to create without any arguments
-
 =head1 SIGNALS
 
 =over 4
@@ -126,31 +120,6 @@ sub new {
     $self->_constructorArguments(%args);
 
     return $self;
-}
-
-sub newMultiple {
-    my ($proto, @args) = @_;
-    my @widgets;
-    if (scalar @args == 1 && !ref $args[0]) {
-	foreach (1..$args[0]) {
-	    my $widget = $proto->new;
-	    push @widgets, $widget;
-	}
-    } else {
-        if ($args[0] =~ /^\d+$/) {
-            my $number = shift @args;
-            foreach (1 .. $number) {
-                my $widget = $proto->new(@args);
-                push @widgets, $widget;
-            }
-        } else {
-            foreach my $args (@args) {
-                my $widget = $proto->new(%$args);
-                push @widgets, $widget;
-            }
-        }
-    }
-    return @widgets;
 }
 
 =head1 METHODS

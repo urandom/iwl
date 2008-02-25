@@ -39,6 +39,16 @@ L<IWL::Error> -> L<IWL::Object>
 
 This is the base object module for IWL. Every other module will inherit from it.
 
+=head1 CONSTRUCTOR
+
+IWL::Object->new
+
+IWL::Object->newMultiple (B<ARGS>, B<ARGS>, ...)
+
+Returns an array of multiple objects.
+
+Parameters: B<ARGS> - if only one argument is passed, and it is a number, it is used to create that many number of objects. If the first argument is a number, and is followed by other arguments, the first argument will create the number of objects, with the rest of the arguments passed to the constructor. Otherwise, if the arguments are a list of hash references, they will be used to create the objects.
+
 =head1 PROPERTIES
 
 =over 4
@@ -83,6 +93,31 @@ sub new {
     $self->{_tailObjects} = [];
 
     return $self;
+}
+
+sub newMultiple {
+    my ($proto, @args) = @_;
+    my @objects;
+    if (scalar @args == 1 && !ref $args[0]) {
+	foreach (1..$args[0]) {
+	    my $object = $proto->new;
+	    push @objects, $object;
+	}
+    } else {
+        if ($args[0] =~ /^\d+$/) {
+            my $number = shift @args;
+            foreach (1 .. $number) {
+                my $object = $proto->new(@args);
+                push @objects, $object;
+            }
+        } else {
+            foreach my $args (@args) {
+                my $object = $proto->new(%$args);
+                push @objects, $object;
+            }
+        }
+    }
+    return @objects;
 }
 
 =head1 METHODS

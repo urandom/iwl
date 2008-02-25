@@ -1,7 +1,8 @@
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 use IWL::Static;
 use IWL::Config '%IWLConfig';
+use IWL::Widget;
 use File::Spec;
 
 $IWLConfig{RESPONSE_CLASS} = 'FooBar';
@@ -27,6 +28,9 @@ is_deeply([$s->addRequest($script)], ['foo?IWLStaticURI=./t/iwl.conf']);
 $IWLConfig{STATIC_URI_SCRIPT} = '';
 $IWLConfig{STATIC_LABEL} = 1;
 like($s->addRequest('./t/iwl.conf'), qr|\./t/iwl\.conf\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
+$IWLConfig{JS_DIR} = 'share/jscript/dist';
+my $o = IWL::Widget->new->requiredJs('prototype.js')->getObject;
+like($o->{scripts}[0]{attributes}{src}, qr|share/jscript/dist/prototype\.js\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
 
 package FooBar;
 

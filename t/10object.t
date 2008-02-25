@@ -1,9 +1,19 @@
-use Test::More tests => 35;
+use Test::More tests => 39;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
 
 $IWLConfig{STRICT_LEVEL} = 2;
+
+{
+	my @objects = IWL::Object->newMultiple(10);
+	is (scalar @objects, 10);
+	isa_ok($objects[7], 'IWL::Object');
+
+	@objects = IWL::Object->newMultiple({id => 'foo'}, {id => 'bar', class => 'foo'});
+	is (scalar @objects, 2);
+	isa_ok($objects[0], 'IWL::Object');
+}
 
 {
 	my $object = IWL::Object->new;
