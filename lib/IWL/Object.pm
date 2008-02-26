@@ -989,7 +989,7 @@ Serializes the object to HTML and sends it with a text/plain header
 
 =item B<header>
 
-A hash reference, representing an HTTP header, can be passed, if the I<type> option is either I<html> or I<json>. It will override the default header for those types.
+A hash reference, representing an HTTP header, can be passed. It will extend the default header for those types.
 
 =back
 
@@ -997,16 +997,16 @@ A hash reference, representing an HTTP header, can be passed, if the I<type> opt
 
 sub send {
     my ($self, %args) = @_;
-    my ($header, $content);
+    my ($header, $content) = ref $args{header} eq 'HASH' ? $args{header} : {};
 
     if ($args{type} eq 'html') {
-        $header = $args{header} || IWL::Object::getHTMLHeader;
+        $header = { %{IWL::Object::getHTMLHeader()}, %$header };
         $content = $self->getContent;
     } elsif ($args{type} eq 'json') {
-        $header = $args{header} || IWL::Object::getJSONHeader;
+        $header = { %{IWL::Object::getJSONHeader()}, %$header };
         $content = $self->getJSON;
     } elsif ($args{type} eq 'text') {
-        $header = IWL::Object::getTextHeader;
+        $header = { %{IWL::Object::getTextHeader()}, %$header };
         $content = $self->getContent;
     } else {
         return;

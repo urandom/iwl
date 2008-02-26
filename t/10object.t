@@ -1,9 +1,10 @@
-use Test::More tests => 39;
+use Test::More tests => 48;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
 
 $IWLConfig{STRICT_LEVEL} = 2;
+my $output;
 
 {
 	my @objects = IWL::Object->newMultiple(10);
@@ -52,6 +53,28 @@ $IWLConfig{STRICT_LEVEL} = 2;
 }
 
 {
+    my $o = IWL::Object->new;
+    tie *STDOUT, 'PRINT_TEST';
+    $o->send(type => 'html');
+    is($output, "Content-type: text/html; charset=utf-8\n\n<></>\n");
+    $o->send(type => 'json');
+    like($output, qr|X-IWL: 1|);
+    like($output, qr|Content-type: application/json|);
+    $o->send(type => 'text');
+    is($output, "Content-type: text/plain\n\n<></>\n");
+    $o->send(type => 'html', header => {test => 'success'});
+    like($output, qr|test: success|);
+    like($output, qr|Content-type: text/html; charset=utf-8|);
+    $o->send(type => 'json', header => {'X-IWL' => 42});
+    like($output, qr|X-IWL: 42|);
+    like($output, qr|Content-type: application/json|);
+    $o->send(type => 'text', header => {'Content-type' => 'plain text, really!'});
+    is($output, "Content-type: plain text, really!\n\n<></>\n");
+
+    untie *STDOUT;
+}
+
+{
 	my $object = IWL::Object->new;
 
 	$object->setAttribute(foo => 'bar');
@@ -94,4 +117,18 @@ $IWLConfig{STRICT_LEVEL} = 2;
     is_deeply($clone->{childNodes}[0], $object->{childNodes}[0]);
     is_deeply($clone->{childNodes}[1], $object->{childNodes}[1]);
     is($clone->{childNodes}[1]->{parentNode}, $clone);
+}
+
+package PRINT_TEST;
+
+sub TIEHANDLE {
+	my $self = {};
+	bless $self, shift;
+
+	return $self;
+}
+
+sub PRINT {
+	my $self = shift;
+    $output = $_[0];
 }
