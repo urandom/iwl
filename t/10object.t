@@ -1,4 +1,4 @@
-use Test::More tests => 48;
+use Test::More tests => 50;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -71,6 +71,9 @@ my $output;
     $o->send(type => 'text', header => {'Content-type' => 'plain text, really!'});
     is($output, "Content-type: plain text, really!\n\n<></>\n");
 
+    $o->send(type => 'html', static => 1);
+    like($output, qr|ETag: [0-9A-Fa-f]+|);
+    like($output, qr|<></>\n$|, 'ETag content');
     untie *STDOUT;
 }
 

@@ -991,6 +991,14 @@ Serializes the object to HTML and sends it with a text/plain header
 
 A hash reference, representing an HTTP header, can be passed. It will extend the default header for those types.
 
+=item B<static>
+
+If true, an I<ETag>, generated using L<Digest::MD5>, will be added to the header of the response. If the I<ETag> matches the I<HTTP_IF_NONE_MATCH>, the response will also contain a I<Status> with a value of I<304>, and no actual content will be passed.
+
+=item B<etag>
+
+If provided, along with I<static>, it will use the values as an I<ETag> header, instead of using Digest::MD5. This is also useful, since no content needs to exist.
+
 =back
 
 =cut
@@ -1010,6 +1018,18 @@ sub send {
         $content = $self->getContent;
     } else {
         return;
+    }
+
+    if ($args{static}) {
+        if ($args{etag}) {
+            $header->{ETag} = $args{etag};
+        } elsif (eval "require Digest::MD5") {
+            $header->{ETag} = Digest::MD5::md5_hex($content);
+        }
+        if (exists $ENV{HTTP_IF_NONE_MATCH} && $ENV{HTTP_IF_NONE_MATCH} eq $header->{ETag}) {
+            $header->{Status} = 304;
+            $content = '';
+        }
     }
 
     $self->getResponseObject->send(header => $header, content => $content);
