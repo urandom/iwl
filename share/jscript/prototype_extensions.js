@@ -577,7 +577,7 @@ document.insertScript = (function () {
       debug: false
     }, arguments[1]);
     if (!scripts) scripts = $$('script').pluck('src');
-    if (scripts.grep(url + "$").length) {
+    if (scripts.invoke('endsWith', url).any()) {
       if (options.onComplete)
         options.onComplete.bind(window, url).delay(0.1);
       return;
