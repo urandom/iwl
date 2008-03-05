@@ -18,11 +18,9 @@ use IWL::JSON qw(toJSON);
 
 use Scalar::Util qw(weaken isweak blessed reftype);
 
-# Used to detect looped networks and avoid infinite recursion.
-use vars qw(%cloneCache);
-
-# A hash to keep track of initialized js.
-my %initialized_js;
+# cloneCache: Used to detect looped networks and avoid infinite recursion.
+# initializedJs: A hash to keep track of required javascript files
+use vars qw(%cloneCache %initializedJs);
 
 # The IWL::Response object
 my $response;
@@ -453,13 +451,13 @@ sub getContent {
 
     my @header_scripts;
     foreach (@{$self->{_requiredJs}}) {
-	next if exists $initialized_js{$_->[0]};
-	$initialized_js{$_->[0]} = 1;
+	next if exists $initializedJs{$_->[0]};
 	if ($self->isa('IWL::Page::Head')) {
 	    push @header_scripts, $_->[1];
 	} else {
 	    $content .= $_->[1]->getContent;
 	}
+	$initializedJs{$_->[0]} = 1;
     }
 
     $content .= "<!" . $self->{_declaration} . ">\n" if $self->{_declaration};
@@ -559,13 +557,13 @@ sub getObject {
 	  || $self->{_ignore});
 
     foreach (@{$self->{_requiredJs}}) {
-	next if exists $initialized_js{$_->[0]};
-	$initialized_js{$_->[0]} = 1;
+	next if exists $initializedJs{$_->[0]};
 	if (UNIVERSAL::isa($self, 'IWL::Page::Head')) {
 	    push @{$self->{_tailObjects}}, $_->[1];
 	} else {
 	    push @$scripts, $_->[1]->getObject;
 	}
+	$initializedJs{$_->[0]} = 1;
     }
 
     foreach my $child (@{$self->{childNodes}}) {
@@ -908,7 +906,7 @@ in order to call it.
 =cut
 
 sub cleanStateful {
-    %initialized_js = ();
+    %initializedJs = ();
 }
 
 =item B<getState>
@@ -1083,13 +1081,13 @@ Finds the top-most parent of the object and returns it.
 
 sub _findTopParent {
     my $self = shift;
-    my $parent = $self->{parentNode};
+    my $element = $self;
 
-    while ($parent) {
-	last if !$parent->{parentNode} || $parent->{parentNode}->isa('IWL::Page::Body');
-	$parent = $parent->{parentNode};
-    }
-    return $parent;
+    do {
+        return $element if $element->isa('IWL::Page::Body') || !$element->{parentNode};
+        $element = $element->{parentNode};
+    } while $element;
+    return $element;
 }
 
 # Internal
