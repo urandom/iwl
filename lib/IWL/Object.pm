@@ -1137,8 +1137,9 @@ sub __addInitScripts {
             $parent->{_initScriptElement}->appendScript($expr . ';');
         }
         if ($parent->{_initScriptElement} && !$parent->{_initScriptElement}{_added}) {
-            unshift @{$parent->{_tailObjects}}, $parent->{_initScriptElement}
-              if $parent->{_initScriptElement};
+            $parent->isa('IWL::Page::Body')
+              ? $parent->appendChild($parent->{_initScriptElement})
+              : unshift @{$parent->{_tailObjects}}, $parent->{_initScriptElement};
             $parent->{_initScriptElement}{_added} = 1;
             $parent->{_initScriptElement}->setAttribute('iwl:initScript');
         }

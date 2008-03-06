@@ -166,6 +166,27 @@ if (!exists $IWLConfig{JS_DIR}) {
 @EXPORT_OK = qw(%IWLConfig);
 @EXPORT    = qw(%IWLConfig);
 
+=head1 METHODS
+
+=over 4
+
+=item B<getJSConfig>
+
+Returns a javascript expression, which creates the global IWL object, if such does not exist, and adds the Config attribute to it.
+
+This is a class method.
+
+=cut
+
+sub getJSConfig {
+    require IWL::JSON;
+
+    return "if (!window.IWL) var IWL = {};" .
+           "IWL.Config = " . IWL::JSON::toJSON(
+               {map {$_ => $IWLConfig{$_}} @{$IWLConfig{JS_WHITELIST}}}
+           ) . ";";
+}
+
 1;
 
 =head1 LICENCE AND COPYRIGHT

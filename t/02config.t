@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use IWL::Config '%IWLConfig';
 ok(%IWLConfig);
@@ -13,3 +13,5 @@ is_deeply(\%IWLConfig, {
     DEBUG        => '',
     JS_WHITELIST => [qw(SKIN SKIN_DIR IMAGE_DIR ICON_DIR ICON_EXT JS_DIR STRICT_LEVEL DEBUG)],
 });
+$IWLConfig{JS_WHITELIST} = ['SKIN'];
+is(IWL::Config::getJSConfig, q|if (!window.IWL) var IWL = {};IWL.Config = {"SKIN": "darkness"};|);

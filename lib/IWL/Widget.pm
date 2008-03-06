@@ -480,8 +480,9 @@ EOF
 	    }
 	}
 	if ($parent->{_customSignalScript} && !$parent->{_customSignalScript}{_added}) {
-            unshift @{$parent->{_tailObjects}}, $parent->{_customSignalScript}
-              if $parent->{_customSignalScript};
+            $parent->isa('IWL::Page::Body')
+              ? $parent->appendChild($parent->{_customSignalScript})
+              : unshift @{$parent->{_tailObjects}}, $parent->{_customSignalScript};
 	    $parent->{_customSignalScript}{_added} = 1;
 	}
     }

@@ -247,9 +247,7 @@ sub __init {
     $self->requiredJs('base.js');
 
     my $script = IWL::Script->new;
-    $script->appendScript("if (!window.IWL) var IWL = {};" .
-                          "IWL.Config = " .
-        toJSON({map {$_ => $IWLConfig{$_}} @{$IWLConfig{JS_WHITELIST}}}) . ";");
+    $script->appendScript(IWL::Config::getJSConfig);
     $head->appendChild($script);
 
     $head->appendChild($skin);
