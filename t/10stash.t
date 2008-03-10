@@ -1,12 +1,12 @@
-use Test::More tests => 17;
+use Test::More tests => 21;
 
 use IWL::Stash;
 
 {
 
     my $ref_state = IWL::Stash->new;
-    $ref_state->setValues(foo => 'bar');
-    $ref_state->setValues(bar => 'baz', 'bazoo');
+    is($ref_state->setValues(foo => 'bar'), $ref_state);
+    is($ref_state->setValues(bar => 'baz', 'bazoo'), $ref_state);
     $ref_state->setDirty(0);
 
     my $num_keys = $ref_state->keys;
@@ -79,8 +79,8 @@ use IWL::Stash;
     my $state   = IWL::Stash->new(my_key => [qw (a b)]);
     my $compare = IWL::Stash->new($state);
     my $merger1 = IWL::Stash->new(new1 => 'foobar');
-    $state->mergeState($merger1);
-    $compare->pushValues(new1 => 'foobar');
+    is($state->mergeState($merger1), $state);
+    is($compare->pushValues(new1 => 'foobar'), $compare);
     is_deeply($compare, $state, "mergeState does not create new keys");
 
     my $merger2 = IWL::Stash->new(my_key => 'barbaz');

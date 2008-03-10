@@ -122,6 +122,7 @@ sub setValues {
     $self->{__dirty} = $self->__compare ($key, $values)
 	unless $self->{__dirty};
     $self->{__state}->{$key} = $values;
+    return $self;
 }
 
 sub pushValues {
@@ -140,6 +141,7 @@ sub pushValues {
     }
     $self->{__dirty} = 1;
     push @{$self->{__state}->{$key}}, @values;
+    return $self;
 }
 
 sub deleteValues {
@@ -251,7 +253,7 @@ sub mergeState {
 	$self->pushValues ($key, $merger->getValues ($key));
     }
 
-    return 1;
+    return $self;
 }
 
 sub searchKey {
