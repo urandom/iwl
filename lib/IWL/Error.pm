@@ -5,6 +5,8 @@ package IWL::Error;
 
 use strict;
 
+# These are more or less copied from the Imperia ErrorSaver module.
+
 =head1 NAME
 
 IWL::Error - The base error handling class of IWL
@@ -17,7 +19,6 @@ IWL::Error handles registering and reporting errors for IWL
 
 =over 4
 
-# These are more or less copied from the Imperia ErrorSaver module.
 =item B<errorList>
 
 In scalar context returns the newline separated contents of the
@@ -42,7 +43,7 @@ sub errorList {
 
 =item B<errorShift>
 
-Like IWL::Error::errorShift(3pm) but empties the error stack and resets the bad state.
+Like IWL::Error::errorList(3pm) but empties the error stack and resets the bad state.
 
 =cut
 
