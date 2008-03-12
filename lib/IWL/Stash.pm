@@ -256,6 +256,15 @@ sub mergeState {
     return $self;
 }
 
+sub overrideState {
+    my ($self, $overrider) = @_;
+
+    $self->setValues($_, $overrider->getValues($_))
+        foreach $overrider->keys;
+
+    return $self;
+}
+
 sub searchKey {
     my ($self, $key, $reg) = @_;
     eval {$reg = qr/$reg/i};
@@ -574,8 +583,14 @@ B<FLAG>.
 =item B<mergeState MERGER>
 
 "Merges" the state B<MERGER> into the state.  That means, that input
-fields present in B<MERGER> will unconditionally clobber the respecting
+fields present in B<MERGER> will be appended to the respecting
 fields in the original state object.
+
+=item B<overrideState> (B<OVERRIDE>)
+
+Uses the B<OVERRIDE> stash to extend the current one. New fields are added
+and fields that exist both in the current and override stash, are overwritten
+with the value from the override stash.
 
 =item B<searchKey KEY, REG>
 

@@ -1,4 +1,4 @@
-use Test::More tests => 21;
+use Test::More tests => 24;
 
 use IWL::Stash;
 
@@ -87,4 +87,12 @@ use IWL::Stash;
     $state->mergeState($merger2);
     $compare->pushValues(my_key => 'barbaz');
     is_deeply($compare, $state, "mergeState does not overwrite existing keys");
+}
+
+{
+    my $state    = IWL::Stash->new(my_key => [qw(a b)]);
+    my $override = IWL::Stash->new(new1 => 'foobar', my_key => 'a');
+    is_deeply([$state->getValues('my_key')], [qw(a b)]);
+    is($state->overrideState($override), $state);
+    is_deeply([$state->getValues('my_key')], [qw(a)]);
 }
