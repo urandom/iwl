@@ -77,6 +77,18 @@ sub new {
     return $self;
 }
 
+# Protected
+#
+sub _registerEvent {
+    my ($self, $event, $params, $options) = @_;
+
+    my ($package, $signal) = $event =~ /^(.*)-(\w+)$/;
+    return unless 'IWL-Page' eq $package;
+
+    $self->signalConnect($signal => "\$(document.body).emitEvent('$event', {}, {id: this.id})");
+    return $options;
+}
+
 1;
 
 =head1 LICENCE AND COPYRIGHT

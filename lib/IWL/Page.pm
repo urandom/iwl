@@ -16,6 +16,7 @@ use IWL::Script;
 use IWL::Comment;
 use IWL::Config qw(%IWLConfig);
 use IWL::JSON qw(toJSON);
+use IWL::String qw(randomize);
 
 use constant DOCTYPES => {
     html401 => <<DECL,
@@ -203,25 +204,27 @@ sub getDeclaration {
 # Overrides
 #
 sub signalConnect {
-    my ($self, $signal, $callback) = @_;
+    return shift->{_body}->signalConnect(@_);
+}
 
-    $self->{_body}->signalConnect($signal, $callback);
+sub signalDisconnect {
+    return shift->{_body}->signalDisconnect(@_);
 }
 
 sub appendChild {
-    my ($self, @objects) = @_;
-    $self->{_body}->appendChild(@objects);
+    return shift->{_body}->appendChild(@_);
 }
 
 sub prependChild {
-    my ($self, @objects) = @_;
-    $self->{_body}->prependChild(@objects);
+    return shift->{_body}->prependChild(@_);
+}
+
+sub registerEvent {
+    return shift->{_body}->registerEvent(@_);
 }
 
 sub requiredJs {
-    my ($self, @urls) = @_;
-    
-    return $self->{_head}->requiredJs(@urls);
+    return shift->{_head}->requiredJs(@_);
 }
 
 # Internal
@@ -252,6 +255,7 @@ sub __init {
 
     $head->appendChild($skin);
     $head->appendChild($conditional);
+    $body->setId(randomize('body'));
     $conditional->setConditionalData('IE', $ie);
     $conditional = IWL::Comment->new;
     $head->appendChild($conditional);
