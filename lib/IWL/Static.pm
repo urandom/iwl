@@ -121,14 +121,13 @@ sub handleRequest {
     my $etag;
     return unless $uri;
 
-    ($etag, $uri) = $self->__getETag($uri);
-
     unless ($self->{_staticURIs}{$uri}) {
         my (undef, $directory, undef) = File::Spec->splitpath($uri);
         return $self->_pushError(
             __x("The URI '{URI}' does not belong in the predefined list of static URIs.", URI => $uri))
           unless $self->{_staticURIs}{$directory};
     }
+    ($etag, $uri) = $self->__getETag($uri);
 
     my ($header, $content) = ({}, '');
     my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
