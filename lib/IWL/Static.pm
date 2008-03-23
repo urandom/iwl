@@ -145,7 +145,7 @@ sub handleRequest {
         $header = {
             'Content-type'   => $mime,
             'Content-length' => $clength,
-            'Last-Modified'  => time2str($modtime),
+            'Last-Modified'  => __timeToString($modtime),
             'ETag'           => $etag,
         };
     }
@@ -254,7 +254,7 @@ sub __getMime {
 }
 
 ## From HTTP::Date ##
-sub time2str (;$) {
+sub __timeToString (;$) {
     my $time = shift;
     $time = time unless defined $time;
     my @DoW = qw(Sun Mon Tue Wed Thu Fri Sat);
