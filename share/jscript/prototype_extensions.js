@@ -707,5 +707,17 @@ Object.extend(document.viewport, {
 
     testDiv.remove();
     return size;
+  },
+
+  /* This makes IE return non-0 values in quirks-mode, should be removed if prototype fixes this in future versions */
+  getDimensions: function() {
+    var dimensions = { };
+    var B = Prototype.Browser;
+    $w('width height').each(function(d) {
+      var D = d.capitalize();
+      dimensions[d] = (B.WebKit && !document.evaluate) ? self['inner' + D] :
+        (B.Opera || B.IE) ? document.body['client' + D] : document.documentElement['client' + D];
+    });
+    return dimensions;
   }
 });
