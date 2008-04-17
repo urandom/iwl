@@ -453,7 +453,7 @@ sub getContent {
     foreach (@{$self->{_requiredJs}}) {
 	next if exists $initializedJs{$_->[0]};
 	if ($self->isa('IWL::Page::Head')) {
-	    push @header_scripts, $_->[1];
+	    push @header_scripts, $_->[1]->getContent;
 	} else {
 	    $content .= $_->[1]->getContent;
 	}
@@ -491,7 +491,7 @@ sub getContent {
         foreach my $child (@{$self->{childNodes}}) {
             $content .= $child->getContent if $child;
         }
-	$content .= $_->getContent foreach (@header_scripts);
+        $content .= join("\n", @header_scripts) if @header_scripts;
         $content .= "</" . $self->{_tag} . ">\n";
     }
 
