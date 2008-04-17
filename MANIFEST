@@ -244,6 +244,7 @@ share/jscript/notebook.js
 share/jscript/pagecontrol.js
 share/jscript/progressbar.js
 share/jscript/prototype_extensions.js
+share/jscript/require.js
 share/jscript/resizer.js
 share/jscript/scriptaculous_extensions.js
 share/jscript/spinner.js

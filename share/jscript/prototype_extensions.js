@@ -565,24 +565,30 @@ Object.extend(Date.prototype, {
 });
 
 document.insertScript = (function () {
-  var scripts = null;
+  if (!document._urlCache)
+    document._urlCache = {};
 
   if (Prototype.Browser.WebKit || Prototype.Browser.KHTML)
     Prototype._helpers = [];
 
   return function(url) {
+    if (!Object.isString(url) || url.blank());
+
     var options = Object.extend({
       onComplete: Prototype.emptyFunction,
       skipCache: false,
-      debug: false
+      removeScriptElement: true 
     }, arguments[1]);
-    if (!scripts) scripts = $$('script').pluck('src');
-    if (scripts.invoke('endsWith', url).any()) {
+
+    var scripts = $$('script').pluck('src');
+    if (document._urlCache[url] || scripts.invoke('endsWith', url).any()) {
+      document._urlCache[url] = true;
       if (options.onComplete)
         options.onComplete.bind(window, url).delay(0.1);
       return;
     }
-    scripts.push(url);
+
+    document._urlCache[url] = true;
     if (options.skipCache) {
       var query = {_: (new Date).valueOf()};
       var index = url.indexOf('?');
@@ -602,7 +608,7 @@ document.insertScript = (function () {
         return;
       script.onreadystatechange = script.onload = null;
       if (options.onComplete) options.onComplete(url);
-      if (!options.debug) script.remove();
+      if (!options.removeScriptElement) script.remove();
       fired = true;
     };
 

@@ -47,7 +47,7 @@ function animate_progress_bar(backwards) {
 
 function run_prototype_tests() {
     var test_span;
-    document.insertScript(IWL.Config.JS_DIR + '/entry.js', {debug: true});
+    document.insertScript(IWL.Config.JS_DIR + '/entry.js', {removeScriptElement: true});
     new Test.Unit.Runner({
         setup: function() {
             test_span = new Element('span', {style: "display: none", id: 'test_span'});

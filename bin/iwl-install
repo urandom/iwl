@@ -16,6 +16,7 @@ sub recursive(&@);
 Getopt::Long::Configure ('no_ignore_case');
 
 my ($opt_docroot, $opt_skindir, $opt_imagedir, $opt_icondir, $opt_help, $opt_jsdir, $opt_cgibin, $opt_absolute_cgibin, $opt_static_uri_script, $opt_pack);
+my @copy_argv = @ARGV;
 
 GetOptions (
 	'docroot=s'           => \$opt_docroot,
@@ -115,7 +116,16 @@ sub prefix_replace {
 # Conf creation subroutine {{{
 #######################################################################
 sub create_conf_file {
+    my $sep = $";
+    $" = "' '";
     my $content = <<EOF;
+# Installated using:
+#   $0 '@copy_argv'
+#
+EOF
+    $" = $sep;
+
+    $content .= <<EOF;
 # The skin name to use
 # 
 # SKIN = "default"

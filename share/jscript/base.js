@@ -188,7 +188,7 @@ Object.extend(IWL, (function() {
                     if (!url) continue;
                     ++script_urls;
                     document.insertScript(url,
-                        {onComplete: evalScript, debug: IWL.Config.DEBUG, skipCache: IWL.Config.DEBUG});
+                        {onComplete: evalScript, removeScriptElement: !IWL.Config.DEBUG, skipCache: IWL.Config.DEBUG});
                 }
             }
             if (!json.tag) {
@@ -220,7 +220,6 @@ Object.extend(IWL, (function() {
 		    attributes[attr] = value;
 		}
                 if (attributes.style) {
-                    var time = new Date;
                     var style = $H(attributes.style);
                     attributes.style = style.keys().map(function(key) {
                         return [key, style.get(key)].join(": ");
