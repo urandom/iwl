@@ -558,11 +558,7 @@ sub getObject {
 
     foreach (@{$self->{_requiredJs}}) {
 	next if exists $initializedJs{$_->[0]};
-	if (UNIVERSAL::isa($self, 'IWL::Page::Head')) {
-	    push @{$self->{_tailObjects}}, $_->[1];
-	} else {
-	    push @$scripts, $_->[1]->getObject;
-	}
+        push @$scripts, $_->[1]->getObject;
 	$initializedJs{$_->[0]} = 1;
     }
 
