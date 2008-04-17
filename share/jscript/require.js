@@ -23,6 +23,8 @@ document.require = (function() {
 
                 script.text = or.responseText;
                 parent.appendChild(script);
+
+                document.fire("dom:required", url)
             }
         });
         return status;
