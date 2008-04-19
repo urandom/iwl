@@ -1030,6 +1030,60 @@ sub send {
     return $self;
 }
 
+=item B<up> (B<%OPTIONS>)
+
+Searches upward along the element stack for elements, matching the criteria set by the options.
+
+In scalar context, returns the first found element. In list context, returns all matching elements.
+
+Parameters: B<%OPTIONS> - a hash with the following key-value pairs:
+
+=over 8
+
+=item B<package>
+
+The package, which the element belongs to. Example: L<IWL::Image>
+
+=item B<attributes>
+
+The attributes, whose names and values should match the attributes of an element. The value of this option is a hashref, where the keys are the attribute names, and the values are the unescaped attribute values. Example: {class => 'container', id => 'foobar'}
+
+=back
+
+=cut
+
+sub up {
+    my ($self, %options) = @_;
+    my $wantarray = wantarray;
+    my $element = $self->{parentNode};
+    my @result;
+
+    return unless $element;
+    do {
+        my $match = __selector($element, %options);
+
+        if ($wantarray) {
+            push @result, $match if $match;
+        } else {
+            return $match if $match;
+        }
+    } while $element = $element->{parentNode};
+
+    return @result;
+}
+
+=item B<down> (B<%OPTIONS>)
+
+Searches downward along the element stack for elements, matching the criteria set by the options.
+
+See IWL::Object::up(3pm) for documentation on the return value and parameter description.
+
+=cut
+
+sub down {
+    my ($self, %options) = @_;
+}
+
 =head1 PROTECTED METHODS
 
 The following methods should only be used by classes that inherit
@@ -1140,6 +1194,22 @@ sub __addInitScripts {
             $parent->{_initScriptElement}->setAttribute('iwl:initScript');
         }
     }
+}
+
+sub __selector {
+    my ($element, %options) = @_;
+    my $match = $element;
+
+    undef $match if $options{package} && !$element->isa($options{package});
+    if (ref $options{attributes} eq 'HASH') {
+        foreach my $key (keys %{$options{attributes}}) {
+            undef $match
+                unless $element->getAttribute($key, 1) eq $options{attributes}{$key};
+        }
+    }
+
+    return $match if $match;
+    return;
 }
 
 1;
