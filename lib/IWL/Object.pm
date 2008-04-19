@@ -228,6 +228,44 @@ sub prevSibling {
     return;
 }
 
+=item B<getNextSiblings>
+
+Returns all siblings, which are after the current object.
+
+=cut
+
+sub getNextSiblings {
+    my $self = shift;
+    my $element = $self->nextSibling;
+    my @result;
+
+    return unless $element;
+    do {
+        push @result, $element;
+    } while $element = $element->nextSibling;
+
+    return @result;
+}
+
+=item B<getPreviousSiblings>
+
+Returns all siblings, which are before the current object.
+
+=cut
+
+sub getPreviousSiblings {
+    my $self = shift;
+    my $element = $self->prevSibling;
+    my @result;
+
+    return unless $element;
+    do {
+        push @result, $element;
+    } while $element = $element->prevSibling;
+
+    return @result;
+}
+
 =item B<getParent>
 
 Returns the parent object of the current object
@@ -1098,7 +1136,7 @@ sub up {
     my $element = $self->{parentNode};
     my @result;
 
-    return $element unless %options;
+    return ($wantarray ? $self->getAncestors : $element) unless %options;
     return unless $element;
     do {
         my $match = __selector($element, %options);
@@ -1126,7 +1164,7 @@ sub down {
     my $wantarray = wantarray;
     my @result;
 
-    return $self->firstChild unless %options;
+    return ($wantarray ? $self->getDescendants : $self->firstChild) unless %options;
     return unless @{$self->{childNodes}};
 
     foreach my $element (@{$self->{childNodes}}) {
@@ -1159,7 +1197,7 @@ sub next {
     my $element = $self->nextSibling;
     my @result;
 
-    return $element unless %options;
+    return ($wantarray ? $self->getNextSiblings : $element) unless %options;
     return unless $element;
     do {
         my $match = __selector($element, %options);
@@ -1189,7 +1227,7 @@ sub previous {
     my $element = $self->prevSibling;
     my @result;
 
-    return $element unless %options;
+    return ($wantarray ? $self->getPreviousSiblings : $element) unless %options;
     return unless $element;
     do {
         my $match = __selector($element, %options);
