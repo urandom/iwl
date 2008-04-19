@@ -1112,7 +1112,7 @@ sub send {
 Searches upward along the element stack for elements, matching the criteria set by the options.
 
 In scalar context, returns the first found element. In list context, returns all matching elements.
-Returns the parent element, if no options are given.
+Returns the parent element in scalar context, and parent elements in list context, if no options are given.
 
 Parameters: B<%OPTIONS> - a hash with the following key-value pairs:
 
