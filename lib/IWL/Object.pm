@@ -1035,6 +1035,7 @@ sub send {
 Searches upward along the element stack for elements, matching the criteria set by the options.
 
 In scalar context, returns the first found element. In list context, returns all matching elements.
+Returns the parent element, if no options are given.
 
 Parameters: B<%OPTIONS> - a hash with the following key-value pairs:
 
@@ -1058,6 +1059,7 @@ sub up {
     my $element = $self->{parentNode};
     my @result;
 
+    return $element unless %options;
     return unless $element;
     do {
         my $match = __selector($element, %options);
@@ -1069,7 +1071,7 @@ sub up {
         }
     } while $element = $element->{parentNode};
 
-    return @result;
+    return $wantarray ? @result : undef;
 }
 
 =item B<down> (B<%OPTIONS>)
@@ -1082,6 +1084,26 @@ See IWL::Object::up(3pm) for documentation on the return value and parameter des
 
 sub down {
     my ($self, %options) = @_;
+    my $wantarray = wantarray;
+    my @result;
+
+    return $self->firstChild unless %options;
+    return unless @{$self->{childNodes}};
+
+    foreach my $element (@{$self->{childNodes}}) {
+        my $match = __selector($element, %options);
+
+        if ($wantarray) {
+            push @result, $match if $match;
+            push @result, $element->down(%options);
+        } else {
+            return $match if $match;
+            my $ret = $element->down(%options);
+            return $ret if $ret;
+        }
+    }
+
+    return $wantarray ? @result : undef;
 }
 
 =head1 PROTECTED METHODS

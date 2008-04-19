@@ -1,4 +1,4 @@
-use Test::More tests => 59;
+use Test::More tests => 65;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -138,6 +138,7 @@ my $output;
     ok(!$a_a_a->up(package => 'IWL::Test::Object'));
     ok(!$a_a_a->up(attributes => {id => 'asdlkj'}));
 
+    is($a_a_a->up, $a_a);
     is($a_a_a->up(attributes => {id => 'middle'}), $a_a);
     is($a_a_a->up(attributes => {id => 'top', class => 'object'}), $a);
     is($a_a_a->up(attributes => {id => 'middle'}, package => 'IWL::Object'), $a_a);
@@ -146,6 +147,12 @@ my $output;
     is(scalar $a_b_a_a->up(package => 'IWL::Test::Object'), $a_b_a);
     is_deeply([$a_b_a_a->up(package => 'IWL::Test::Object')], [$a_b_a, $a_b]);
     is_deeply([$a_b_a_a->up(attributes => {class => 'test_object'})], [$a_b_a, $a_b]);
+
+    ok(!$a->down(package => 'IWL::Widget'));
+    is($a->down, $a_a);
+    is($a->down(package => 'IWL::Object'), $a_a);
+    is_deeply([$a->down(package => 'IWL::Test::Object')], [$a_b, $a_b_a]);
+    is($a->down(package => 'IWL::Test::Object', attributes => {id => 'test_middle', class => 'test_object'}), $a_b);
 }
 
 package PRINT_TEST;
