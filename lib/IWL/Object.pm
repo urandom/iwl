@@ -238,6 +238,43 @@ sub getParent {
     return shift->{parentNode};
 }
 
+=item B<getAncestors>
+
+Returns all ancestors of the current object
+
+=cut
+
+sub getAncestors {
+    my $self = shift;
+    my $element = $self->{parentNode};
+    my @result;
+
+    return unless $element;
+    do {
+        push @result, $element;
+    } while $element = $element->{parentNode};
+
+    return @result;
+}
+
+=item B<getDescendants>
+
+Returns all the descendants of the current object
+
+=cut
+
+sub getDescendants {
+    my $self = shift;
+    my @result;
+
+    return unless @{$self->{childNodes}};
+    foreach my $child (@{$self->{childNodes}}) {
+        push @result, $child, $child->getDescendants;
+    }
+
+    return @result;
+}
+
 =item B<appendChild> (B<OBJECT>)
 
 Appends B<OBJECT>  as a child to the current object.
@@ -1261,7 +1298,7 @@ sub __addInitScripts {
     if (@{$self->{_initScripts}}) {
         require IWL::Script;
 
-        my $parent = $self->_findTopParent || $self;
+        my $parent = $self->up(package => 'IWL::Page:Body') || $self;
         my $expr = join '; ', @{$self->{_initScripts}};
 
         if ($expr) {

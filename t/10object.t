@@ -1,4 +1,4 @@
-use Test::More tests => 77;
+use Test::More tests => 81;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -135,6 +135,12 @@ my $output;
     my $a_b_a_a = IWL::Object->new->setAttributes(foo => 'bar', class => 'test_object');
 
     $a->appendChild($a_a->appendChild($a_a_a, $a_a_b, $a_a_c), $a_b->appendChild($a_b_a->appendChild($a_b_a_a)));
+
+    is_deeply([$a_b_a_a->getAncestors], [$a_b_a, $a_b, $a]);
+    ok(!$a_b_a_a->getDescendants);
+
+    ok(!$a->getAncestors);
+    is_deeply([$a->getDescendants], [$a_a, $a_a_a, $a_a_b, $a_a_c, $a_b, $a_b_a, $a_b_a_a]);
 
     ok(!$a_a_a->up(package => 'IWL::Test::Object'));
     ok(!$a_a_a->up(attributes => {id => 'asdlkj'}));
