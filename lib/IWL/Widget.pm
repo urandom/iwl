@@ -456,6 +456,39 @@ sub getTitle {
     return shift->getAttribute('title', 1);
 }
 
+=item B<match> (B<CRITERIA>, B<OPTIONS>)
+
+Returns the object, if it matches the given criteria. Returns false, otherwise.
+
+See IWL::Object::match(3pm) for additional parameter description.
+
+Parameters: B<CRITERIA> - a hash reference with the following key-value pairs:
+
+=over 8
+
+=item B<class>
+
+The class, which is contained in the widget's class attribute
+
+=item B<id>
+
+The id of the widget
+
+=back
+
+=cut
+
+sub match {
+    my ($self, $criteria, $options) = @_;
+    my $match = $self->SUPER::match($criteria, $options);
+
+    undef $match if $criteria->{class} && !$self->hasClass($criteria->{class});
+    undef $match if $criteria->{id} && $self->getId ne $criteria->{id};
+
+    return $match if $match;
+    return;
+}
+
 # Protected
 #
 sub _realize {
@@ -464,7 +497,7 @@ sub _realize {
     $self->IWL::Object::_realize;
     if ($self->{_customSignals}) {
 	my $id = $self->getId;
-	my $parent = $self->_findTopParent(package => 'IWL::Page::Body') || $self;
+	my $parent = $self->_findTopParent({package => 'IWL::Page::Body'}) || $self;
 
 	if ($id) {
 	    foreach my $signal (keys %{$self->{_customSignals}}) {
@@ -541,25 +574,6 @@ sub _namespacedSignalName {
     return 'dom:' . $signal
       if $signal =~ /mouse(?:enter|leave|wheel)/;
     return $signal;
-}
-
-sub _canMatch {
-    return {
-        class => 1,
-        id => 1,
-    }->{$_[1]};
-}
-
-sub _match {
-    my ($self, $key, $value) = @_;
-
-    if ($key eq 'class') {
-        return $self->hasClass($value);
-    } elsif ($key eq 'id') {
-        return $self->getId eq $value;
-    }
-
-    return;
 }
 
 # Internal
