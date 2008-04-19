@@ -1,3 +1,3 @@
 *.sw[op]
-IWL-0.\d+
+IWL-*
 Makefile
