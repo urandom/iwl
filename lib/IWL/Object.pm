@@ -236,13 +236,13 @@ Returns all siblings, which are after the current object.
 
 sub getNextSiblings {
     my $self = shift;
-    my $element = $self->nextSibling;
+    my $object = $self->nextSibling;
     my @result;
 
-    return unless $element;
+    return unless $object;
     do {
-        push @result, $element;
-    } while $element = $element->nextSibling;
+        push @result, $object;
+    } while $object = $object->nextSibling;
 
     return @result;
 }
@@ -255,13 +255,13 @@ Returns all siblings, which are before the current object.
 
 sub getPreviousSiblings {
     my $self = shift;
-    my $element = $self->prevSibling;
+    my $object = $self->prevSibling;
     my @result;
 
-    return unless $element;
+    return unless $object;
     do {
-        push @result, $element;
-    } while $element = $element->prevSibling;
+        push @result, $object;
+    } while $object = $object->prevSibling;
 
     return @result;
 }
@@ -284,13 +284,13 @@ Returns all ancestors of the current object
 
 sub getAncestors {
     my $self = shift;
-    my $element = $self->{parentNode};
+    my $object = $self->{parentNode};
     my @result;
 
-    return unless $element;
+    return unless $object;
     do {
-        push @result, $element;
-    } while $element = $element->{parentNode};
+        push @result, $object;
+    } while $object = $object->{parentNode};
 
     return @result;
 }
@@ -1109,10 +1109,10 @@ sub send {
 
 =item B<up> (B<%OPTIONS>)
 
-Searches upward along the element stack for elements, matching the criteria set by the options.
+Searches upward along the object stack for objects, matching the criteria set by the options.
 
-In scalar context, returns the first found element. In list context, returns all matching elements.
-Returns the parent element in scalar context, and parent elements in list context, if no options are given.
+In scalar context, returns the first found object. In list context, returns all matching objects.
+Returns the parent object in scalar context, and parent objects in list context, if no options are given.
 
 Parameters: B<%OPTIONS> - a hash with the following key-value pairs:
 
@@ -1120,11 +1120,11 @@ Parameters: B<%OPTIONS> - a hash with the following key-value pairs:
 
 =item B<package>
 
-The package, which the element belongs to. Example: L<IWL::Image>
+The package, which the object belongs to. Example: L<IWL::Image>
 
 =item B<attributes>
 
-The attributes, whose names and values should match the attributes of an element. The value of this option is a hashref, where the keys are the attribute names, and the values are the unescaped attribute values. Example: {class => 'container', id => 'foobar'}
+The attributes, whose names and values should match the attributes of an object. The value of this option is a hashref, where the keys are the attribute names, and the values are the unescaped attribute values, or compiled reguler expressions, which should match those values. Example: {class => 'container', id => qr/foob/}
 
 =back
 
@@ -1133,27 +1133,27 @@ The attributes, whose names and values should match the attributes of an element
 sub up {
     my ($self, %options) = @_;
     my $wantarray = wantarray;
-    my $element = $self->{parentNode};
+    my $object = $self->{parentNode};
     my @result;
 
-    return ($wantarray ? $self->getAncestors : $element) unless %options;
-    return unless $element;
+    return ($wantarray ? $self->getAncestors : $object) unless %options;
+    return unless $object;
     do {
-        my $match = __selector($element, %options);
+        my $match = __match($object, %options);
 
         if ($wantarray) {
             push @result, $match if $match;
         } else {
             return $match if $match;
         }
-    } while $element = $element->{parentNode};
+    } while $object = $object->{parentNode};
 
     return $wantarray ? @result : undef;
 }
 
 =item B<down> (B<%OPTIONS>)
 
-Searches downward along the element stack for elements, matching the criteria set by the options.
+Searches downward along the object stack for objects, matching the criteria set by the options.
 
 See IWL::Object::up(3pm) for documentation on the return value and parameter description.
 
@@ -1167,15 +1167,15 @@ sub down {
     return ($wantarray ? $self->getDescendants : $self->firstChild) unless %options;
     return unless @{$self->{childNodes}};
 
-    foreach my $element (@{$self->{childNodes}}) {
-        my $match = __selector($element, %options);
+    foreach my $object (@{$self->{childNodes}}) {
+        my $match = __match($object, %options);
 
         if ($wantarray) {
             push @result, $match if $match;
-            push @result, $element->down(%options);
+            push @result, $object->down(%options);
         } else {
             return $match if $match;
-            my $ret = $element->down(%options);
+            my $ret = $object->down(%options);
             return $ret if $ret;
         }
     }
@@ -1185,7 +1185,7 @@ sub down {
 
 =item B<next> (B<%OPTIONS>)
 
-Searches the next siblings of the element for elements, matching the criteria set by the options.
+Searches the next siblings of the object for objects, matching the criteria set by the options.
 
 See IWL::Object::up(3pm) for documentation on the return value and parameter description.
 
@@ -1194,20 +1194,20 @@ See IWL::Object::up(3pm) for documentation on the return value and parameter des
 sub next {
     my ($self, %options) = @_;
     my $wantarray = wantarray;
-    my $element = $self->nextSibling;
+    my $object = $self->nextSibling;
     my @result;
 
-    return ($wantarray ? $self->getNextSiblings : $element) unless %options;
-    return unless $element;
+    return ($wantarray ? $self->getNextSiblings : $object) unless %options;
+    return unless $object;
     do {
-        my $match = __selector($element, %options);
+        my $match = __match($object, %options);
 
         if ($wantarray) {
             push @result, $match if $match;
         } else {
             return $match if $match;
         }
-    } while $element = $element->nextSibling;
+    } while $object = $object->nextSibling;
 
     return $wantarray ? @result : undef;
 }
@@ -1215,7 +1215,7 @@ sub next {
 
 =item B<previous> (B<%OPTIONS>)
 
-Searches the previous siblings of the element for elements, matching the criteria set by the options.
+Searches the previous siblings of the object for objects, matching the criteria set by the options.
 
 See IWL::Object::up(3pm) for documentation on the return value and parameter description.
 
@@ -1224,20 +1224,20 @@ See IWL::Object::up(3pm) for documentation on the return value and parameter des
 sub previous {
     my ($self, %options) = @_;
     my $wantarray = wantarray;
-    my $element = $self->prevSibling;
+    my $object = $self->prevSibling;
     my @result;
 
-    return ($wantarray ? $self->getPreviousSiblings : $element) unless %options;
-    return unless $element;
+    return ($wantarray ? $self->getPreviousSiblings : $object) unless %options;
+    return unless $object;
     do {
-        my $match = __selector($element, %options);
+        my $match = __match($object, %options);
 
         if ($wantarray) {
             push @result, $match if $match;
         } else {
             return $match if $match;
         }
-    } while $element = $element->prevSibling;
+    } while $object = $object->prevSibling;
 
     return $wantarray ? @result : undef;
 }
@@ -1291,13 +1291,13 @@ See IWL::Object::up(3pm) for documentation on parameter description.
 
 sub _findTopParent {
     my ($self, %options) = @_;
-    my $element = $self;
+    my $object = $self;
 
     do {
-        return $element if __selector($element, %options) || !$element->{parentNode};
-        $element = $element->{parentNode};
-    } while $element;
-    return $element;
+        return $object if __match($object, %options) || !$object->{parentNode};
+        $object = $object->{parentNode};
+    } while $object;
+    return $object;
 }
 
 # Internal
@@ -1356,22 +1356,26 @@ sub __addInitScripts {
     }
 }
 
-sub __selector {
-    my ($element, %options) = @_;
-    my $match = $element;
+sub __match {
+    my ($object, %options) = @_;
+    my $match = $object;
 
     foreach my $key (keys %options) {
         if ($key eq 'package') {
-            undef $match if $options{package} && !$element->isa($options{package});
+            undef $match if $options{package} && !$object->isa($options{package});
         } elsif ($key eq 'attributes') {
             if (ref $options{attributes} eq 'HASH') {
                 foreach my $key (keys %{$options{attributes}}) {
-                    undef $match
-                        unless $element->getAttribute($key, 1) eq $options{attributes}{$key};
+                    my $attribute = $object->getAttribute($key, 1);
+                    my $value = $options{attributes}{$key};
+                    undef $match unless (ref $value eq 'Regexp'
+                        ? $attribute =~ /$value/
+                        : $attribute eq $value
+                    );
                 }
             }
-        } elsif ($element->can('_canSelect') && $element->_canSelect($key)) {
-            undef $match unless $element->_selector($key, $options{$key});
+        } elsif ($object->can('_canMatch') && $object->_canMatch($key)) {
+            undef $match unless $object->_match($key, $options{$key});
         }
     }
 

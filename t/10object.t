@@ -153,8 +153,8 @@ my $output;
 
     is(scalar $a_a_a->up, $a_a);
     is_deeply([$a_a_a->up], [$a_a, $a]);
-    is($a_a_a->up(attributes => {id => 'middle'}), $a_a);
-    is($a_a_a->up(attributes => {id => 'top', class => 'object'}), $a);
+    is($a_a_a->up(attributes => {id => qr/midd/}), $a_a);
+    is($a_a_a->up(attributes => {id => 'top', class => qr/obj/}), $a);
     is($a_a_a->up(attributes => {id => 'middle'}, package => 'IWL::Object'), $a_a);
     ok(!$a_a_a->up(attributes => {id => 'middle'}, package => 'IWL::Test::Object'));
 

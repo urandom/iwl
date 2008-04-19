@@ -543,14 +543,14 @@ sub _namespacedSignalName {
     return $signal;
 }
 
-sub _canSelect {
+sub _canMatch {
     return {
         class => 1,
         id => 1,
     }->{$_[1]};
 }
 
-sub _selector {
+sub _match {
     my ($self, $key, $value) = @_;
 
     if ($key eq 'class') {
