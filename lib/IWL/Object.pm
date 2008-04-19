@@ -1281,18 +1281,20 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 sub _realize {
 }
 
-=item B<_findTopParent>
+=item B<_findTopParent> (B<%OPTIONS>)
 
 Finds the top-most parent of the object and returns it.
+
+See IWL::Object::up(3pm) for documentation on parameter description.
 
 =cut
 
 sub _findTopParent {
-    my $self = shift;
+    my ($self, %options) = @_;
     my $element = $self;
 
     do {
-        return $element if $element->isa('IWL::Page::Body') || !$element->{parentNode};
+        return $element if __selector($element, %options) || !$element->{parentNode};
         $element = $element->{parentNode};
     } while $element;
     return $element;
@@ -1336,7 +1338,7 @@ sub __addInitScripts {
     if (@{$self->{_initScripts}}) {
         require IWL::Script;
 
-        my $parent = $self->up(package => 'IWL::Page:Body') || $self;
+        my $parent = $self->_findTopParent(package => 'IWL::Page::Body') || $self;
         my $expr = join '; ', @{$self->{_initScripts}};
 
         if ($expr) {
