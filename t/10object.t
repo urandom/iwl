@@ -1,4 +1,4 @@
-use Test::More tests => 65;
+use Test::More tests => 77;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -128,12 +128,13 @@ my $output;
     my $a_a = IWL::Object->new->setAttributes(id => 'middle', class => 'object');
     my $a_a_a = IWL::Object->new->setAttributes(id => 'bottom1', class => 'object');
     my $a_a_b = IWL::Object->new->setAttributes(id => 'bottom2', class => 'object');
+    my $a_a_c = IWL::Test::Object->new->setAttributes(id => 'bottom3', class => 'object');
 
     my $a_b = IWL::Test::Object->new->setAttributes(id => 'test_middle', class => 'test_object');
     my $a_b_a = IWL::Test::Object->new->setAttributes(id => 'test_bottom', class => 'test_object');
     my $a_b_a_a = IWL::Object->new->setAttributes(foo => 'bar', class => 'test_object');
 
-    $a->appendChild($a_a->appendChild($a_a_a, $a_a_b), $a_b->appendChild($a_b_a->appendChild($a_b_a_a)));
+    $a->appendChild($a_a->appendChild($a_a_a, $a_a_b, $a_a_c), $a_b->appendChild($a_b_a->appendChild($a_b_a_a)));
 
     ok(!$a_a_a->up(package => 'IWL::Test::Object'));
     ok(!$a_a_a->up(attributes => {id => 'asdlkj'}));
@@ -151,8 +152,22 @@ my $output;
     ok(!$a->down(package => 'IWL::Widget'));
     is($a->down, $a_a);
     is($a->down(package => 'IWL::Object'), $a_a);
-    is_deeply([$a->down(package => 'IWL::Test::Object')], [$a_b, $a_b_a]);
+    is_deeply([$a->down(package => 'IWL::Test::Object')], [$a_a_c, $a_b, $a_b_a]);
     is($a->down(package => 'IWL::Test::Object', attributes => {id => 'test_middle', class => 'test_object'}), $a_b);
+
+    ok(!$a_a_a->next(package => 'IWL::Test'));
+    is($a_a_a->next, $a_a_b);
+    is($a_a_a->next(package => 'IWL::Test::Object'), $a_a_c);
+    ok(!$a_a_a->next(package => 'IWL::Test::Object', attributes => {id => 'foo'}));
+    is($a_a_a->next(package => 'IWL::Test::Object', attributes => {id => 'bottom3', class => 'object'}), $a_a_c);
+    is_deeply([$a_a_a->next(attributes => {class => 'object'})], [$a_a_b, $a_a_c]);
+
+    ok(!$a_a_c->previous(package => 'IWL::Test'));
+    is($a_a_c->previous, $a_a_b);
+    is($a_a_c->previous(package => 'IWL::Object'), $a_a_b);
+    ok(!$a_a_c->previous(package => 'IWL::Test::Object', attributes => {id => 'foo'}));
+    is($a_a_c->previous(package => 'IWL::Object', attributes => {id => 'bottom1', class => 'object'}), $a_a_a);
+    is_deeply([$a_a_c->previous(attributes => {class => 'object'})], [$a_a_b, $a_a_a]);
 }
 
 package PRINT_TEST;

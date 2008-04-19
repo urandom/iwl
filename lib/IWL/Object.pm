@@ -212,6 +212,7 @@ sub nextSibling {
     my $self = shift;
 
     return $self->{parentNode}->nextChild($self) if $self->{parentNode};
+    return;
 }
 
 =item B<prevSibling>
@@ -224,6 +225,7 @@ sub prevSibling {
     my $self = shift;
 
     return $self->{parentNode}->prevChild($self) if $self->{parentNode};
+    return;
 }
 
 =item B<getParent>
@@ -1102,6 +1104,65 @@ sub down {
             return $ret if $ret;
         }
     }
+
+    return $wantarray ? @result : undef;
+}
+
+=item B<next> (B<%OPTIONS>)
+
+Searches the next siblings of the element for elements, matching the criteria set by the options.
+
+See IWL::Object::up(3pm) for documentation on the return value and parameter description.
+
+=cut
+
+sub next {
+    my ($self, %options) = @_;
+    my $wantarray = wantarray;
+    my $element = $self->nextSibling;
+    my @result;
+
+    return $element unless %options;
+    return unless $element;
+    do {
+        my $match = __selector($element, %options);
+
+        if ($wantarray) {
+            push @result, $match if $match;
+        } else {
+            return $match if $match;
+        }
+    } while $element = $element->nextSibling;
+
+    return $wantarray ? @result : undef;
+}
+
+
+=item B<previous> (B<%OPTIONS>)
+
+Searches the previous siblings of the element for elements, matching the criteria set by the options.
+
+See IWL::Object::up(3pm) for documentation on the return value and parameter description.
+
+=cut
+
+sub previous {
+    my ($self, %options) = @_;
+    my $wantarray = wantarray;
+    my $element = $self->prevSibling;
+    my @result;
+
+    return $element unless %options;
+    return unless $element;
+    do {
+        my $match = __selector($element, %options);
+
+        if ($wantarray) {
+            push @result, $match if $match;
+        } else {
+            return $match if $match;
+        }
+    } while $element = $element->prevSibling;
 
     return $wantarray ? @result : undef;
 }
