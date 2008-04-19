@@ -1358,11 +1358,18 @@ sub __selector {
     my ($element, %options) = @_;
     my $match = $element;
 
-    undef $match if $options{package} && !$element->isa($options{package});
-    if (ref $options{attributes} eq 'HASH') {
-        foreach my $key (keys %{$options{attributes}}) {
-            undef $match
-                unless $element->getAttribute($key, 1) eq $options{attributes}{$key};
+    foreach my $key (keys %options) {
+        if ($key eq 'package') {
+            undef $match if $options{package} && !$element->isa($options{package});
+        } elsif ($key eq 'attributes') {
+            if (ref $options{attributes} eq 'HASH') {
+                foreach my $key (keys %{$options{attributes}}) {
+                    undef $match
+                        unless $element->getAttribute($key, 1) eq $options{attributes}{$key};
+                }
+            }
+        } elsif ($element->can('_canSelect') && $element->_canSelect($key)) {
+            undef $match unless $element->_selector($key, $options{$key});
         }
     }
 

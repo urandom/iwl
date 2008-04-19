@@ -543,6 +543,25 @@ sub _namespacedSignalName {
     return $signal;
 }
 
+sub _canSelect {
+    return {
+        class => 1,
+        id => 1,
+    }->{$_[1]};
+}
+
+sub _selector {
+    my ($self, $key, $value) = @_;
+
+    if ($key eq 'class') {
+        return $self->hasClass($value);
+    } elsif ($key eq 'id') {
+        return $self->getId eq $value;
+    }
+
+    return;
+}
+
 # Internal
 #
 sub __setStyle {
