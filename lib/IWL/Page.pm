@@ -224,7 +224,7 @@ sub registerEvent {
 }
 
 sub requiredJs {
-    return shift->{_head}->requiredJs(@_);
+    return shift->{_body}->requiredJs(@_);
 }
 
 # Internal

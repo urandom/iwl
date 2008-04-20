@@ -471,26 +471,17 @@ sub _realize {
     $self->IWL::Object::_realize;
     if ($self->{_customSignals}) {
 	my $id = $self->getId;
-        my $parent = $self->up(criteria => [{package => 'IWL::Page::Body'}], options => {last => 1}) || $self;
 
-	if ($id) {
-	    foreach my $signal (keys %{$self->{_customSignals}}) {
+        if ($id) {
+            foreach my $signal (keys %{$self->{_customSignals}}) {
                 my $expr = join '; ', @{$self->{_customSignals}{$signal}};
-		if ($expr) {
+                if ($expr) {
                     $signal = $self->_namespacedSignalName($signal);
-		    $parent->{_customSignalScript} = IWL::Script->new
-		      unless $parent->{_customSignalScript};
-		    $parent->{_customSignalScript}->appendScript(<<EOF);
-\$('$id').signalConnect('$signal', function() { $expr });
-EOF
+                    $self->_appendInitScript(
+                        "\$('$id').signalConnect('$signal', function() { $expr });"
+                    );
 		}
 	    }
-	}
-	if ($parent->{_customSignalScript} && !$parent->{_customSignalScript}{_added}) {
-            $parent->isa('IWL::Page::Body')
-              ? $parent->appendChild($parent->{_customSignalScript})
-              : unshift @{$parent->{_tailObjects}}, $parent->{_customSignalScript};
-	    $parent->{_customSignalScript}{_added} = 1;
 	}
     }
 
@@ -509,9 +500,7 @@ sub _realizeEvents {
 
     $self->SUPER::_realizeEvents;
 
-    unshift @{$self->{_tailObjects}}, IWL::Script->new->setScript(<<EOF);
-\$('$id').prepareEvents();
-EOF
+    $self->_appendInitScript("\$('$id').prepareEvents();");
 }
 
 sub _constructorArguments {

@@ -383,6 +383,35 @@ sub setChild {
     return $self;
 }
 
+=item B<insertBefore> (B<REFERENCE>, B<OBJECT>)
+
+Inserts B<OBJECT> before B<REFERENCE>.
+
+Parameter: B<OBJECT> - the object to be inserted (can be an array of objects)
+
+=cut
+
+sub insertBefore {
+    my ($self, $reference, @objects) = @_;
+
+    @objects = grep {$_ && $_ ne $self} @objects;
+    return if !@objects;
+    return if $self->{_noChildren};
+
+    $_->{parentNode} = $self and weaken $_->{parentNode}
+        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+
+    my $i;
+    for ($i = 0; $i < @{$self->{childNodes}}; $i++) {
+	if ($self->{childNodes}[$i] == $reference) {
+	    last;
+	}
+    }
+    splice @{$self->{childNodes}}, $i, 0, @objects;
+
+    return $self;
+}
+
 =item B<insertAfter> (B<REFERENCE>, B<OBJECT>)
 
 Inserts B<OBJECT> after B<REFERENCE>.
@@ -570,6 +599,27 @@ sub getContent {
 	  || $self->{_ignore});
 
     my @header_scripts;
+    if (my @requires = map {$_->[1]} @{$self->{_requiredJs}}) {
+        my $top = $self->isa('IWL::Page::Body')
+            ? $self
+            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+        $DB::single = 1;
+        my $script = $top->down({package => 'IWL::Script'});
+        my $pivot = $top->lastChild;
+
+        $top->{_firstScript} = $script and weaken $top->{_firstScript}
+            unless $top->{_firstScript};
+        $top->{_pivot} = $pivot and weaken $top->{_pivot}
+            unless $top->{_pivot};
+
+        $top->{_firstScript}
+            ? $top->{_firstScript}{parentNode}->insertBefore($top->{_firstScript}, @requires)
+            : $top->{_pivot}
+                ? $top->insertAfter($top->{_pivot}, @requires)
+                : $top->appendChild(@requires);
+    }
+
+=head1
     foreach (@{$self->{_requiredJs}}) {
 	next if exists $initializedJs{$_->[0]};
 	if ($self->isa('IWL::Page::Head')) {
@@ -579,6 +629,7 @@ sub getContent {
 	}
 	$initializedJs{$_->[0]} = 1;
     }
+=cut
 
     $content .= "<!" . $self->{_declaration} . ">\n" if $self->{_declaration};
     $content .= "<" . $self->{_tag};
@@ -998,7 +1049,7 @@ sub requiredJs {
 	$src       = $IWLConfig{JS_DIR} . '/' . $src
 	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
-	$script->setSrc($src);
+	$script->setSrc($src)->setAttribute('iwl:requiredScript');
 	push @{$self->{_requiredJs}}, [$src => $script];
     }
 
