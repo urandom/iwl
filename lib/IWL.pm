@@ -61,6 +61,7 @@ use IWL::Table::Row;
 use IWL::Table;
 use IWL::Text;
 use IWL::Textarea;
+use IWL::TextEditor;
 use IWL::Tooltip;
 use IWL::Tree::Cell;
 use IWL::Tree::Row;
@@ -181,6 +182,7 @@ The following widgets have so far been written. They have extensive documentatio
  IWL::Table::Row - A row widget for the table ("<tr">)
  IWL::Text - A simple text container
  IWL::Textarea - A textarea widget ("<textarea>")
+ IWL::TextEditor - A rich text editor
  IWL::Tooltip - A tooltip widget
  IWL::Tree - A tree widget (has keyboard navigation)
  IWL::Tree::Cell - A tree cell widget

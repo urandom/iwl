@@ -1540,3 +1540,9 @@ div.tooltip_content {
     text-align: center;
     color: #000 !important;
 }
+
+/* TextEditor */
+.texteditor {
+    width: 400px;
+    height: 300px;
+}

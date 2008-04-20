@@ -293,6 +293,7 @@ sub build_advanced_widgets {
     my $list = IWL::Tree::Row->new(id => 'list_row');
     my $table = IWL::Tree::Row->new(id => 'table_row');
     my $tree = IWL::Tree::Row->new(id => 'tree_row');
+    my $texteditors = IWL::Tree::Row->new(id => 'texteditors_row');
 
     $calendars->appendTextCell('Calendars');
     $row->appendRow($calendars);
@@ -314,8 +315,10 @@ sub build_advanced_widgets {
     $tables->appendRow($table);
     $tree->appendTextCell('Tree');
     $tables->appendRow($tree);
+    $texteditors->appendTextCell('Text editors');
+    $row->appendRow($texteditors);
 
-    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $progress, $list, $table, $tree);
+    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $progress, $list, $table, $tree, $texteditors);
 }
 
 sub build_containers {
@@ -743,6 +746,27 @@ sub generate_tree {
 
     $container->appendChild($label);
     $label->setText('<----   The tree');
+
+    return $container;
+}
+
+sub generate_texteditors {
+    my $container = IWL::Container->new(id => 'texteditors_container');
+    my $main_editor = IWL::TextEditor->new(id => 'main_editor');
+    my $panel = IWL::Container->new(id => 'editor_panel');
+    my $div_editor = IWL::Container->new(id => 'div_editor');
+    my $primary_editor = IWL::TextEditor->new(id => 'primary_editor', fullPanel => 1, panel => $panel, editors => [$div_editor]);
+
+    $container->appendChild(
+        IWL::Label->new->setText('Default editor'),
+        $main_editor,
+        IWL::Label->new->setText('Separate panel'),
+        $panel,
+        IWL::Label->new->setText('A container as a text editor'),
+        $div_editor,
+        IWL::Label->new->setText('The primary editor instance'),
+        $primary_editor,
+    );
 
     return $container;
 }

@@ -87,6 +87,7 @@ lib/IWL/Table/Container.pm
 lib/IWL/Table/Row.pm
 lib/IWL/Text.pm
 lib/IWL/Textarea.pm
+lib/IWL/TextEditor.pm
 lib/IWL/Tooltip.pm
 lib/IWL/Tree.pm
 lib/IWL/Tree/Cell.pm
@@ -210,6 +211,7 @@ share/images/notebook/offr.gif
 share/images/notebook/offr.png
 share/images/slider/handle.gif
 share/images/slider/vertical_handle.gif
+share/images/texteditor/nicEditorIcons.gif
 share/images/tree/blank.gif
 share/images/tree/collapser_l.gif
 share/images/tree/collapser_t.gif
@@ -230,6 +232,7 @@ share/jscript/dist/controls.js
 share/jscript/dist/dragdrop.js
 share/jscript/dist/effects.js
 share/jscript/dist/excanvas.js
+share/jscript/dist/nicEdit.js
 share/jscript/dist/prototype.js
 share/jscript/dist/scriptaculous.js
 share/jscript/dist/slider.js
@@ -249,6 +252,7 @@ share/jscript/resizer.js
 share/jscript/scriptaculous_extensions.js
 share/jscript/spinner.js
 share/jscript/tags
+share/jscript/texteditor.js
 share/jscript/tooltip.js
 share/jscript/tree.js
 share/jscript/unittest_extensions.js
@@ -330,5 +334,6 @@ t/50menu.t
 t/50menubar.t
 t/50radiobutton.t
 t/50spinner.t
+t/50texteditor.t
 t/iwl.conf
 t/test.html

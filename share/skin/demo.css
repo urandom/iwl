@@ -26,6 +26,20 @@
 .demo, .demo_label, div.demo span.button_label_default, .demo * {
     color: #4546d0;
 }
+.texteditor {
+    height: 100px;
+}
+#div_editor {
+    width: 400px;
+    height: 100px;
+    border: 1px solid gray;
+}
+#primary_editor {
+    border: 1px solid gray;
+}
+#editor_panel {
+    width: 400px;
+}
 
 span.c_comment {
     color: #0066dd;
