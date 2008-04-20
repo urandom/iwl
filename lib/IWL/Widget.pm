@@ -471,7 +471,7 @@ sub _realize {
     $self->IWL::Object::_realize;
     if ($self->{_customSignals}) {
 	my $id = $self->getId;
-	my $parent = $self->_findTopParent({package => 'IWL::Page::Body'}) || $self;
+        my $parent = $self->up(criteria => [{package => 'IWL::Page::Body'}], options => {last => 1}) || $self;
 
 	if ($id) {
 	    foreach my $signal (keys %{$self->{_customSignals}}) {

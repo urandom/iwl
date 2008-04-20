@@ -1150,14 +1150,29 @@ sub send {
     return $self;
 }
 
+# Private function for splitting the criteria into criteria and options
+my $splitCriteria;
+
 =item B<up> ([B<CRITERIA>])
+
+=item B<up> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
 
 Searches upward along the object stack for objects, matching the criteria set by the options.
 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for documentation on parameter descriptions.
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
 
 =cut
 
@@ -1165,40 +1180,63 @@ sub up {
     my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my $object = $self->{parentNode};
-    my @result;
+    my (%options, @result, $last);
 
-    return ($wantarray ? $self->getAncestors : $object) unless @criteria;
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray 
+        ? $self->getAncestors
+        : $options{last} 
+            ? ($self->getAncestors)[-1] : $object
+    ) unless @criteria;
     return unless $object;
     do {
         my $match = $object->match(@criteria);
 
-        if ($wantarray) {
+        if ($wantarray || $options{last}) {
             push @result, $match if $match;
+            $last = $object;
         } else {
             return $match if $match;
         }
     } while $object = $object->{parentNode};
 
-    return $wantarray ? @result : undef;
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
 }
 
 =item B<down> ([B<CRITERIA>])
+
+=item B<down> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
 
 Searches downward along the object stack for objects, matching the criteria set by the options.
 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for documentation on parameter descriptions.
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
 
 =cut
 
 sub down {
-    my ($self, @criteria) = @_;
+    my ($self, @criteria) = (shift, @_);
     my $wantarray = wantarray;
-    my @result;
+    my (%options, @result, $last);
 
-    return ($wantarray ? $self->getDescendants : $self->firstChild) unless @criteria;
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray
+        ? $self->getDescendants
+        : $options{last}
+            ? ($self->getDescendants)[-1] : $self->firstChild
+    ) unless @criteria;
     return unless @{$self->{childNodes}};
 
     foreach my $object (@{$self->{childNodes}}) {
@@ -1206,25 +1244,42 @@ sub down {
 
         if ($wantarray) {
             push @result, $match if $match;
-            push @result, $object->down(@criteria);
+            push @result, $object->down(@_);
+        } elsif ($options{last}) {
+            push @result, $match if $match;
+            my $ret = $object->down(@_);
+            push @result, $ret if $ret && $ret->match(@criteria);
+            $last = $ret || $object;
         } else {
             return $match if $match;
-            my $ret = $object->down(@criteria);
+            my $ret = $object->down(@_);
             return $ret if $ret;
         }
     }
 
-    return $wantarray ? @result : undef;
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
 }
 
 =item B<next> ([B<CRITERIA>])
+
+=item B<next> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
 
 Searches the next siblings of the object for objects, matching the criteria set by the options.
 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for documentation on parameter descriptions.
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
 
 =cut
 
@@ -1232,32 +1287,50 @@ sub next {
     my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my $object = $self->nextSibling;
-    my @result;
+    my (%options, @result, $last);
 
-    return ($wantarray ? $self->getNextSiblings : $object) unless @criteria;
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray
+        ? $self->getNextSiblings
+        : $options{last}
+            ? ($self->getNextSiblings)[-1] : $object
+    ) unless @criteria;
     return unless $object;
     do {
         my $match = $object->match(@criteria);
 
-        if ($wantarray) {
+        if ($wantarray || $options{last}) {
             push @result, $match if $match;
+            $last = $object;
         } else {
             return $match if $match;
         }
     } while $object = $object->nextSibling;
 
-    return $wantarray ? @result : undef;
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
 }
 
 
 =item B<previous> ([B<CRITERIA>])
+
+=item B<previous> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
 
 Searches the previous siblings of the object for objects, matching the criteria set by the options.
 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for documentation on parameter descriptions.
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
 
 =cut
 
@@ -1265,21 +1338,27 @@ sub previous {
     my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my $object = $self->prevSibling;
-    my @result;
+    my (%options, @result, $last);
 
-    return ($wantarray ? $self->getPreviousSiblings : $object) unless @criteria;
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray
+        ? $self->getPreviousSiblings
+        : $options{last}
+            ? ($self->getPreviousSiblings)[-1] : $object
+    ) unless @criteria;
     return unless $object;
     do {
         my $match = $object->match(@criteria);
 
-        if ($wantarray) {
+        if ($wantarray || $options{last}) {
             push @result, $match if $match;
+            $last = $object;
         } else {
             return $match if $match;
         }
     } while $object = $object->prevSibling;
 
-    return $wantarray ? @result : undef;
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
 }
 
 =item B<match> (B<CRITERIA>)
@@ -1403,25 +1482,6 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 sub _realize {
 }
 
-=item B<_findTopParent> ([B<CRITERIA>])
-
-Finds the top-most parent of the object and returns it.
-
-See IWL::Object::up(3pm) for documentation on parameter description.
-
-=cut
-
-sub _findTopParent {
-    my ($self, @criteria) = @_;
-    my $object = $self;
-
-    do {
-        return $object if $object->match(@criteria) || !$object->{parentNode};
-        $object = $object->{parentNode};
-    } while $object;
-    return $object;
-}
-
 # Internal
 #
 # Convert control characters, so that error messages cannot be tainted
@@ -1460,7 +1520,7 @@ sub __addInitScripts {
     if (@{$self->{_initScripts}}) {
         require IWL::Script;
 
-        my $parent = $self->_findTopParent({package => 'IWL::Page::Body'}) || $self;
+        my $parent = $self->up(criteria => [{package => 'IWL::Page::Body'}], options => {last => 1}) || $self;
         my $expr = join '; ', @{$self->{_initScripts}};
 
         if ($expr) {
@@ -1477,6 +1537,13 @@ sub __addInitScripts {
         }
     }
 }
+
+$splitCriteria = sub {
+    return unless {2 => 1, 4 => 1}->{scalar @{$_[0]}} && grep {$_ eq 'options'} @{$_[0]};
+    my %args = %{{@{$_[0]}}};
+    @{$_[0]} = @{$args{criteria} || []};
+    %{$_[1]} = %{$args{options}};
+};
 
 1;
 
