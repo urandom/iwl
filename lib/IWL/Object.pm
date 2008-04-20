@@ -1107,7 +1107,7 @@ sub send {
     return $self;
 }
 
-=item B<up> ([B<CRITERIA>, B<OPTIONS>])
+=item B<up> ([B<CRITERIA>])
 
 Searches upward along the object stack for objects, matching the criteria set by the options.
 
@@ -1119,15 +1119,15 @@ See IWL::Object::match(3pm) for documentation on parameter descriptions.
 =cut
 
 sub up {
-    my ($self, $criteria, $options) = @_;
+    my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my $object = $self->{parentNode};
     my @result;
 
-    return ($wantarray ? $self->getAncestors : $object) unless $criteria;
+    return ($wantarray ? $self->getAncestors : $object) unless @criteria;
     return unless $object;
     do {
-        my $match = $object->match($criteria, $options);
+        my $match = $object->match(@criteria);
 
         if ($wantarray) {
             push @result, $match if $match;
@@ -1139,7 +1139,7 @@ sub up {
     return $wantarray ? @result : undef;
 }
 
-=item B<down> ([B<CRITERIA>, B<OPTIONS>])
+=item B<down> ([B<CRITERIA>])
 
 Searches downward along the object stack for objects, matching the criteria set by the options.
 
@@ -1151,22 +1151,22 @@ See IWL::Object::match(3pm) for documentation on parameter descriptions.
 =cut
 
 sub down {
-    my ($self, $criteria, $options) = @_;
+    my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my @result;
 
-    return ($wantarray ? $self->getDescendants : $self->firstChild) unless $criteria;
+    return ($wantarray ? $self->getDescendants : $self->firstChild) unless @criteria;
     return unless @{$self->{childNodes}};
 
     foreach my $object (@{$self->{childNodes}}) {
-        my $match = $object->match($criteria, $options);
+        my $match = $object->match(@criteria);
 
         if ($wantarray) {
             push @result, $match if $match;
-            push @result, $object->down($criteria, $options);
+            push @result, $object->down(@criteria);
         } else {
             return $match if $match;
-            my $ret = $object->down($criteria, $options);
+            my $ret = $object->down(@criteria);
             return $ret if $ret;
         }
     }
@@ -1174,7 +1174,7 @@ sub down {
     return $wantarray ? @result : undef;
 }
 
-=item B<next> ([B<CRITERIA>, B<OPTIONS>])
+=item B<next> ([B<CRITERIA>])
 
 Searches the next siblings of the object for objects, matching the criteria set by the options.
 
@@ -1186,15 +1186,15 @@ See IWL::Object::match(3pm) for documentation on parameter descriptions.
 =cut
 
 sub next {
-    my ($self, $criteria, $options) = @_;
+    my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my $object = $self->nextSibling;
     my @result;
 
-    return ($wantarray ? $self->getNextSiblings : $object) unless $criteria;
+    return ($wantarray ? $self->getNextSiblings : $object) unless @criteria;
     return unless $object;
     do {
-        my $match = $object->match($criteria, $options);
+        my $match = $object->match(@criteria);
 
         if ($wantarray) {
             push @result, $match if $match;
@@ -1207,7 +1207,7 @@ sub next {
 }
 
 
-=item B<previous> ([B<CRITERIA>, B<OPTIONS>])
+=item B<previous> ([B<CRITERIA>])
 
 Searches the previous siblings of the object for objects, matching the criteria set by the options.
 
@@ -1219,15 +1219,15 @@ See IWL::Object::match(3pm) for documentation on parameter descriptions.
 =cut
 
 sub previous {
-    my ($self, $criteria, $options) = @_;
+    my ($self, @criteria) = @_;
     my $wantarray = wantarray;
     my $object = $self->prevSibling;
     my @result;
 
-    return ($wantarray ? $self->getPreviousSiblings : $object) unless $criteria;
+    return ($wantarray ? $self->getPreviousSiblings : $object) unless @criteria;
     return unless $object;
     do {
-        my $match = $object->match($criteria, $options);
+        my $match = $object->match(@criteria);
 
         if ($wantarray) {
             push @result, $match if $match;
@@ -1239,48 +1239,85 @@ sub previous {
     return $wantarray ? @result : undef;
 }
 
-=item B<match> (B<CRITERIA>, B<OPTIONS>)
+=item B<match> (B<CRITERIA>)
 
-Returns the object, if it matches the given criteria. Returns false, otherwise.
+Returns the object, if it matches the given criteria. Returns false, otherwise. By default, criteria are evaluated with a logical I<AND>.
 
-Parameters: B<CRITERIA> - a hash reference with the following key-value pairs:
+Parameters: B<CRITERIA> - the criteria is a list of parameters, which can have the following values:
 
 =over 8
 
-=item B<package>
+=item B<or>
 
-The package, which the object belongs to. Example: L<IWL::Image>
+A short-circuit logical I<OR> operator.
 
-=item B<attributes>
+=item B<not>
 
-The attributes, whose names and values should match the attributes of an object. The value of this option is a hashref, where the keys are the attribute names, and the values are the unescaped attribute values, or compiled reguler expressions, which should match those values. Example: {class => 'container', id => qr/foob/}
+A logical I<NOT> operator. Will reverse the next criterion.
+
+=item B<term>
+
+A term is a hash reference. The following key-value pairs are supported by L<IWL::Object>:
+
+=over 10 
+
+=item B<package> => I<CLASS>
+
+The package, which the object belongs to.
+
+=item B<attribute> => [I<NAME> => I<VALUE>]
+
+An attribute, whose name and value should match an attribute of an object. The value of this option is a arrayref, where the first element is the attribute name, and second is the string value for that name, or a compiled reguler expression.
+
+=back
+
+Other classes can expand the list, if they implement the protected B<_matchTerm> method, which receives the term, and returns true or false, depending on whether the object matches the term.
 
 =back
 
 =cut
 
 sub match {
-    my ($self, $criteria, $options) = @_;
-    my $match = $self;
+    my $self = shift;
+    my ($current, $last, $not);
 
-    foreach my $key (keys %$criteria) {
-        if ($key eq 'package') {
-            undef $match if $criteria->{package} && !$self->isa($criteria->{package});
-        } elsif ($key eq 'attributes') {
-            if (ref $criteria->{attributes} eq 'HASH') {
-                foreach my $key (keys %{$criteria->{attributes}}) {
-                    my $attribute = $self->getAttribute($key, 1);
-                    my $value = $criteria->{attributes}{$key};
-                    undef $match unless (ref $value eq 'Regexp'
-                        ? $attribute =~ /$value/
-                        : $attribute eq $value
-                    );
+    foreach my $term (@_) {
+        if (ref $term eq 'HASH') {
+            next if defined $current && !$current;
+            if ($term->{package}) {
+                $current = $self->isa($term->{package}) ? 1 : 0;
+            } elsif ($term->{attribute}) {
+                my $attribute = $self->getAttribute($term->{attribute}[0], 1);
+                my $value = $term->{attribute}[1];
+                if (   defined $attribute
+                    && defined $value
+                    && (
+                        ref $value eq 'Regexp'
+                          ? $attribute =~ /$value/
+                          : $attribute eq $value
+                    )) {
+                    $current = 1;
+                } else {
+                    $current = 0;
                 }
+            } elsif ($self->can('_matchTerm')) {
+                my $ret = $self->_matchTerm($term);
+                $ret == 1 ? $current = 1 : $ret == 0 ? $current = 0 : ();
             }
+            $current = 0 unless $current;
+            if ($not) {
+                $current = !$current;
+                undef $not;
+            }
+        } elsif (lc $term eq 'or') {
+            $last = $current and return $self;
+            undef $current;
+        } elsif (lc $term eq 'not') {
+            $not = 1;
         }
     }
-
-    return $match if $match;
+    
+    return $self if $current;
     return;
 }
 
@@ -1323,7 +1360,7 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 sub _realize {
 }
 
-=item B<_findTopParent> ([B<CRITERIA>, B<OPTIONS>])
+=item B<_findTopParent> ([B<CRITERIA>])
 
 Finds the top-most parent of the object and returns it.
 
@@ -1332,11 +1369,11 @@ See IWL::Object::up(3pm) for documentation on parameter description.
 =cut
 
 sub _findTopParent {
-    my ($self, $criteria, $options) = @_;
+    my ($self, @criteria) = @_;
     my $object = $self;
 
     do {
-        return $object if $object->match($criteria, $options) || !$object->{parentNode};
+        return $object if $object->match(@criteria) || !$object->{parentNode};
         $object = $object->{parentNode};
     } while $object;
     return $object;

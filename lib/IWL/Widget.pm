@@ -456,41 +456,15 @@ sub getTitle {
     return shift->getAttribute('title', 1);
 }
 
-=item B<match> (B<CRITERIA>, B<OPTIONS>)
+# Protected
+#
+=head1 PROTECTED METHODS
 
-Returns the object, if it matches the given criteria. Returns false, otherwise.
-
-See IWL::Object::match(3pm) for additional parameter description.
-
-Parameters: B<CRITERIA> - a hash reference with the following key-value pairs:
-
-=over 8
-
-=item B<class>
-
-The class, which is contained in the widget's class attribute
-
-=item B<id>
-
-The id of the widget
-
-=back
+The following methods should only be used by classes that inherit
+from B<IWL::Widget>.
 
 =cut
 
-sub match {
-    my ($self, $criteria, $options) = @_;
-    my $match = $self->SUPER::match($criteria, $options);
-
-    undef $match if $criteria->{class} && !$self->hasClass($criteria->{class});
-    undef $match if $criteria->{id} && $self->getId ne $criteria->{id};
-
-    return $match if $match;
-    return;
-}
-
-# Protected
-#
 sub _realize {
     my $self = shift;
 
@@ -574,6 +548,39 @@ sub _namespacedSignalName {
     return 'dom:' . $signal
       if $signal =~ /mouse(?:enter|leave|wheel)/;
     return $signal;
+}
+
+=item B<_matchTerm> (B<TERM>)
+
+Returns I<1> if the widget matches the given term, I<0> if it doesn't, or I<-1> if the term is not supported.
+
+Parameters: B<TERM> - a hash reference with the following key-value pairs:
+
+=over 8
+
+=item B<class>
+
+The class, which is contained in the widget's class attribute
+
+=item B<id>
+
+The id of the widget
+
+=back
+
+=cut
+
+sub _matchTerm {
+    my ($self, $term) = @_;
+    my $ret = -1;
+
+    if ($term->{class}) {
+        $ret = $self->hasClass($term->{class}) ? 1 : 0;
+    } elsif ($term->{id}) {
+        $ret = $self->getId eq $term->{id} ? 1 : 0;
+    }
+
+    return $ret;
 }
 
 # Internal
