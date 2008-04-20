@@ -412,6 +412,49 @@ sub insertAfter {
     return $self;
 }
 
+=item B<removeChild> (B<OBJECT>)
+
+Removes B<OBJECT> from the list of children
+
+Parameters: B<OBJECT> - the object to be removed (can be an array of objects)
+
+=cut
+
+sub removeChild {
+    my ($self, @objects) = @_;
+
+    @objects = grep {$_ && $_ ne $self} @objects;
+    return if !@objects;
+    return if $self->{_noChildren};
+
+    my @children = @{$self->{childNodes}};
+    foreach my $object (@objects) {
+        @children = grep {$_ ne $object} @children;
+    }
+
+    if (@children) {
+        return $self->setChild(@children);
+    } else {
+        $self->{childNodes} = [];
+        return $self;
+    }
+}
+
+=item B<remove>
+
+Removes itself from the child list of its parent
+
+=cut
+
+sub remove {
+    my $self = shift;
+
+    return unless $self->{parentNode};
+
+    $self->{parentNode}->removeChild($self);
+    return $self;
+}
+
 =item B<clone> (B<DEPTH>)
 
 Clones itself and optionally, its children

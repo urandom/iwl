@@ -1,4 +1,4 @@
-use Test::More tests => 99;
+use Test::More tests => 105;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -34,6 +34,13 @@ my $output;
 	is($object, $child2->{parentNode}, 'Parent link');
 	is($object, $child2->getParent, 'getParent()');
 	is($object->{childNodes}[4], $child3, 'Child link');
+
+    is($object->removeChild($child3), $object);
+	ok(!$object->{childNodes}[4]);
+    is($object->removeChild($child1, $first_child, $child2_5), $object);
+	is(scalar @{$object->{childNodes}}, 1);
+    is($child2->remove, $child2);
+	is(scalar @{$object->{childNodes}}, 0);
 
 	isa_ok($object->setChild(IWL::Object->new), 'IWL::Object', 'Returns itself');
 	is(scalar @{$object->{childNodes}}, 1, 'setChild');
