@@ -19,8 +19,7 @@ use IWL::JSON qw(toJSON);
 use Scalar::Util qw(weaken isweak blessed reftype);
 
 # cloneCache: Used to detect looped networks and avoid infinite recursion.
-# initializedJs: A hash to keep track of required javascript files
-use vars qw(%cloneCache %initializedJs);
+use vars qw(%cloneCache);
 
 # The IWL::Response object
 my $response;
@@ -686,6 +685,7 @@ sub getObject {
 	$self->{_realized} = 1;
 	$self->_realize;
         $self->__addInitScripts;
+        push @$scripts, $self->__addRequiredScripts('object');
     }
 
     return {} if $self->bad;
@@ -693,12 +693,6 @@ sub getObject {
     return
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
 	  || $self->{_ignore});
-
-    foreach (@{$self->{_requiredJs}}) {
-	next if exists $initializedJs{$_->[0]};
-        push @$scripts, $_->[1]->getObject;
-	$initializedJs{$_->[0]} = 1;
-    }
 
     foreach my $child (@{$self->{childNodes}}) {
         push @$children, $child->getObject if $child;
@@ -1037,10 +1031,11 @@ server that does not reload modules for each request.
 This method is a class method!  You do not need to instantiate an object
 in order to call it.
 
+B<Note>: Currently does nothing, as there is no state data to be cleaned.
+
 =cut
 
 sub cleanStateful {
-    %initializedJs = ();
 }
 
 =item B<getState>
@@ -1538,13 +1533,25 @@ sub __iterateForm {
 }
 
 sub __addRequiredScripts {
-    my $self = shift;
+    my ($self, $from) = @_;
     my @required = @{$self->{_requiredJs}};
 
     if (my @urls = map {$_->getSrc} @required) {
         my $top = $self->isa('IWL::Page::Body')
             ? $self
             : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+
+        $top->{_required} = {} unless $top->{_required};
+
+        foreach my $url (@urls) {
+            if ($top->{_required}{$url}) {
+                @required = grep {$_->getSrc ne $url} @required;
+            } else {
+                $top->{_required}{$url} = 1;
+            }
+        }
+        
+        return map {$_->getObject} @required if $from && $from eq 'object';
 
         unless ($top->{_firstScript}) {
             my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
@@ -1555,25 +1562,18 @@ sub __addRequiredScripts {
             $top->{_pivot} = $pivot and weaken $top->{_pivot};
         }
 
-        $top->{_required} = {} unless $top->{_required};
-        foreach my $url (@urls) {
-            if ($top->{_required}{$url}) {
-                @required = grep {$_->getSrc ne $url} @required;
-            } else {
-                $top->{_required}{$url} = 1;
-            }
-        }
         my $pivot = $top->{_lastRequired} || $top->{_pivot};
         my $script = $top->{_initScript} || $top->{_firstScript};
 
         $top->{_lastRequired} = @required[$#required] and weaken $top->{_lastRequired};
 
-        $script
+        return $script
             ? $script->{parentNode}->insertBefore($script, @required)
             : $pivot
                 ? $top->insertAfter($pivot, @required)
                 : $top->appendChild(@required);
     }
+    return;
 }
 
 sub __addInitScripts {

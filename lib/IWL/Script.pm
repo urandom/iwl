@@ -142,13 +142,6 @@ sub getScript {
 #
 sub _realize {
     my $self = shift;
-    if ($IWLConfig{STRICT_LEVEL} > 1) {
-        my $src = $self->getAttribute(src => 1);
-        if ($src) {
-            $self->_setBad(1) if $IWL::Object::initializedJs{$src};
-            $IWL::Object::initializedJs{$src} = 1;
-        }
-    }
 
     $self->appendChild(IWL::Text->new($self->getScript));
 }
