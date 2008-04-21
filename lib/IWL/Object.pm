@@ -589,6 +589,7 @@ sub getContent {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
+        $self->__addRequiredScripts;
         $self->__addInitScripts;
     }
 
@@ -597,39 +598,6 @@ sub getContent {
     return ''
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
 	  || $self->{_ignore});
-
-    my @header_scripts;
-    if (my @requires = map {$_->[1]} @{$self->{_requiredJs}}) {
-        my $top = $self->isa('IWL::Page::Body')
-            ? $self
-            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
-        $DB::single = 1;
-        my $script = $top->down({package => 'IWL::Script'});
-        my $pivot = $top->lastChild;
-
-        $top->{_firstScript} = $script and weaken $top->{_firstScript}
-            unless $top->{_firstScript};
-        $top->{_pivot} = $pivot and weaken $top->{_pivot}
-            unless $top->{_pivot};
-
-        $top->{_firstScript}
-            ? $top->{_firstScript}{parentNode}->insertBefore($top->{_firstScript}, @requires)
-            : $top->{_pivot}
-                ? $top->insertAfter($top->{_pivot}, @requires)
-                : $top->appendChild(@requires);
-    }
-
-=head1
-    foreach (@{$self->{_requiredJs}}) {
-	next if exists $initializedJs{$_->[0]};
-	if ($self->isa('IWL::Page::Head')) {
-	    push @header_scripts, $_->[1]->getContent;
-	} else {
-	    $content .= $_->[1]->getContent;
-	}
-	$initializedJs{$_->[0]} = 1;
-    }
-=cut
 
     $content .= "<!" . $self->{_declaration} . ">\n" if $self->{_declaration};
     $content .= "<" . $self->{_tag};
@@ -662,7 +630,6 @@ sub getContent {
         foreach my $child (@{$self->{childNodes}}) {
             $content .= $child->getContent if $child;
         }
-        $content .= join("\n", @header_scripts) if @header_scripts;
         $content .= "</" . $self->{_tag} . ">\n";
     }
 
@@ -1050,7 +1017,7 @@ sub requiredJs {
 	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
 	$script->setSrc($src)->setAttribute('iwl:requiredScript');
-	push @{$self->{_requiredJs}}, [$src => $script];
+	push @{$self->{_requiredJs}}, $script;
     }
 
     return $self;
@@ -1470,6 +1437,10 @@ sub match {
                           : $attribute eq $value
                     )) {
                     $current = 1;
+                } elsif (!defined $value
+                       && $self->hasAttribute($term->{attribute}[0])
+                   ) {
+                    $current = 1;
                 } else {
                     $current = 0;
                 }
@@ -1566,26 +1537,79 @@ sub __iterateForm {
     return $self;
 }
 
+sub __addRequiredScripts {
+    my $self = shift;
+    my @required = @{$self->{_requiredJs}};
+
+    if (my @urls = map {$_->getSrc} @required) {
+        my $top = $self->isa('IWL::Page::Body')
+            ? $self
+            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+
+        unless ($top->{_firstScript}) {
+            my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
+            $top->{_firstScript} = $first and weaken $top->{_firstScript};
+        }
+        unless ($top->{_pivot}) {
+            my $pivot = $top->lastChild;
+            $top->{_pivot} = $pivot and weaken $top->{_pivot};
+        }
+
+        $top->{_required} = {} unless $top->{_required};
+        foreach my $url (@urls) {
+            if ($top->{_required}{$url}) {
+                @required = grep {$_->getSrc ne $url} @required;
+            } else {
+                $top->{_required}{$url} = 1;
+            }
+        }
+        my $pivot = $top->{_lastRequired} || $top->{_pivot};
+        my $script = $top->{_initScript} || $top->{_firstScript};
+
+        $top->{_lastRequired} = @required[$#required] and weaken $top->{_lastRequired};
+
+        $script
+            ? $script->{parentNode}->insertBefore($script, @required)
+            : $pivot
+                ? $top->insertAfter($pivot, @required)
+                : $top->appendChild(@required);
+    }
+}
+
 sub __addInitScripts {
     my $self = shift;
     if (@{$self->{_initScripts}}) {
-        require IWL::Script;
-
-        my $parent = $self->up(criteria => [{package => 'IWL::Page::Body'}], options => {last => 1}) || $self;
         my $expr = join '; ', @{$self->{_initScripts}};
+        return unless $expr;
 
-        if ($expr) {
-            $parent->{_initScriptElement} = IWL::Script->new
-              unless $parent->{_initScriptElement};
-            $parent->{_initScriptElement}->appendScript($expr . ';');
+        my $top = $self->isa('IWL::Page::Body')
+            ? $self
+            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+
+        unless($top->{_initScript}) {
+            require IWL::Script;
+
+            my $init = $top->{_initScript} = IWL::Script->new->setAttribute('iwl:initScript');
+            weaken $top->{_initScript};
+
+            unless ($top->{_firstScript}) {
+                my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
+                $top->{_firstScript} = $first and weaken $top->{_firstScript};
+            }
+            unless ($top->{_pivot}) {
+                my $pivot = $top->lastChild;
+                $top->{_pivot} = $pivot and weaken $top->{_pivot};
+            }
+            my $pivot = $top->{_lastRequired} || $top->{_pivot};
+
+            $top->{_firstScript}
+                ? $top->{_firstScript}{parentNode}->insertBefore($top->{_firstScript}, $init)
+                : $pivot
+                    ? $top->insertAfter($pivot, $init)
+                    : $top->appendChild($init);
         }
-        if ($parent->{_initScriptElement} && !$parent->{_initScriptElement}{_added}) {
-            $parent->isa('IWL::Page::Body')
-              ? $parent->appendChild($parent->{_initScriptElement})
-              : unshift @{$parent->{_tailObjects}}, $parent->{_initScriptElement};
-            $parent->{_initScriptElement}{_added} = 1;
-            $parent->{_initScriptElement}->setAttribute('iwl:initScript');
-        }
+
+        $top->{_initScript}->appendScript($expr . ';');
     }
 }
 

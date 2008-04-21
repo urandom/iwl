@@ -63,6 +63,16 @@ sub setSrc {
     return $self->setAttribute(src => IWL::Static->addRequest($source), 'uri');
 }
 
+=item B<getSrc>
+
+Returns the source of the script
+
+=cut
+
+sub getSrc {
+    return shift->getAttribute('src', 1);
+}
+
 =item B<appendScript> (B<STRING>)
 
 Appends the strings as a child of the script object
