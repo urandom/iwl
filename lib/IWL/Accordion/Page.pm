@@ -7,6 +7,7 @@ use strict;
 
 use base qw(IWL::Container);
 
+use IWL::Text;
 use IWL::String qw(randomize);
 
 =head1 NAME

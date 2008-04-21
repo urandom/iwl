@@ -7,6 +7,8 @@ use strict;
 
 use base 'IWL::Container';
 
+use IWL::Text;
+
 =head1 NAME
 
 IWL::Frame - a frame object

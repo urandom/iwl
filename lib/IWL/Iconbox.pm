@@ -5,7 +5,6 @@ package IWL::Iconbox;
 
 use strict;
 
-use IWL::Script;
 use IWL::Response;
 use IWL::String qw(randomize escape);
 use IWL::JSON qw(toJSON);
@@ -198,7 +197,7 @@ sub __init {
     my ($self, %args) = @_;
     my $icon_con = IWL::Container->new;
 
-    $self->{_selected}     = IWL::Script->new;
+    $self->{_selected}     = 0;
     $self->{__iconCon}     = $icon_con;
     $self->{__icons}       = [];
     $self->{_defaultClass} = 'iconbox';
