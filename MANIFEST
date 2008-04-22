@@ -74,6 +74,7 @@ lib/IWL/RPC/Request.pm
 lib/IWL/RadioButton.pm
 lib/IWL/Script.pm
 lib/IWL/Slider.pm
+lib/IWL/SnippetManager.pm
 lib/IWL/Spinner.pm
 lib/IWL/Stash.pm
 lib/IWL/Static.pm
@@ -274,6 +275,7 @@ t/20text.t
 t/21page_head.t
 t/21page_title.t
 t/21script.t
+t/21snippetmanager.t
 t/21style.t
 t/22widget.t
 t/30anchor.t
