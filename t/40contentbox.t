@@ -22,8 +22,7 @@ is($cb->setShadows(1), $cb);
 is($cb->setAutoWidth(1), $cb);
 is($cb->setTitleImage, $cb);
 
-like($cb->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*dist/dragdrop.js.*resizer.js.*contentbox.js.*?
-<div (?:(?:class="contentbox shadowbox"|id="cb")\s*){2}><div (?:(?:class="contentbox_top"|id="cb_top")\s*){2}><div (?:(?:class="contentbox_topr"|id="cb_topr")\s*){2}></div>
+like($cb->getContent, qr(<div (?:(?:class="contentbox shadowbox"|id="cb")\s*){2}><div (?:(?:class="contentbox_top"|id="cb_top")\s*){2}><div (?:(?:class="contentbox_topr"|id="cb_topr")\s*){2}></div>
 </div>
 <div (?:(?:class="contentbox_title"|id="cb_title"|style="cursor: move")\s*){3}><div (?:(?:class="contentbox_titler"|id="cb_titler"|style="cursor: move")\s*){3}><span (?:(?:class="contentbox_title_label"|id="cb_title_label")\s*){2}>Alpha</span>
 <span id="label_\d+">Foo bar<br />
@@ -44,6 +43,7 @@ like($cb->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effe
 </div>
 <div (?:(?:class="contentbox_bottom"|id="cb_bottom")\s*){2}><div (?:(?:class="contentbox_bottomr"|id="cb_bottomr")\s*){2}></div>
 </div>
-</div>
+.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*dist/dragdrop.js.*resizer.js.*contentbox.js.*?
 <script (?:(?:type="text/javascript"|iwl:initScript)\s*){2}>IWL.Contentbox.create.'cb', {.*}.;*</script>
+</div>
 )s);
