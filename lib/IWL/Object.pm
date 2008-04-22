@@ -1565,7 +1565,7 @@ sub __addRequiredScripts {
         my $pivot = $top->{_lastRequired} || $top->{_pivot};
         my $script = $top->{_initScript} || $top->{_firstScript};
 
-        $top->{_lastRequired} = @required[$#required] and weaken $top->{_lastRequired};
+        $top->{_lastRequired} = $required[$#required] and weaken $top->{_lastRequired};
 
         return $script
             ? $script->{parentNode}->insertBefore($script, @required)
