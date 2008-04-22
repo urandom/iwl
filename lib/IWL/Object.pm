@@ -19,8 +19,7 @@ use IWL::JSON qw(toJSON);
 use Scalar::Util qw(weaken isweak blessed reftype);
 
 # cloneCache: Used to detect looped networks and avoid infinite recursion.
-# initializedJs: A hash to keep track of required javascript files
-use vars qw(%cloneCache %initializedJs);
+use vars qw(%cloneCache);
 
 # The IWL::Response object
 my $response;
@@ -212,6 +211,7 @@ sub nextSibling {
     my $self = shift;
 
     return $self->{parentNode}->nextChild($self) if $self->{parentNode};
+    return;
 }
 
 =item B<prevSibling>
@@ -224,6 +224,45 @@ sub prevSibling {
     my $self = shift;
 
     return $self->{parentNode}->prevChild($self) if $self->{parentNode};
+    return;
+}
+
+=item B<getNextSiblings>
+
+Returns all siblings, which are after the current object.
+
+=cut
+
+sub getNextSiblings {
+    my $self = shift;
+    my $object = $self->nextSibling;
+    my @result;
+
+    return unless $object;
+    do {
+        push @result, $object;
+    } while $object = $object->nextSibling;
+
+    return @result;
+}
+
+=item B<getPreviousSiblings>
+
+Returns all siblings, which are before the current object.
+
+=cut
+
+sub getPreviousSiblings {
+    my $self = shift;
+    my $object = $self->prevSibling;
+    my @result;
+
+    return unless $object;
+    do {
+        push @result, $object;
+    } while $object = $object->prevSibling;
+
+    return @result;
 }
 
 =item B<getParent>
@@ -234,6 +273,43 @@ Returns the parent object of the current object
 
 sub getParent {
     return shift->{parentNode};
+}
+
+=item B<getAncestors>
+
+Returns all ancestors of the current object
+
+=cut
+
+sub getAncestors {
+    my $self = shift;
+    my $object = $self->{parentNode};
+    my @result;
+
+    return unless $object;
+    do {
+        push @result, $object;
+    } while $object = $object->{parentNode};
+
+    return @result;
+}
+
+=item B<getDescendants>
+
+Returns all the descendants of the current object
+
+=cut
+
+sub getDescendants {
+    my $self = shift;
+    my @result;
+
+    return unless @{$self->{childNodes}};
+    foreach my $child (@{$self->{childNodes}}) {
+        push @result, $child, $child->getDescendants;
+    }
+
+    return @result;
 }
 
 =item B<appendChild> (B<OBJECT>)
@@ -306,6 +382,35 @@ sub setChild {
     return $self;
 }
 
+=item B<insertBefore> (B<REFERENCE>, B<OBJECT>)
+
+Inserts B<OBJECT> before B<REFERENCE>.
+
+Parameter: B<OBJECT> - the object to be inserted (can be an array of objects)
+
+=cut
+
+sub insertBefore {
+    my ($self, $reference, @objects) = @_;
+
+    @objects = grep {$_ && $_ ne $self} @objects;
+    return if !@objects;
+    return if $self->{_noChildren};
+
+    $_->{parentNode} = $self and weaken $_->{parentNode}
+        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+
+    my $i;
+    for ($i = 0; $i < @{$self->{childNodes}}; $i++) {
+	if ($self->{childNodes}[$i] == $reference) {
+	    last;
+	}
+    }
+    splice @{$self->{childNodes}}, $i, 0, @objects;
+
+    return $self;
+}
+
 =item B<insertAfter> (B<REFERENCE>, B<OBJECT>)
 
 Inserts B<OBJECT> after B<REFERENCE>.
@@ -332,6 +437,49 @@ sub insertAfter {
     }
     splice @{$self->{childNodes}}, $i + 1, 0, @objects;
 
+    return $self;
+}
+
+=item B<removeChild> (B<OBJECT>)
+
+Removes B<OBJECT> from the list of children
+
+Parameters: B<OBJECT> - the object to be removed (can be an array of objects)
+
+=cut
+
+sub removeChild {
+    my ($self, @objects) = @_;
+
+    @objects = grep {$_ && $_ ne $self} @objects;
+    return if !@objects;
+    return if $self->{_noChildren};
+
+    my @children = @{$self->{childNodes}};
+    foreach my $object (@objects) {
+        @children = grep {$_ ne $object} @children;
+    }
+
+    if (@children) {
+        return $self->setChild(@children);
+    } else {
+        $self->{childNodes} = [];
+        return $self;
+    }
+}
+
+=item B<remove>
+
+Removes itself from the child list of its parent
+
+=cut
+
+sub remove {
+    my $self = shift;
+
+    return unless $self->{parentNode};
+
+    $self->{parentNode}->removeChild($self);
     return $self;
 }
 
@@ -440,6 +588,7 @@ sub getContent {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
+        $self->__addRequiredScripts;
         $self->__addInitScripts;
     }
 
@@ -448,17 +597,6 @@ sub getContent {
     return ''
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
 	  || $self->{_ignore});
-
-    my @header_scripts;
-    foreach (@{$self->{_requiredJs}}) {
-	next if exists $initializedJs{$_->[0]};
-	if ($self->isa('IWL::Page::Head')) {
-	    push @header_scripts, $_->[1]->getContent;
-	} else {
-	    $content .= $_->[1]->getContent;
-	}
-	$initializedJs{$_->[0]} = 1;
-    }
 
     $content .= "<!" . $self->{_declaration} . ">\n" if $self->{_declaration};
     $content .= "<" . $self->{_tag};
@@ -491,7 +629,6 @@ sub getContent {
         foreach my $child (@{$self->{childNodes}}) {
             $content .= $child->getContent if $child;
         }
-        $content .= join("\n", @header_scripts) if @header_scripts;
         $content .= "</" . $self->{_tag} . ">\n";
     }
 
@@ -548,6 +685,7 @@ sub getObject {
 	$self->{_realized} = 1;
 	$self->_realize;
         $self->__addInitScripts;
+        push @$scripts, $self->__addRequiredScripts('object');
     }
 
     return {} if $self->bad;
@@ -555,12 +693,6 @@ sub getObject {
     return
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
 	  || $self->{_ignore});
-
-    foreach (@{$self->{_requiredJs}}) {
-	next if exists $initializedJs{$_->[0]};
-        push @$scripts, $_->[1]->getObject;
-	$initializedJs{$_->[0]} = 1;
-    }
 
     foreach my $child (@{$self->{childNodes}}) {
         push @$children, $child->getObject if $child;
@@ -878,8 +1010,8 @@ sub requiredJs {
 	$src       = $IWLConfig{JS_DIR} . '/' . $src
 	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
-	$script->setSrc($src);
-	push @{$self->{_requiredJs}}, [$src => $script];
+	$script->setSrc($src)->setAttribute('iwl:requiredScript');
+	push @{$self->{_requiredJs}}, $script;
     }
 
     return $self;
@@ -899,10 +1031,11 @@ server that does not reload modules for each request.
 This method is a class method!  You do not need to instantiate an object
 in order to call it.
 
+B<Note>: Currently does nothing, as there is no state data to be cleaned.
+
 =cut
 
 sub cleanStateful {
-    %initializedJs = ();
 }
 
 =item B<getState>
@@ -1030,6 +1163,303 @@ sub send {
     return $self;
 }
 
+# Private function for splitting the criteria into criteria and options
+my $splitCriteria;
+
+=item B<up> ([B<CRITERIA>])
+
+=item B<up> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
+
+Searches upward along the object stack for objects, matching the criteria set by the options.
+
+In scalar context, returns the first found object. In list context, returns all matching objects.
+Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
+
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
+
+=cut
+
+sub up {
+    my ($self, @criteria) = @_;
+    my $wantarray = wantarray;
+    my $object = $self->{parentNode};
+    my (%options, @result, $last);
+
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray 
+        ? $self->getAncestors
+        : $options{last} 
+            ? ($self->getAncestors)[-1] : $object
+    ) unless @criteria;
+    return unless $object;
+    do {
+        my $match = $object->match(@criteria);
+
+        if ($wantarray || $options{last}) {
+            push @result, $match if $match;
+            $last = $object;
+        } else {
+            return $match if $match;
+        }
+    } while $object = $object->{parentNode};
+
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
+}
+
+=item B<down> ([B<CRITERIA>])
+
+=item B<down> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
+
+Searches downward along the object stack for objects, matching the criteria set by the options.
+
+In scalar context, returns the first found object. In list context, returns all matching objects.
+Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
+
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
+
+=cut
+
+sub down {
+    my ($self, @criteria) = (shift, @_);
+    my $wantarray = wantarray;
+    my (%options, @result, $last);
+
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray
+        ? $self->getDescendants
+        : $options{last}
+            ? ($self->getDescendants)[-1] : $self->firstChild
+    ) unless @criteria;
+    return unless @{$self->{childNodes}};
+
+    foreach my $object (@{$self->{childNodes}}) {
+        my $match = $object->match(@criteria);
+
+        if ($wantarray) {
+            push @result, $match if $match;
+            push @result, $object->down(@_);
+        } elsif ($options{last}) {
+            push @result, $match if $match;
+            my $ret = $object->down(@_);
+            push @result, $ret if $ret && $ret->match(@criteria);
+            $last = $ret || $object;
+        } else {
+            return $match if $match;
+            my $ret = $object->down(@_);
+            return $ret if $ret;
+        }
+    }
+
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
+}
+
+=item B<next> ([B<CRITERIA>])
+
+=item B<next> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
+
+Searches the next siblings of the object for objects, matching the criteria set by the options.
+
+In scalar context, returns the first found object. In list context, returns all matching objects.
+Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
+
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
+
+=cut
+
+sub next {
+    my ($self, @criteria) = @_;
+    my $wantarray = wantarray;
+    my $object = $self->nextSibling;
+    my (%options, @result, $last);
+
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray
+        ? $self->getNextSiblings
+        : $options{last}
+            ? ($self->getNextSiblings)[-1] : $object
+    ) unless @criteria;
+    return unless $object;
+    do {
+        my $match = $object->match(@criteria);
+
+        if ($wantarray || $options{last}) {
+            push @result, $match if $match;
+            $last = $object;
+        } else {
+            return $match if $match;
+        }
+    } while $object = $object->nextSibling;
+
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
+}
+
+
+=item B<previous> ([B<CRITERIA>])
+
+=item B<previous> ([options => B<OPTIONS>, criteria => B<CRITERIA>])
+
+Searches the previous siblings of the object for objects, matching the criteria set by the options.
+
+In scalar context, returns the first found object. In list context, returns all matching objects.
+Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
+
+See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+
+Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
+
+=over 8
+
+=item B<last>
+
+If true and in list context, the method will return the last matched object, or the last object in the stack.
+
+=back
+
+=cut
+
+sub previous {
+    my ($self, @criteria) = @_;
+    my $wantarray = wantarray;
+    my $object = $self->prevSibling;
+    my (%options, @result, $last);
+
+    $splitCriteria->(\@criteria, \%options);
+    return ($wantarray
+        ? $self->getPreviousSiblings
+        : $options{last}
+            ? ($self->getPreviousSiblings)[-1] : $object
+    ) unless @criteria;
+    return unless $object;
+    do {
+        my $match = $object->match(@criteria);
+
+        if ($wantarray || $options{last}) {
+            push @result, $match if $match;
+            $last = $object;
+        } else {
+            return $match if $match;
+        }
+    } while $object = $object->prevSibling;
+
+    return $wantarray ? @result : $options{last} ? $result[$#result] || $last : undef;
+}
+
+=item B<match> (B<CRITERIA>)
+
+Returns the object, if it matches the given criteria. Returns false, otherwise. By default, criteria are evaluated with a logical I<AND>.
+
+Parameters: B<CRITERIA> - the criteria is a list of parameters, which can have the following values:
+
+=over 8
+
+=item B<or>
+
+A short-circuit logical I<OR> operator.
+
+=item B<not>
+
+A logical I<NOT> operator. Will reverse the next criterion.
+
+=item B<term>
+
+A term is a hash reference. The following key-value pairs are supported by L<IWL::Object>:
+
+=over 10 
+
+=item B<package> => I<CLASS>
+
+The package, which the object belongs to.
+
+=item B<attribute> => [I<NAME> => I<VALUE>]
+
+An attribute, whose name and value should match an attribute of an object. The value of this option is a arrayref, where the first element is the attribute name, and second is the string value for that name, or a compiled reguler expression.
+
+=back
+
+Other classes can expand the list, if they implement the protected B<_matchTerm> method, which receives the term, and returns true or false, depending on whether the object matches the term.
+
+=back
+
+=cut
+
+sub match {
+    my $self = shift;
+    my ($current, $last, $not);
+
+    foreach my $term (@_) {
+        if (ref $term eq 'HASH') {
+            next if defined $current && !$current;
+            if ($term->{package}) {
+                $current = $self->isa($term->{package}) ? 1 : 0;
+            } elsif ($term->{attribute}) {
+                my $attribute = $self->getAttribute($term->{attribute}[0], 1);
+                my $value = $term->{attribute}[1];
+                if (   defined $attribute
+                    && defined $value
+                    && (
+                        ref $value eq 'Regexp'
+                          ? $attribute =~ /$value/
+                          : $attribute eq $value
+                    )) {
+                    $current = 1;
+                } elsif (!defined $value
+                       && $self->hasAttribute($term->{attribute}[0])
+                   ) {
+                    $current = 1;
+                } else {
+                    $current = 0;
+                }
+            } elsif ($self->can('_matchTerm')) {
+                my $ret = $self->_matchTerm($term);
+                $ret == 1 ? $current = 1 : $ret == 0 ? $current = 0 : ();
+            }
+            $current = 0 unless $current;
+            if ($not) {
+                $current = !$current;
+                undef $not;
+            }
+        } elsif (lc $term eq 'or') {
+            $last = $current and return $self;
+            undef $current;
+        } elsif (lc $term eq 'not') {
+            $not = 1;
+        }
+    }
+    
+    return $self if $current;
+    return;
+}
+
 =head1 PROTECTED METHODS
 
 The following methods should only be used by classes that inherit
@@ -1069,23 +1499,6 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 sub _realize {
 }
 
-=item B<_findTopParent>
-
-Finds the top-most parent of the object and returns it.
-
-=cut
-
-sub _findTopParent {
-    my $self = shift;
-    my $element = $self;
-
-    do {
-        return $element if $element->isa('IWL::Page::Body') || !$element->{parentNode};
-        $element = $element->{parentNode};
-    } while $element;
-    return $element;
-}
-
 # Internal
 #
 # Convert control characters, so that error messages cannot be tainted
@@ -1119,28 +1532,93 @@ sub __iterateForm {
     return $self;
 }
 
+sub __addRequiredScripts {
+    my ($self, $from) = @_;
+    my @required = @{$self->{_requiredJs}};
+
+    if (my @urls = map {$_->getSrc} @required) {
+        my $top = $self->isa('IWL::Page::Body')
+            ? $self
+            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+
+        $top->{_required} = {} unless $top->{_required};
+
+        foreach my $url (@urls) {
+            if ($top->{_required}{$url}) {
+                @required = grep {$_->getSrc ne $url} @required;
+            } else {
+                $top->{_required}{$url} = 1;
+            }
+        }
+        
+        return map {$_->getObject} @required if $from && $from eq 'object';
+
+        unless ($top->{_firstScript}) {
+            my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
+            $top->{_firstScript} = $first and weaken $top->{_firstScript};
+        }
+        unless ($top->{_pivot}) {
+            my $pivot = $top->lastChild;
+            $top->{_pivot} = $pivot and weaken $top->{_pivot};
+        }
+
+        my $pivot = $top->{_lastRequired} || $top->{_pivot};
+        my $script = $top->{_initScript} || $top->{_firstScript};
+
+        $top->{_lastRequired} = @required[$#required] and weaken $top->{_lastRequired};
+
+        return $script
+            ? $script->{parentNode}->insertBefore($script, @required)
+            : $pivot
+                ? $top->insertAfter($pivot, @required)
+                : $top->appendChild(@required);
+    }
+    return;
+}
+
 sub __addInitScripts {
     my $self = shift;
     if (@{$self->{_initScripts}}) {
-        require IWL::Script;
-
-        my $parent = $self->_findTopParent || $self;
         my $expr = join '; ', @{$self->{_initScripts}};
+        return unless $expr;
 
-        if ($expr) {
-            $parent->{_initScriptElement} = IWL::Script->new
-              unless $parent->{_initScriptElement};
-            $parent->{_initScriptElement}->appendScript($expr . ';');
+        my $top = $self->isa('IWL::Page::Body')
+            ? $self
+            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+
+        unless($top->{_initScript}) {
+            require IWL::Script;
+
+            my $init = $top->{_initScript} = IWL::Script->new->setAttribute('iwl:initScript');
+            weaken $top->{_initScript};
+
+            unless ($top->{_firstScript}) {
+                my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
+                $top->{_firstScript} = $first and weaken $top->{_firstScript};
+            }
+            unless ($top->{_pivot}) {
+                my $pivot = $top->lastChild;
+                $top->{_pivot} = $pivot and weaken $top->{_pivot};
+            }
+            my $pivot = $top->{_lastRequired} || $top->{_pivot};
+
+            $top->{_firstScript}
+                ? $top->{_firstScript}{parentNode}->insertBefore($top->{_firstScript}, $init)
+                : $pivot
+                    ? $top->insertAfter($pivot, $init)
+                    : $top->appendChild($init);
         }
-        if ($parent->{_initScriptElement} && !$parent->{_initScriptElement}{_added}) {
-            $parent->isa('IWL::Page::Body')
-              ? $parent->appendChild($parent->{_initScriptElement})
-              : unshift @{$parent->{_tailObjects}}, $parent->{_initScriptElement};
-            $parent->{_initScriptElement}{_added} = 1;
-            $parent->{_initScriptElement}->setAttribute('iwl:initScript');
-        }
+
+        $top->{_initScript}->appendScript($expr . ';');
     }
 }
+
+$splitCriteria = sub {
+    return unless {2 => 1, 4 => 1}->{scalar @{$_[0]}} && grep {$_ eq 'options'} @{$_[0]};
+    my %args = %{{@{$_[0]}}};
+    @{$_[0]} = @{$args{criteria} || []};
+    %{$_[1]} = %{$args{options}};
+};
 
 1;
 

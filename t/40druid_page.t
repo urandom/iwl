@@ -1,5 +1,6 @@
 use Test::More tests => 7;
 
+use IWL::Text;
 use IWL::Druid::Page;
 
 my $page = IWL::Druid::Page->new;

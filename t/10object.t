@@ -1,4 +1,4 @@
-use Test::More tests => 50;
+use Test::More tests => 117;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -34,6 +34,13 @@ my $output;
 	is($object, $child2->{parentNode}, 'Parent link');
 	is($object, $child2->getParent, 'getParent()');
 	is($object->{childNodes}[4], $child3, 'Child link');
+
+    is($object->removeChild($child3), $object);
+	ok(!$object->{childNodes}[4]);
+    is($object->removeChild($child1, $first_child, $child2_5), $object);
+	is(scalar @{$object->{childNodes}}, 1);
+    is($child2->remove, $child2);
+	is(scalar @{$object->{childNodes}}, 0);
 
 	isa_ok($object->setChild(IWL::Object->new), 'IWL::Object', 'Returns itself');
 	is(scalar @{$object->{childNodes}}, 1, 'setChild');
@@ -122,6 +129,93 @@ my $output;
     is($clone->{childNodes}[1]->{parentNode}, $clone);
 }
 
+{
+    my $a = IWL::Object->new->setAttributes(id => 'top', class => 'object');
+
+    my $a_a = IWL::Object->new->setAttributes(id => 'middle', class => 'object');
+    my $a_a_a = IWL::Object->new->setAttributes(id => 'bottom1', class => 'object');
+    my $a_a_b = IWL::Object->new->setAttributes(id => 'bottom2', class => 'object');
+    my $a_a_c = IWL::Test::Object->new->setAttributes(id => 'bottom3', class => 'object');
+
+    my $a_b = IWL::Test::Object->new->setAttributes(id => 'test_middle', class => 'test_object');
+    my $a_b_a = IWL::Test::Object->new->setAttributes(id => 'test_bottom', class => 'test_object');
+    my $a_b_a_a = IWL::Object->new->setAttributes(foo => 'bar', class => 'test_object');
+
+    $a->appendChild($a_a->appendChild($a_a_a, $a_a_b, $a_a_c), $a_b->appendChild($a_b_a->appendChild($a_b_a_a)));
+
+    ok(!$a->match);
+    ok(!$a->match({}));
+    ok($a->match({package => 'IWL::Object'}));
+    ok(!$a->match({package => 'IWL::Test::Object'}));
+    ok($a->match('not', {package => 'IWL::Test::Object'}));
+    ok(!$a->match('not', {package => 'IWL::Test::Object'}, {attribute => [class => 'foo']}));
+    ok($a->match('not', {package => 'IWL::Test::Object'}, {attribute => [class => 'foo']}, 'or', {attribute => [id => 'top']}, {package => 'IWL::Object'}));
+    ok(!$a->match('not', {package => 'IWL::Test::Object'}, {attribute => [class => 'foo']}, 'or', {attribute => [id => 'top']}, {package => 'IWL::Test::Object2'}));
+    ok($a->match('not', {package => 'IWL::Test::Object'}, {attribute => [class => 'foo']}, 'or', {attribute => [id => 'top']}, 'not', {package => 'IWL::Test::Object2'}));
+
+    is_deeply([$a_b_a_a->getAncestors], [$a_b_a, $a_b, $a]);
+    ok(!$a_b_a_a->getDescendants);
+
+    ok(!$a->getAncestors);
+    is_deeply([$a->getDescendants], [$a_a, $a_a_a, $a_a_b, $a_a_c, $a_b, $a_b_a, $a_b_a_a]);
+
+    ok(!$a_a_c->getNextSiblings);
+    is_deeply([$a_a_a->getNextSiblings], [$a_a_b, $a_a_c]);
+
+    ok(!$a_a_a->getPreviousSiblings);
+    is_deeply([$a_a_c->getPreviousSiblings], [$a_a_b, $a_a_a]);
+
+    ok(!$a_a_a->up({package => 'IWL::Test::Object'}));
+    ok(!$a_a_a->up({attribute => [id => 'asdlkj']}));
+
+    is(scalar $a_a_a->up, $a_a);
+    is_deeply([$a_a_a->up], [$a_a, $a]);
+    is($a_a_a->up({attribute => [id => qr/midd/]}), $a_a);
+    is($a_a_a->up(options => {last => 1}), $a);
+    is($a_a_a->up(options => {last => 1}, criteria => [{package => 'IWL::Test::Object'}]), $a);
+    is($a_b_a_a->up(options => {last => 1}, criteria => [{package => 'IWL::Test::Object'}]), $a_b);
+    is($a_a_a->up({attribute => [id => 'top']}, {attribute => [class => qr/obj/]}), $a);
+    is($a_a_a->up({attribute => [id => 'middle']}, {package => 'IWL::Object'}), $a_a);
+    ok(!$a_a_a->up({attribute => [id => 'middle']}, {package => 'IWL::Test::Object'}));
+    ok($a_a_a->up({attribute => [id => 'middle']}, 'not', {package => 'IWL::Test::Object'}), $a_a);
+
+    is(scalar $a_b_a_a->up({package => 'IWL::Test::Object'}), $a_b_a);
+    is_deeply([$a_b_a_a->up({package => 'IWL::Test::Object'})], [$a_b_a, $a_b]);
+    is_deeply([$a_b_a_a->up({attribute => [class => 'test_object']})], [$a_b_a, $a_b]);
+
+    ok(!$a->down({package => 'IWL::Widget'}));
+    is(scalar $a->down, $a_a);
+    is_deeply([$a->down], [$a_a, $a_a_a, $a_a_b, $a_a_c, $a_b, $a_b_a, $a_b_a_a]);
+    is($a->down(options => {last => 1}), $a_b_a_a);
+    is($a->down(options => {last => 1}, criteria => [{package => 'IWL::Test::Object'}]), $a_b_a);
+    is($a->down(options => {last => 1}, criteria => [{package => 'IWL::Test::Object2'}]), $a_b_a_a);
+    is($a->down({package => 'IWL::Object'}), $a_a);
+    is_deeply([$a->down({package => 'IWL::Test::Object'})], [$a_a_c, $a_b, $a_b_a]);
+    is($a->down({package => 'IWL::Test::Object'}, {attribute => [id => 'test_middle']}, {attribute => [class => 'test_object']}), $a_b);
+
+    ok(!$a_a_a->next({package => 'IWL::Test'}));
+    is(scalar $a_a_a->next, $a_a_b);
+    is_deeply([$a_a_a->next], [$a_a_b, $a_a_c]);
+    is($a_a_a->next(options => {last => 1}), $a_a_c);
+    is($a_a_a->next(options => {last => 1}, criteria => [{attribute => [id => 'bottom2']}]), $a_a_b);
+    is($a_a_a->next(options => {last => 1}, criteria => [{package => 'IWL::Test::Object'}]), $a_a_c);
+    is($a_a_a->next({package => 'IWL::Test::Object'}), $a_a_c);
+    ok(!$a_a_a->next({package => 'IWL::Test::Object'}, {attribute => [id => 'foo']}));
+    is($a_a_a->next({package => 'IWL::Test::Object'}, {attribute => [id => 'bottom3']}, {attribute => [class => 'object']}), $a_a_c);
+    is_deeply([$a_a_a->next({attribute => [class => 'object']})], [$a_a_b, $a_a_c]);
+
+    ok(!$a_a_c->previous({package => 'IWL::Test'}));
+    is(scalar $a_a_c->previous, $a_a_b);
+    is_deeply([$a_a_c->previous], [$a_a_b, $a_a_a]);
+    is($a_a_c->previous(options => {last => 1}), $a_a_a);
+    is($a_a_c->previous(options => {last => 1}, criteria => [{attribute => [id => 'bottom2']}]), $a_a_b);
+    is($a_a_c->previous(options => {last => 1}, criteria => [{package => 'IWL::Test::Object'}]), $a_a_a);
+    is($a_a_c->previous({package => 'IWL::Object'}), $a_a_b);
+    ok(!$a_a_c->previous({package => 'IWL::Test::Object'}, {attribute => [id => 'foo']}));
+    is($a_a_c->previous({package => 'IWL::Object'}, {attribute => [id => 'bottom1']}, {attribute => [class => 'object']}), $a_a_a);
+    is_deeply([$a_a_c->previous({attribute => [class => 'object']})], [$a_a_b, $a_a_a]);
+}
+
 package PRINT_TEST;
 
 sub TIEHANDLE {
@@ -135,3 +229,7 @@ sub PRINT {
 	my $self = shift;
     $output = $_[0];
 }
+
+package IWL::Test::Object;
+
+use base 'IWL::Object';
