@@ -26,14 +26,14 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function defaultTextBlurCallback() {
-        if (this.control.value == '') {
+        if (this.control.value === '') {
             this.control.value = this.options.defaultText;
             this.control.addClassName($A(this.classNames()).first() + '_text_default');
         }
     }
 
     function defaultTextFocusCallback() {
-        if (this.control.value == this.options.defaultText) {
+        if (this.control.value === this.options.defaultText) {
             this.control.value = '';
             this.control.removeClassName($A(this.classNames()).first() + '_text_default');
         }
@@ -64,7 +64,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function receiverOnShow(element, update) {
-        if(!update.style.position || update.style.position=='absolute') {
+        if(!update.style.position || update.style.position == 'absolute') {
             update.style.position = 'absolute';
             update.clonePosition(this, {
                 setHeight: false,
@@ -114,7 +114,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * @type Number 
          * */
         getValue: function() {
-            return this.control.value == this.options.defaultText ? '' : this.control.value;
+            return this.control.value === this.options.defaultText ? '' : this.control.value;
         },
 
         _init: function(id) {
