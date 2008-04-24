@@ -4,13 +4,14 @@
  * @extends IWL.Widget
  * */
 IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
+    var accumulator = function(a, n) { return a + parseFloat(n) };
+
     function adjust() {
-        var accumulator = function(a, n) { return a + parseFloat(n) };
         var children = [this.image1, this.control, this.image2].findAll(function(e) { return e != null });
         var width = children.invoke('getWidth').inject(0, accumulator)
             + (children.invoke('getStyle', 'marginLeft').inject(0, accumulator) || 0)
             + (children.invoke('getStyle', 'marginRight').inject(0, accumulator) || 0);
-        this.setStyle({width: width + 'px'});
+        this.setStyle({width: width + 1 + 'px'});
         this.style.visibility = '';
         this.emitSignal('iwl:load');
     }
@@ -26,14 +27,14 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function defaultTextBlurCallback() {
-        if (this.control.value == '') {
+        if (this.control.value === '') {
             this.control.value = this.options.defaultText;
             this.control.addClassName($A(this.classNames()).first() + '_text_default');
         }
     }
 
     function defaultTextFocusCallback() {
-        if (this.control.value == this.options.defaultText) {
+        if (this.control.value === this.options.defaultText) {
             this.control.value = '';
             this.control.removeClassName($A(this.classNames()).first() + '_text_default');
         }
@@ -64,7 +65,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function receiverOnShow(element, update) {
-        if(!update.style.position || update.style.position=='absolute') {
+        if(!update.style.position || update.style.position == 'absolute') {
             update.style.position = 'absolute';
             update.clonePosition(this, {
                 setHeight: false,
@@ -114,7 +115,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * @type Number 
          * */
         getValue: function() {
-            return this.control.value == this.options.defaultText ? '' : this.control.value;
+            return this.control.value === this.options.defaultText ? '' : this.control.value;
         },
 
         _init: function(id) {
