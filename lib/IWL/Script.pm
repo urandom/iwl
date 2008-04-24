@@ -127,7 +127,7 @@ If the I<STRICT_LEVEL> value of L<IWL::Config> is greater than I<1>, the script 
 
 sub getScript {
     my $self = shift;
-    my $string = join '; ', @{$self->{__scripts}};
+    my $string = join ";\n", @{$self->{__scripts}};
     $string =~ s/;+/;/g;
     $string .= ';' if $string && $string !~ /;\s*$/;
 
@@ -143,7 +143,8 @@ sub getScript {
 sub _realize {
     my $self = shift;
 
-    $self->appendChild(IWL::Text->new($self->getScript));
+    $self->appendChild(IWL::Text->new($self->getScript))
+        unless $self->hasAttribute('src');
 }
 
 1;

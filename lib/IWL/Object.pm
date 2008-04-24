@@ -1588,7 +1588,7 @@ sub __addInitScripts {
             ? $self
             : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
 
-        unless($top->{_initScript}) {
+        unless($top->{_initScript} && !$top->{_initScript}{_realized}) {
             require IWL::Script;
 
             my $init = $top->{_initScript} = IWL::Script->new->setAttribute('iwl:initScript');
