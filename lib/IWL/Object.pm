@@ -1557,17 +1557,19 @@ sub __addRequiredScripts {
             my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
             $top->{_firstScript} = $first and weaken $top->{_firstScript};
         }
-        unless ($top->{_pivot}) {
+        my $script = $top->{_initScript} || $top->{_firstScript};
+        undef $script if $script && $script->{_realized};
+
+        unless ($script  || $top->{_pivot}) {
             my $pivot = $top->lastChild;
             $top->{_pivot} = $pivot and weaken $top->{_pivot};
         }
-
         my $pivot = $top->{_lastRequired} || $top->{_pivot};
-        my $script = $top->{_initScript} || $top->{_firstScript};
+        undef $pivot if $pivot && $pivot->{_realized};
 
         $top->{_lastRequired} = $required[$#required] and weaken $top->{_lastRequired};
 
-        return $script
+        return $script && $script->{parentNode}
             ? $script->{parentNode}->insertBefore($script, @required)
             : $pivot
                 ? $top->insertAfter($pivot, @required)
@@ -1596,14 +1598,18 @@ sub __addInitScripts {
                 my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
                 $top->{_firstScript} = $first and weaken $top->{_firstScript};
             }
-            unless ($top->{_pivot}) {
+            my $script = $top->{_firstScript};
+            undef $script if $script && $script->{_realized};
+
+            unless ($script || $top->{_pivot}) {
                 my $pivot = $top->lastChild;
                 $top->{_pivot} = $pivot and weaken $top->{_pivot};
             }
             my $pivot = $top->{_lastRequired} || $top->{_pivot};
+            undef $pivot if $pivot && $pivot->{_realized};
 
-            $top->{_firstScript}
-                ? $top->{_firstScript}{parentNode}->insertBefore($top->{_firstScript}, $init)
+            $script && $script->{parentNode}
+                ? $script->{parentNode}->insertBefore($script, $init)
                 : $pivot
                     ? $top->insertAfter($pivot, $init)
                     : $top->appendChild($init);

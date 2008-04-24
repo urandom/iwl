@@ -58,6 +58,11 @@ The IWL::SnippetManager provides a pseudo-object, used to manage snippets of L<I
 
  ...
 
+ # Adding scripts as shared resources
+ $manager->requiredJs('/foo/bar.js');
+
+ $html .= $manager->getContent;
+
 =head1 CONSTRUCTOR
 
 IWL::SnippetManager->new ([B<%ARGS>])
