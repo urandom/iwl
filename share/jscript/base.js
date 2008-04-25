@@ -192,7 +192,7 @@ Object.extend(IWL, (function() {
                 }
             }
             if (!json.tag) {
-                if (json.text === undefined || json.text === null || !json.snippetManager) return false;
+                if ((json.text === undefined || json.text === null) && !json.snippetManager) return false;
                 if (parentElement.tagName.toLowerCase() == 'script') {
                     if (script_urls)
                         scripts.push(json.text);

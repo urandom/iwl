@@ -20,7 +20,7 @@ use IWL::Config '%IWLConfig';
 	$script->prependScript('console.log(this)');
 	$script->appendScript('window.close()');
 
-	is($script->getScript, 'console.log(this); alert(1); window.close();');
+	is($script->getScript, "console.log(this);\nalert(1);\nwindow.close();");
 
 	$script->setScript('console.debug(1)');
 	is($script->getScript, 'console.debug(1);');

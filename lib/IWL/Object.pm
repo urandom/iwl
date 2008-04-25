@@ -321,14 +321,9 @@ Parameter: B<OBJECT> - the object to be appended (can be an array of objects)
 =cut
 
 sub appendChild {
-    my ($self, @objects) = @_;
-
-    @objects = grep {$_ && $_ ne $self} @objects;
-    return if !@objects;
-    return if $self->{_noChildren};
-
-    $_->{parentNode} = $self and weaken $_->{parentNode}
-        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+    my $self = shift;
+    my @objects = $self->__addChildren(@_);
+    return unless @objects;
 
     push @{$self->{childNodes}}, @objects;
 
@@ -344,14 +339,9 @@ Parameter: B<OBJECT> - the object to be prepended (can be an array of objects)
 =cut
 
 sub prependChild {
-    my ($self, @objects) = @_;
-
-    @objects = grep {$_ && $_ ne $self} @objects;
-    return if !@objects;
-    return if $self->{_noChildren};
-
-    $_->{parentNode} = $self and weaken $_->{parentNode}
-        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+    my $self = shift;
+    my @objects = $self->__addChildren(@_);
+    return unless @objects;
 
     unshift @{$self->{childNodes}}, @objects;
 
@@ -367,14 +357,9 @@ Parameter: B<OBJECT> - the object to be set (can be an array of objects)
 =cut
 
 sub setChild {
-    my ($self, @objects) = @_;
-
-    @objects = grep {$_ && $_ ne $self} @objects;
-    return if !@objects;
-    return if $self->{_noChildren};
-
-    $_->{parentNode} = $self and weaken $_->{parentNode}
-        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+    my $self = shift;
+    my @objects = $self->__addChildren(@_);
+    return unless @objects;
 
     $self->{childNodes} = [];
     push @{$self->{childNodes}}, @objects;
@@ -392,13 +377,8 @@ Parameter: B<OBJECT> - the object to be inserted (can be an array of objects)
 
 sub insertBefore {
     my ($self, $reference, @objects) = @_;
-
-    @objects = grep {$_ && $_ ne $self} @objects;
-    return if !@objects;
-    return if $self->{_noChildren};
-
-    $_->{parentNode} = $self and weaken $_->{parentNode}
-        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+    @objects = $self->__addChildren(@objects);
+    return unless @objects;
 
     my $i;
     for ($i = 0; $i < @{$self->{childNodes}}; $i++) {
@@ -421,13 +401,8 @@ Parameter: B<OBJECT> - the object to be inserted (can be an array of objects)
 
 sub insertAfter {
     my ($self, $reference, @objects) = @_;
-
-    @objects = grep {$_ && $_ ne $self} @objects;
-    return if !@objects;
-    return if $self->{_noChildren};
-
-    $_->{parentNode} = $self and weaken $_->{parentNode}
-        foreach grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects;
+    @objects = $self->__addChildren(@objects);
+    return unless @objects;
 
     my $i;
     for ($i = 0; $i < @{$self->{childNodes}}; $i++) {
@@ -461,11 +436,11 @@ sub removeChild {
     }
 
     if (@children) {
-        return $self->setChild(@children);
+        $self->{childNodes} = \@children;
     } else {
         $self->{childNodes} = [];
-        return $self;
     }
+    return $self;
 }
 
 =item B<remove>
@@ -1617,6 +1592,24 @@ sub __addInitScripts {
 
         $top->{_initScript}->appendScript($expr . ';');
     }
+}
+
+sub __addChildren {
+    my ($self, @objects) = @_;
+    return if $self->{_noChildren};
+
+    @objects = grep {$_ && $_ ne $self} @objects;
+    return unless @objects;
+
+    my @children;
+    foreach my $object (grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects) {
+        $object->remove;
+        $object->{parentNode} = $self and weaken $object->{parentNode};
+        push @children, $object;
+    }
+
+
+    return @children;
 }
 
 $splitCriteria = sub {
