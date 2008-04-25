@@ -24,13 +24,15 @@ $)s);
     my $manager = IWL::SnippetManager->new;
     my ($object1, $object2, $object3) = IWL::Object->newMultiple(3);
 
-    $object2->requiredJs('shared.js');
-    $object3->requiredJs('shared.js');
+    $object2->requiredJs('shared.js')->requiredCSS('shared.css');
+    $object3->requiredJs('shared.js')->requiredCSS('shared.css');
 
     $object1->appendChild($object2);
     $manager->appendChild($object1);
 
-    like($manager->getContent, qr(^<><></>
+    like($manager->getContent, qr(^<style (?:(?:type="text/css"|iwl:requiredCSS)\s*){2}>\@import "/my/skin/darkness/shared.css";
+</style>
+<><></>
 </>
 <script (?:(?:src="/jscript/shared.js"|type="text/javascript"|iwl:requiredScript)\s*){3}></script>
 $)s);

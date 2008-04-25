@@ -961,7 +961,7 @@ sub appendAfter {
 
 =item B<requiredJs> [B<URLS>]
 
-Adds the list of urls (relative to JS_DIR) as required by the object
+Adds the list of urls (relative to JS_DIR, or absolute) as required by the object
 
 Parameters: B<URLS> - a list of required javascript files
 
@@ -987,6 +987,30 @@ sub requiredJs {
         $self->{_required}{js} = []
             unless $self->{_required}{js};
         push @{$self->{_required}{js}} , $src;
+    }
+
+    return $self;
+}
+
+=item B<requiredCSS> [B<URLS>]
+
+Adds the list of urls (relative to CSS_DIR, or absolute) as required by the object
+
+Parameters: B<URLS> - a list of required CSS files
+
+=cut
+
+sub requiredCSS {
+    my ($self, @urls) = @_;
+
+    foreach my $url (@urls) {
+	my $src    = $url ;
+	$src       = $IWLConfig{SKIN_DIR} . '/' . $src
+	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+
+        $self->{_required}{css} = []
+            unless $self->{_required}{css};
+        push @{$self->{_required}{css}} , $src;
     }
 
     return $self;
@@ -1480,13 +1504,14 @@ sub _shareResources {
     return if $self->{parentNode};
     my @descendants = ($self, $self->getDescendants);
     my %required = (js => []);
-    my $script;
+    my ($script, $head);
 
     foreach my $object (@descendants) {
         $script = $object
             unless $script
                    || !UNIVERSAL::isa($object, 'IWL::Script')
                    || $object->hasAttribute('iwl:independant');
+        $head = $object if UNIVERSAL::isa($object, 'IWL::Page::Head');
 
         foreach my $resource (keys %{$object->{_required}}) {
             foreach (@{$object->{_required}{$resource}}) {
@@ -1518,6 +1543,25 @@ sub _shareResources {
         : $pivot
             ? $self->insertAfter($pivot, @scripts)
             : $self->appendChild(@scripts);
+
+    if (ref $required{css} eq 'ARRAY') {
+        if ($head) {
+            require IWL::Page::Link;
+
+            my @css = map {IWL::Page::Link->newLinkToCSS($_)} @{$required{js}};
+            $head->appendChild(@css);
+        } else {
+            require IWL::Style;
+
+            my $style = IWL::Style->new->setAttribute('iwl:requiredCSS');
+            $style->appendStyleImport($_) foreach @{$required{css}};
+
+            $self->isa('IWL::Page')
+                ? ($self->down({package => 'IWL::Page::Body'}) || $self)->prependChild($style)
+                : $self->prependChild($style);
+        }
+    }
+
 }
 
 # Internal
