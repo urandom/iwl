@@ -563,8 +563,8 @@ sub getContent {
     my $content = '';
 
     if (!$self->{_realized}) {
-	$self->{_realized} = 1;
-	$self->_realize;
+        $self->{_realized} = 1;
+        $self->_realize;
         $self->_shareResources;
         $self->__addInitScripts;
     }
@@ -659,16 +659,17 @@ sub getObject {
     my $scripts  = [];
 
     if (!$self->{_realized}) {
-	$self->{_realized} = 1;
-	$self->_realize;
+        $self->{_realized} = 1;
+        $self->_realize;
         $self->_shareResources;
+        $self->__addInitScripts;
     }
 
     return {} if $self->bad;
 
     return
       if (!@{$self->{childNodes}} && ($self->{_removeEmpty})
-	  || $self->{_ignore});
+          || $self->{_ignore});
 
     foreach my $child (@{$self->{childNodes}}) {
         push @$children, $child->getObject if $child;
@@ -679,16 +680,16 @@ sub getObject {
     my $attributes = {};
     foreach my $key (keys %{$self->{_attributes}}) {
         my $value = $self->{_attributes}{$key};
-	if (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'uri') {
-	    $value = encodeURI($value);
-	} elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'escape') {
-	    $value = escape($value);
-	} elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'none') {
-	    # No need to do anything here
-	} else {
-	    $value = escapeHTML($value);
-	}
-	$attributes->{$key} = $value;
+        if (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'uri') {
+            $value = encodeURI($value);
+        } elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'escape') {
+            $value = escape($value);
+        } elsif (defined $self->{_escapings}{$key} && $self->{_escapings}{$key} eq 'none') {
+            # No need to do anything here
+        } else {
+            $value = escapeHTML($value);
+        }
+        $attributes->{$key} = $value;
     }
 
     $attributes->{style} = $self->{_style} if keys %{$self->{_style}};

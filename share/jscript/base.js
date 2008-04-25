@@ -205,7 +205,7 @@ Object.extend(IWL, (function() {
             } else if (json.tag == 'script' && json.attributes && json.attributes.src) {
                 var url = json.attributes.src;
                 ++script_urls;
-                document.insertScript(url,
+                return document.insertScript(url,
                     {onComplete: evalScript, removeScriptElement: !IWL.Config.DEBUG, skipCache: IWL.Config.DEBUG});
             } else {
                 var attributes = {};
