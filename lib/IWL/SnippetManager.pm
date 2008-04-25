@@ -94,10 +94,10 @@ sub getContent {
     my $self = shift;
     my $content = "";
     
-    $self->__addRequiredScripts;
+    $self->_realize;
 
     foreach my $child (@{$self->{childNodes}}) {
-        $content .= $child->getContent if $child;
+        $content .= $child->getContent;
     }
 
     $self->{childNodes} = [];

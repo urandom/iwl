@@ -76,6 +76,7 @@ sub new {
     $self->{_removeEmpty} = 0;
 
     # Required javascript files
+    $self->{_required} = {};
     $self->{_requiredJs} = [];
 
     # True if the object is realized
@@ -563,8 +564,6 @@ sub getContent {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
-        $self->__addRequiredScripts;
-        $self->__addInitScripts;
     }
 
     return '' if $self->bad;
@@ -659,8 +658,6 @@ sub getObject {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
-        $self->__addInitScripts;
-        push @$scripts, $self->__addRequiredScripts('object');
     }
 
     return {} if $self->bad;
@@ -968,8 +965,6 @@ Parameters: B<URLS> - a list of required javascript files
 sub requiredJs {
     my ($self, @urls) = @_;
 
-    require IWL::Script;
-
     foreach my $url (@urls) {
 	if ($url eq 'base.js') {
 	    $self->requiredJs(
@@ -980,13 +975,11 @@ sub requiredJs {
 		'scriptaculous_extensions.js');
 	}
 
-	my $script = IWL::Script->new;
 	my $src    = $url ;
 	$src       = $IWLConfig{JS_DIR} . '/' . $src
 	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
-	$script->setSrc($src)->setAttribute('iwl:requiredScript');
-	push @{$self->{_requiredJs}}, $script;
+        $self->{_required}{js}{$src} = 1;
     }
 
     return $self;
@@ -1472,6 +1465,45 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 =cut
 
 sub _realize {
+    my $self = shift;
+
+    return if $self->{parentNode};
+    my @descendants = $self->getDescendants;
+    my ($script, %required);
+    my $init = '';
+
+    foreach my $object (@descendants) {
+        $script = $object
+            unless $script
+                   || !UNIVERSAL::isa($object, 'IWL::Script')
+                   || $object->hasAttribute('iwl:independant');
+
+        foreach my $resource (keys %{$object->{_required}}) {
+            $required{$resource}{$_} = 1
+                foreach keys %{$object->{_required}{$resource}};
+        }
+        delete $object->{_required};
+
+        $init .= join ";\n", @{$self->{_initScripts}}
+            if @{$self->{_initScripts}};
+    }
+
+    require IWL::Script;
+
+    my $pivot = $script ? undef : $self->lastChild;
+    my @scripts = ref $required{js} eq 'HASH'
+        ? map {
+            IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc($_)
+          } keys %{$required{js}}
+        : ();
+    $init = IWL::Script->new->setAttribute('iwl:initScript')->setScript($init)
+        if $init;
+
+    $script
+        ? $script->{parentNode}->insertBefore($script, @scripts, $init)
+        : $pivot
+            ? $self->insertAfter($pivot, @scripts, $init)
+            : $self->appendChild(@scripts, $init);
 }
 
 # Internal
@@ -1602,9 +1634,11 @@ sub __addChildren {
     return unless @objects;
 
     my @children;
+    my $top = $self->up(options => {last => 1}) || $self;
     foreach my $object (grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects) {
         $object->remove;
         $object->{parentNode} = $self and weaken $object->{parentNode};
+
         push @children, $object;
     }
 

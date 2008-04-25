@@ -249,7 +249,7 @@ sub __init {
     my $conditional = IWL::Comment->new;
     $self->requiredJs('base.js');
 
-    my $script = IWL::Script->new;
+    my $script = IWL::Script->new->setAttribute('iwl:independant');
     $script->appendScript(IWL::Config::getJSConfig);
     $head->appendChild($script);
 

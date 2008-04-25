@@ -143,6 +143,7 @@ sub getScript {
 sub _realize {
     my $self = shift;
 
+    $self->SUPER::_realize;
     $self->appendChild(IWL::Text->new($self->getScript))
         unless $self->hasAttribute('src');
 }
