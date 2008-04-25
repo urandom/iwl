@@ -13,8 +13,8 @@ $)s);
     $manager->requiredJs('manager2.js');
     my $object = $manager->getObject;
     ok($object->{snippetManager});
-    is(scalar @{$object->{scripts}}, 1);
-    is($object->{scripts}[0]{attributes}{src}, '/jscript/manager2.js');
+    is(scalar @{$object->{children}}, 1);
+    is($object->{children}[0]{attributes}{src}, '/jscript/manager2.js');
 
     $object = $manager->getObject;
     ok(!$object->{scripts});
@@ -52,10 +52,10 @@ $)s);
 
     my $obj = $manager->getObject;
     ok($obj->{snippetManager});
-    is(scalar @{$obj->{children}}, 1);
+    is(scalar @{$obj->{children}}, 2);
     is(scalar @{$obj->{children}[0]{children}}, 1);
-    is(scalar @{$obj->{children}[0]{children}[0]{scripts}}, 1);
-    is($obj->{children}[0]{children}[0]{scripts}[0]{attributes}{src}, '/jscript/shared.js');
+    is($obj->{children}[1]{tag}, 'script');
+    is($obj->{children}[1]{attributes}{src}, '/jscript/shared.js');
 
     $manager->appendChild($object3);
     is_deeply($manager->{childNodes}, [$object3]);

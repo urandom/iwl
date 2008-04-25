@@ -77,6 +77,7 @@ sub new {
 
     # Required javascript files
     $self->{_required} = {};
+    $self->{_shared} = {};
     $self->{_requiredJs} = [];
 
     # True if the object is realized
@@ -564,6 +565,8 @@ sub getContent {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
+        $self->_shareResources;
+        $self->__addInitScripts;
     }
 
     return '' if $self->bad;
@@ -658,6 +661,7 @@ sub getObject {
     if (!$self->{_realized}) {
 	$self->{_realized} = 1;
 	$self->_realize;
+        $self->_shareResources;
     }
 
     return {} if $self->bad;
@@ -979,7 +983,9 @@ sub requiredJs {
 	$src       = $IWLConfig{JS_DIR} . '/' . $src
 	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
-        $self->{_required}{js}{$src} = 1;
+        $self->{_required}{js} = []
+            unless $self->{_required}{js};
+        push @{$self->{_required}{js}} , $src;
     }
 
     return $self;
@@ -1465,12 +1471,15 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 =cut
 
 sub _realize {
+}
+
+sub _shareResources {
     my $self = shift;
 
     return if $self->{parentNode};
-    my @descendants = $self->getDescendants;
-    my ($script, %required);
-    my $init = '';
+    my @descendants = ($self, $self->getDescendants);
+    my %required = (js => []);
+    my $script;
 
     foreach my $object (@descendants) {
         $script = $object
@@ -1479,31 +1488,35 @@ sub _realize {
                    || $object->hasAttribute('iwl:independant');
 
         foreach my $resource (keys %{$object->{_required}}) {
-            $required{$resource}{$_} = 1
-                foreach keys %{$object->{_required}{$resource}};
+            foreach (@{$object->{_required}{$resource}}) {
+                next if $self->{_shared}{$resource}{$_};
+                $self->{_shared}{$resource}{$_} = 1;
+                push @{$required{$resource}}, $_;
+            }
         }
         delete $object->{_required};
-
-        $init .= join ";\n", @{$self->{_initScripts}}
-            if @{$self->{_initScripts}};
     }
-
+    
     require IWL::Script;
 
-    my $pivot = $script ? undef : $self->lastChild;
-    my @scripts = ref $required{js} eq 'HASH'
+    my $pivot = $script
+        ? $script->{parentNode}
+            ? undef
+            : $script
+        : $self->lastChild;
+    my @scripts = ref $required{js} eq 'ARRAY'
         ? map {
             IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc($_)
-          } keys %{$required{js}}
+          } @{$required{js}}
         : ();
-    $init = IWL::Script->new->setAttribute('iwl:initScript')->setScript($init)
-        if $init;
 
-    $script
-        ? $script->{parentNode}->insertBefore($script, @scripts, $init)
+    $self->{_lastShared} = $scripts[-1];
+
+    $script && $script->{parentNode}
+        ? $script->{parentNode}->insertBefore($script, @scripts)
         : $pivot
-            ? $self->insertAfter($pivot, @scripts, $init)
-            : $self->appendChild(@scripts, $init);
+            ? $self->insertAfter($pivot, @scripts)
+            : $self->appendChild(@scripts);
 }
 
 # Internal
@@ -1539,69 +1552,21 @@ sub __iterateForm {
     return $self;
 }
 
-sub __addRequiredScripts {
-    my ($self, $from) = @_;
-    my @required = @{$self->{_requiredJs}};
-
-    if (my @urls = map {$_->getSrc} @required) {
-        my $top = $self->isa('IWL::Page::Body')
-            ? $self
-            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
-
-        $top->{_required} = {} unless $top->{_required};
-
-        foreach my $url (@urls) {
-            if ($top->{_required}{$url}) {
-                @required = grep {$_->getSrc ne $url} @required;
-            } else {
-                $top->{_required}{$url} = 1;
-            }
-        }
-        
-        return map {$_->getObject} @required if $from && $from eq 'object';
-
-        unless ($top->{_firstScript}) {
-            my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
-            $top->{_firstScript} = $first and weaken $top->{_firstScript};
-        }
-        my $script = $top->{_initScript} || $top->{_firstScript};
-        undef $script if $script && $script->{_realized};
-
-        unless ($script  || $top->{_pivot}) {
-            my $pivot = $top->lastChild;
-            $top->{_pivot} = $pivot and weaken $top->{_pivot};
-        }
-        my $pivot = $top->{_lastRequired} || $top->{_pivot};
-        undef $pivot if $pivot && $pivot->{_realized};
-
-        $top->{_lastRequired} = $required[$#required] and weaken $top->{_lastRequired};
-
-        return $script && $script->{parentNode}
-            ? $script->{parentNode}->insertBefore($script, @required)
-            : $pivot
-                ? $top->insertAfter($pivot, @required)
-                : $top->appendChild(@required);
-    }
-    return;
-}
-
 sub __addInitScripts {
     my $self = shift;
     if (@{$self->{_initScripts}}) {
         my $expr = join '; ', @{$self->{_initScripts}};
         return unless $expr;
 
-        my $top = $self->isa('IWL::Page::Body')
-            ? $self
-            : $self->up(options => {last => 1}, criteria => [{package => 'IWL::Page::Body'}]) || $self;
+        my $top = $self->up(options => {last => 1}) || $self;
 
-        unless($top->{_initScript} && !$top->{_initScript}{_realized}) {
+        unless ($top->{_initScript} && !$top->{_initScript}{_realized}) {
             require IWL::Script;
 
             my $init = $top->{_initScript} = IWL::Script->new->setAttribute('iwl:initScript');
             weaken $top->{_initScript};
 
-            unless ($top->{_firstScript}) {
+            unless ($top->{_lastShared} || $top->{_firstScript}) {
                 my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
                 $top->{_firstScript} = $first and weaken $top->{_firstScript};
             }
@@ -1612,7 +1577,7 @@ sub __addInitScripts {
                 my $pivot = $top->lastChild;
                 $top->{_pivot} = $pivot and weaken $top->{_pivot};
             }
-            my $pivot = $top->{_lastRequired} || $top->{_pivot};
+            my $pivot = $top->{_lastShared} || $top->{_pivot};
             undef $pivot if $pivot && $pivot->{_realized};
 
             $script && $script->{parentNode}

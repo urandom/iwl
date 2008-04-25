@@ -182,15 +182,6 @@ Object.extend(IWL, (function() {
             var flags = {disabled: true, multiple: true};
             if (!json || !(parentElement == $(parentElement))) return;
             previousElement = $(previousElement);
-            if (json.scripts) {
-                while (json.scripts.length) {
-                    var url = json.scripts.shift().attributes.src;
-                    if (!url) continue;
-                    ++script_urls;
-                    document.insertScript(url,
-                        {onComplete: evalScript, removeScriptElement: !IWL.Config.DEBUG, skipCache: IWL.Config.DEBUG});
-                }
-            }
             if (!json.tag) {
                 if ((json.text === undefined || json.text === null) && !json.snippetManager) return false;
                 if (parentElement.tagName.toLowerCase() == 'script') {
@@ -211,6 +202,11 @@ Object.extend(IWL, (function() {
                         parentElement.appendChild(textNode);
                     return textNode;
                 }
+            } else if (json.tag == 'script' && json.attributes && json.attributes.src) {
+                var url = json.attributes.src;
+                ++script_urls;
+                document.insertScript(url,
+                    {onComplete: evalScript, removeScriptElement: !IWL.Config.DEBUG, skipCache: IWL.Config.DEBUG});
             } else {
                 var attributes = {};
 		for (var attr in json.attributes) {

@@ -94,7 +94,7 @@ sub getContent {
     my $self = shift;
     my $content = "";
     
-    $self->_realize;
+    $self->_shareResources;
 
     foreach my $child (@{$self->{childNodes}}) {
         $content .= $child->getContent;
