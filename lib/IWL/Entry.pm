@@ -8,6 +8,8 @@ use strict;
 use base 'IWL::Input';
 
 use IWL::Image;
+use IWL::Table::Container;
+use IWL::Table::Row;
 use IWL::Container;
 use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
@@ -76,8 +78,8 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->{_tag}   = 'div';
-    $self->{_noChildren}   = 0;
+    $self->{_tag}   = 'table';
+    $self->{_noChildren} = 0;
     $self->__init(%args);
     return $self;
 }
@@ -397,7 +399,7 @@ sub setId {
 sub setAttribute {
     my ($self, $attr, $value) = @_;
 
-    if ($attr eq 'id' || $attr eq 'class') {
+    if (grep {$attr eq $_} qw(id class cellspacing cellpadding)) {
         $self->SUPER::setAttribute($attr, $value);
     } else {
         $self->{text}->setAttribute($attr, $value);
@@ -408,7 +410,7 @@ sub setAttribute {
 sub getAttribute {
     my ($self, $attr) = @_;
 
-    if ($attr eq 'id' || $attr eq 'class') {
+    if (grep {$attr eq $_} qw(id class cellspacing cellpadding)) {
         return $self->SUPER::getAttribute($attr);
     } else {
         return $self->{text}->getAttribute($attr);
@@ -429,7 +431,6 @@ sub _realize {
     my $id     = $self->getId;
 
     $self->SUPER::_realize;
-    $self->setStyle(visibility => 'hidden');
 
     my $options = toJSON($self->{_options});
     $self->_appendInitScript("IWL.Entry.create('$id', $options);");
@@ -458,17 +459,23 @@ sub __init {
     my $image1        = IWL::Image->new;
     my $image2        = IWL::Image->new;
     my $receiver      = IWL::Container->new;
+    my $body          = IWL::Table::Container->new;
+    my $row           = IWL::Table::Row->new;
 
     $self->{image1}        = $image1;
     $self->{image2}        = $image2;
     $self->{text}          = $entry;
     $self->{__receiver}    = $receiver;
     $self->{_defaultClass} = 'entry';
+    $self->{__row}         = $row;
 
-    $self->appendChild($image1);
-    $self->appendChild($entry);
-    $self->appendChild($image2);
+    $self->appendChild($body);
+    $body->appendChild($row);
+    $row->appendCell($image1);
+    $row->appendCell($entry);
+    $row->appendCell($image2);
 
+    $self->setAttributes(cellpadding => 0, cellspacing => 0);
     $entry->setAttribute(type => 'text');
 
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};

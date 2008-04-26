@@ -4,17 +4,6 @@
  * @extends IWL.Widget
  * */
 IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
-    function adjust() {
-        var accumulator = function(a, n) { return a + parseFloat(n) };
-        var children = [this.image1, this.control, this.image2].findAll(function(e) { return e != null });
-        var width = children.invoke('getWidth').inject(0, accumulator)
-            + (children.invoke('getStyle', 'marginLeft').inject(0, accumulator) || 0)
-            + (children.invoke('getStyle', 'marginRight').inject(0, accumulator) || 0);
-        this.setStyle({width: width + 'px'});
-        this.style.visibility = '';
-        this.emitSignal('iwl:load');
-    }
-
     function clearButtonCallback() {
         this.control.value = '';
         this.control.focus();
@@ -53,14 +42,6 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 id: this.id + '_receiver', className: $A(this.classNames()).first() + '_receiver'
             }));
         this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
-    }
-
-    function periodicalChecker(element, callback, pe) {
-        var dims = element.getDimensions();
-        if (dims.width && dims.height) {
-            pe.stop();
-            callback();
-        }
     }
 
     function receiverOnShow(element, update) {
@@ -139,31 +120,6 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                     this.control.value = this.options.defaultText;
             }
             setupAutoComplete.call(this);
-
-            var images = [this.image1, this.image2].findAll(function(e) { return e != null });
-            if (this.control.getWidth() && this.control.getHeight()
-                    && (!images.length || images.invoke('getWidth').concat(images.invoke('getHeight')).all()))
-                adjust.call(this);
-            else {
-                var count = 0;
-                var callback = function() {
-                    if (--count == 0) adjust.call(this)
-                }.bind(this);
-                images.each(function(image) {
-                    if (image.getWidth() && image.getHeight()) return;
-                    count++;
-                    if (image.complete)
-                        new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1);
-                    else
-                        image.signalConnect('load', function() {
-                            new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1)
-                        }.bind(this));
-                }.bind(this));
-                if (!this.control.getWidth() || !this.control.getHeight()) {
-                    count++;
-                    new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1);
-                }
-            }
 
             this.control.signalConnect('change', changeCallback.bind(this));
             changeCallback.call(this);
