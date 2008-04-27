@@ -34,7 +34,7 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new;
 
     $self->{_tag} = "script";
     $self->{__scripts} = [];
@@ -52,7 +52,7 @@ sub new {
 
 Sets a "src='B<SOURCE>'" attribute to B<<script>>.
 
-Parameter: B<SOURCE> - a URL to a javascript file
+Parameter: B<SOURCE> - a URL to a javascript file, or an array reference of URIs, if both I<STATIC_URI_SCRIPT> and I<STATIC_UNION> options are set.
 
 =cut
 
@@ -60,7 +60,14 @@ sub setSrc {
     my ($self, $source) = @_;
     require IWL::Static;
 
-    return $self->setAttribute(src => IWL::Static->addRequest($source), 'uri');
+    if (ref $source eq 'ARRAY') {
+        return $self->setAttribute(src =>
+            IWL::Static->addMultipleRequest($source, $self->getAttribute('type', 1)),
+            'uri'
+        );
+    } else {
+        return $self->setAttribute(src => IWL::Static->addRequest($source), 'uri');
+    }
 }
 
 =item B<getSrc>

@@ -565,7 +565,6 @@ sub getContent {
     if (!$self->{_realized}) {
         $self->{_realized} = 1;
         $self->_realize;
-        $self->_shareResources;
         $self->__addInitScripts;
     }
 
@@ -661,7 +660,6 @@ sub getObject {
     if (!$self->{_realized}) {
         $self->{_realized} = 1;
         $self->_realize;
-        $self->_shareResources;
         $self->__addInitScripts;
     }
 
@@ -1496,15 +1494,12 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 =cut
 
 sub _realize {
-}
-
-sub _shareResources {
     my $self = shift;
 
     return if $self->{parentNode};
     my @descendants = ($self, $self->getDescendants);
     my %required = (js => []);
-    my ($script, $head);
+    my ($script, $head, @scripts);
 
     foreach my $object (@descendants) {
         $script = $object
@@ -1530,11 +1525,18 @@ sub _shareResources {
             ? undef
             : $script
         : $self->lastChild;
-    my @scripts = ref $required{js} eq 'ARRAY'
-        ? map {
-            IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc($_)
-          } @{$required{js}}
-        : ();
+    if (ref $required{js} eq 'ARRAY') {
+        if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
+            my @required = @{$required{js}};
+            push @scripts,
+                IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc(\@required) while @required;
+        } else {
+            @scripts = map {
+                IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc($_)
+            } @{$required{js}};
+        }
+
+    }
 
     $self->{_lastShared} = $scripts[-1];
 
@@ -1561,7 +1563,6 @@ sub _shareResources {
                 : $self->prependChild($style);
         }
     }
-
 }
 
 # Internal

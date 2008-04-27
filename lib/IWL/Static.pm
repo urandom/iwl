@@ -116,47 +116,65 @@ An optional string or coderef. If the value is a string, it will be used as the 
 
 sub handleRequest {
     my ($self, %options) = @_;
-    my %form = $self->getParams;
-    my $uri = $form{IWLStaticURI};
-    my $etag;
-    return unless $uri;
-
-    ($etag, $uri) = $self->__getETag($uri);
-
-    unless ($self->{_staticURIs}{$uri}) {
-        my (undef, $directory, undef) = File::Spec->splitpath($uri);
-        return $self->_pushError(
-            __x("The URI '{URI}' does not belong in the predefined list of static URIs.", URI => $uri))
-          unless $self->{_staticURIs}{$directory};
-    }
-
+    my %form               = $self->getParams;
+    my @uris               = split ',', ($form{IWLStaticURI});
+    my $type               = $form{type} || '';
     my ($header, $content) = ({}, '');
-    my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
+    my $etag;
 
-    if (exists $ENV{HTTP_IF_NONE_MATCH} && $ENV{HTTP_IF_NONE_MATCH} eq $etag) {
-        $header->{Status} = 304;
-    } else {
-        local *DATA;
-        open DATA, $uri or return $self->_pushError($!);
-        local $/;
-        $content = <DATA>;
-        close DATA;
-        my @stat = stat $uri;
-        my ($inode, $clength, $modtime) = @stat[1,7,9];
+    if (@uris > 1) {
+        my $modtime;
+        ($etag, $modtime, @uris) = $self->__getCompoundETagModTime(@uris);
+        $modtime = timeToString($modtime);
+        my @content;
+        if ($self->__existsInCache($modtime, $etag)) {
+            $header->{Status} = 304;
+        }
+        foreach my $uri (@uris) {
+            next unless $uri;
+            return unless $self->__checkURI($uri);
+            my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
+            next unless $mime eq $type;
+            push @content, $self->__getURIContent($uri) unless $header->{Status} == 304;
+        }
+        $content = join "\n", @content;
+
         $header = {
-            'Content-type'   => $mime,
-            'Content-length' => $clength,
-            'Last-Modified'  => timeToString($modtime),
+            %$header, 
+            'Content-length' => length $content,
+            'Last-Modified'  => $modtime,
+            'Content-type'   => $type,
             'ETag'           => $etag,
         };
-    }
 
-    $options{header} = $options{header}->($uri, $mime) if ref $options{header} eq 'CODE';
-    $header->{$_} = $options{header}{$_} foreach keys %{
-        ref $options{header} eq 'CODE'
-              ? $options{header}->($uri, $mime)
-              : $options{header} || {}
-    };
+        $self->__getCustomHeader(\@uris, $type, $header, %options);
+    } else {
+        my $uri = $uris[0];
+        return unless $uri;
+
+        ($etag, $uri) = $self->__getETag($uri);
+
+        return unless $self->__checkURI($uri);
+
+        my $mime = ref $options{mimeType} eq 'CODE' ? $options{mimeType}->($uri) : ($options{mimeType} || $self->__getMime($uri));
+        my @stat = stat $uri;
+        my ($clength, $modtime) = @stat[7,9];
+        $modtime = timeToString($modtime);
+
+        if ($self->__existsInCache($modtime, $etag)) {
+            $header->{Status} = 304;
+        } else {
+            $content = $self->__getURIContent($uri);
+            $header = {
+                'Content-type'   => $mime,
+                'Content-length' => $clength,
+                'Last-Modified'  => $modtime,
+                'ETag'           => $etag,
+            };
+        }
+
+        $self->__getCustomHeader($uri, $mime, $header, %options);
+    }
 
     IWL::Response->new->send(header => $header, content => $content);
 
@@ -191,6 +209,28 @@ sub addRequest {
     return wantarray ? @uris : $uris[0];
 }
 
+=item B<addMultipleRequest> (B<URIS>)
+
+Changes the B<URIS> into a static request, if the I<STATIC_URI_SCRIPT> and I<STATIC_UNION> options are set in the %IWLConfig. Otherwise, returns a false value.
+The request will later pull the content of these B<URIS> using a single request.
+
+Parameters: B<URI> - an array reference of URIs, which will be handled by the static uri handler script
+
+=cut
+
+sub addMultipleRequest {
+    my ($self, $script, $uris, $mime) = (shift, $IWLConfig{STATIC_URI_SCRIPT}, @_);
+    return unless $script && $IWLConfig{STATIC_UNION};
+    my $request = $script . '?IWLStaticURI=';
+    my $type    = '&type=' . $mime;
+    my @uris;
+    map {
+        length $request . (join ',', @uris, $_) . $type > 2048
+            or push @uris, shift @$uris
+    } @$uris;
+    return $request . (join ',', @uris) . $type;
+}
+
 # Internal
 #
 sub __init {
@@ -214,6 +254,28 @@ sub __getETag {
     my ($inode, $clength, $modtime) = @stat[1,7,9];
     my $etag = $inode ? sprintf('%x-%x', $clength, $modtime) : '';
     return wantarray ? ($etag, $uri) : $etag;
+}
+
+sub __getCompoundETagModTime {
+    my ($self, @uris) = @_;
+    my ($modtime, $clength) = ('', 0);
+    foreach my $uri (@uris) {
+        $uri = File::Spec->join($IWLConfig{DOCUMENT_ROOT}, $uri)
+          if substr($uri, 0, 1) eq '/' && $IWLConfig{DOCUMENT_ROOT};
+
+        $uri =~ s{/+}{/}g;
+
+        my @stat = stat $uri;
+        my ($inode, $cl, $mod) = @stat[1,7,9];
+        if ($inode) {
+            $modtime  = $mod if $modtime < $mod;
+            $clength += $cl;
+        } else {
+            $uri = undef;
+        }
+    }
+    my $etag = $clength ? sprintf('%x-%x', $clength, $modtime) : '';
+    return $etag, $modtime, grep {defined $_} @uris;
 }
 
 sub __recursiveScan {
@@ -240,10 +302,10 @@ sub __recursiveScan {
 
 sub __getMime {
     my ($self, $uri) = @_;
-    return (substr($uri, -4) eq '.css')    ? 'text/css; charset=utf-8'
+    return (substr($uri, -4) eq '.css')    ? 'text/css'
          : (substr($uri, -5) eq '.html')   ? 'text/html; charset=utf-8'
          : (substr($uri, -4) eq '.xml')    ? 'text/xml; charset=utf-8'
-         : (substr($uri, -3) eq '.js')     ? 'text/javascript; charset=utf-8'
+         : (substr($uri, -3) eq '.js')     ? 'text/javascript'
          : (substr($uri, -4) eq '.jpg')    ? 'image/jpeg'
          : (substr($uri, -4) eq '.gif')    ? 'image/gif'
          : (substr($uri, -4) eq '.tif')    ? 'image/tiff'
@@ -252,6 +314,45 @@ sub __getMime {
          : (substr($uri, -6) eq '.xhtml')  ? 'application/xhtml+xml'
          : (substr($uri, -4) eq '.swf')    ? 'application/x-shockwave-flash'
          : 'application/octet-stream';
+}
+
+sub __checkURI {
+    my ($self, $uri) = @_;
+    unless ($self->{_staticURIs}{$uri}) {
+        my (undef, $directory, undef) = File::Spec->splitpath($uri);
+        return $self->_pushError(
+            __x("The URI '{URI}' does not belong in the predefined list of static URIs.", URI => $uri))
+          unless $self->{_staticURIs}{$directory};
+    }
+    return $self;
+}
+
+sub __getURIContent {
+    my ($self, $uri) = @_;
+    my $content;
+    local *DATA;
+    open DATA, $uri or return $self->_pushError($!);
+    local $/;
+    $content = <DATA>;
+    close DATA;
+
+    return $content;
+}
+
+sub __existsInCache {
+    my ($self, $modtime, $etag) = @_;
+    return (exists $ENV{HTTP_IF_MODIFIED_SINCE} && $ENV{HTTP_IF_MODIFIED_SINCE} eq $modtime)
+        || (exists $ENV{HTTP_IF_NONE_MATCH} && $ENV{HTTP_IF_NONE_MATCH} eq $etag);
+}
+
+sub __getCustomHeader {
+    my ($self, $uri, $mime, $header, %options) = @_;
+    $options{header} = $options{header}->($uri, $mime, $header) if ref $options{header} eq 'CODE';
+    $header->{$_} = $options{header}{$_} foreach keys %{
+        ref $options{header} eq 'CODE'
+              ? $options{header}->($uri, $mime)
+              : $options{header} || {}
+    };
 }
 
 ## From HTTP::Date ##
