@@ -289,6 +289,7 @@ sub build_advanced_widgets {
     my $sliders = IWL::Tree::Row->new(id => 'sliders_row');
     my $iconbox = IWL::Tree::Row->new(id => 'iconbox_row');
     my $menus = IWL::Tree::Row->new(id => 'menus_row');
+    my $navbar = IWL::Tree::Row->new(id => 'navbar_row');
     my $progress = IWL::Tree::Row->new(id => 'progress_bars_row');
     my $list = IWL::Tree::Row->new(id => 'list_row');
     my $table = IWL::Tree::Row->new(id => 'table_row');
@@ -304,6 +305,8 @@ sub build_advanced_widgets {
     $row->appendRow($iconbox);
     $menus->appendTextCell('Menus');
     $row->appendRow($menus);
+    $navbar->appendTextCell('Navigation Bar');
+    $row->appendRow($navbar);
     $progress->appendTextCell('Progress bars');
     $row->appendRow($progress);
     $tables->appendTextCell('Tables');
@@ -315,7 +318,7 @@ sub build_advanced_widgets {
     $tree->appendTextCell('Tree');
     $tables->appendRow($tree);
 
-    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $progress, $list, $table, $tree);
+    register_row_event($calendars, $combobox, $sliders, $iconbox, $menus, $navbar, $progress, $list, $table, $tree);
 }
 
 sub build_containers {
@@ -638,6 +641,21 @@ sub generate_menus {
         IWL.Status.display('Received item ' + arguments[1].id);
     });
     $submenu->appendMenuItem("Submenu item $_")->setType('check')->setId($_) foreach (1 .. 20);
+
+    return $container;
+}
+
+sub generate_navbar {
+    my $container = IWL::Container->new(id => 'navbar_container');
+    my $navbar    = IWL::NavBar->new(id => 'navbar');
+
+    $navbar->appendPath('bar', q|IWL.Status.display('bar')|);
+    $navbar->appendPath('baz', q|IWL.Status.display('Something else')|);
+    $navbar->prependPath('foo', q|IWL.Status.display('foo')|);
+    $navbar->appendOption('Alpha', 'alpha');
+    $navbar->appendOption('Beta', 'beta');
+    $navbar->appendOption('Gamma', 'gamma');
+    $container->appendChild($navbar);
 
     return $container;
 }
