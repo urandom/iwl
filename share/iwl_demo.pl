@@ -146,6 +146,34 @@ EOF
     }
 );
 
+# NavBar handlers
+$rpc->handleEvent(
+    'IWL-NavBar-activatePath',
+    sub {
+        my ($params, $id) = @_;
+
+        my $con = IWL::Container->new;
+        my $label = IWL::Label->new->setText('/' . join '/', @{$params->{path}});
+        my $list = IWL::List->new(type => 'ordered');
+
+        if ('foo/bar' eq join '/', @{$params->{path}}) {
+            $list->appendListItemText($_)
+                foreach qw(base.js button.js calendar.js contentbox.js unittest_extensions.js upload.js);
+        } elsif ('foo/bar/baz/beta' eq join '/', @{$params->{path}}) {
+            $list->appendListItemText($_)
+                foreach qw(main.css demo.css);
+        }
+
+        $con->appendChild(
+            IWL::Label->new->appendTextType("Elements for: ", 'strong'),
+            $label,
+            $list
+        );
+
+        return $con;
+    }
+);
+
 # IWL RPC JavaScript unit tests
 $rpc->handleEvent(
     'IWL-Object-testEvent',
@@ -648,14 +676,16 @@ sub generate_menus {
 sub generate_navbar {
     my $container = IWL::Container->new(id => 'navbar_container');
     my $navbar    = IWL::NavBar->new(id => 'navbar');
+    my $updatee   = IWL::Container->new(id => 'updatee');
 
-    $navbar->appendPath('bar', q|IWL.Status.display('bar')|);
+    $navbar->appendPath('bar');
     $navbar->appendPath('baz', q|IWL.Status.display('Something else')|);
     $navbar->prependPath('foo', q|IWL.Status.display('foo')|);
     $navbar->appendOption('Alpha', 'alpha');
     $navbar->appendOption('Beta', 'beta');
     $navbar->appendOption('Gamma', 'gamma');
-    $container->appendChild($navbar);
+    $navbar->registerEvent('IWL-NavBar-activatePath', 'iwl_demo.pl', {}, {update => 'updatee'});
+    $container->appendChild($navbar, $updatee);
 
     return $container;
 }
@@ -1270,6 +1300,9 @@ sub show_the_code_for {
     } elsif ($code_for eq 'druid_container') {
 	$paragraph->appendTextType(read_code($code_for), 'pre');
 	$paragraph->appendTextType(read_code("Druid handlers", 54), 'pre');
+    } elsif ($code_for eq 'navbar_container') {
+	$paragraph->appendTextType(read_code($code_for), 'pre');
+	$paragraph->appendTextType(read_code("NavBar handlers", 27), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {
 	$paragraph->appendTextType(read_code($code_for), 'pre');
 	$paragraph->appendTextType(read_code("Event row handlers", 21), 'pre');

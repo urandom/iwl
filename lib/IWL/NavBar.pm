@@ -65,6 +65,7 @@ sub appendPath {
     my ($self, $text, $callback) = @_;
     my ($delim, $label) = $self->__createCrumb($text, $callback);
 
+    push @{$self->{__crumbs}}, $label;
     $self->{__crumbCon}->appendChild($delim, $label);
     return $label;
 }
@@ -81,6 +82,7 @@ sub prependPath {
     my ($self, $text, $callback) = @_;
     my ($delim, $label) = $self->__createCrumb($text, $callback);
 
+    unshift @{$self->{__crumbs}}, $label;
     $self->{__crumbCon}->prependChild($delim, $label);
     return $label;
 }
@@ -137,6 +139,32 @@ sub setId {
 
 # Protected
 #
+sub _realize {
+    my $self = shift;
+
+    $self->SUPER::_realize;
+    if ($self->{_handlers}{'IWL-NavBar-activatePath'}) {
+        foreach (@{$self->{__crumbs}}) {
+            $_->signalConnect(click => <<EOF);
+var path = this.previousSiblings().grep(new Selector('.navbar_crumb')).invoke('getText');
+path.unshift(this.getText());
+this.up('.navbar').emitEvent('IWL-NavBar-activatePath', {path: path.reverse()});
+EOF
+        }
+        $self->{__navCombo}->signalConnect(change => <<EOF);
+var path = this.previous('.navbar_crumb_con').childElements().grep(new Selector('.navbar_crumb')).invoke('getText');
+path.push(this.value);
+this.up('.navbar').emitEvent('IWL-NavBar-activatePath', {path: path});
+EOF
+    }
+    my $combo = '$(\'' . $self->{__navCombo}->getId . '\')';
+    foreach (@{$self->{__crumbs}}) {
+        $_->signalConnect(click => <<EOF);
+$combo.selectedIndex = 0;
+EOF
+    }
+}
+
 sub _setupDefaultClass {
     my $self = shift;
 
@@ -144,6 +172,16 @@ sub _setupDefaultClass {
     $self->{__crumbCon}->prependClass($self->{_defaultClass} . '_crumb_con');
     $self->{__navCombo}->prependClass($self->{_defaultClass} . '_combo');
     return $self;
+}
+
+sub _registerEvent {
+    my ($self, $event, $params, $options) = @_;
+
+    if ($event ne 'IWL-NavBar-activatePath') {
+	return $self->SUPER::_registerEvent($event, $params, $options);
+    }
+
+    return $options;
 }
 
 sub _init {
@@ -165,10 +203,13 @@ sub _init {
 
     $self->{_defaultClass} = 'navbar';
     $delim->{_defaultClass} = $self->{_defaultClass} . '_delim';
+    $combo->appendOption();
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     $self->{__delimeter} = $delimeter;
     $self->{__crumbCon}  = $crumb_con;
     $self->{__navCombo}  = $combo;
+    $self->{__options}   = [];
+    $self->{__crumbs}    = [];
     $self->appendChild($crumb_con);
     $self->appendChild($delim);
     $self->appendChild($combo);
@@ -188,7 +229,8 @@ sub __createCrumb {
 
     $delim->setText($self->{__delimeter});
     $label->setText($text);
-    $label->signalConnect(click => $callback);
+    $label->signalConnect(click => $callback)
+        if $callback;
 
     return $delim, $label;
 }
