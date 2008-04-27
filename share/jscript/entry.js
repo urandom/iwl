@@ -125,6 +125,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
             this.control.signalConnect('change', changeCallback.bind(this));
             changeCallback.call(this);
+            this.emitSignal('iwl:load');
         }
     }
 })());

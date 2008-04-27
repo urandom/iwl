@@ -1310,6 +1310,7 @@ div.tooltip_content {
 }
 .pagecontrol_page_entry {
     float: left;
+    margin-right: 3px;
 }
 
 /* Accordions */

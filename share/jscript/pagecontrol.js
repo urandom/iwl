@@ -179,6 +179,9 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             /* 3px gap bug */
             if (Prototype.Browser.IE)
                 dims.width += 3 * this.labelContainer.select('span').length;
+            /* 1px+ in Gecko 1.9 */
+            if (Prototype.Browser.Gecko)
+                dims.width += 1;
             return dims;
         },
 
