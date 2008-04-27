@@ -1549,14 +1549,26 @@ sub _realize {
     if (ref $required{css} eq 'ARRAY') {
         if ($head) {
             require IWL::Page::Link;
+            my @required = @{$required{css}};
+            my @css;
 
-            my @css = map {IWL::Page::Link->newLinkToCSS($_)} @{$required{js}};
+            if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
+                push @css,
+                    IWL::Page::Link->newLinkToCSS(\@required)->setAttribute('iwl:requiredCSS') while @required;
+            } else {
+                @css = map {IWL::Page::Link->newLinkToCSS($_)->setAttribute('iwl:requiredCSS')} @{$required{css}};
+            }
             $head->appendChild(@css);
         } else {
             require IWL::Style;
 
             my $style = IWL::Style->new->setAttribute('iwl:requiredCSS');
-            $style->appendStyleImport($_) foreach @{$required{css}};
+            if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
+                my @required = @{$required{css}};
+                $style->appendStyleImport(\@required) while @required;
+            } else {
+                $style->appendStyleImport($_) foreach @{$required{css}};
+            }
 
             $self->isa('IWL::Page')
                 ? ($self->down({package => 'IWL::Page::Body'}) || $self)->prependChild($style)

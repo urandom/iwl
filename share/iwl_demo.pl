@@ -194,12 +194,11 @@ if (my $file = $form{upload_file}) {
     my $tree = IWL::Tree->new(id => 'widgets_tree', alternate => 1, animate => 1);
     my $notebook = IWL::Notebook->new(id => 'main_notebook');
     my $container = IWL::Container->new(id => 'content');
-    my $style = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/demo.css');
     my @scripts = (qw(demo.js dist/unittest.js unittest_extensions.js));
     my $locale = IWL::Combo->new(id => 'locale');
 
+    $page->requiredCSS('demo.css');
     $page->appendChild($hbox);
-    $page->appendHeader($style);
     $hbox->packStart($tree)->appendChild($locale);
     $hbox->packStart($notebook);
     $page->requiredJs(@scripts);

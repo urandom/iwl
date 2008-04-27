@@ -242,7 +242,7 @@ sub __init {
     do { $self->{__simple} = delete $args{simple}; return 1 } if $args{simple};
 
     $self->_constructorArguments(%args);
-    my $skin = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/main.css', undef, title => 'Main');
+    $self->requiredCSS('main.css');
     my $ie   = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie.css');
     my $ie6  = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
 
@@ -253,7 +253,6 @@ sub __init {
     $script->appendScript(IWL::Config::getJSConfig);
     $head->appendChild($script);
 
-    $head->appendChild($skin);
     $head->appendChild($conditional);
     $body->setId(randomize('body'));
     $conditional->setConditionalData('IE', $ie);

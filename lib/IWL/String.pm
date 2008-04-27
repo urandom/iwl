@@ -188,6 +188,8 @@ sub randomize {
     $string .= '_' . $counter++;
     $string =~ s/\.//g;
 
+    $counter = 0 if index($counter, 'e') != -1;
+
     return $string;
 }
 
