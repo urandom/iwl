@@ -78,7 +78,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -318,9 +318,7 @@ sub _setupDefaultClass {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $anchor = IWL::Anchor->new;
     my $image  = IWL::Image->new;

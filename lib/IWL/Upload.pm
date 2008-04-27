@@ -65,7 +65,7 @@ sub new {
         enctype => 'multipart/form-data'
     );
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -198,9 +198,7 @@ sub _setupDefaultClass {
     $self->{__button}->prependClass($self->{_defaultClass} . '_button');
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $file   = IWL::File->new;
     my $frame  = IWL::IFrame->new;

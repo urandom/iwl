@@ -54,7 +54,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -167,9 +167,7 @@ sub _setupDefaultClass {
     $self->prependClass($self->{_defaultClass});
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     $self->{_defaultClass} = 'druid_page';

@@ -61,7 +61,7 @@ sub new {
 
     $self->{_tag} = 'div';
     $self->{_noChildren} = 0;
-    $self->__init(%args);
+    $self->_init(%args);
     return $self;
 }
 
@@ -281,9 +281,7 @@ sub _setupDefaultClass {
     return $self->{__handle}->prependClass($self->{_defaultClass} . '_handle');
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $rail = IWL::Container->new;
     my $handle = IWL::Container->new;

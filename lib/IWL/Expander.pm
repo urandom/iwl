@@ -45,7 +45,7 @@ sub new {
 
     my $self = $class->SUPER::new;
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -176,9 +176,7 @@ sub _realize {
     $self->{__header}->signalConnect(mouseout => "\$(this).removeClassName('expander_header_hover')");
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my ($header, $icon, $label, $content) = IWL::Container->newMultiple(4);
 

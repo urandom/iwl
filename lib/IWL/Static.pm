@@ -57,7 +57,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new(%args);
 
-    $self->__init;
+    $self->_init;
 
     return $self;
 }
@@ -191,9 +191,9 @@ sub addRequest {
     return wantarray ? @uris : $uris[0];
 }
 
-# Internal
+# Protected
 #
-sub __init {
+sub _init {
     my $self = shift;
 
     $self->{_staticURIs} = {};
@@ -203,6 +203,8 @@ sub __init {
     $self->addURI(map {$_ => 1} @uri);
 }
 
+# Internal
+#
 sub __getETag {
     my ($self, $uri) = @_;
     $uri = File::Spec->join($IWLConfig{DOCUMENT_ROOT}, $uri)

@@ -53,7 +53,7 @@ sub new {
     # The list of pages
     $self->{__pages} = [];
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -74,7 +74,7 @@ Returns: the page
 
 sub appendPage {
     my ($self, $object, $callback, $param, $current) = @_;
-    return $self->__setup_page($object, $callback, $param, $current);
+    return $self->__setupPage($object, $callback, $param, $current);
 }
 
 =item B<prependPage> (B<OBJECT>, [B<CALLBACK>, B<PARAM>, B<CURRENT>])
@@ -89,7 +89,7 @@ Returns: the page
 
 sub prependPage {
     my ($self, $object, $callback, $param, $current) = @_;
-    return $self->__setup_page($object, $callback, $param, $current, 1);
+    return $self->__setupPage($object, $callback, $param, $current, 1);
 }
 
 =item B<showFinish> (B<PAGE>)
@@ -148,9 +148,7 @@ sub _setupDefaultClass {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $content     = IWL::Container->new;
     my $back_button =
@@ -187,7 +185,9 @@ sub __init {
     return $self;
 }
 
-sub __setup_page {
+# Internal
+#
+sub __setupPage {
     my ($self, $data, $callback, $param, $selected, $reverse) = @_;
     my $page = IWL::Druid::Page->new;
     my $index;

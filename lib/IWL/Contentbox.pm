@@ -90,7 +90,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -452,9 +452,7 @@ sub _setupDefaultClass {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $top     = IWL::Container->new;
     my $topr    = IWL::Container->new;
@@ -532,6 +530,8 @@ sub __init {
     return $self;
 }
 
+# Internal
+#
 sub __set_type {
     my ($self) = @_;
     my $type = $self->{_options}{type};

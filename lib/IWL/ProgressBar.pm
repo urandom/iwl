@@ -66,7 +66,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self = $class->SUPER::new;
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -170,9 +170,7 @@ sub _realize {
     $self->_appendInitScript("IWL.ProgressBar.create('$id', $options);");
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $block = IWL::Container->new;
     my $label = IWL::Label->new(expand => 1);

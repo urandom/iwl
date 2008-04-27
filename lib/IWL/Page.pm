@@ -80,7 +80,7 @@ sub new {
     $self->setAttribute(xmlns => "http://www.w3.org/1999/xhtml");
     $self->setAttribute('xmlns:iwl' => "http://namespace.bloka.org/iwl");
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -227,9 +227,9 @@ sub requiredJs {
     return shift->{_head}->requiredJs(@_);
 }
 
-# Internal
+# Protected
 #
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $head = IWL::Page::Head->new;
     my $body = IWL::Page::Body->new;

@@ -76,7 +76,7 @@ sub new {
     my $self = $class->SUPER::new();
 
     $self->{__iconNum} = 0;
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -192,9 +192,7 @@ sub _refreshEvent {
       );
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $icon_con = IWL::Container->new;
 

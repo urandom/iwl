@@ -44,7 +44,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -146,9 +146,7 @@ sub _setupDefaultClass {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $crumb_con = IWL::Container->new(inline => 1);
     my $delim     = IWL::Label->new;
@@ -177,6 +175,8 @@ sub __init {
     return $self->_constructorArguments(%args);
 }
 
+# Internal
+#
 sub __createCrumb {
     my ($self, $text, $callback) = @_;
 
