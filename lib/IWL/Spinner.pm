@@ -339,8 +339,6 @@ sub _realize {
     $self->_appendInitScript("IWL.Spinner.create('$id', $options);");
 }
 
-# Internal
-#
 sub _init {
     my ($self, %args) = @_;
     my %options = (value => 0, from => 0, to => 100,

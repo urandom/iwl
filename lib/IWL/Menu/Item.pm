@@ -67,7 +67,7 @@ sub new {
 
     my $self = $class->SUPER::new;
 
-    $self->IWL::Menu::Item::__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -260,9 +260,7 @@ sub _realize {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $label = $self->{__label} = IWL::Label->new;
     my $parentType = $args{parentType} || 'menu';

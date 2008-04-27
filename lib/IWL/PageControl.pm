@@ -59,7 +59,7 @@ sub new {
 
     my $self = $class->SUPER::new;
 
-    $self->IWL::PageControl::__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -149,9 +149,7 @@ sub _setupDefaultClass {
     $self->{__pageEntry}->prependClass($self->{_defaultClass} . "_page_entry");
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $label = IWL::Container->new;
     my $page_count = IWL::Label->new->appendText($args{pageCount});

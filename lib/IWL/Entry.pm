@@ -445,8 +445,6 @@ sub _setupDefaultClass {
     $self->{text}->prependClass($self->{_defaultClass} . '_text');
 }
 
-# Internal
-#
 sub _init {
     my ($self, %args) = @_;
     my $entry         = IWL::Input->new;

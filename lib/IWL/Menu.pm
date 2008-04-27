@@ -47,9 +47,7 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new;
-
-    $self->IWL::Menu::__init(%args);
+    my $self = $class->SUPER::new(%args);
 
     return $self;
 }
@@ -188,9 +186,7 @@ sub _realize {
     return $self->_appendInitScript($script);
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     $self->{_defaultClass} = 'menu';
@@ -202,6 +198,8 @@ sub __init {
     $self->{__bindWidgets} = [];
 }
 
+# Internal
+#
 sub __setup_menu_separator {
     my $self = shift;
     my $mi = IWL::Widget->new;
