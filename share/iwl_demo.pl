@@ -446,12 +446,13 @@ sub generate_entries {
     my $normal_entry   = IWL::Entry->new;
     my $password_entry = IWL::Entry->new;
     my $cleanup_entry  = IWL::Entry->new;
+    my $useless        = IWL::Entry->new;
     my $image_entry    = IWL::Entry->new(id => 'image_entry');
     my $label          = IWL::Label->new;
     my $completion     = IWL::Entry->new(id => 'entry_completion');
 
     $container->appendChild($normal_entry, $password_entry, $cleanup_entry,
-        $image_entry, IWL::Break->new, $label, $completion);
+        $image_entry, $useless, IWL::Break->new, $label, $completion);
     $normal_entry->setDefaultText('Type here');
     $password_entry->setPassword(1);
     $cleanup_entry->addClearButton;
@@ -462,6 +463,8 @@ sub generate_entries {
 	    insertion => 'bottom',
 	    onComplete => q|IWL.Status.display.bind(this, 'Completed')|,
     ));
+    $useless->setIconFromStock('IWL_STOCK_DOWNLOAD', 'left');
+    $useless->setIconFromStock('IWL_STOCK_UPLOAD', 'right');
     $label->setText("The following entry provides completion capabilities. Try searching for 'gtk' or 'IWL'.");
     $completion->setAutoComplete('iwl_demo.pl', paramName => 'completion');
     return $container;
@@ -1172,16 +1175,19 @@ sub read_code {
     my ($start, $count) = @_;
     my $counter = 0;
     my $read = 0;
-    my $contents = '';
+    my $content = '';
     local *DEMO;
     open DEMO, "$0";
 
+    $start = "generate_" . $1 if $start =~ /^(\w+)_container$/ && !$count;
+
     while (<DEMO>) {
 	$read++ if $_ =~ /$start/;
-	last if $read && $count == $counter++;
-	$contents .= $_ if $read;
+	last if $read && ($count ? $count == $counter++ : $_ =~ /^}/);
+	$content .= $_ if $read;
     }
     close DEMO;
+    $content .= "}\n" unless $count;
     eval {
 	my %CSS_colors = (
 	    none      => "</span>",
@@ -1226,72 +1232,37 @@ sub read_code {
 	    'File_Name'        => [$CSS_colors{'misc'}, $CSS_colors{'none'}],
 	);
 
-	$contents = $formatter->format_string($contents);
+	$content = $formatter->format_string($content);
     };;
-    return $contents;
+    return $content;
 }
 
 sub show_the_code_for {
     my $code_for = shift;
     my $paragraph = IWL::Label->new;
 
-    if ($code_for eq 'buttons_container') {
-	$paragraph->appendTextType(read_code("generate_buttons", 28), 'pre');
-    } elsif ($code_for eq 'entries_container') {
-	$paragraph->appendTextType(read_code("generate_entries", 25), 'pre');
+    if ($code_for eq 'entries_container') {
+	$paragraph->appendTextType(read_code($code_for), 'pre');
 	$paragraph->appendTextType('...', 'pre');
 	$paragraph->appendTextType(read_code('my \$search = quotemeta \$form\{completion\}', 10), 'pre');
-    } elsif ($code_for eq 'spinners_container') {
-	$paragraph->appendTextType(read_code("generate_spinners", 9), 'pre');
-    } elsif ($code_for eq 'images_container') {
-	$paragraph->appendTextType(read_code("generate_images", 17), 'pre');
-    } elsif ($code_for eq 'labels_container') {
-	$paragraph->appendTextType(read_code("generate_labels", 18), 'pre');
-    } elsif ($code_for eq 'calendars_container') {
-	$paragraph->appendTextType(read_code("generate_calendars", 20), 'pre');
-    } elsif ($code_for eq 'combobox_container') {
-	$paragraph->appendTextType(read_code("generate_combobox", 13), 'pre');
-    } elsif ($code_for eq 'slider_container') {
-	$paragraph->appendTextType(read_code("generate_sliders", 27), 'pre');
-    } elsif ($code_for eq 'iconbox_container') {
-	$paragraph->appendTextType(read_code("generate_iconbox", 23), 'pre');
-    } elsif ($code_for eq 'menus_container') {
-	$paragraph->appendTextType(read_code("generate_menus", 40), 'pre');
-    } elsif ($code_for eq 'progress_bars_container') {
-	$paragraph->appendTextType(read_code("generate_progress_bars", 11), 'pre');
-    } elsif ($code_for eq 'list_container') {
-	$paragraph->appendTextType(read_code("generate_list", 45), 'pre');
-    } elsif ($code_for eq 'table_container') {
-	$paragraph->appendTextType(read_code("generate_table", 41), 'pre');
     } elsif ($code_for eq 'tree_container') {
 	$paragraph->appendTextType(read_code("sub build_tree", 119), 'pre');
         $paragraph->appendTextType(read_code("Tree row handlers", 21), 'pre');
         $paragraph->appendTextType(');', 'pre');
-    } elsif ($code_for eq 'contentbox_container') {
-	$paragraph->appendTextType(read_code("generate_contentbox", 24), 'pre');
-    } elsif ($code_for eq 'accordions_container') {
-	$paragraph->appendTextType(read_code("generate_accordions", 20), 'pre');
     } elsif ($code_for eq 'druid_container') {
-	$paragraph->appendTextType(read_code("generate_druid", 16), 'pre');
+	$paragraph->appendTextType(read_code($code_for), 'pre');
 	$paragraph->appendTextType(read_code("Druid handlers", 54), 'pre');
-    } elsif ($code_for eq 'expander_container') {
-	$paragraph->appendTextType(read_code("generate_expander", 12), 'pre');
-    } elsif ($code_for eq 'notebook_container') {
-	$paragraph->appendTextType(read_code("generate_notebook", 15), 'pre');
-    } elsif ($code_for eq 'tooltips_container') {
-	$paragraph->appendTextType(read_code("generate_tooltips", 21), 'pre');
-    } elsif ($code_for eq 'file_container') {
-	$paragraph->appendTextType(read_code("generate_file", 12), 'pre');
-    } elsif ($code_for eq 'canvas_container') {
-	$paragraph->appendTextType(read_code("generate_canvas", 30), 'pre');
     } elsif ($code_for eq 'rpc_events_container') {
-	$paragraph->appendTextType(read_code("generate_rpc_events", 25), 'pre');
+	$paragraph->appendTextType(read_code($code_for), 'pre');
 	$paragraph->appendTextType(read_code("Event row handlers", 21), 'pre');
     } elsif ($code_for eq 'rpc_pagecontrol_container') {
-	$paragraph->appendTextType(read_code("generate_rpc_pagecontrol", 12), 'pre');
+	$paragraph->appendTextType(read_code($code_for), 'pre');
 	$paragraph->appendTextType(read_code("PageControl handlers", 28), 'pre');
     } else {
-	$paragraph->setText('Code not available');
+        my $code = read_code($code_for);
+	$code
+            ? $paragraph->appendTextType($code, 'pre')
+            : $paragraph->setText('Code not available');
     }
 
     return $paragraph->getContent;

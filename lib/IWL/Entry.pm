@@ -80,7 +80,7 @@ sub new {
 
     $self->{_tag}   = 'table';
     $self->{_noChildren} = 0;
-    $self->__init(%args);
+    $self->_init(%args);
     return $self;
 }
 
@@ -347,10 +347,6 @@ sub setAutoComplete {
     return unless $url;
 
     $self->{_options}{autoComplete} = [$url, \%options];
-    unless ($self->{__completionAdded}) {
-	$self->appendChild($self->{__receiver});
-	$self->{__completionAdded} = 1;
-    }
     return $self;
 }
 
@@ -388,7 +384,6 @@ sub setId {
     $self->setAttribute(id              => $id);
     $self->{image1}->setAttribute(id    => $id . '_left');
     $self->{image2}->setAttribute(id    => $id . '_right');
-    $self->{__receiver}->setAttribute(id => $id . '_receiver');
     if ($control_id) {
         $self->{text}->setAttribute(id => $control_id);
     } else {
@@ -444,7 +439,6 @@ sub _setupDefaultClass {
     $self->prependClass($self->{_defaultClass});
     $self->{image1}->prependClass($self->{_defaultClass} . '_left');
     $self->{image2}->prependClass($self->{_defaultClass} . '_right');
-    $self->{__receiver}->prependClass($self->{_defaultClass} . '_receiver');
     if ($self->{_options}{defaultText}) {
 	$self->{text}->prependClass($self->{_defaultClass} . '_text_default');
     }
@@ -453,21 +447,19 @@ sub _setupDefaultClass {
 
 # Internal
 #
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $entry         = IWL::Input->new;
     my $image1        = IWL::Image->new;
     my $image2        = IWL::Image->new;
-    my $receiver      = IWL::Container->new;
     my $body          = IWL::Table::Container->new;
     my $row           = IWL::Table::Row->new;
 
     $self->{image1}        = $image1;
     $self->{image2}        = $image2;
     $self->{text}          = $entry;
-    $self->{__receiver}    = $receiver;
+    $self->{_row}          = $row;
     $self->{_defaultClass} = 'entry';
-    $self->{__row}         = $row;
 
     $self->appendChild($body);
     $body->appendChild($row);

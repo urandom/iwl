@@ -37,10 +37,12 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             onHide: receiverOnHide.bind(this)
         }, this.options.autoComplete[1]);
         var receiver = $(this.id + '_receiver');
-        if (!receiver)
-            receiver = this.appendChild(new Element('div', {
+        if (!receiver) {
+            receiver = new Element('div', {
                 id: this.id + '_receiver', className: $A(this.classNames()).first() + '_receiver'
-            }));
+            });
+            this.control.parentNode.appendChild(receiver);
+        }
         this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
     }
 
