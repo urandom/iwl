@@ -490,6 +490,96 @@ Object.extend(document.viewport, {
     enable: IWL.View.enable
 });
 
+document.insertScript = (function () {
+  if (!document._urlCache)
+    document._urlCache = {};
+
+  if (Prototype.Browser.WebKit || Prototype.Browser.KHTML)
+    Prototype._helpers = [];
+
+  return function(url) {
+    if (!Object.isString(url) || url.blank());
+
+    var options = Object.extend({
+      onComplete: Prototype.emptyFunction,
+      skipCache: false,
+      removeScriptElement: true 
+    }, arguments[1]);
+
+    var scripts = $$('script').pluck('src');
+    scripts.each(function(src) {
+        var match = src.match(/IWLStaticURI=([^&]+)/);
+        if (match && match[1]) {
+            match[1].split(',').each(function(u) {
+                document._urlCache[u] = true;
+            });
+        };
+    });
+    var complete = false;
+    var match = url.match(/IWLStaticURI=([^&]+)/);
+    if (match && match[1]) {
+        var urls = match[1].split(',');
+        urls.clone().each(function(u) {
+            if (document._urlCache[u]) {
+                urls = urls.without(u);
+            } else {
+                document._urlCache[u] = true;
+            }
+        });
+        if (urls.length) {
+            url = url.replace(/IWLStaticURI=[^&]+/, 'IWLStaticURI=' + urls.join(','))
+        } else complete = true;
+    }
+
+    if (complete || document._urlCache[url] || scripts.invoke('endsWith', url).any()) {
+      document._urlCache[url] = true;
+      if (options.onComplete)
+        options.onComplete.bind(window, url).delay(0.1);
+      return;
+    }
+
+    document._urlCache[url] = true;
+    if (options.skipCache) {
+      var query = {_: (new Date).valueOf()};
+      var index = url.indexOf('?');
+      if (index != -1) {
+        Object.extend(query, url.substr(index).toQueryParams());
+        url = url.substr(0, index);
+      }
+      url += '?' + Object.toQueryString(query);
+    }
+
+    var script = new Element('script', {type: 'text/javascript', charset: 'utf-8'});
+    var fired = false;
+    var stateChangedCallback = function() {
+      if (fired) return;
+      if (script.readyState && script.readyState != 'loaded' &&
+          script.readyState != 'complete')
+        return;
+      script.onreadystatechange = script.onload = null;
+      if (options.onComplete) options.onComplete(url);
+      if (!options.removeScriptElement) script.remove();
+      fired = true;
+    };
+
+    script.onload = script.onreadystatechange = stateChangedCallback;
+    script.src = url;
+
+    document.getElementsByTagName('head').item(0).appendChild(script);
+
+    if ((Prototype.Browser.WebKit || Prototype.Browser.KHTML) && options.onComplete) {
+      var helper = new Element('script', {type: 'text/javascript'});
+      var index = Prototype._helpers.push({script: helper, callback: stateChangedCallback}) - 1;
+      helper.update(
+        'var helper = Prototype._helpers[' + index + '];helper.callback();' +
+        'helper.script.remove.delay(0.1);Prototype._helpers[' + index + '] = undefined'
+      );
+      Element.extend(document.body).appendChild.bind(document.body, helper).delay(0.1);
+    }
+  }
+})();
+
+
 /* Deprecated */
 var createHtmlElement = IWL.createHtmlElement;
 var disableView = IWL.View.disable;
