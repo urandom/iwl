@@ -94,7 +94,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         },
         /**
          * @returns The current value of the entry 
-         * @type Number 
+         * @type String
          * */
         getValue: function() {
             return this.control.value === this.options.defaultText ? '' : this.control.value;

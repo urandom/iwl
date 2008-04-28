@@ -156,10 +156,10 @@ $rpc->handleEvent(
         my $label = IWL::Label->new->setText('/' . join '/', @{$params->{path}});
         my $list = IWL::List->new(type => 'ordered');
 
-        if ('foo/bar' eq join '/', @{$params->{path}}) {
+        if ('Foo/Bar' eq join '/', @{$params->{path}}) {
             $list->appendListItemText($_)
                 foreach qw(base.js button.js calendar.js contentbox.js unittest_extensions.js upload.js);
-        } elsif ('foo/bar/baz/beta' eq join '/', @{$params->{path}}) {
+        } elsif ('Foo/Bar/Baz/Beta' eq join '/', @{$params->{path}}) {
             $list->appendListItemText($_)
                 foreach qw(main.css demo.css);
         }
@@ -167,6 +167,8 @@ $rpc->handleEvent(
         $con->appendChild(
             IWL::Label->new->appendTextType("Elements for: ", 'strong'),
             $label,
+            IWL::Label->new->appendTextType(" with values: ", 'em'),
+            IWL::Label->new->setText(join ':', @{$params->{values}}),
             $list
         );
 
@@ -678,9 +680,9 @@ sub generate_navbar {
     my $navbar    = IWL::NavBar->new(id => 'navbar');
     my $updatee   = IWL::Container->new(id => 'updatee');
 
-    $navbar->appendPath('bar');
-    $navbar->appendPath('baz', q|IWL.Status.display('Something else')|);
-    $navbar->prependPath('foo', q|IWL.Status.display('foo')|);
+    $navbar->appendPath('Bar', 'something_else');
+    $navbar->appendPath('Baz', 'baz');
+    $navbar->prependPath('Foo', 'foo');
     $navbar->appendOption('Alpha', 'alpha');
     $navbar->appendOption('Beta', 'beta');
     $navbar->appendOption('Gamma', 'gamma');
