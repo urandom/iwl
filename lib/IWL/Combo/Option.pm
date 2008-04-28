@@ -35,9 +35,8 @@ sub new {
 
     my $self = $class->SUPER::new(%args);
 
-    $self->{_tag}     = "option";
-    $self->{_noChildren}     = 0;
-    $self->{_removeEmpty} = 1;
+    $self->{_tag}        = "option";
+    $self->{_noChildren} = 0;
 
     return $self;
 }

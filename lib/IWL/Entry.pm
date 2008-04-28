@@ -263,17 +263,9 @@ sub setIcon {
     my ($self, $src, $alt, $position, $clickable) = @_;
 
     if (!$position || $position eq 'left') {
-        $self->{image1}{_ignore} = 0;
-        $self->{image1}->set($src);
-        $self->{image1}->setAlt($alt);
-	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image1};
+        return $self->__setIcon($self->{image1}, $src, $alt, $clickable);
     } elsif ($position eq 'right') {
-        $self->{image2}{_ignore} = 0;
-        $self->{image2}->set($src);
-        $self->{image2}->setAlt($alt);
-	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image2};
+        return $self->__setIcon($self->{image2}, $src, $alt, $clickable);
     }
 }
 
@@ -290,16 +282,10 @@ Returns the set image
 sub setIconFromStock {
     my ($self, $stock_id, $position, $clickable) = @_;
 
-    if ($position && $position eq 'right') {
-        $self->{image2}->setFromStock($stock_id) or return;
-        $self->{image2}{_ignore} = 0;
-	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image2};
-    } elsif (!$position || $position eq 'left') {
-        $self->{image1}->setFromStock($stock_id) or return;
-        $self->{image1}{_ignore} = 0;
-	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image1};
+    if (!$position || $position eq 'left') {
+        return $self->__setIcon($self->{image1}, $stock_id, undef, $clickable);
+    } elsif ($position eq 'right') {
+        return $self->__setIcon($self->{image2}, $stock_id, undef, $clickable);
     }
 }
 
@@ -313,7 +299,6 @@ sub addClearButton {
     my $self = shift;
 
     $self->setIconFromStock(IWL_STOCK_CLEAR => 'right', 1);
-    $self->{image2}->setAttribute(id => $self->getId . '_right');
     $self->{_options}{clearButton} = 1;
     return $self;
 }
@@ -486,6 +471,19 @@ sub _init {
     $self->requiredJs('base.js', 'entry.js');
 
     return $self;
+}
+
+# Internal
+#
+sub __setIcon {
+    my ($self, $icon, $src, $alt, $clickable) = @_;
+
+    $icon->{_ignore} = 0;
+    $icon->setAlt($alt) if $alt;
+    $icon->setStyle(cursor => 'pointer') if $clickable;
+    return $src =~ /^[A-Z]+_STOCK/
+        ? $icon->setFromStock($src)
+        : $icon->set($src);
 }
 
 1;

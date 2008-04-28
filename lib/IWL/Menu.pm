@@ -189,6 +189,7 @@ sub _realize {
 sub _init {
     my ($self, %args) = @_;
 
+    $self->SUPER::_init(%args);
     $self->{_defaultClass} = 'menu';
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     $self->_constructorArguments(%args);

@@ -249,7 +249,7 @@ EOF
 
     build_tree($tree);
     $page->setTitle('Widget Library');
-    $page->send(type => 'html');
+    $page->send(type => 'html', static => 1);
 }
 
 sub build_tree {

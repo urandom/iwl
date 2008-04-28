@@ -143,6 +143,7 @@ sub _realize {
     my $self = shift;
 
     $self->SUPER::_realize;
+    $self->{__navCombo}->prependOption;
     if ($self->{_handlers}{'IWL-NavBar-activatePath'}) {
         foreach (@{$self->{__crumbs}}) {
             $_->signalConnect(click => <<EOF);
@@ -203,7 +204,6 @@ sub _init {
 
     $self->{_defaultClass} = 'navbar';
     $delim->{_defaultClass} = $self->{_defaultClass} . '_delim';
-    $combo->appendOption();
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
     $self->{__delimeter} = $delimeter;
     $self->{__crumbCon}  = $crumb_con;
