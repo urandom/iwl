@@ -78,6 +78,9 @@ sub toJSON {
         my $copy = $$data;
         return toJSON($copy);
     }
+    if (UNIVERSAL::isa($data, 'IWL::Object')) {
+        return $data->getJSON;
+    }
     return;
 }
 

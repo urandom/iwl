@@ -1,4 +1,4 @@
-use Test::More tests => 50;
+use Test::More tests => 52;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -120,6 +120,13 @@ my $output;
     is_deeply($clone->{childNodes}[0], $object->{childNodes}[0]);
     is_deeply($clone->{childNodes}[1], $object->{childNodes}[1]);
     is($clone->{childNodes}[1]->{parentNode}, $clone);
+}
+
+{
+    require IWL::JSON;
+
+    is(IWL::JSON::toJSON({a => IWL::Object->new->setAttribute(foo => 1)}), '{"a": {"attributes": {"foo": 1}}}');
+    is(IWL::JSON::toJSON([IWL::Object->newMultiple(3)]), '[{}, {}, {}]');
 }
 
 package PRINT_TEST;
