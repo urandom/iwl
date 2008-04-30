@@ -67,6 +67,66 @@ Fires when the iconbox and its icons have finished loading
 
 =back
 
+=head1 EVENTS
+
+=over 4
+
+=item B<IWL-Iconbox-refresh>
+
+Emitted when the iconbox has to be refreshed. This event is used by L<IWL::PageControl>. The paramaters hashref contains:
+
+=over 8
+
+=item B<type>
+
+The type of the request:
+
+=over 12
+
+=item B<input>
+
+The given page comes from a user input. In this case, the B<value> parameter is filled with the user requested page number.
+
+=item B<first>
+
+The first page. Ideally, a first page should be generated and returned.
+
+=item B<prev>
+
+The previous page. Ideally, the page, previous to the one given in the B<page> parameter should be returned.
+
+=item B<next>
+
+The next page. Ideally, the page, next to the one given in the B<page> parameter should be returned.
+
+=item B<last>
+
+The last page. Ideally, the last page should be generated and returned.
+
+=back
+
+=item B<value>
+
+If the B<type> parameter was I<input>, this parameter holds the user requested page.
+
+=item B<page>
+
+The current page of the widget.
+
+=item B<pageSize>
+
+The number of entities per page.
+
+=item B<pageCount>
+
+The total number of pages.
+
+=back
+
+As a return first parameter, the perl callback has to return an arrayref of L<IWL::Iconbox::Icon> objects. As a second return parameter, the perl callback can return any of above parameters in the hash reference. These parameters will change the state of the L<IWL::PageControl> for this widget.
+
+=back
+
 =cut
 
 sub new {

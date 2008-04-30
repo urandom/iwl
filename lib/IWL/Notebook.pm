@@ -122,16 +122,6 @@ sub _realize {
     $self->_appendInitScript("IWL.Notebook.create('$id');");
 }
 
-sub _registerEvent {
-    my ($self, $event, $params, $options) = @_;
-
-    if ($event eq 'IWL-Notebook-Tab-add') {
-	return $options;
-    } else {
-	return $self->SUPER::_registerEvent($event, $params, $options);
-    }
-}
-
 sub _setupDefaultClass {
     my $self = shift;
 

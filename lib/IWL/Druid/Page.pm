@@ -46,6 +46,52 @@ Fires when the page is removed
 
 =back
 
+=head1 EVENTS
+
+=over 4
+
+=item B<IWL-Druid-Page-next>
+
+Emitted when the next druid page has been requested. A custom event handler is used. The perl callback for it has to return an arrayref of L<IWL::Widget>s.  As a second return parameter, the perl callback can return the following parameters in the hash reference:
+
+=over 8
+
+=item B<newId> => I<STRING>
+
+The I<ID> of the newly created page.
+
+=item B<deter>
+
+If true, the user should be stopped from proceeding to the next page.
+
+=item B<expression> => I<EXPRESSION>
+
+If B<deter> is true, the javascript expression will be evaluated.
+
+=item B<next> => {I<url> => I<URL>, I<params> => I<HASH>, I<options> => I<HASH>}
+
+Registers an I<IWL-Druid-Page-next> event for the new page.
+
+=item B<previous> => {I<url> => I<URL>, I<params> => I<HASH>, I<options> => I<HASH>}
+
+Registers an I<IWL-Druid-Page-previous> event for the new page.
+
+=item B<final> => {I<url> => I<URL>, I<params> => I<HASH>, I<options> => I<HASH>}
+
+Registers an I<IWL-Druid-Page-final> event for the new page.
+
+=back
+
+=item B<IWL-Druid-Page-previous>
+
+Emitted when the previous druid page has been requested. A custom event handler is used. The perl callback for it has to return an arrayref of L<IWL::Widget>s. The paramaters hashref contains are the same as in I<IWL-Druid-Page-next>
+
+=item B<IWL-Druid-Page-final>
+
+Emitted when the previous druid page has been requested. The default event handler is used. See L<IWL::RPC::handleEvent> for more details.
+
+=back
+
 =cut
 
 sub new {

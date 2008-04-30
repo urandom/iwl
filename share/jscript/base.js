@@ -64,9 +64,9 @@ Object.extend(IWL, {RPC: (function() {
                       onComplete: function(or) {
                           var json = or.responseJSON;
                           if (!json) return;
-                          if (options.method && options.method in element)
+                          if (Object.isFunction(element[options.method]))
                               element[options.method].call(element, json, params, options);
-                          if (options.responseCallback && typeof options.responseCallback === 'function')
+                          if (Object.isFunction(options.responseCallback))
                               options.responseCallback.call(element, json, params, options);
                           if (options.onComplete) {
                               var callback = eventCompletion(options.onComplete);

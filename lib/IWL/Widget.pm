@@ -93,6 +93,19 @@ Fires when a key on the keyboard is released
 
 =back
 
+=head1 EVENTS
+
+Every widget signal will also be emitted as an event, if it was registered. The event name is the widget's class, delimeted by a I<'-'>, and camelized signal name. Examples:
+
+    IWL-Widget-click            signal name: 'click'
+    IWL-NavBar-activatePath     signal name: 'activate_path'
+
+Unless otherwise noted, the perl callback called by the event handler, will only receive the serialized signal event, under the I<eventData> key of the parameter hashref.
+
+See L<IWL::RPC::handleEvent> for more information
+
+=back
+
 =cut
 
 sub new {
@@ -530,7 +543,8 @@ sub _registerEvent {
     $package =~ s/-/::/g;
     return unless ref $self eq $package;
 
-    $self->signalConnect($signal => "this.emitEvent('$event', {}, {id: this.id})");
+    $signal =~ s/(?<=\w)([A-Z])/_\l$1/g;
+    $self->signalConnect($signal => "this.emitEvent('$event', {eventData: Event.serialize(arguments[0])}, {id: this.id})");
     return $options;
 }
 

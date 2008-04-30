@@ -80,6 +80,16 @@ Fires when a row has expanded
 
 =back
 
+=head1 EVENTS
+
+=over 4
+
+=item B<IWL-Tree-refresh>
+
+Emitted when the tree has to be refreshed. This event is used by L<IWL::PageControl>. As a return first parameter, the perl callback has to return an arrayref of L<IWL::Tree::Row> objects. As a second return parameter, the perl callback can return the same values as the L<IWL::Iconbox> refresh event. These values will change the state of the L<IWL::PageControl> for this widget.
+
+=back
+
 =cut
 
 sub new {
