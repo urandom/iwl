@@ -4,13 +4,14 @@
  * @extends IWL.Widget
  * */
 IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
+    var accumulator = function(a, n) { return a + parseFloat(n) };
+
     function adjust() {
-        var accumulator = function(a, n) { return a + parseFloat(n) };
         var children = [this.image1, this.control, this.image2].findAll(function(e) { return e != null });
         var width = children.invoke('getWidth').inject(0, accumulator)
             + (children.invoke('getStyle', 'marginLeft').inject(0, accumulator) || 0)
             + (children.invoke('getStyle', 'marginRight').inject(0, accumulator) || 0);
-        this.setStyle({width: width + 'px'});
+        this.setStyle({width: width + 1 + 'px'});
         this.style.visibility = '';
         this.emitSignal('iwl:load');
     }
