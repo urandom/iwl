@@ -348,11 +348,8 @@ sub __existsInCache {
 sub __getCustomHeader {
     my ($self, $uri, $mime, $header, %options) = @_;
     $options{header} = $options{header}->($uri, $mime, $header) if ref $options{header} eq 'CODE';
-    $header->{$_} = $options{header}{$_} foreach keys %{
-        ref $options{header} eq 'CODE'
-              ? $options{header}->($uri, $mime)
-              : $options{header} || {}
-    };
+    $options{header} = {} unless ref $options{header} eq 'HASH';
+    $header->{$_} = $options{header}{$_} foreach keys %{$options{header}};
 }
 
 ## From HTTP::Date ##
