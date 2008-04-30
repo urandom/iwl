@@ -83,9 +83,9 @@ sub appendStyleImport {
     require IWL::Static;
 
     my $import = IWL::Text->new('@import "'
-        . ref $style eq 'ARRAY'
+        . (ref $style eq 'ARRAY'
             ? IWL::Static->addMultipleRequest($style, 'text/css')
-            : IWL::Static->addRequest($style)
+            : IWL::Static->addRequest($style))
         . '";' . "\n");
 
     return $self->appendChild($import);
