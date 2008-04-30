@@ -11,9 +11,6 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK);
 @EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape unescape escapeHTML unescapeHTML randomize);
 
-# randomize counter
-my $counter = 0;
-
 =head1 NAME
 
 IWL::String - string helper functions
@@ -185,7 +182,7 @@ sub randomize {
     my $string = shift;
 
     return '' unless defined $string;
-    $string .= '_' . $counter++;
+    $string .= '_' . int(rand(1e10));
     $string =~ s/\.//g;
 
     return $string;
