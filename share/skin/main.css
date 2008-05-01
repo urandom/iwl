@@ -31,6 +31,7 @@ tbody.table_body tr td, tbody.table_row tr th {
 
 .iwl-unselectable {
     -moz-user-select: none;
+    user-select: none;
 }
 
 .iwl-clear {
