@@ -621,7 +621,6 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }.bind(this));
         this.observe('dblclick', function(event) {
             IWL.Focus.current = this.tree;
-            IWL.removeSelection();
             this.activate();
         }.bind(this));
     }

@@ -1,4 +1,4 @@
-use Test::More tests => 28;
+use Test::More tests => 32;
 
 use IWL::Widget;
 use IWL::Config '%IWLConfig';
@@ -59,4 +59,19 @@ $IWLConfig{STRICT_LEVEL} = 2;
 	is($widget->setName('My name'), $widget);
 	is($widget->setTitle('My title'), $widget);
 	like($widget->getContent, qr/< (?:(?:name="My name"|title="My title")\s*){2}><\/>/);
+}
+
+{
+    my $widget = IWL::Widget->new;
+
+    ok($widget->isSelectable);
+    is($widget->setSelectable(0), $widget);
+    ok(!$widget->isSelectable);
+    $object = $widget->getObject;
+    is_deeply($object, {
+        attributes => {
+            class => 'iwl-unselectable',
+            unselectable => 'on'
+        }
+    });
 }

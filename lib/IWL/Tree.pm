@@ -119,6 +119,7 @@ sub new {
         row_collapse => [],
         row_expand   => []
     };
+    $self->setSelectable(0);
 
     return $self;
 }

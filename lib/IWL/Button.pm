@@ -355,6 +355,7 @@ sub __init {
     $self->signalConnect(focus => "this.hideFocus = true");
     $self->{_customSignals} = {load => [], adjust => []};
 
+    $self->setSelectable(0);
     return $self;
 }
 

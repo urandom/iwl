@@ -117,6 +117,9 @@ sub new {
     # The style hash
     $self->{_style} = {};
 
+    # Selectable
+    $self->{__selectable} = 1;
+
     $self->_constructorArguments(%args);
 
     return $self;
@@ -456,12 +459,43 @@ sub getTitle {
     return shift->getAttribute('title', 1);
 }
 
+=item B<setSelectable> (B<BOOL>)
+
+Sets whether the text inside the object can be selected by the user
+
+Parameters: B<BOOL> - if true, the user can select the text of the object (default)
+
+=cut
+
+sub setSelectable {
+    my ($self, $selectable) = @_;
+
+    $self->{__selectable} = !(!$selectable);
+    return $self;
+}
+
+=item B<isSelectable>
+
+Returns true if the user can select the text inside the object
+
+=cut
+
+sub isSelectable {
+    return shift->{__selectable};
+}
+
 # Protected
 #
 sub _realize {
     my $self = shift;
 
     $self->IWL::Object::_realize;
+
+    unless ($self->{__selectable}) {
+        $self->setAttribute(unselectable => 'on');
+        $self->appendClass('iwl-unselectable');
+    }
+
     if ($self->{_customSignals}) {
 	my $id = $self->getId;
 	my $parent = $self->_findTopParent || $self;

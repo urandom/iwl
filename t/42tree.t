@@ -20,7 +20,7 @@ is($t->prependHeader(IWL::Tree::Row->new(id => 'header1')), $t);
 is($t->appendFooter(IWL::Tree::Row->new(id => 'footer2')), $t);
 is($t->prependFooter(IWL::Tree::Row->new(id => 'footer1')), $t);
 like($t->getContent, qr(.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*tree.js.*?
-<table (?:(?:class="(tree)"|id="(\1_\d+)"|cellspacing="0"|cellpadding="0")\s*){4}><thead (?:(?:class="\1_header"|id="\2_header")\s*){2}><tr (?:(?:iwl:treeRowData=".*?"|id="header1"|class="\1_row \1_header_row")\s*){3}></tr>
+<table (?:(?:class="(tree) iwl-unselectable"|id="(\1_\d+)"|cellspacing="0"|cellpadding="0"|unselectable="on")\s*){5}><thead (?:(?:class="\1_header"|id="\2_header")\s*){2}><tr (?:(?:iwl:treeRowData=".*?"|id="header1"|class="\1_row \1_header_row")\s*){3}></tr>
 <tr (?:(?:iwl:treeRowData=".*?"|id="header2"|class="\1_row \1_header_row")\s*){3}></tr>
 </thead>
 <tbody (?:(?:class="\1_body"|id="\2_body")\s*){2}><tr (?:(?:iwl:treeRowData=".*?"|id="\1_row_\d+"|class="\1_row")\s*){3}><td><span (?:(?:class="\1_nav_con"|id="\1_row_\d+_nav_con")\s*){2}></span>

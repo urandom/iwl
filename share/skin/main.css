@@ -29,6 +29,14 @@ tbody.table_body tr td, tbody.table_row tr th {
     vertical-align: middle;
 }
 
+.iwl-unselectable {
+    -moz-user-select: none;
+}
+
+.iwl-clear {
+    clear: both;
+}
+
 /* Tree */
 table.tree {
 /*    border: 1px solid red;*/
