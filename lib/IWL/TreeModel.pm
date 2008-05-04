@@ -83,6 +83,7 @@ sub dataReader {
                 if (length $content eq $size) {
                     push @content, $content;
                     $content = '';
+                    undef $size;
                 }
             } else {
                 $content .= $line;
