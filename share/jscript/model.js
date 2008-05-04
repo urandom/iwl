@@ -16,8 +16,23 @@ IWL.ObservableModel = Class.create(Enumerable, (function() {
     emitSignal: function() {
       var args = $A(arguments);
       var name = args.shift();
-      var event = Event.fire(this.__emitter, name, args);
+      Event.fire(this.__emitter, name, args);
       return this;
+    },
+    registerEvent: function() {
+      this.__emitter.registerEvent.apply(this.__emitter, arguments);
+      return this;
+    },
+    prepareEvents: function() {
+      this.__emitter.prepareEvents.apply(this.__emitter, arguments);
+      return this;
+    },
+    emitEvent: function() {
+      this.__emitter.emitEvent.apply(this.__emitter, arguments);
+      return this;
+    },
+    hasEvent: function() {
+      return this.__emitter.hasEvent.apply(this.__emitter, arguments);
     }
   };
 })());
@@ -40,23 +55,43 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     });
   }
 
+  /*
+   *  [value, [children]]
+   */
+  function getColumnValues(index, nodes) {
+    var ret = [];
+    nodes.each(function(node) {
+      var r = node.getValues(index);
+      if (node.hasChildren())
+        r.push(getColumnValues.call(this, index, node.children()));
+      ret.push(r);
+    });
+    return ret;
+  }
+
+  function sortResponse(response, params, options) {
+    this.emitSignal('iwl:sort_column_change');
+  }
+
   return {
     initialize: function($super) {
       $super();
       var args = $A(arguments), index = -1;
       args.shift();
 
+      this.options = Object.extend({
+      }, args.length % 2 ? args.pop() : {});
+
       this.rootNodes = [];
       this.frozen = false;
       this.columns = new Array(parseInt(args.length / 2));
-      this.sortFunctions = [];
+      this.sortMethods = [];
       while (args.length) {
         var tuple = args.splice(0, 2);
         this.setColumn(++index, tuple[0], tuple[1]);
       }
     },
 
-    /* Model Interface */
     addColumnType: function(type) {
       IWL.TreeModel.addColumnType(type);
       return this;
@@ -99,36 +134,47 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     isFrozen: function() {
       return this.frozen;
     },
-    /* !Model Interface */
 
     /* Sortable Interface */
-    setSortFunction: function(fun, index) {
-      this.sortFunctions[index] = fun;
+    setSortMethod: function(index, options) {
+      this.sortMethods[index] = options;
+      if (Object.isString(options.url) && !options.url.blank()) {
+        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {responseCallback: sortResponse});
+      }
       return this;
     },
-    setDefaultOrderFunction: function(fun) {
-      this.defaultOrderFunction = fun;
+    setDefaultOrderMethod: function(options) {
+      this.defaultOrderMethod = options;
       return this;
     },
     getSortColumn: function() {
       return this.sortColumn || {index: -1};
     },
     setSortColumn: function(index, sortType) {
-      var sortable;
+      var options;
       if (index == -1)
-        sortable = this.defaultOrderFunction;
+        options = this.defaultOrderMethod;
       else
-        sortable = this.sortFunctions[index];
+        options = this.sortMethods[index];
 
-      if (!Object.isFunction(sortable)) return;
+      this.sortColumn = {index: index, sortType: sortType || IWL.TreeModel.SortTypes.DESCENDING};
+      var asc = this.sortColumn.sortType == IWL.TreeModel.SortTypes.ASCENDING;
 
-      this.sortColumn = {index: index, sortType: sortType || IWL.TreeModel.SortType.DESCENDING};
-      var asc = this.sortColumn.sortType == IWL.TreeModel.SortType.ASCENDING;
+      if (Object.isString(options.url) && !options.url.blank()) {
+        var emitOptions = {};
+        if (options.serializeColumnValues)
+          emitOptions.columnValues = Object.toJSON(getColumnValues.call(this, index, this.rootNodes));
+        emitOptions.ascending = asc ? 1 : 0;
+        return this.emitEvent('IWL-TreeModel-sortColumn', {}, emitOptions);
+      } else if (!Object.isFunction(options.sortable)) return;
+
       var wrapper = function(a, b) {
-        var ret = sortable(a.getValues(index), b.getValues(index));
+        var ret = options.sortable(a.getValues(index), b.getValues(index));
         return asc ? ret * -1 : ret;
       };
       sortDepth.call(this, this.rootNodes, wrapper);
+
+      this.emitSignal('iwl:sort_column_change');
       return this;
     },
     /* !Sortable Interface */
@@ -231,7 +277,7 @@ Object.extend(IWL.TreeModel, (function() {
     addColumnType: function(type) {
       IWL.TreeModel.Types[type] = ++index;
     },
-    SortType: {
+    SortTypes: {
       DESCENDING: 1,
       ASCENDING:  2
     }
