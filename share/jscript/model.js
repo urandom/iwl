@@ -70,7 +70,23 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   }
 
   function sortResponse(response, params, options) {
+    this.loadData(response.data);
     this.emitSignal('iwl:sort_column_change');
+  }
+
+  function loadNodes(nodes, parentNode, options) {
+    if ('preserve' in options && !options.preserve)
+      parentNode ? parentNode.childNodes = [] : this.clear();
+
+    nodes.each(function(n) {
+      var node = this.insertNode(parentNode, options.index);
+      if (n.values && n.values.length) {
+        for (var i = 0, l = n.values.length; i < l; i++)
+          node.setValues(i, n.values[i]);
+      }
+      if (n.children && n.children.length)
+        loadNodes.call(this, n.children, node, {});
+    }.bind(this))
   }
 
   return {
@@ -116,6 +132,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return this.rootNodes;
     },
     getNodeByPath: function(path) {
+      if (!Object.isArray(path)) return;
       var node = this.rootNodes[path.shift()];
       for (var i = 0, l = path.length; i < l; i++)
         node = node.childNodes[path[i]];
@@ -139,12 +156,15 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     setSortMethod: function(index, options) {
       this.sortMethods[index] = options;
       if (Object.isString(options.url) && !options.url.blank()) {
-        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {responseCallback: sortResponse});
+        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {responseCallback: sortResponse.bind(this)});
       }
       return this;
     },
     setDefaultOrderMethod: function(options) {
       this.defaultOrderMethod = options;
+      if (Object.isString(options.url) && !options.url.blank()) {
+        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {responseCallback: sortResponse.bind(this)});
+      }
       return this;
     },
     getSortColumn: function() {
@@ -162,8 +182,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
       if (Object.isString(options.url) && !options.url.blank()) {
         var emitOptions = {};
-        if (options.serializeColumnValues)
-          emitOptions.columnValues = Object.toJSON(getColumnValues.call(this, index, this.rootNodes));
+        if (index == -1)
+          emitOptions.defaultOrder = 1;
+
         emitOptions.ascending = asc ? 1 : 0;
         return this.emitEvent('IWL-TreeModel-sortColumn', {}, emitOptions);
       } else if (!Object.isFunction(options.sortable)) return;
@@ -249,6 +270,25 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       node.insert(this, parent, index);
       this.emitSignal('iwl:node_move', parent, previous);
 
+      return this.thaw();
+    },
+
+    loadData: function(data) {
+      if (!Object.isObject(data) || !Object.isArray(data.nodes)) return;
+      var options = {
+        totalCount: data.totalCount,
+        size: data.size,
+        offset: data.offset,
+        index: data.index,
+        parentNode: this.getNodeByPath(data.parentNode)
+      };
+      if ('preserve' in data)
+        options.preserve = !!data.preserve;
+
+      this.freeze();
+      loadNodes.call(this, data.nodes, options.parentNode, options);
+
+      this.emitSignal('iwl:load_data', options);
       return this.thaw();
     },
 

@@ -4,24 +4,32 @@ package IWL::TreeModel;
 
 use strict;
 
-use IWL::JSON qw(evalJSON);
+use IWL::JSON qw(evalJSON toJSON);
 
 =head1
 
 Data:
-  [
-    {
-      values => ['Sample', 15],
-      children => [
-                  {
-                    ...
-                  }
-                ],
-    },
-    {
-      ...
-    }
-  ]
+  {
+    totalCount => int,
+    size => int,
+    offset => int,
+    preserve => boolean,
+    index => int,
+    parentNode => [path],
+    nodes => [
+      {
+        values => ['Sample', 15],
+        children => [
+                    {
+                      ...
+                    }
+                  ],
+      },
+      {
+        ...
+      }
+    ]
+  }
 
 =cut
 
@@ -37,23 +45,51 @@ sub dataReader {
         $content = <FILE>;
         close FILE;
     } elsif ($options{host}) {
-        eval "require Net::Telnet" or die $@;
-        $options{port} ||= 80;
-        $options{uri}  ||= '/';
-        my $t = Net::Telnet->new(Host => $options{host}, Port => $options{port});
+        $options{port}  ||= 80;
+        $options{uri}   ||= '/';
+        $options{proto} ||= 'tcp';
+        require IO::Socket;
+
+        my $r = IO::Socket::INET->new(Proto => $options{proto}, PeerAddr => $options{host}, PeerPort => $options{port});
         my @printer = ("GET $options{uri} HTTP/1.1", "Host: $options{host}:$options{port}");
         my $body;
 
-        $t->put(join "\n", @printer, "\n");
-        while (my $line = $t->getline) {
+        binmode $r;
+        $r->print(join "\n", @printer, "\n");
+        my ($headers, @content, $size) = ({});
+        while (my $line = <$r>) {
             unless ($body) {
-                $body = 1 if $line eq "\n";
+                if ($line eq "\n" || $line eq "\r\n") {
+                    $body = 1;
+                } else {
+                    my @header = split ': ', $line, 2;
+                    if (@header == 2) {
+                        $header[1] =~ s/\r\n$//;
+                        $headers->{$header[0]} = $header[1];
+                    }
+                }
+
                 next;
             }
-            $content .= $line;
-            last if $t->eof;
+            if ($headers->{'Transfer-Encoding'} eq 'chunked') {
+                $line =~ s/\r\n//;
+                if (!defined $size) {
+                    $size = hex($line);
+                    next;
+                }
+                last if $size == 0;
+                $content .= $line;
+
+                if (length $content eq $size) {
+                    push @content, $content;
+                    $content = '';
+                }
+            } else {
+                $content .= $line;
+            }
         }
-        $t->close;
+        $content = join '', @content if @content;
+        $r->shutdown(2);
     } elsif ($options{data}) {
         $data = $options{data};
     }
@@ -67,10 +103,6 @@ sub dataReader {
         } else {
             $data = __readHashList($data, %options);
         }
-    } elsif ($options{type} eq 'array') {
-        $data = __readArray($data, %options);
-    } elsif ($options{type} eq 'hashlist') {
-        $data = __readHashList($data, %options);
     } elsif ($options{type} eq 'json') {
         $data = evalJSON($content, 1);
         if ($options{subtype} eq 'array') {
@@ -78,9 +110,14 @@ sub dataReader {
         } else {
             $data = __readHashList($data, %options);
         }
+    } elsif ($options{type} eq 'array') {
+        $data = __readArray($data, %options);
+    } else {
+        $data = __readHashList($data, %options);
     }
+    $options{preserve} = 1 unless defined $options{preserve};
 
-    return $data;
+    return {preserve => $options{preserve}, index => $options{index}, nodes => $data};
 }
 
 sub _sortColumnEvent {
@@ -88,8 +125,12 @@ sub _sortColumnEvent {
     my $response = IWL::Response->new;
 
     my ($data, $extras) = ('CODE' eq ref $handler)
-      ? $handler->($event->{params}, $event->{options}{ascending},
-        $event->{options}{columnValues} ? evalJSON($event->{options}{columnValues}, 1) : undef)
+      ? $handler->($event->{params}, {
+              ascending => $event->{options}{ascending},
+              columnValues => 
+                  $event->{options}{columnValues} ? evalJSON($event->{options}{columnValues}, 1) : undef,
+              defaultOrder => $event->{options}{defaultOrder}
+          })
       : (undef, undef);
     $data = toJSON($data);
 
@@ -145,18 +186,46 @@ sub __readArray {
     }
   ]
 
+  {
+    someInfo => [],
+    nodesProperty => 
+      [
+        {
+          childrenProperty => [ ... ],
+          valuesProperty => [ ... ],
+        },
+        {
+          ...
+        }
+      ]
+  }
+
 =cut
 
 sub __readHashList {
     my ($list, %options) = @_;
-    my $data = [];
-    my $values = $options{valuesProperty};
-    my $children = $options{childrenProperty};
+    my $data = [], my $options = {};
+    my $values = $options{valuesProperty} || 'values';
+    my $children = $options{childrenProperty} || 'children';
+
+    if (ref $list eq 'HASH') {
+        $options->{totalCount} = $list->{$options{totalCountProperty}};
+        $options->{size} = $list->{$options{sizeProperty}};
+        $options->{offset} = $list->{$options{offsetProperty}};
+
+        $list = $list->{$options{nodesProperty}} || [];
+    }
+
     foreach my $item (@$list) {
         next unless 'HASH' eq ref $item;
         my $node = {};
-        $node->{children} = $item->{$children} if ref $item->{$children} eq 'ARRAY';
-        $node->{values} = $item->{$values} if ref $item->{$values} eq 'ARRAY';
+        $node->{children} = __readHashList($item->{$children}, %options)
+            if ref $item->{$children} eq 'ARRAY';
+        if (ref $item->{$values} eq 'ARRAY') {
+            $node->{values} = $item->{$values};
+        } elsif (ref $options{valueProperties} eq 'ARRAY') {
+            $node->{values} = [map {$item->{$_}} @{$options{valueProperties}}];
+        }
         push @$data, $node;
     }
 
