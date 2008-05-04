@@ -97,10 +97,23 @@ sub evalJSON {
     return if !$string;
     
     if (!$sanitize || isJSON($string)) {
-        $string =~ s/(?<!\\)":/" =>/go;
+#        $string =~ s/(?<!\\)":/" =>/go;
         $string =~ s/\$/\\\$/go;
         $string =~ s/\@/\\\@/go;
         $string =~ s/\%/\\\%/go;
+
+        my $pos = 0;
+        while ($pos = index $string, ':', $pos) {
+            last if $pos == -1;
+            my $pos2 = $pos++;
+            my $sub = substr $string, $pos2 - 2, 2;
+            my $quot = substr $sub, 1, 1;
+            unless (($quot eq '"' || $quot eq "'") && substr($sub, 0, 1) ne '\\') {
+                my @match = substr($string, 0, $pos2) =~ /(?<!\\)"/g;
+                next if @match % 2;
+            }
+            substr $string, $pos2, 1, ' =>';
+        }
 
         my $object = eval('(' . $string . ')');
 
