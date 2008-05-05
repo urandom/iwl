@@ -49,6 +49,10 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
     if (this.options.overview != 'none')
       this.control.addControl(new GOverviewMapControl());
 
+    this.options.markers.each(function(marker) {
+      this.addMarker.apply(this, marker);
+    }.bind(this));
+
     Event.observe(document.body, 'unload', google.maps.Unload);
     this.emitSignal('iwl:load');
   }
@@ -175,7 +179,8 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
         scaleView: 'none',
         mapControl: 'none',
         mapTypeControl: 'none',
-        overview: 'none'
+        overview: 'none',
+        markers: []
       }, arguments[1] || {});
       
       google.load("maps", "2", {callback: initialize.bind(this), language: this.options.language});

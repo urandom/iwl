@@ -929,10 +929,11 @@ sub generate_file {
 
 sub generate_gmap {
     my $container = IWL::Container->new(id => 'gmap_container');
-    my $map = IWL::Google::Map->new(id => 'gmap', latitude => 42.60244915107272, longitude => 23.24128746986389, zoom => 18);
+    my $map = IWL::Google::Map->new(id => 'gmap', latitude => 42.60244915107272, longitude => 23.24128746986389, zoom => 9);
 
     $map->setScaleView('ruler')->setMapTypeControl('menu')->setMapControl('small')->setOverview('mini');
-    $map->setMapType('hybrid')->setWidth('490px');
+    $map->setMapType('physical')->setWidth('490px')->addMarker(IWL::Label->new->appendTextType('Hello World!', 'strong'));
+    $map->addMarker('Still here', 42, 23);
     $container->appendChild($map);
 
     return $container;

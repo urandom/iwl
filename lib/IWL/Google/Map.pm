@@ -234,11 +234,31 @@ sub setOverview {
     return $self;
 }
 
+=item B<addMarker> ([B<CONTENT>, B<LATITUDE>, B<LONGITUDE>])
+
+Adds a marker to the map
+
+Parameters: B<CONTENT> - the optional content of the information window, which will appear if the marker is clicked. Can be a string, html or L<IWL::Object>, B<LATITUDE> - the latitude of the marker, B<LONGITUDE> - the longitude of the marker. If the coordinates are not supplied, the initial map coordinates will be used.
+
+=cut
+
+sub addMarker {
+    my $self = shift;
+
+    push @{$self->{__markers}}, [@_];
+    return $self;
+}
+
 # Protected
 #
 sub _realize {
     my $self = shift;
     my $id = $self->getId;
+
+    foreach my $marker (@{$self->{__markers}}) {
+        $marker->[0] = $marker->[0]->getContent if UNIVERSAL::isa($marker->[0], 'IWL::Object');
+    }
+    $self->{_options}{markers} = $self->{__markers};
     my $options = toJSON($self->{_options});
     my $signals = $self->{_customSignals};
 
@@ -299,6 +319,7 @@ sub _init {
         infowindowclose => [], mouseover => [], mouseout => [], mousemove => [],
         drag => [], dragend => [],
     };
+    $self->{__markers} = [];
 }
 
 1;
