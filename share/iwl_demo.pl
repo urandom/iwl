@@ -378,14 +378,17 @@ sub build_containers {
 sub build_misc {
     my $row    = shift;
     my $file   = IWL::Tree::Row->new(id => 'file_row');
+    my $gmap   = IWL::Tree::Row->new(id => 'gmap_row');
     my $canvas = IWL::Tree::Row->new(id => 'canvas_row');
 
     $file->appendTextCell('File Upload');
     $row->appendRow($file);
+    $gmap->appendTextCell('Google Map');
+    $row->appendRow($gmap);
     $canvas->appendTextCell('Canvas');
     $row->appendRow($canvas);
 
-    register_row_event($file, $canvas);
+    register_row_event($file, $gmap, $canvas);
 }
 
 sub build_tests {
@@ -920,6 +923,17 @@ sub generate_file {
     $container->appendChild($label);
     $container->appendChild($file);
     $label->setText('Press the button to upload a file.');
+
+    return $container;
+}
+
+sub generate_gmap {
+    my $container = IWL::Container->new(id => 'gmap_container');
+    my $map = IWL::Google::Map->new(id => 'gmap', latitude => 42.60244915107272, longitude => 23.24128746986389, zoom => 18);
+
+    $map->setScaleView('ruler')->setMapTypeControl('menu')->setMapControl('small')->setOverview('mini');
+    $map->setMapType('hybrid')->setWidth('490px');
+    $container->appendChild($map);
 
     return $container;
 }

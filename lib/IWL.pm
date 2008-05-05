@@ -25,6 +25,7 @@ use IWL::Expander;
 use IWL::File;
 use IWL::Form;
 use IWL::Frame;
+use IWL::Google::Map;
 use IWL::Hidden;
 use IWL::HBox;
 use IWL::Iconbox::Icon;

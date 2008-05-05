@@ -1551,3 +1551,9 @@ div.tooltip_content {
     text-align: center;
     color: #000 !important;
 }
+
+/* Google Map */
+.google_map {
+    width: 500px;
+    height: 400px;
+}
