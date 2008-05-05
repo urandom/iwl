@@ -36,7 +36,7 @@ Data:
 
 sub dataReader {
     my (%options) = @_;
-    my ($content, $data) = ('', undef);
+    my ($content, $data, $modifiers) = ('', undef, {});
 
     if ($options{file}) {
         local *FILE;
@@ -102,23 +102,29 @@ sub dataReader {
         if ($options{subtype} eq 'array') {
             $data = __readArray($data, %options);
         } else {
-            $data = __readHashList($data, %options);
+            ($data, $modifiers) = __readHashList($data, %options);
         }
     } elsif ($options{type} eq 'json') {
         $data = evalJSON($content, 1);
         if ($options{subtype} eq 'array') {
             $data = __readArray($data, %options);
         } else {
-            $data = __readHashList($data, %options);
+            ($data, $modifiers) = __readHashList($data, %options);
         }
     } elsif ($options{type} eq 'array') {
         $data = __readArray($data, %options);
     } else {
-        $data = __readHashList($data, %options);
+        ($data, $modifiers) = __readHashList($data, %options);
     }
-    $options{preserve} = 1 unless defined $options{preserve};
+    $modifiers = {
+        %$modifiers,
+        preserve => defined $options{preserve} ? $options{preserve} : 1,
+    };
 
-    return {preserve => $options{preserve}, index => $options{index}, nodes => $data};
+    $modifiers->{$_} = $options{$_} foreach
+        grep {defined $options{$_}} qw(totalCount size offset index parentNode);
+
+    return {%$modifiers, nodes => $data};
 }
 
 sub _sortColumnEvent {
@@ -205,14 +211,15 @@ sub __readArray {
 
 sub __readHashList {
     my ($list, %options) = @_;
-    my $data = [], my $options = {};
+    my $data = [];
+    my $modifiers = {};
     my $values = $options{valuesProperty} || 'values';
     my $children = $options{childrenProperty} || 'children';
 
     if (ref $list eq 'HASH') {
-        $options->{totalCount} = $list->{$options{totalCountProperty}};
-        $options->{size} = $list->{$options{sizeProperty}};
-        $options->{offset} = $list->{$options{offsetProperty}};
+        $modifiers->{totalCount} = $list->{$options{totalCountProperty}};
+        $modifiers->{size} = $list->{$options{sizeProperty}};
+        $modifiers->{offset} = $list->{$options{offsetProperty}};
 
         $list = $list->{$options{nodesProperty}} || [];
     }
@@ -220,7 +227,7 @@ sub __readHashList {
     foreach my $item (@$list) {
         next unless 'HASH' eq ref $item;
         my $node = {};
-        $node->{children} = __readHashList($item->{$children}, %options)
+        ($node->{children}) = __readHashList($item->{$children}, %options)
             if ref $item->{$children} eq 'ARRAY';
         if (ref $item->{$values} eq 'ARRAY') {
             $node->{values} = $item->{$values};
@@ -230,7 +237,7 @@ sub __readHashList {
         push @$data, $node;
     }
 
-    return $data;
+    return $data, $modifiers;
 }
 
 1;
