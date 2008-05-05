@@ -7,7 +7,6 @@ use strict;
 
 use base qw(IWL::Object IWL::RPC::Request);
 use IWL::Config qw(%IWLConfig);
-use IWL::Script;
 
 =head1 NAME
 
@@ -486,6 +485,13 @@ sub isSelectable {
 
 # Protected
 #
+=head1 PROTECTED METHODS
+
+The following methods should only be used by classes that inherit
+from B<IWL::Widget>.
+
+=cut
+
 sub _realize {
     my $self = shift;
 
@@ -498,26 +504,17 @@ sub _realize {
 
     if ($self->{_customSignals}) {
 	my $id = $self->getId;
-	my $parent = $self->_findTopParent || $self;
 
-	if ($id) {
-	    foreach my $signal (keys %{$self->{_customSignals}}) {
+        if ($id) {
+            foreach my $signal (keys %{$self->{_customSignals}}) {
                 my $expr = join '; ', @{$self->{_customSignals}{$signal}};
-		if ($expr) {
+                if ($expr) {
                     $signal = $self->_namespacedSignalName($signal);
-		    $parent->{_customSignalScript} = IWL::Script->new
-		      unless $parent->{_customSignalScript};
-		    $parent->{_customSignalScript}->appendScript(<<EOF);
-\$('$id').signalConnect('$signal', function() { $expr });
-EOF
+                    $self->_appendInitScript(
+                        "\$('$id').signalConnect('$signal', function() { $expr });"
+                    );
 		}
 	    }
-	}
-	if ($parent->{_customSignalScript} && !$parent->{_customSignalScript}{_added}) {
-            $parent->isa('IWL::Page::Body')
-              ? $parent->appendChild($parent->{_customSignalScript})
-              : unshift @{$parent->{_tailObjects}}, $parent->{_customSignalScript};
-	    $parent->{_customSignalScript}{_added} = 1;
 	}
     }
 
@@ -536,9 +533,7 @@ sub _realizeEvents {
 
     $self->SUPER::_realizeEvents;
 
-    unshift @{$self->{_tailObjects}}, IWL::Script->new->setScript(<<EOF);
-\$('$id').prepareEvents();
-EOF
+    $self->_appendInitScript("\$('$id').prepareEvents();");
 }
 
 sub _constructorArguments {
@@ -575,6 +570,39 @@ sub _namespacedSignalName {
     return 'dom:' . $signal
       if $signal =~ /mouse(?:enter|leave|wheel)/;
     return $signal;
+}
+
+=item B<_matchTerm> (B<TERM>)
+
+Returns I<1> if the widget matches the given term, I<0> if it doesn't, or I<-1> if the term is not supported.
+
+Parameters: B<TERM> - a hash reference with the following key-value pairs:
+
+=over 8
+
+=item B<class>
+
+The class, which is contained in the widget's class attribute
+
+=item B<id>
+
+The id of the widget
+
+=back
+
+=cut
+
+sub _matchTerm {
+    my ($self, $term) = @_;
+    my $ret = -1;
+
+    if ($term->{class}) {
+        $ret = $self->hasClass($term->{class}) ? 1 : 0;
+    } elsif ($term->{id}) {
+        $ret = $self->getId eq $term->{id} ? 1 : 0;
+    }
+
+    return $ret;
 }
 
 # Internal

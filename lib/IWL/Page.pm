@@ -224,7 +224,7 @@ sub registerEvent {
 }
 
 sub requiredJs {
-    return shift->{_head}->requiredJs(@_);
+    return shift->{_body}->requiredJs(@_);
 }
 
 # Internal
@@ -242,18 +242,17 @@ sub __init {
     do { $self->{__simple} = delete $args{simple}; return 1 } if $args{simple};
 
     $self->_constructorArguments(%args);
-    my $skin = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/main.css', undef, title => 'Main');
+    $self->requiredCSS('main.css');
     my $ie   = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie.css');
     my $ie6  = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
 
     my $conditional = IWL::Comment->new;
     $self->requiredJs('base.js');
 
-    my $script = IWL::Script->new;
+    my $script = IWL::Script->new->setAttribute('iwl:independant');
     $script->appendScript(IWL::Config::getJSConfig);
     $head->appendChild($script);
 
-    $head->appendChild($skin);
     $head->appendChild($conditional);
     $body->setId(randomize('body'));
     $conditional->setConditionalData('IE', $ie);

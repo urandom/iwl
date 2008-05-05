@@ -34,7 +34,7 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new;
 
     $self->{_tag} = "script";
     $self->{__scripts} = [];
@@ -52,7 +52,7 @@ sub new {
 
 Sets a "src='B<SOURCE>'" attribute to B<<script>>.
 
-Parameter: B<SOURCE> - a URL to a javascript file
+Parameter: B<SOURCE> - a URL to a javascript file, or an array reference of URIs, if both I<STATIC_URI_SCRIPT> and I<STATIC_UNION> options are set.
 
 =cut
 
@@ -60,7 +60,24 @@ sub setSrc {
     my ($self, $source) = @_;
     require IWL::Static;
 
-    return $self->setAttribute(src => IWL::Static->addRequest($source), 'uri');
+    if (ref $source eq 'ARRAY') {
+        return $self->setAttribute(src =>
+            IWL::Static->addMultipleRequest($source, 'text/javascript'),
+            'uri'
+        );
+    } else {
+        return $self->setAttribute(src => IWL::Static->addRequest($source), 'uri');
+    }
+}
+
+=item B<getSrc>
+
+Returns the source of the script
+
+=cut
+
+sub getSrc {
+    return shift->getAttribute('src', 1);
 }
 
 =item B<appendScript> (B<STRING>)
@@ -117,7 +134,7 @@ If the I<STRICT_LEVEL> value of L<IWL::Config> is greater than I<1>, the script 
 
 sub getScript {
     my $self = shift;
-    my $string = join '; ', @{$self->{__scripts}};
+    my $string = join ";\n", @{$self->{__scripts}};
     $string =~ s/;+/;/g;
     $string .= ';' if $string && $string !~ /;\s*$/;
 
@@ -132,15 +149,10 @@ sub getScript {
 #
 sub _realize {
     my $self = shift;
-    if ($IWLConfig{STRICT_LEVEL} > 1) {
-        my $src = $self->getAttribute(src => 1);
-        if ($src) {
-            $self->_setBad(1) if $IWL::Object::initializedJs{$src};
-            $IWL::Object::initializedJs{$src} = 1;
-        }
-    }
 
-    $self->appendChild(IWL::Text->new($self->getScript));
+    $self->SUPER::_realize;
+    $self->appendChild(IWL::Text->new($self->getScript))
+        unless $self->hasAttribute('src');
 }
 
 1;

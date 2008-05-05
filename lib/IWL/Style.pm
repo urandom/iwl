@@ -74,7 +74,7 @@ sub getMedia {
 
 Imports stylesheets from a file.
 
-Parameter: B<FILE> - the css file
+Parameter: B<FILE> - the css file, or an array reference of files, if both I<STATIC_URI_SCRIPT> and I<STATIC_UNION> options are set.
 
 =cut
 
@@ -82,7 +82,11 @@ sub appendStyleImport {
     my ($self, $style) = @_;
     require IWL::Static;
 
-    my $import = IWL::Text->new('@import "' . IWL::Static->addRequest($style) . '";' . "\n");
+    my $import = IWL::Text->new('@import "'
+        . (ref $style eq 'ARRAY'
+            ? IWL::Static->addMultipleRequest($style, 'text/css')
+            : IWL::Static->addRequest($style))
+        . '";' . "\n");
 
     return $self->appendChild($import);
 }

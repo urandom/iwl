@@ -7,7 +7,6 @@ use strict;
 
 use base 'IWL::Widget';
 
-use IWL::Script;
 use IWL::String 'randomize';
 
 use Locale::TextDomain qw(org.bloka.iwl);

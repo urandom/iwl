@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 14;
 
 use IWL::Static;
 use IWL::Config '%IWLConfig';
@@ -30,7 +30,8 @@ $IWLConfig{STATIC_LABEL} = 1;
 like($s->addRequest('./t/iwl.conf'), qr|\./t/iwl\.conf\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
 $IWLConfig{JS_DIR} = 'share/jscript/dist';
 my $o = IWL::Widget->new->requiredJs('prototype.js')->getObject;
-like($o->{scripts}[0]{attributes}{src}, qr|share/jscript/dist/prototype\.js\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
+is($o->{children}[0]{tag}, 'script');
+like($o->{children}[0]{attributes}{src}, qr|share/jscript/dist/prototype\.js\?[0-9a-fA-F]+-[0-9a-fA-F]+|);
 
 package FooBar;
 

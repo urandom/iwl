@@ -1,4 +1,4 @@
-use Test::More tests => 32;
+use Test::More tests => 37;
 
 use IWL::Widget;
 use IWL::Config '%IWLConfig';
@@ -74,4 +74,19 @@ $IWLConfig{STRICT_LEVEL} = 2;
             unselectable => 'on'
         }
     });
+}
+
+{
+    my $a = IWL::Widget->new->setAttributes(id => 'top', class => 'object');
+
+    my $a_a = IWL::Widget->new->setAttributes(id => 'middle', class => 'object middle');
+    my $a_a_a = IWL::Widget->new->setAttributes(id => 'bottom1', class => 'object bottom');
+    my $a_a_b = IWL::Widget->new->setAttributes(id => 'bottom2', class => 'object bottom');
+
+    $a->appendChild($a_a->appendChild($a_a_a, $a_a_b));
+    is($a->down({id => 'bottom2'}), $a_a_b);
+    ok(!$a->down({id => 'bottom2'}, {class => 'middle'}));
+    is($a->down({id => 'middle'}, {class => 'middle'}), $a_a);
+    ok(!$a->down({id => 'middle'}, {class => 'top'}));
+    is_deeply([$a->down({class => 'bottom'})], [$a_a_a, $a_a_b]);
 }

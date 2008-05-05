@@ -23,9 +23,11 @@ my $entry = IWL::Entry->new;
 	is($entry->getMaxLength, 10);
 	is($entry->getSize, 3);
 
-	like($entry->getContent, qr(^.*entry.js.*
-<div (?:(?:class="entry password"|style="visibility: hidden"|id="(entry_\d+)")\s*){3}><input (?:(?:maxlength="10"|value="Some text"| size="3"|readonly="true"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){7}/>\n</div>
-<script.*IWL.Entry.create.*\1.*</script>\n)s);
+	like($entry->getContent, qr(^<div (?:(?:class="entry password"|style="visibility: hidden"|id="(entry_\d+)")\s*){3}><input (?:(?:maxlength="10"|value="Some text"| size="3"|readonly="true"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){7}/>
+.*entry.js.*
+<script.*IWL.Entry.create.*\1.*</script>
+</div>
+)s);
 }
 
 {
@@ -66,5 +68,8 @@ my $entry = IWL::Entry->new;
 	my $entry = IWL::Entry->new(id => 'foo');
 
 	$entry->setAutoComplete('iwl_demo.pl');
-	like($entry->getContent, qr(^<div (?:(?:class="entry"|style="visibility: hidden"|id="foo")\s*){3}><input (?:(?:class="entry_text"|id="foo_text"|type="text")\s*){3}/>\n<div (?:(?:class="entry_receiver"|id="foo_receiver")\s*){2}></div>\n</div>\n<script .*IWL.Entry.create.*foo.*</script>\n$)s);
+	like($entry->getContent, qr(^<div (?:(?:class="entry"|style="visibility: hidden"|id="foo")\s*){3}><input (?:(?:class="entry_text"|id="foo_text"|type="text")\s*){3}/>\n<div (?:(?:class="entry_receiver"|id="foo_receiver")\s*){2}></div>
+.*entry.js.*
+<script .*IWL.Entry.create.*foo.*</script>
+</div>\n$)s);
 }
