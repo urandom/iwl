@@ -36,7 +36,7 @@ sub new {
 
     my $self = $class->SUPER::new(tag => 'h1');
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -155,9 +155,7 @@ sub _setupDefaultClass {
     $self->{__content}->prependClass('accordion_page_content');
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $page = IWL::Container->new;
 

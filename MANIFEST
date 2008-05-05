@@ -241,6 +241,7 @@ share/jscript/entry.js
 share/jscript/gmap.js
 share/jscript/iconbox.js
 share/jscript/menu.js
+share/jscript/navbar.js
 share/jscript/notebook.js
 share/jscript/pagecontrol.js
 share/jscript/progressbar.js

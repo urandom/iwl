@@ -53,7 +53,7 @@ sub new {
     # The list of tabs
     $self->{__tabs} = [];
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -74,7 +74,7 @@ Returns: the newly created tab
 
 sub appendTab {
     my ($self, $text, $object, $selected) = @_;
-    return $self->__setup_page($object, $text, $selected);
+    return $self->__setupPage($object, $text, $selected);
 }
 
 =item B<prependTab> (B<TEXT>, [B<OBJECT>, B<SELECTED>])
@@ -89,7 +89,7 @@ Returns: the newly created tab
 
 sub prependTab {
     my ($self, $text, $object, $selected) = @_;
-    return $self->__setup_page($object, $text, $selected, 1);
+    return $self->__setupPage($object, $text, $selected, 1);
 }
 
 # Overrides
@@ -122,16 +122,6 @@ sub _realize {
     $self->_appendInitScript("IWL.Notebook.create('$id');");
 }
 
-sub _registerEvent {
-    my ($self, $event, $params, $options) = @_;
-
-    if ($event eq 'IWL-Notebook-Tab-add') {
-	return $options;
-    } else {
-	return $self->SUPER::_registerEvent($event, $params, $options);
-    }
-}
-
 sub _setupDefaultClass {
     my $self = shift;
 
@@ -145,9 +135,7 @@ sub _setupDefaultClass {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $navgroup  = IWL::Container->new;
     my $navborder = IWL::Container->new;
@@ -175,8 +163,10 @@ sub __init {
 
     return $self;
 }
+# Internal
+#
 
-sub __setup_page {
+sub __setupPage {
     my ($self, $object, $text, $selected, $reverse) = @_;
     my $tab = IWL::Notebook::Tab->new;
 

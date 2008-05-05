@@ -62,6 +62,16 @@ Fires when the row has expanded
 
 =back
 
+=head1 EVENTS
+
+=over 4
+
+=item B<IWL-Tree-Row-expand>
+
+Emitted when a row is expanded. A custom event handler is used. The perl callback for it has to return an arrayref of L<IWL::Tree::Row>s, which will be added as children of the row.
+
+=back
+
 =cut
 
 sub new {

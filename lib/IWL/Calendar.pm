@@ -143,9 +143,7 @@ Fires when a date has been activated, via double clicking. Receives a I<Date> ob
 sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
-    my $self = $class->SUPER::new;
-
-    $self->__init(%args);
+    my $self = $class->SUPER::new(%args);
 
     return $self;
 }
@@ -373,13 +371,13 @@ sub _realize {
     $self->_appendInitScript($script);
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $default_class = 'calendar';
     my $id = $args{id} || randomize($default_class);
     my $options = {};
+
+    $self->SUPER::_init(%args);
 
     $options->{fromYear}  = $args{fromYear}  if defined $args{fromYear};
     $options->{fromMonth} = $args{fromMonth} if defined $args{fromMonth};

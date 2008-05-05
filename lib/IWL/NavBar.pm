@@ -37,6 +37,30 @@ The delimeter between the crumbs (defaults to "/")
 
 =back
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the navbar has finished loading
+
+=item B<activate_path>
+
+Fires when a path has been activated. Receives the I<path> and I<values> arrays as second and third arguments.
+
+=back
+
+=head1 EVENTS
+
+=over 4
+
+=item B<IWL-NavBar-activatePath>
+
+Emitted when a path has been activated. The paramaters hashref contains the I<path> arrayref and I<values> arrayref.
+
+=back
+
 =cut
 
 sub new {
@@ -44,7 +68,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $self  = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -53,34 +77,36 @@ sub new {
 
 =over 4
 
-=item B<appendPath> (B<TEXT>, B<CALLBACK>)
+=item B<appendPath> (B<TEXT>, B<VALUE>)
 
 Appends a crumb to the navbar.
 
-Parameters: B<TEXT> - the label of the crumb, B<CALLBACK> - the click callback
+Parameters: B<TEXT> - the label of the crumb, B<VALUE> - the data value
 
 =cut
 
 sub appendPath {
-    my ($self, $text, $callback) = @_;
-    my ($delim, $label) = $self->__createCrumb($text, $callback);
+    my ($self, $text, $value) = @_;
+    my ($delim, $label) = $self->__createCrumb($text, $value);
 
+    push @{$self->{__crumbs}}, $label;
     $self->{__crumbCon}->appendChild($delim, $label);
     return $label;
 }
 
-=item B<prependPath> (B<TEXT>, B<CALLBACK>)
+=item B<prependPath> (B<TEXT>, B<VALUE>)
 
 Prepends a crumb to the navbar.
 
-Parameters: B<TEXT> - the label of the crumb, B<CALLBACK> - the click callback
+Parameters: B<TEXT> - the label of the crumb, B<VALUE> - the data value
 
 =cut
 
 sub prependPath {
-    my ($self, $text, $callback) = @_;
-    my ($delim, $label) = $self->__createCrumb($text, $callback);
+    my ($self, $text, $value) = @_;
+    my ($delim, $label) = $self->__createCrumb($text, $value);
 
+    unshift @{$self->{__crumbs}}, $label;
     $self->{__crumbCon}->prependChild($delim, $label);
     return $label;
 }
@@ -111,20 +137,6 @@ sub prependOption {
     return $self->{__navCombo}->prependOption($text, $value);
 }
 
-=item B<setComboChangeCB> (B<CALLBACK>)
-
-Sets the combobox change callback
-
-Parameters: B<CALLBACK> - the change callback
-
-=cut
-
-sub setComboChangeCB {
-    my ($self, $callback) = @_;
-    $self->{__navCombo}->signalConnect(change => $callback);
-    return $self;
-}
-
 # Overrides
 #
 sub setId {
@@ -132,11 +144,21 @@ sub setId {
     $self->SUPER::setId($id);
     $self->{__crumbCon}->setId($id . '_crumb_con');
     $self->{__navCombo}->setId($id . '_combo');
+    $_->setId(randomize($id . '_crumb')) foreach @{$self->{__crumbs}};
     return $self;
 }
 
 # Protected
 #
+sub _realize {
+    my $self = shift;
+
+    $self->SUPER::_realize;
+    $self->{__navCombo}->prependOption;
+    my $combo = '$(\'' . $self->{__navCombo}->getId . '\')';
+    $self->_appendInitScript("IWL.NavBar.create('@{[$self->getId]}');");
+}
+
 sub _setupDefaultClass {
     my $self = shift;
 
@@ -146,51 +168,56 @@ sub _setupDefaultClass {
     return $self;
 }
 
-# Internal
-#
-sub __init {
+sub _registerEvent {
+    my ($self, $event, $params, $options) = @_;
+
+    if ($event ne 'IWL-NavBar-activatePath') {
+	return $self->SUPER::_registerEvent($event, $params, $options);
+    }
+
+    return $options;
+}
+
+sub _init {
     my ($self, %args) = @_;
     my $crumb_con = IWL::Container->new(inline => 1);
     my $delim     = IWL::Label->new;
     my $combo     = IWL::Combo->new;
     my $delimeter;
 
-    if ($args{delimeter}) {
-        $delimeter = $args{delimeter};
-    } else {
-        $delimeter = '/';
-    }
+    $delimeter = defined $args{delimeter} ? $args{delimeter} : '/';
     delete $args{delimeter};
-
 
     $delim->setText($delimeter);
 
     $self->{_defaultClass} = 'navbar';
     $delim->{_defaultClass} = $self->{_defaultClass} . '_delim';
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
-    $self->{__delimeter} = $delimeter;
+    $self->{__delimeter} = $delim;
     $self->{__crumbCon}  = $crumb_con;
     $self->{__navCombo}  = $combo;
+    $self->{__options}   = [];
+    $self->{__crumbs}    = [];
     $self->appendChild($crumb_con);
     $self->appendChild($delim);
     $self->appendChild($combo);
+    $self->{_customSignals} = {load => [], activate_path => []};
+    $self->requiredJs('base.js', 'navbar.js');
     return $self->_constructorArguments(%args);
 }
 
+# Internal
+#
 sub __createCrumb {
-    my ($self, $text, $callback) = @_;
-
-    my $delim = IWL::Label->new;
+    my ($self, $text, $value) = @_;
     my $label = IWL::Label->new;
 
-    $delim->{_defaultClass} = $self->{_defaultClass} . '_delim';
     $label->{_defaultClass} = $self->{_defaultClass} . '_crumb';
-
-    $delim->setText($self->{__delimeter});
     $label->setText($text);
-    $label->signalConnect(click => $callback);
+    $label->setAttribute('iwl:value' => $value) if $value;
+    $label->setId(randomize($self->getId . '_crumb'));
 
-    return $delim, $label;
+    return $self->{__delimeter}->clone, $label;
 }
 
 1;

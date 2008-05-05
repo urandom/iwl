@@ -55,7 +55,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -172,9 +172,7 @@ sub _setupDefaultClass {
     $self->{__anchor}->prependClass($self->{_defaultClass} . '_anchor');
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $page = IWL::Container->new;
     my $anchor = IWL::Anchor->new;

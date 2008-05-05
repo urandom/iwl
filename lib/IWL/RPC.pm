@@ -217,7 +217,9 @@ sub queryStringToCGIForm {
 
 Handles L<IWL::RPC> widget specific events. Non-library specific handling code comes is passed via the user specified callback.
 
-Parameters: B<EVENT> - The event name to be handled. B<CALLBACK> - a perl callback to handle the event.
+Parameters: B<EVENT> - The event name to be handled. B<CALLBACK> (I<parameters>, [I<id>, I<elementData>]) - a perl callback, called by the event handler.
+
+Unless provided by the class, to which the event belongs, all events are processed by the default event handler. The handler calls the perl B<CALLBACK>, passing the I<parameters> hashref as a first argument, as well as the I<id> of the emitting element (if it has an ID), and the collected I<elementData> (if the I<collectData> option was passed when registering the event. See L<IWL::RPC::Request::registerEvent> for more information). The B<CALLBACK> has to return I<DATA>, and I<EXTRAS>. The I<DATA> can be an L<IWL::Object>, an arrayref or hashref, which will be serialized into JSON, or string data. The I<EXTRAS> is in the form of a hashref, with keys and values that might be needed by processing client-side code.
 
 =cut
 

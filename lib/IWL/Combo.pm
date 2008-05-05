@@ -170,9 +170,10 @@ sub __createOption {
     my $option = IWL::Combo::Option->new;
 
     $option->setSelected($selected);
-    $value = $text unless defined $value;
-    $option->setValue($value);
-    return $option->setText($text);
+    $value = $text if $text && !defined $value;
+    $option->setValue($value) if $value;
+    $option->setText($text) if $text;
+    return $option;
 }
 
 1;

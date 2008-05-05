@@ -6,6 +6,20 @@ Object.extend(Prototype.Browser, {
 
 (function() {
   var EventMethods = {
+    serialize: function(event) {
+      var keys = Object.keys(event), ret = {}, test = /^[A-Z_]+$/;
+      keys.each(function(key) {
+        if (test.test(key)) return;
+        ['Array', 'Boolean', 'Hash', 'Number', 'Object', 'String'].each(function(method) {
+          if (Object['is' + method](event[key])) {
+            ret[key] = event[key];
+            throw $break;
+          }
+        });
+      });
+
+      return ret;
+    },
     // Checks if the element is in the current event stack
     checkElement: function(event, element) {
       element = $(element);

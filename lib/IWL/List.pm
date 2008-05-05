@@ -44,7 +44,7 @@ sub new {
 
     my $self = $class->SUPER::new;
 
-    $self->IWL::List::__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -177,9 +177,9 @@ sub prependDefText {
     return $li;
 }
 
-# Internal
+# Protected
 #
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     if (!$args{type} || $args{type} eq 'unordered') {
@@ -198,6 +198,8 @@ sub __init {
     $self->_constructorArguments(%args);
 }
 
+# Internal
+#
 sub __setup_li {
     my ($self, $data, %args) = @_;
     my $li = IWL::Widget->new;

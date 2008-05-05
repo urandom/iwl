@@ -4,18 +4,6 @@
  * @extends IWL.Widget
  * */
 IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
-    var accumulator = function(a, n) { return a + parseFloat(n) };
-
-    function adjust() {
-        var children = [this.image1, this.control, this.image2].findAll(function(e) { return e != null });
-        var width = children.invoke('getWidth').inject(0, accumulator)
-            + (children.invoke('getStyle', 'marginLeft').inject(0, accumulator) || 0)
-            + (children.invoke('getStyle', 'marginRight').inject(0, accumulator) || 0);
-        this.setStyle({width: width + 1 + 'px'});
-        this.style.visibility = '';
-        this.emitSignal('iwl:load');
-    }
-
     function clearButtonCallback() {
         this.control.value = '';
         this.control.focus();
@@ -49,19 +37,13 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             onHide: receiverOnHide.bind(this)
         }, this.options.autoComplete[1]);
         var receiver = $(this.id + '_receiver');
-        if (!receiver)
-            receiver = this.appendChild(new Element('div', {
+        if (!receiver) {
+            receiver = new Element('div', {
                 id: this.id + '_receiver', className: $A(this.classNames()).first() + '_receiver'
-            }));
-        this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
-    }
-
-    function periodicalChecker(element, callback, pe) {
-        var dims = element.getDimensions();
-        if (dims.width && dims.height) {
-            pe.stop();
-            callback();
+            });
+            this.control.parentNode.appendChild(receiver);
         }
+        this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
     }
 
     function receiverOnShow(element, update) {
@@ -112,7 +94,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         },
         /**
          * @returns The current value of the entry 
-         * @type Number 
+         * @type String
          * */
         getValue: function() {
             return this.control.value === this.options.defaultText ? '' : this.control.value;
@@ -141,33 +123,9 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             }
             setupAutoComplete.call(this);
 
-            var images = [this.image1, this.image2].findAll(function(e) { return e != null });
-            if (this.control.getWidth() && this.control.getHeight()
-                    && (!images.length || images.invoke('getWidth').concat(images.invoke('getHeight')).all()))
-                adjust.call(this);
-            else {
-                var count = 0;
-                var callback = function() {
-                    if (--count == 0) adjust.call(this)
-                }.bind(this);
-                images.each(function(image) {
-                    if (image.getWidth() && image.getHeight()) return;
-                    count++;
-                    if (image.complete)
-                        new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1);
-                    else
-                        image.signalConnect('load', function() {
-                            new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1)
-                        }.bind(this));
-                }.bind(this));
-                if (!this.control.getWidth() || !this.control.getHeight()) {
-                    count++;
-                    new PeriodicalExecuter(periodicalChecker.bind(this, this.control, callback), 0.1);
-                }
-            }
-
             this.control.signalConnect('change', changeCallback.bind(this));
             changeCallback.call(this);
+            this.emitSignal('iwl:load');
         }
     }
 })());

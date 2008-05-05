@@ -62,7 +62,7 @@ sub new {
     # The list of pages
     $self->{__pages} = [];
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -240,9 +240,7 @@ sub _setupDefaultClass {
     $self->SUPER::prependClass($self->{_defaultClass});
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     $self->{_defaultClass} = 'accordion';
@@ -263,6 +261,8 @@ sub __init {
     return $self;
 }
 
+# Internal
+#
 sub __setup_page {
     my ($self, $object, $text, $selected, $reverse) = @_;
     my $page = IWL::Accordion::Page->new;

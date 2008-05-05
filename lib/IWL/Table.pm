@@ -48,7 +48,7 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new;
 
     $self->{_tag} = "table";
     if ($args{spacing}) {
@@ -62,7 +62,7 @@ sub new {
         $self->setAttribute(cellpadding => 0);
     }
     delete @args{qw(spacing padding)};
-    $self->IWL::Table::__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -381,9 +381,7 @@ sub _setupDefaultClass {
     $self->{_body}->prependClass($self->{_defaultClass} . '_body');
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     $self->{_defaultClass} = 'table';

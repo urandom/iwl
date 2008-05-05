@@ -8,6 +8,8 @@ use strict;
 use base 'IWL::Input';
 
 use IWL::Image;
+use IWL::Table::Container;
+use IWL::Table::Row;
 use IWL::Container;
 use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
@@ -76,9 +78,9 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->{_tag}   = 'div';
-    $self->{_noChildren}   = 0;
-    $self->__init(%args);
+    $self->{_tag}   = 'table';
+    $self->{_noChildren} = 0;
+    $self->_init(%args);
     return $self;
 }
 
@@ -261,17 +263,9 @@ sub setIcon {
     my ($self, $src, $alt, $position, $clickable) = @_;
 
     if (!$position || $position eq 'left') {
-        $self->{image1}{_ignore} = 0;
-        $self->{image1}->set($src);
-        $self->{image1}->setAlt($alt);
-	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image1};
+        return $self->__setIcon($self->{image1}, $src, $alt, $clickable);
     } elsif ($position eq 'right') {
-        $self->{image2}{_ignore} = 0;
-        $self->{image2}->set($src);
-        $self->{image2}->setAlt($alt);
-	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image2};
+        return $self->__setIcon($self->{image2}, $src, $alt, $clickable);
     }
 }
 
@@ -288,16 +282,10 @@ Returns the set image
 sub setIconFromStock {
     my ($self, $stock_id, $position, $clickable) = @_;
 
-    if ($position && $position eq 'right') {
-        $self->{image2}->setFromStock($stock_id) or return;
-        $self->{image2}{_ignore} = 0;
-	$self->{image2}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image2};
-    } elsif (!$position || $position eq 'left') {
-        $self->{image1}->setFromStock($stock_id) or return;
-        $self->{image1}{_ignore} = 0;
-	$self->{image1}->setStyle(cursor => 'pointer') if $clickable;
-	return $self->{image1};
+    if (!$position || $position eq 'left') {
+        return $self->__setIcon($self->{image1}, $stock_id, undef, $clickable);
+    } elsif ($position eq 'right') {
+        return $self->__setIcon($self->{image2}, $stock_id, undef, $clickable);
     }
 }
 
@@ -311,7 +299,6 @@ sub addClearButton {
     my $self = shift;
 
     $self->setIconFromStock(IWL_STOCK_CLEAR => 'right', 1);
-    $self->{image2}->setAttribute(id => $self->getId . '_right');
     $self->{_options}{clearButton} = 1;
     return $self;
 }
@@ -345,10 +332,6 @@ sub setAutoComplete {
     return unless $url;
 
     $self->{_options}{autoComplete} = [$url, \%options];
-    unless ($self->{__completionAdded}) {
-	$self->appendChild($self->{__receiver});
-	$self->{__completionAdded} = 1;
-    }
     return $self;
 }
 
@@ -386,7 +369,6 @@ sub setId {
     $self->setAttribute(id              => $id);
     $self->{image1}->setAttribute(id    => $id . '_left');
     $self->{image2}->setAttribute(id    => $id . '_right');
-    $self->{__receiver}->setAttribute(id => $id . '_receiver');
     if ($control_id) {
         $self->{text}->setAttribute(id => $control_id);
     } else {
@@ -397,7 +379,7 @@ sub setId {
 sub setAttribute {
     my ($self, $attr, $value) = @_;
 
-    if ($attr eq 'id' || $attr eq 'class') {
+    if (grep {$attr eq $_} qw(id class cellspacing cellpadding)) {
         $self->SUPER::setAttribute($attr, $value);
     } else {
         $self->{text}->setAttribute($attr, $value);
@@ -408,7 +390,7 @@ sub setAttribute {
 sub getAttribute {
     my ($self, $attr) = @_;
 
-    if ($attr eq 'id' || $attr eq 'class') {
+    if (grep {$attr eq $_} qw(id class cellspacing cellpadding)) {
         return $self->SUPER::getAttribute($attr);
     } else {
         return $self->{text}->getAttribute($attr);
@@ -429,7 +411,6 @@ sub _realize {
     my $id     = $self->getId;
 
     $self->SUPER::_realize;
-    $self->setStyle(visibility => 'hidden');
 
     my $options = toJSON($self->{_options});
     $self->_appendInitScript("IWL.Entry.create('$id', $options);");
@@ -443,32 +424,33 @@ sub _setupDefaultClass {
     $self->prependClass($self->{_defaultClass});
     $self->{image1}->prependClass($self->{_defaultClass} . '_left');
     $self->{image2}->prependClass($self->{_defaultClass} . '_right');
-    $self->{__receiver}->prependClass($self->{_defaultClass} . '_receiver');
     if ($self->{_options}{defaultText}) {
 	$self->{text}->prependClass($self->{_defaultClass} . '_text_default');
     }
     $self->{text}->prependClass($self->{_defaultClass} . '_text');
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $entry         = IWL::Input->new;
     my $image1        = IWL::Image->new;
     my $image2        = IWL::Image->new;
-    my $receiver      = IWL::Container->new;
+    my $body          = IWL::Table::Container->new;
+    my $row           = IWL::Table::Row->new;
 
     $self->{image1}        = $image1;
     $self->{image2}        = $image2;
     $self->{text}          = $entry;
-    $self->{__receiver}    = $receiver;
+    $self->{_row}          = $row;
     $self->{_defaultClass} = 'entry';
 
-    $self->appendChild($image1);
-    $self->appendChild($entry);
-    $self->appendChild($image2);
+    $self->appendChild($body);
+    $body->appendChild($row);
+    $row->appendCell($image1);
+    $row->appendCell($entry);
+    $row->appendCell($image2);
 
+    $self->setAttributes(cellpadding => 0, cellspacing => 0);
     $entry->setAttribute(type => 'text');
 
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
@@ -489,6 +471,19 @@ sub __init {
     $self->requiredJs('base.js', 'entry.js');
 
     return $self;
+}
+
+# Internal
+#
+sub __setIcon {
+    my ($self, $icon, $src, $alt, $clickable) = @_;
+
+    $icon->{_ignore} = 0;
+    $icon->setAlt($alt) if $alt;
+    $icon->setStyle(cursor => 'pointer') if $clickable;
+    return $src =~ /^[A-Z]+_STOCK/
+        ? $icon->setFromStock($src)
+        : $icon->set($src);
 }
 
 1;

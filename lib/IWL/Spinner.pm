@@ -308,47 +308,6 @@ sub getMask {
 
 # Overrides
 #
-
-=item B<setId> (B<ID>, [B<CONTROL_ID>])
-
-Sets the id of the entry and all of it's parts. Can optionally set the id of the control.
-
-Parameters: B<ID> - the id of the entry, B<CONTROL_ID> - the id of the text control, optional
-
-=cut
-
-sub setId {
-    my ($self, $id, $control_id) = @_;
-
-    $self->setAttribute(id => $id);
-    $self->{image1}->setId($id . '_left');
-    $self->{image2}->setId($id . '_right');
-    if ($control_id) {
-        $self->{text}->setId($control_id);
-    } else {
-        $self->{text}->setId($id . '_text');
-    }
-}
-
-sub setAttribute {
-    my ($self, $attr, $value) = @_;
-
-    if ($attr eq 'id' || $attr eq 'class') {
-        $self->SUPER::setAttribute($attr, $value);
-        return $self;
-    } else {
-        $self->{text}->setAttribute($attr, $value);
-	return $self;
-    }
-}
-
-sub signalConnect {
-    my ($self, $signal, $callback) = @_;
-
-    $self->{text}->signalConnect($signal => $callback);
-    return $self;
-}
-
 sub addClearButton {}
 sub setPassword {}
 sub isPassword {}
@@ -380,53 +339,35 @@ sub _realize {
     $self->_appendInitScript("IWL.Spinner.create('$id', $options);");
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
-    my $entry  = IWL::Input->new;
-    my $image1 = IWL::Image->newFromStock('IWL_STOCK_GO_BACK');
-    my $image2 = IWL::Image->newFromStock('IWL_STOCK_GO_FORWARD');
+    my %options = (value => 0, from => 0, to => 100,
+        stepIncrement => 1.0, pageIncrement => 10.0,
+        acceleration => 0.2, snap => 0, wrap => 0);
 
-    $self->{image1} = $image1;
-    $self->{image2} = $image2;
-    $self->{text} = $entry;
+    $options{to}            = $args{to}            if exists $args{to};
+    $options{from}          = $args{from}          if exists $args{from};
+    $options{value}         = $args{value}         if defined $args{value};
+    $options{stepIncrement} = $args{stepIncrement} if defined $args{stepIncrement};
+    $options{pageIncrement} = $args{pageIncrement} if defined $args{pageIncrement};
+    $options{acceleration}  = $args{acceleration}  if defined $args{acceleration};
+    $options{precision}     = $args{precision}     if defined $args{precision};
+    $options{mask}          = $args{mask}          if defined $args{mask};
+
+    $options{snap} = 1 if $args{snap};
+    $options{wrap} = 1 if $args{wrap};
+
+
+    delete @args{qw(value to from
+          stepIncrement pageIncrement acceleration precision mask snap wrap)};
+
+    $self->SUPER::_init(%args);
+    $self->setIconFromStock('IWL_STOCK_GO_BACK');
+    $self->setIconFromStock('IWL_STOCK_GO_FORWARD', 'right');
     $self->{_defaultClass} = 'spinner';
 
-    $self->appendChild($image1);
-    $self->appendChild($entry);
-    $self->appendChild($image2);
-
-    $entry->setAttribute(type => 'text');
-
-    $args{id} = randomize($self->{_defaultClass}) if !$args{id};
-    $self->setClass($args{class}) if $args{class};
-    $self->setId($args{id}) if $args{id};
-
-    $self->{_options} = {value => 0, from => 0, to => 100,
-        stepIncrement => 1.0, pageIncrement => 10.0,
-        acceleration => 0.2, snap => 0, wrap => 0};
-
-    $self->{_options}{to}            = $args{to}            if exists $args{to};
-    $self->{_options}{from}          = $args{from}          if exists $args{from};
-    $self->{_options}{value}         = $args{value}         if defined $args{value};
-    $self->{_options}{stepIncrement} = $args{stepIncrement} if defined $args{stepIncrement};
-    $self->{_options}{pageIncrement} = $args{pageIncrement} if defined $args{pageIncrement};
-    $self->{_options}{acceleration}  = $args{acceleration}  if defined $args{acceleration};
-    $self->{_options}{precision}     = $args{precision}     if defined $args{precision};
-    $self->{_options}{mask}          = $args{mask}          if defined $args{mask};
-
-    $self->{_options}{snap} = 1 if $args{snap};
-    $self->{_options}{wrap} = 1 if $args{wrap};
-
-
-    $entry->setAttribute(readonly => 1) if $args{readonly};
-    $entry->setAttribute(maxlength => $args{maxlength}) if $args{maxlength};
-
-    delete @args{qw(readonly maxlength password id class value to from
-          stepIncrement pageIncrement acceleration precision mask snap wrap)};
-    $self->requiredJs('base.js', 'entry.js', 'spinner.js');
-    $entry->_constructorArguments(%args);
+    $self->requiredJs('spinner.js');
+    $self->{_options} = \%options;
 
     return $self;
 }

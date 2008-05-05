@@ -222,8 +222,6 @@ button.button, input.inputbutton {
 .entry, .spinner {
     border: 1px solid #7F9DB9;
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
-    font-size: 16px;
-    height: 16px;
     margin: 1px 0;
 }
 
@@ -246,12 +244,10 @@ input.entry_text_default {
     vertical-align: middle;
 }
 .entry_left, .spinner_left {
-    padding-left: 3px; /* do NOT use margin*/
-    padding-right: 1px;
+    padding: 1px 2px 1px 1px;
 }
 .entry_right, .spinner_right {
-    padding-left: 1px;
-    padding-right: 2px; /* do NOT use margin*/
+    padding: 1px 1px 1px 2px;
 }
 
 div.entry_receiver {
@@ -961,6 +957,7 @@ div.navbar {
    padding-top: 3px;
    padding-bottom: 3px;
    background-color:#efefef;
+   color: black;
 }
 span.navbar_crumb_con {
 }
@@ -968,6 +965,7 @@ select.navbar_combo {
     color: inherit;
     background: inherit;
     border: 1px inset;
+    margin-left: 1px;
 }
 select.navbar_combo option {
     background: white;
@@ -975,8 +973,11 @@ select.navbar_combo option {
 }
 span.navbar_crumb {
     cursor: pointer;
+    margin: 0 1px;
 }
 span.navbar_delim {
+    color: #555;
+    font-weight: bold;
 }
 
 /* Druid */
@@ -1323,6 +1324,7 @@ div.tooltip_content {
 }
 .pagecontrol_page_entry {
     float: left;
+    margin-right: 3px;
 }
 
 /* Accordions */

@@ -23,10 +23,15 @@ my $entry = IWL::Entry->new;
 	is($entry->getMaxLength, 10);
 	is($entry->getSize, 3);
 
-	like($entry->getContent, qr(^<div (?:(?:class="entry password"|style="visibility: hidden"|id="(entry_\d+)")\s*){3}><input (?:(?:maxlength="10"|value="Some text"| size="3"|readonly="true"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){7}/>
+	like($entry->getContent, qr(^<table (?:(?:class="entry password"|cellspacing="0"|cellpadding="0"|id="(entry_\d+)")\s*){4}><tbody><tr [^>]+><td></td>
+<td><input (?:(?:maxlength="10"|value="Some text"| size="3"|readonly="true"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){7}/>
+</td>
+<td></td>
+</tr>
+</tbody>
 .*entry.js.*
 <script.*IWL.Entry.create.*\1.*</script>
-</div>
+</table>
 )s);
 }
 
@@ -57,8 +62,17 @@ my $entry = IWL::Entry->new;
 			}
 	});
 	is($entry->addClearButton, $entry);
-	my $clear = __("Clear");
-	like($entry->{image2}->getContent, qr(<img (?:(?:alt="$clear"|src="/my/skin/darkness/tiny/clear.gif"|class="image"|class="entry_right"|id="entry_\d+_right"|style="cursor: pointer")\s*){5}/>\n)s);
+    $entry->setId('clear_entry');
+    is_deeply($entry->{image2}->getObject, {
+        tag => 'img',
+        attributes => {
+            alt => __('Clear'),
+            src => '/my/skin/darkness/tiny/clear.gif',
+            style => { cursor => 'pointer' },
+            id => 'clear_entry_right',
+            class => 'image'
+        }
+    });
     $entry->getContent;
     ok($entry->{image1}->hasClass('entry_left'));
     ok($entry->{image2}->hasClass('entry_right'));
@@ -68,8 +82,14 @@ my $entry = IWL::Entry->new;
 	my $entry = IWL::Entry->new(id => 'foo');
 
 	$entry->setAutoComplete('iwl_demo.pl');
-	like($entry->getContent, qr(^<div (?:(?:class="entry"|style="visibility: hidden"|id="foo")\s*){3}><input (?:(?:class="entry_text"|id="foo_text"|type="text")\s*){3}/>\n<div (?:(?:class="entry_receiver"|id="foo_receiver")\s*){2}></div>
+	like($entry->getContent, qr(^<table (?:(?:class="entry"|cellspacing="0"|cellpadding="0"|id="foo")\s*){4}><tbody><tr [^>]+><td></td>
+<td><input (?:(?:class="entry_text"|id="foo_text"|type="text")\s*){3}/>
+</td>
+<td></td>
+</tr>
+</tbody>
 .*entry.js.*
-<script .*IWL.Entry.create.*foo.*</script>
-</div>\n$)s);
+<script .*IWL.Entry.create.*foo.*"autoComplete": \["iwl_demo.pl", {}\].*</script>
+</table>
+$)s);
 }

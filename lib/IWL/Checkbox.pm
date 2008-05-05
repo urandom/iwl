@@ -48,7 +48,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -195,10 +195,8 @@ sub _setupDefaultClass {
     return $self->{_label}->prependClass($self->{_defaultClass} . '_label');
 }
 
-# Internal
-#
 # FIXME create an IWL::InputLabel, so that the necessary signals are inherited from IWL::Input
-sub __init {
+sub _init {
     my ($self, %args) = @_;
     my $label = IWL::Label->new(expand => 0);
 

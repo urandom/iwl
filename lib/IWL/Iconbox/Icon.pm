@@ -71,7 +71,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -197,9 +197,9 @@ sub signalConnect {
     return $self;
 }
 
-# Internal
+# Protected
 #
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     $self->{image}          = IWL::Image->new;

@@ -54,7 +54,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->__init(%args);
+    $self->_init(%args);
 
     return $self;
 }
@@ -179,9 +179,7 @@ sub _realize {
     $self->_appendInitScript("IWL.Tooltip.create('$id', $options);");
 }
 
-# Internal
-#
-sub __init {
+sub _init {
     my ($self, %args) = @_;
 
     $self->{_options} = {style => {}};

@@ -57,6 +57,10 @@ If true, the screen will be fully covered (default: I<false>)
 
 The opacity of the covering element (default: I<0.8>)
 
+=item B<collectData>
+
+If true, all names (or ids) and values of control descendants (such as L<IWL::Entry>s or L<IWL::Slider>s) of the object will be extracted, and passed back to the event handler.
+
 =back
 
 =item B<update>
