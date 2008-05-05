@@ -78,7 +78,6 @@ sub new {
     # Required javascript files
     $self->{_required} = {};
     $self->{_shared} = {};
-    $self->{_requiredJs} = [];
 
     # True if the object is realized
     $self->{_realized} = 0;

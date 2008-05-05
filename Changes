@@ -1,3 +1,23 @@
+Release: 0.60 - 
+      . A logo and a move to github
+      . Proper documentation of the event system
+        * Generic events, derived from signals, will receive the serialized Event object.
+      . Rewrite of the NavBar (API Break!)
+      . The entry is internally represented as a table
+      . Combo can have empty options
+      . New selection API for IWL::Objects
+      . Rewrite of the shared resource management
+        * No more global hash for storing shared resources
+        * Addition of a 'requiredCSS' method
+        * New IWL::SnippetManager pseudo-root object, for use with html snippets
+        * Javascript files are placed at the last possible moment
+        * CSS files are placed as early as possible
+        * 'iwl:independant' attribute for scripts, if they don't require any shared resources
+        * Multiple shared resources are obtained in one request, if a 'STATIC_URI_SCRIPT' is in use
+      . Javascript:
+        * document.insertScript is now part of 'base.js', requires IWL
+      . Various internal changes
+
 Release: 0.52 - 22/11/07
       . External dependency to JSON removed. IWL::JSON has been included, and
           is a perl implementation of prototype's JSON parsing.
