@@ -8,6 +8,7 @@ if (!IWL.Google)
 
 IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
   function createPoint(latitude, longitude) {
+    if (latitude instanceof google.maps.LatLng) return latitude;
     if (isNaN(latitude)) latitude = this.getLatitude();
     if (isNaN(longitude)) longitude = this.getLongitude();
     return new google.maps.LatLng(latitude, longitude);
@@ -108,17 +109,18 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     /*
      * Creates and returns a new marker on the map
-     * @param {Function} clickCallback An optional click callback for the marker
+     * @param content An optional content that will appear in an information window, if the marker is clicked
      * @param {Float} latitude The latitude of the map marker. The current latitude will be used, if none is supplied.
      * @param {Float} longitude The longitude of the map marker. The current longitude will be used, if none is supplied.
      * @returns The creater marker
      * */
-    addMarker: function(clickCallback, latitude, longitude) {
-      var marker = new google.maps.Marker(createPoint.call(this, latitude, longitude));
+    addMarker: function(content, latitude, longitude) {
+      var point = createPoint.call(this, latitude, longitude);
+      var marker = new google.maps.Marker(point);
       this.control.addOverlay(marker);
 
-      if (Object.isFunction(clickCallback))
-        GEvent.addListener(marker, "click", clickCallback);
+      if (Object.isElement(content) || Object.isString(content))
+        GEvent.addListener(marker, "click", this.openInfoWindow.bind(this, content, point));
       return marker;
     },
 
