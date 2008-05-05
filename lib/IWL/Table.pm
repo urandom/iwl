@@ -51,17 +51,6 @@ sub new {
     my $self = $class->SUPER::new;
 
     $self->{_tag} = "table";
-    if ($args{spacing}) {
-        $self->setAttribute(cellspacing => $args{spacing});
-    } else {
-        $self->setAttribute(cellspacing => 0);
-    }
-    if ($args{padding}) {
-        $self->setAttribute(cellpadding => $args{padding});
-    } else {
-        $self->setAttribute(cellpadding => 0);
-    }
-    delete @args{qw(spacing padding)};
     $self->_init(%args);
 
     return $self;
@@ -383,14 +372,25 @@ sub _setupDefaultClass {
 
 sub _init {
     my ($self, %args) = @_;
-
-    $self->{_defaultClass} = 'table';
-    $args{id} = randomize($self->{_defaultClass}) if !$args{id};
-
     my $header = IWL::Table::Container->new(type  => 'header');
     my $footer = IWL::Table::Container->new(type  => 'footer');
     my $body = IWL::Table::Container->new;
     my $caption = IWL::Container->new;
+
+    if ($args{spacing}) {
+        $self->setAttribute(cellspacing => $args{spacing});
+    } else {
+        $self->setAttribute(cellspacing => 0);
+    }
+    if ($args{padding}) {
+        $self->setAttribute(cellpadding => $args{padding});
+    } else {
+        $self->setAttribute(cellpadding => 0);
+    }
+    delete @args{qw(spacing padding)};
+
+    $self->{_defaultClass} = 'table';
+    $args{id} = randomize($self->{_defaultClass}) if !$args{id};
 
     $caption->{_removeEmpty} = 1;
     $caption->{_tag} = 'caption';

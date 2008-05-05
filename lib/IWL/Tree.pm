@@ -95,41 +95,7 @@ Emitted when the tree has to be refreshed. This event is used by L<IWL::PageCont
 sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
-    my $options = {multipleSelect => 0, scrollToSelection => 0, list => 0, alternate => 0};
-    my $default_class;
-    my $id;
-
-    $default_class = 'tree';
-
-    $id = randomize($default_class) if !$args{id};
-
-    $options->{list} = 1 if $args{list};
-    $options->{multipleSelect} = 1 if $args{multipleSelect};
-    $options->{scrollToSelection} = 1 if $args{scrollToSelection};
-    $options->{alternate} = 1 if $args{alternate};
-    $options->{animate} = 1 if $args{animate};
-    delete @args{qw(list multipleSelect scrollToSelection alternate)};
-
     my $self = $class->SUPER::new(%args);
-    $self->{_defaultClass} = $default_class;
-    $self->setId($id) if $id;
-    $self->requiredJs('base.js', 'tree.js');
-
-    # All the rows from the body of the tree
-    $self->{_bodyRows} = {};
-
-    # Holds the custom sortable callbacks for the tree/list
-    $self->{__sortables} = [];
-
-    $self->{_options} = $options;
-    $self->{_customSignals} = {
-        select_all   => [],
-        unselect_all => [],
-        row_activate => [],
-        row_collapse => [],
-        row_expand   => []
-    };
-    $self->setSelectable(0);
 
     return $self;
 }
@@ -342,6 +308,43 @@ sub _refreshEvent {
            . '], extras: ' . (toJSON($extras) || 'null'). '}',
         header => IWL::Object::getJSONHeader,
     );
+}
+
+sub _init {
+    my ($self, %args) = @_;
+    my $options = {multipleSelect => 0, scrollToSelection => 0, list => 0, alternate => 0};
+    my $default_class;
+
+    $default_class = 'tree';
+
+    $args{id} = randomize($default_class) if !$args{id};
+
+    $options->{list} = 1 if $args{list};
+    $options->{multipleSelect} = 1 if $args{multipleSelect};
+    $options->{scrollToSelection} = 1 if $args{scrollToSelection};
+    $options->{alternate} = 1 if $args{alternate};
+    $options->{animate} = 1 if $args{animate};
+    delete @args{qw(list multipleSelect scrollToSelection alternate)};
+
+    $self->SUPER::_init(%args);
+    $self->{_defaultClass} = $default_class;
+    $self->requiredJs('base.js', 'tree.js');
+
+    # All the rows from the body of the tree
+    $self->{_bodyRows} = {};
+
+    # Holds the custom sortable callbacks for the tree/list
+    $self->{__sortables} = [];
+
+    $self->{_options} = $options;
+    $self->{_customSignals} = {
+        select_all   => [],
+        unselect_all => [],
+        row_activate => [],
+        row_collapse => [],
+        row_expand   => []
+    };
+    $self->setSelectable(0);
 }
 
 # Internal
