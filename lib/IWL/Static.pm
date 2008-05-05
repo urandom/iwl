@@ -224,7 +224,7 @@ sub addMultipleRequest {
     my $request = $script . '?IWLStaticURI=';
     my $type    = '&type=' . $mime;
     my @uris;
-    return shift @$uris unless $self->__getETag($_);
+    return shift @$uris unless $self->__getETag($uris->[0]);
 
     map {
         (!$self->__getETag($_) || length $request . (join ',', @uris, $_) . $type > 2048)

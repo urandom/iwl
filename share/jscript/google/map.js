@@ -7,10 +7,22 @@ if (!IWL.Google)
   IWL.Google = {};
 
 IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
+  function createPoint(latitude, longitude) {
+    if (isNaN(latitude)) latitude = this.getLatitude();
+    if (isNaN(longitude)) longitude = this.getLongitude();
+    return new google.maps.LatLng(latitude, longitude);
+  }
+
   function initialize() {
     this.control = new google.maps.Map2(this);
     this.setCenter(this.options.latitude, this.options.longitude, this.options.zoom);
     this.setMapType(this.options.mapType);
+
+    this.control[(this.options.dragging ? 'enable' : 'disable') + 'Dragging']();
+    this.control[(this.options.infoWindow ? 'enable' : 'disable') + 'InfoWindow']();
+    this.control[(this.options.doubleClickZoom ? 'enable' : 'disable') + 'DoubleClickZoom']();
+    this.control[(this.options.scrollWheelZoom ? 'enable' : 'disable') + 'ScrollWheelZoom']();
+    this.control[(this.options.googleBar ? 'enable' : 'disable') + 'GoogleBar']();
 
     if (this.options.scaleView != 'none')
       this.control.addControl(new GScaleControl());
@@ -39,6 +51,7 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
     Event.observe(document.body, 'unload', google.maps.Unload);
     this.emitSignal('iwl:load');
   }
+
   return {
     /*
      * Sets the center of the map
@@ -48,12 +61,7 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
      * @returns The object
      * */
     setCenter: function(latitude, longitude, zoom) {
-      this.control.setCenter(new google.maps.LatLng(latitude, longitude), zoom);
-      this.control[(this.options.dragging ? 'enable' : 'disable') + 'Dragging']();
-      this.control[(this.options.infoWindow ? 'enable' : 'disable') + 'InfoWindow']();
-      this.control[(this.options.doubleClickZoom ? 'enable' : 'disable') + 'DoubleClickZoom']();
-      this.control[(this.options.scrollWheelZoom ? 'enable' : 'disable') + 'ScrollWheelZoom']();
-      this.control[(this.options.googleBar ? 'enable' : 'disable') + 'GoogleBar']();
+      this.control.setCenter(createPoint.call(this, latitude, longitude), zoom);
       return this;
     },
     
@@ -95,6 +103,58 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
         physical:  G_PHYSICAL_MAP
       };
       this.control.setMapType(types[type] || G_NORMAL_MAP);
+      return this;
+    },
+
+    /*
+     * Creates and returns a new marker on the map
+     * @param {Function} clickCallback An optional click callback for the marker
+     * @param {Float} latitude The latitude of the map marker. The current latitude will be used, if none is supplied.
+     * @param {Float} longitude The longitude of the map marker. The current longitude will be used, if none is supplied.
+     * @returns The creater marker
+     * */
+    addMarker: function(clickCallback, latitude, longitude) {
+      var marker = new google.maps.Marker(createPoint.call(this, latitude, longitude));
+      this.control.addOverlay(marker);
+
+      if (Object.isFunction(clickCallback))
+        GEvent.addListener(marker, "click", clickCallback);
+      return marker;
+    },
+
+    /*
+     * Removes a given marker
+     * @param {Marker} marker The marker to remove from the map
+     * @returns The removed marker
+     * */
+    removeMarker: function(marker) {
+      this.control.removeOverlay(marker);
+      return marker;
+    },
+
+    /*
+     * Opens an information window on the map
+     * @param content The window contents. Can be either a DOM element or an (html) string
+     * @param {Float} latitude The latitude of the window. The current latitude will be used, if none is supplied.
+     * @param {Float} longitude The longitude of the window. The current longitude will be used, if none is supplied.
+     * @returns The object
+     * */
+    openInfoWindow: function(content, latitude, longitude) {
+      if (Object.isElement(content))
+        this.control.openInfoWindow(createPoint.call(this, latitude, longitude), content);
+      else if (Object.isString(content))
+        this.control.openInfoWindowHtml(createPoint.call(this, latitude, longitude), content);
+      else return;
+
+      return this;
+    },
+
+    /*
+     * Closes the currently open information window
+     * @returns The object
+     * */
+    closeInfoWindow: function() {
+      this.control.closeInfoWindow();
       return this;
     },
 
