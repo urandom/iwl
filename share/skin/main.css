@@ -956,8 +956,6 @@ div.hbox_end {
 div.navbar {
    padding-top: 3px;
    padding-bottom: 3px;
-   background-color:#efefef;
-   color: black;
 }
 span.navbar_crumb_con {
 }
@@ -1550,4 +1548,10 @@ div.tooltip_content {
     margin: -16px 4px 0 0;
     text-align: center;
     color: #000 !important;
+}
+
+/* Google Map */
+.google_map {
+    width: 500px;
+    height: 400px;
 }

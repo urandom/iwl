@@ -39,7 +39,7 @@ lib/IWL/Expander.pm
 lib/IWL/File.pm
 lib/IWL/Form.pm
 lib/IWL/Frame.pm
-lib/IWL/GoogleMap.pm
+lib/IWL/Google/Map.pm
 lib/IWL/HBox.pm
 lib/IWL/Hidden.pm
 lib/IWL/Iconbox.pm
@@ -239,7 +239,7 @@ share/jscript/dist/sound.js
 share/jscript/dist/unittest.js
 share/jscript/druid.js
 share/jscript/entry.js
-share/jscript/gmap.js
+share/jscript/google/map.js
 share/jscript/iconbox.js
 share/jscript/menu.js
 share/jscript/model.js
@@ -310,6 +310,7 @@ t/40entry.t
 t/40expander.t
 t/40file.t
 t/40frame.t
+t/40google_map.t
 t/40hbox.t
 t/40hidden.t
 t/40iconbox_icon.t
