@@ -302,7 +302,7 @@ sub _realize {
     $self->SUPER::_realize;
 
     $self->_appendInitScript("IWL.Google.Map.create('$id', $options)");
-    my @init = '';
+    my @init = ();
     foreach my $signal (keys %$signals) {
         my $expr = join '; ', @{$signals->{$signal}};
         push @init, "GEvent.addListener(map.control, '$signal', function() { $expr });"

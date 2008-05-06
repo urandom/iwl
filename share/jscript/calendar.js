@@ -405,7 +405,9 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
     function updateElement(element, format, date) {
         if (!(date instanceof Date))
             date = this.getDate();
-        if ("value" in element) {
+        if (Object.isFunction(element.setValue)) {
+            element.setValue(date.sprintf(format));
+        } else if ("value" in element) {
             element.value = date.sprintf(format);
             if (typeof element.onchange == 'function')
                 element.onchange.call(element);
