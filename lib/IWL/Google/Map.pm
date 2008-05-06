@@ -28,6 +28,58 @@ The Google Map widget provides an easy way of creating maps, provided by Google.
 
 IWL::Google::Map->new ([B<%ARGS>])
 
+Where B<%ARGS> is an optional hash parameter with with key-value options:
+
+=over 8
+
+=item B<key> => B<STRING>
+
+The key argument is required, unless the B<GOOGLE_MAPS_KEY> configuration option has been set. If no key is provided, the map will set a fatal error on itself. A key can be obtained here:
+
+L<http://www.google.com/apis/maps/signup.html>
+
+=item B<latitude>
+
+See L<IWL::Google::Map::setLatitude()>
+
+=item B<longitude>
+
+See L<IWL::Google::Map::setLongitude()>
+
+=item B<zoom>
+
+See L<IWL::Google::Map::setZoom()>
+
+=item B<mapType>
+
+See L<IWL::Google::Map::setMapType()>
+
+=item B<dragging>
+
+If true, enables dragging the map. Defaults to I<1>
+
+=item B<infoWindow>
+
+If true, enables info window operations. Defaults to I<1>
+
+=item B<doubleClickZoom>
+
+If true, enables zooming by double-clicking. Defaults to I<1>
+
+=item B<scrollWheelZoom>
+
+If true, enables zooming by the mouse scroll-wheel. Defaults to I<1>
+
+=item B<googleBar>
+
+If true, replaces the Google logo in the lower left corner of the map with a Google bar. Defaults to I<''>
+
+=item B<language>
+
+Sets the language of the map tooltips. If not set, the language is set based on the B<LANG> or B<LANGUAGE> environment variables.
+
+=back
+
 =cut
 
 sub new {
@@ -126,7 +178,7 @@ sub setZoom {
     my ($self, $zoom) = @_;
 
     $zoom = 0 + $zoom;
-    $zoom = 1 if $zoom < 0;
+    $zoom = 0 if $zoom < 0;
 
     $self->{_options}{zoom} = $zoom;
     return $self;
@@ -163,6 +215,7 @@ Physical map
 sub setMapType {
     my ($self, $type) = @_;
 
+    $type = 'normal' unless grep { $_ eq $type } qw(normal satellite hybrid physical);
     $self->{_options}{mapType} = $type;
 
     return $self;
@@ -340,12 +393,13 @@ sub _init {
     $self->{_options}{googleBar}       = !(!$args{googleBar})       if defined $args{googleBar};
     $self->{_options}{language}        = $args{language} || $ENV{LANG} || $ENV{LANGUAGE};
 
+    $self->{_options}{language} =~ s/_.*$//;
     return $self->_pushFatalError(__x(
             "No API key provided. One can be obtained from {URL}",
             URL => "http://www.google.com/apis/maps/signup.html"
         )) unless $self->{__key};
 
-    delete @args{qw(key longitude latitude zoom mapType dragging infoWindow doubleClickZoom scrollWheelZoom googleBar)};
+    delete @args{qw(key longitude latitude zoom mapType dragging infoWindow doubleClickZoom scrollWheelZoom googleBar language)};
     $self->{_defaultClass} = 'google_map';
     $args{id} ||= randomize($self->{_defaultClass});
     $self->_constructorArguments(%args);

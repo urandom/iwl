@@ -308,6 +308,7 @@ t/40entry.t
 t/40expander.t
 t/40file.t
 t/40frame.t
+t/40google_map.t
 t/40hbox.t
 t/40hidden.t
 t/40iconbox_icon.t
