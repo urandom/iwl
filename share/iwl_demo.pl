@@ -930,13 +930,14 @@ sub generate_file {
 sub generate_gmap {
     my $container = IWL::Container->new(id => 'gmap_container');
     my $map = IWL::Google::Map->new(id => 'gmap', latitude => 42.60244915107272, longitude => 23.24128746986389, zoom => 9);
-    my $entry = IWL::Entry->new(id => 'updatee', readonly => 1)->setSize(74);
+    my $entry = IWL::Entry->new(id => 'updatee', readonly => 1);
 
     $map->setScaleView('ruler')->setMapTypeControl('menu')->setMapControl('small')->setOverview('mini');
     $map->setMapType('physical')->setWidth('490px')->addMarker(IWL::Label->new->appendTextType('Hello World!', 'strong'));
     $map->signalConnect('movestart', "IWL.Status.display('Move from ' + this.getCenter().toString())");
     $map->updateOnSignal('moveend', $entry, "Move to %c with zoom level: %z");
     $map->addMarker('Still here', 42, 23);
+    $entry->{text}->setStyle(width => '488px');
     $container->appendChild($map, $entry);
 
     return $container;
