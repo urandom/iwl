@@ -4,7 +4,19 @@ package IWL::TreeModel;
 
 use strict;
 
+use base 'IWL::Object';
+
 use IWL::JSON qw(evalJSON toJSON);
+
+sub new {
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $self = $class->SUPER::new;
+    
+    $self->_init(@_);
+
+    return $self;
+}
 
 =head1
 
@@ -35,7 +47,7 @@ Data:
 
 
 sub dataReader {
-    my (%options) = @_;
+    my ($self, %options) = (@_ % 2 ? (shift @_, @_) : (undef, @_));
     my ($content, $data, $modifiers) = ('', undef, {});
 
     if ($options{file}) {
@@ -124,7 +136,37 @@ sub dataReader {
     $modifiers->{$_} = $options{$_} foreach
         grep {defined $options{$_}} qw(totalCount size offset index parentNode);
 
-    return {%$modifiers, nodes => $data};
+    my $ret = {%$modifiers, nodes => $data};
+    if ($self) {
+        $self->{__data} = $ret;
+        return $self;
+    } else {
+        return $ret
+    }
+}
+
+# Overrides
+#
+sub getContent {
+    shift->SUPER::getContent;
+
+    return '';
+}
+
+# Protected
+#
+sub _realize {
+    my $self = shift;
+
+    my ($even, @script) = (1);
+    push @script, 'window.' . $self->{__name} . ' = new IWL.TreeModel(';
+    push @script, join ', ', map {($even = !$even) ? "'$_'" : $_} @{$self->{__columns}};
+    push @script, ');';
+
+    push @script, $self->{__name} . '.loadData(' . toJSON($self->{__data}) . ');'
+        if $self->{__data};
+
+    $self->_appendInitScript(join "\n", @script);
 }
 
 sub _sortColumnEvent {
@@ -149,6 +191,15 @@ sub _sortColumnEvent {
     );
 }
 
+sub _init {
+    my ($self, $name, $columns, %args) = @_;
+
+    $self->{__name} = $name;
+    $self->{__columns} = $columns;
+}
+
+# Internal
+#
 =head1
 
 [ ['Sample', '15'], ['Foo', 2] ]
