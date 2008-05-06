@@ -5,6 +5,7 @@ Release: 0.60 -
       . Rewrite of the NavBar (API Break!)
       . The entry is internally represented as a table
       . Combo can have empty options
+      . New IWL::Google::Map widget
       . New selection API for IWL::Objects
       . Rewrite of the shared resource management
         * No more global hash for storing shared resources
