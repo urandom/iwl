@@ -12,7 +12,7 @@ use IWL::Google::Map;
 
 {
     $IWLConfig{GOOGLE_MAPS_KEY} = 'abcdef';
-    my $m = IWL::Google::Map->new;
+    my $m = IWL::Google::Map->new(language => 'en');
     ok(!$m->bad);
     is($m->setWidth('400px'), $m);
     is($m->setHeight('300px'), $m);
@@ -29,5 +29,5 @@ use IWL::Google::Map;
     is_deeply($o->{attributes}{style}, {width => '400px', height => '300px'});
     like($o->{attributes}{id}, qr/google_map_\d+/);
     is($o->{attributes}{class}, 'google_map');
-    like($o->{children}[-1]{children}[0]{text}, qr/IWL.Google.Map.create.'google_map_\d+', {(?:(?:"mapTypeControl": "menu"|"longitude": 180|"language": "\w+_\w+(.[\w-]*)?"|"zoom": 0|"overview": "mini"|"mapControl": "none"|"latitude": -90|"mapType": "hybrid"|"markers": \[\]|"scaleView": "ruler"),?\s*){10}}\);/);
+    like($o->{children}[-1]{children}[0]{text}, qr/IWL.Google.Map.create.'google_map_\d+', {(?:(?:"mapTypeControl": "menu"|"longitude": 180|"language": "en"|"zoom": 0|"overview": "mini"|"mapControl": "none"|"latitude": -90|"mapType": "hybrid"|"markers": \[\]|"scaleView": "ruler"),?\s*){10}}\);/);
 }

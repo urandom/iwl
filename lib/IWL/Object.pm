@@ -1623,7 +1623,7 @@ sub __addInitScripts {
             my $init = $top->{_initScript} = IWL::Script->new->setAttribute('iwl:initScript');
             weaken $top->{_initScript};
 
-            unless ($top->{_lastShared} || $top->{_firstScript}) {
+            unless (($top->{_lastShared} && !$top->{_lastShared}{_realized}) || $top->{_firstScript}) {
                 my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
                 $top->{_firstScript} = $first and weaken $top->{_firstScript};
             }
@@ -1634,13 +1634,13 @@ sub __addInitScripts {
                 my $pivot = $top->lastChild;
                 $top->{_pivot} = $pivot and weaken $top->{_pivot};
             }
-            my $pivot = $top->{_lastShared} || $top->{_pivot};
+            my $pivot = $top->{_lastShared} && !$top->{_lastShared}{_realized} ? $top->{_lastShared} : $top->{_pivot};
             undef $pivot if $pivot && $pivot->{_realized};
 
             $script && $script->{parentNode}
                 ? $script->{parentNode}->insertBefore($script, $init)
-                : $pivot
-                    ? $top->insertAfter($pivot, $init)
+                : $pivot && $pivot->{parentNode}
+                    ? $pivot->{parentNode}->insertAfter($pivot, $init)
                     : $top->appendChild($init);
         }
 
