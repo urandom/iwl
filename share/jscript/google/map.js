@@ -164,6 +164,23 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
       return this;
     },
 
+    sprintf: function(string) {
+      var reg = /%./;
+
+      var format = {
+        c: this.control.getCenter().toString(),
+        x: this.getLongitude(),
+        y: this.getLatitude(),
+        z: this.control.getZoom(),
+        '%': '%'
+      };
+
+      return string.gsub(reg, function(match) {
+          var value = format[match[0].substring(1)];
+          return typeof value == 'undefined' ? match : value;
+      });
+    },
+
     _init: function(id) {
       this.options = Object.extend({
         latitude: 0,
