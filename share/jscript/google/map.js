@@ -57,6 +57,22 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
     this.emitSignal('iwl:load');
   }
 
+  function updateElement(element, format) {
+    var string = this.sprintf(format);
+    if (Object.isFunction(element.setValue)) {
+      element.setValue(string);
+    } else if ("value" in element) {
+      element.value = string;
+      if (Object.isFunction(element.onchange))
+        element.onchange.call(element);
+      element.emitSignal('change');
+      element.emitSignal('iwl:change');
+    } else {
+      element.update(string);
+    }
+  }
+
+
   return {
     /*
      * Sets the center of the map
@@ -179,6 +195,19 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
           var value = format[match[0].substring(1)];
           return typeof value == 'undefined' ? match : value;
       });
+    },
+
+    updateOnSignal: function(signal, element, format) {
+      if (!(element = $(element))) return;
+      var update_function = function() {
+        updateElement.apply(this, [element, format].concat($A(arguments)));
+      }.bind(this);
+      if (signal.indexOf('iwl:') == 0) {
+        signal = signal.substr(4);
+        GEvent.addListener(this.control, signal, update_function);
+      } else {
+        this.signalConnect(signal, update_function);
+      }
     },
 
     _init: function(id) {

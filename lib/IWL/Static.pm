@@ -220,16 +220,18 @@ Parameters: B<URI> - an array reference of URIs, which will be handled by the st
 
 sub addMultipleRequest {
     my ($self, $script, $uris, $mime) = (shift, $IWLConfig{STATIC_URI_SCRIPT}, @_);
-    return unless $script && $IWLConfig{STATIC_UNION};
+    return shift @$uris unless $script && $IWLConfig{STATIC_UNION};
     my $request = $script . '?IWLStaticURI=';
     my $type    = '&type=' . $mime;
-    my @uris;
-    return shift @$uris unless $self->__getETag($uris->[0]);
+    my (@copy, @uris);
+    return shift @$uris unless scalar $self->__getETag($uris->[0]);
 
-    map {
-        (!$self->__getETag($_) || length $request . (join ',', @uris, $_) . $type > 2048)
-            or push @uris, shift @$uris
-    } @$uris;
+    foreach (@copy = @$uris) {
+        last unless
+            scalar $self->__getETag($_)
+            && length $request . (join ',', @uris, $_) . $type < 2048;
+        push @uris, shift @$uris;
+    }
     return $request . (join ',', @uris) . $type;
 }
 

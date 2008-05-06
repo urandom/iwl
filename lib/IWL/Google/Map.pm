@@ -249,6 +249,42 @@ sub addMarker {
     return $self;
 }
 
+=item B<updateOnSignal> (B<SIGNAL>, B<ELEMENT>, B<FORMAT>)
+
+Updates the given B<ELEMENT> with data, formatted using B<FORMAT> when B<SIGNAL> has been emitted.
+
+Parameters: B<SIGNAL> - the signal to which to connect. B<ELEMENT> - the element to update, it must have a valid I<id>. B<FORMAT> - the format, which will be used to format the date. Ordinary characters placed in the format string are not modified. If a character is preceded by I<'%'>, it is modified as follows:
+
+=over 8
+
+=item B<c>
+
+The stringified center of the map, consists of the current I<latitude> and I<longitude> of the map, surrounded by parenthesis. Example: I<(51.236123, 21,16123)>
+
+=item B<x>
+
+The current I<longitude> of the map.
+
+=item B<y>
+
+The current I<latitude> of the map.
+
+=item B<z>
+
+The current I<zoom level> of the map.
+
+=back
+
+=cut
+
+sub updateOnSignal {
+    my ($self, $signal, $element, $format) = @_;
+
+    $signal = $self->_namespacedSignalName($signal);
+    push @{$self->{__updates}}, [$signal, $element, $format];
+    return $self;
+}
+
 # Protected
 #
 sub _realize {
@@ -266,19 +302,23 @@ sub _realize {
     $self->SUPER::_realize;
 
     $self->_appendInitScript("IWL.Google.Map.create('$id', $options)");
-    my $added = 0;
+    my @init = '';
     foreach my $signal (keys %$signals) {
         my $expr = join '; ', @{$signals->{$signal}};
-        if ($expr) {
-            $self->_appendInitScript("\$('$id').signalConnect('iwl:load', function() { var map = \$('$id').control;")
-                unless $added;
-            $self->_appendInitScript(
-                "GEvent.addListener(map, '$signal', function() { $expr });"
-            );
-            $self->_appendInitScript("});")
-                unless $added;
-            $added = 1;
-        }
+        push @init, "GEvent.addListener(map.control, '$signal', function() { $expr });"
+            if $expr;
+    }
+
+    foreach my $update (@{$self->{__updates}}) {
+        my $updatee = $update->[1];
+        $updatee = $updatee->getId if UNIVERSAL::isa($updatee, 'IWL::Widget');
+        push @init, "map.updateOnSignal('$update->[0]', '$updatee', '$update->[2]');"
+            if $updatee;
+    }
+    if (@init) {
+        $self->_appendInitScript("\$('$id').signalConnect('iwl:load', function() { var map = \$('$id');");
+        $self->_appendInitScript(join "\n", @init);
+        $self->_appendInitScript("});");
     }
 }
 
@@ -310,7 +350,7 @@ sub _init {
     $args{id} ||= randomize($self->{_defaultClass});
     $self->_constructorArguments(%args);
 
-    $self->requiredJs('google/map.js', 'http://www.google.com/jsapi?key=' . $self->{__key});
+    $self->requiredJs('base.js', 'google/map.js', 'http://www.google.com/jsapi?key=' . $self->{__key});
     $self->{_signals}{click} = $self->{_signals}{dblclick} = $self->{_signals}{mouseover} = $self->{_signals}{mouseout} = $self->{_signals}{mousemove} = '';
     $self->{_customSignals} = {
         load => [], click => [], dblclick => [], singlerightclick => [],
@@ -320,6 +360,7 @@ sub _init {
         drag => [], dragend => [],
     };
     $self->{__markers} = [];
+    $self->{__updates} = [];
 }
 
 1;
