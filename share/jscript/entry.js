@@ -26,11 +26,16 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.value = this.control.value;
     }
 
-    function defaultTextBlurCallback() {
-        if (this.control.value === '') {
+    function setDefaultText() {
+        if (!this.options.defaultText.empty()) {
             this.control.value = this.options.defaultText;
             this.control.addClassName($A(this.classNames()).first() + '_text_default');
         }
+    }
+
+    function defaultTextBlurCallback() {
+        if (this.control.value === '')
+            setDefaultText.call(this);
     }
 
     function defaultTextFocusCallback() {
@@ -107,7 +112,13 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * @returns The object
          * */
         setValue: function(value) {
-            this.value = this.control.value = value;
+            if (Object.isUndefined(value) || value === null) value = '';
+            this.control.value = value;
+            this.value = this.control.value;
+            if (this.value.empty())
+                setDefaultText.call(this)
+            else
+                this.control.removeClassName($A(this.classNames()).first() + '_text_default');
             return this.emitSignal("iwl:change");
         },
         /**
@@ -116,6 +127,23 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * */
         getValue: function() {
             return this.control.value === this.options.defaultText ? '' : this.control.value;
+        },
+        /**
+         * Sets the default text value of the entry
+         * @param {String} value The new default text of the entry
+         * @returns The object
+         * */
+        setDefaultText: function(value) {
+            this.options.defaultText = value;
+            if (this.control.hasClassName($A(this.classNames()).first() + '_text_default'))
+                setDefaultText.call(this)
+            return this;
+        },
+        /*
+         * @returns The default text of the entry
+         * */
+        getDefaultText: function() {
+            return this.options.defaultText;
         },
 
         _init: function(id) {
