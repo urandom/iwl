@@ -158,6 +158,7 @@ sub _realize {
 
 sub _init {
     my ($self, %args) = @_;
+    $self->SUPER::_init(%args);
     $self->{_defaultClass} = 'menubar';
     $args{id} = randomize($self->{_defaultClass}) if !$args{id};
 
