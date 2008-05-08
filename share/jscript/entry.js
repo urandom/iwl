@@ -17,17 +17,17 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.entry.cancelCompletionRequest();
 
             this.startIndicator();
-            
-            var entry = encodeURIComponent(this.options.paramName) + '=' + 
+
+            var entry = encodeURIComponent(this.options.paramName) + '=' +
                 encodeURIComponent(this.getToken());
 
             this.options.parameters = this.options.callback
                 ? this.options.callback(this.element, entry)
                 : entry;
 
-            if(this.options.defaultParams) 
+            if(this.options.defaultParams)
                 this.options.parameters += '&' + this.options.defaultParams;
-            
+
             this.request = new Ajax.Request(this.url, this.options);
         }
     });
@@ -154,7 +154,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return this;
         },
         /**
-         * Sets the entry value 
+         * Sets the entry value
          * @param {String} value The new entry value
          * @param {String} blur The optional blur value
          * @returns The object
@@ -176,7 +176,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return this.emitSignal("iwl:change");
         },
         /**
-         * @returns The current value of the entry 
+         * @returns The current value of the entry
          * @type String
          * */
         getValue: function() {
