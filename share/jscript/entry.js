@@ -4,6 +4,34 @@
  * @extends IWL.Widget
  * */
 IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
+    var EntryCompleter = Class.create(Ajax.Autocompleter, {
+        initialize: function(entry, update, url, options) {
+            this.baseInitialize(entry.control, update, options);
+            this.options.asynchronous  = true;
+            this.options.onComplete    = this.onComplete.bind(this);
+            this.options.defaultParams = this.options.parameters || null;
+            this.url                   = url;
+            this.entry                 = entry;
+        },
+        getUpdatedChoices: function() {
+            this.entry.cancelCompletionRequest();
+
+            this.startIndicator();
+            
+            var entry = encodeURIComponent(this.options.paramName) + '=' + 
+                encodeURIComponent(this.getToken());
+
+            this.options.parameters = this.options.callback
+                ? this.options.callback(this.element, entry)
+                : entry;
+
+            if(this.options.defaultParams) 
+                this.options.parameters += '&' + this.options.defaultParams;
+            
+            this.request = new Ajax.Request(this.url, this.options);
+        }
+    });
+
     var accumulator = function(a, n) { return a + parseFloat(n) };
 
     function adjust() {
@@ -17,32 +45,35 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function clearButtonCallback() {
-        this.control.value = '';
         this.control.focus();
+        setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value = '');
     }
 
     function changeCallback() {
-        if (!this.control.hasClassName($A(this.classNames()).first() + '_text_default'))
+        if (this.textState == IWL.Entry.TextState.NORMAL) {
             this.value = this.control.value;
-    }
-
-    function setDefaultText() {
-        if (!this.options.defaultText.empty()) {
-            this.control.value = this.options.defaultText;
-            this.control.addClassName($A(this.classNames()).first() + '_text_default');
+            this.blurValue = null;
         }
     }
 
-    function defaultTextBlurCallback() {
-        if (this.control.value === '')
-            setDefaultText.call(this);
+    function blurCallback() {
+        this.focused = false;
+        if (!Object.isString(this.value)) return;
+        if (this.value.empty())
+            setTextState.call(this, IWL.Entry.TextState.DEFAULT, this.defaultText);
+        else if (this.blurValue !== null)
+            setTextState.call(this, IWL.Entry.TextState.BLURRED, this.blurValue);
+        else
+            setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
     }
 
-    function defaultTextFocusCallback() {
-        if (this.control.value === this.options.defaultText) {
-            this.control.value = '';
-            this.control.removeClassName($A(this.classNames()).first() + '_text_default');
-        }
+    function focusCallback() {
+        this.focused = true;
+        setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
+    }
+
+    function keyUpCallback() {
+        this.value = this.control.value;
     }
 
     function setupAutoComplete() {
@@ -53,12 +84,12 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             onShow: receiverOnShow.bind(this),
             onHide: receiverOnHide.bind(this)
         }, this.options.autoComplete[1]);
-        var receiver = $(this.id + '_receiver');
-        if (!receiver)
-            receiver = this.appendChild(new Element('div', {
+        this.receiver = $(this.id + '_receiver');
+        if (!this.receiver)
+            this.receiver = this.appendChild(new Element('div', {
                 id: this.id + '_receiver', className: $A(this.classNames()).first() + '_receiver'
             }));
-        this.autoCompleter = new Ajax.Autocompleter(this.control, receiver, url, options);
+        this.autoCompleter = new EntryCompleter(this, this.receiver, url, options);
     }
 
     function periodicalChecker(element, callback, pe) {
@@ -93,6 +124,28 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         });
     }
 
+    function setTextState(state, value) {
+        var className = $A(this.classNames()).first();
+        this.control.removeClassName(className + '_text_default').removeClassName(className + '_text_blurred');
+        switch (state) {
+            case IWL.Entry.TextState.DEFAULT:
+                this.control.addClassName(className + '_text_default');
+                if (value != '')
+                    this.control.value = value;
+                break;
+            case IWL.Entry.TextState.BLURRED:
+                this.control.addClassName(className + '_text_blurred');
+                if (value != '')
+                    this.control.value = value;
+                break;
+            default:
+                this.control.value = value;
+        }
+
+        this.textState = state || IWL.Entry.TextState.NORMAL;
+        this.emitSignal('iwl:text_state_change', state);
+    }
+
     return {
         /**
          * Enables the auto-completing feature of the entry
@@ -107,26 +160,53 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return this;
         },
         /**
-         * Sets the entry value 
-         * @param value The new entry value
+         * Cancels the current completion request, if any
          * @returns The object
          * */
-        setValue: function(value) {
+        cancelCompletionRequest: function() {
+            if (!this.autoCompleter) return this;
+            if (this.autoCompleter.request && this.autoCompleter.request.transport)
+                this.autoCompleter.request.transport.abort();
+            this.receiver.hide();
+            clearTimeout(this.autoCompleter.observer);
+            return this;
+        },
+        /**
+         * Sets the entry value 
+         * @param {String} value The new entry value
+         * @param {String} blur The optional blur value
+         * @returns The object
+         * */
+        setValue: function(value, blur) {
             if (Object.isUndefined(value) || value === null) value = '';
-            this.control.value = value;
-            this.value = this.control.value;
+            this.value = value.toString();
+            this.blurValue = this.value
+                ? Object.isUndefined(blur) || blur === null
+                    ? null
+                    : blur.toString()
+                : null;
             if (this.value.empty())
-                setDefaultText.call(this)
+                setTextState.call(this, IWL.Entry.TextState.DEFAULT, this.defaultText);
+            else if (!this.focused && this.blurValue !== null)
+                setTextState.call(this, IWL.Entry.TextState.BLURRED, this.blurValue);
             else
-                this.control.removeClassName($A(this.classNames()).first() + '_text_default');
+                setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
             return this.emitSignal("iwl:change");
         },
         /**
          * @returns The current value of the entry 
-         * @type Number 
+         * @type String 
          * */
         getValue: function() {
-            return this.control.value === this.options.defaultText ? '' : this.control.value;
+            return this.value;
+        },
+
+        /**
+         * @returns The current blur value of the entry
+         * @type String
+         * */
+        getBlurValue: function() {
+            return this.blurValue;
         },
         /**
          * Sets the default text value of the entry
@@ -134,25 +214,68 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * @returns The object
          * */
         setDefaultText: function(value) {
-            this.options.defaultText = value;
-            if (this.control.hasClassName($A(this.classNames()).first() + '_text_default'))
-                setDefaultText.call(this)
+            this.defaultText = value.toString();
+            if (this.textState == IWL.Entry.TextState.DEFAULT)
+                setTextState.call(this, IWL.Entry.TextState.DEFAULT, this.defaultText);
             return this;
         },
-        /*
+        /**
          * @returns The default text of the entry
          * */
         getDefaultText: function() {
-            return this.options.defaultText;
+            return this.defaultText;
+        },
+        /**
+         * @returns One of the following:
+         *          - IWL.Entry.TextState.DEFAULT: The entry's real value is empty and the entry is not focused
+         *          - IWL.Entry.TextState.BLURRED: The entry's blurred value is given, and the entry is blurred
+         *          - IWL.Entry.TextState.NORMAL: The entry's real value is shown.
+         * */
+        getTextState: function() {
+            return this.textState;
+        },
+
+        /**
+         * Sets focus on the entry text field
+         * @returns The object
+         * */
+        focus: function() {
+            this.control.focus();
+            return this;
+        },
+        /**
+         * Removes focus on the entry text field
+         * @returns The object
+         * */
+        blur: function() {
+            this.control.blur();
+            return this;
+        },
+        /**
+         * @returns True, if the entry text field is focused
+         * @type Boolean
+         * */
+        isFocused: function() {
+            return this.focused;
+        },
+        /**
+         * Selects the text inside the entry text field
+         * @returns The object
+         * */
+        selectText: function() {
+            this.control.select();
+            return this;
         },
 
         _init: function(id) {
             this.options = Object.extend({
                 clearButton: false,
-                defaultText: false,
-                autoComplete: []
+                autoComplete: [],
+                defaultText: '',
+                blurValue: null
             }, arguments[1] || {});
 
+            this.focused = false;
             this.cleanWhitespace();
             this.image1  = $(this.id + '_left');
             this.image2  = $(this.id + '_right');
@@ -161,12 +284,14 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (this.options.clearButton)
                 this.image2.signalConnect('click', clearButtonCallback.bind(this));
 
-            if (this.options.defaultText) {
-                this.control.signalConnect('blur', defaultTextBlurCallback.bind(this));
-                this.control.signalConnect('focus', defaultTextFocusCallback.bind(this));
-                if (!this.control.value)
-                    this.control.value = this.options.defaultText;
-            }
+            this.value = '', this.blurValue = null, this.defaultText = '';
+            this.control.signalConnect('blur', blurCallback.bind(this));
+            this.control.signalConnect('focus', focusCallback.bind(this));
+            this.control.signalConnect('keyup', keyUpCallback.bind(this));
+            this.control.signalConnect('change', changeCallback.bind(this));
+            this.defaultText = this.options.defaultText.toString();
+            this.setValue(this.control.value, this.options.blurValue);
+
             setupAutoComplete.call(this);
 
             var images = [this.image1, this.image2].findAll(function(e) { return e != null });
@@ -194,8 +319,16 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 }
             }
 
-            this.control.signalConnect('change', changeCallback.bind(this));
             changeCallback.call(this);
         }
     }
 })());
+IWL.Entry.TextState = (function () {
+    var index = 0;
+
+    return {
+        DEFAULT: ++index,
+        BLURRED: ++index,
+        NORMAL: ++index
+    };
+})();
