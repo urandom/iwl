@@ -397,6 +397,9 @@ Object.extend(Object, {
   },
   isBoolean: function(object) {
     return typeof object == "boolean";
+  },
+  isHash: function(object) {
+    return object && object instanceof Hash;
   }
 });
 

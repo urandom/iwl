@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 use IWL::Entry;
 
@@ -12,25 +12,26 @@ my $entry = IWL::Entry->new;
 	is($entry->setPassword(1), $entry);
 	is($entry->setReadonly(1), $entry);
 	is($entry->setText('Some text'), $entry);
+    is($entry->setValue('Something', 'else'), $entry);
 	is($entry->setDefaultText('Default text'), $entry);
 	is($entry->setMaxLength(10), $entry);
 	is($entry->setSize(3), $entry);
 
 	ok($entry->isPassword);
 	ok($entry->isReadonly);
-	is($entry->getText, 'Some text');
+	is($entry->getText, 'Something');
 	is($entry->getDefaultText, 'Default text');
 	is($entry->getMaxLength, 10);
 	is($entry->getSize, 3);
 
 	like($entry->getContent, qr(^<table (?:(?:class="entry password"|cellspacing="0"|cellpadding="0"|id="(entry_\d+)")\s*){4}><tbody><tr [^>]+><td></td>
-<td><input (?:(?:maxlength="10"|value="Some text"| size="3"|readonly="true"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){7}/>
+<td><input (?:(?:maxlength="10"|value="Something"| size="3"|readonly="true"|class="entry_text entry_text_default"|type="password"|id="\1_text")\s*){7}/>
 </td>
 <td></td>
 </tr>
 </tbody>
 .*entry.js.*
-<script.*IWL.Entry.create.*\1.*</script>
+<script.*IWL.Entry.create.*\1.*"blurValue": "else".*</script>
 </table>
 )s);
 }
@@ -81,15 +82,16 @@ my $entry = IWL::Entry->new;
 {
 	my $entry = IWL::Entry->new(id => 'foo');
 
+    is($entry->setValue('bar'), $entry);
 	$entry->setAutoComplete('iwl_demo.pl');
 	like($entry->getContent, qr(^<table (?:(?:class="entry"|cellspacing="0"|cellpadding="0"|id="foo")\s*){4}><tbody><tr [^>]+><td></td>
-<td><input (?:(?:class="entry_text"|id="foo_text"|type="text")\s*){3}/>
+<td><input (?:(?:class="entry_text"|id="foo_text"|type="text"|value="bar")\s*){4}/>
 </td>
 <td></td>
 </tr>
 </tbody>
 .*entry.js.*
-<script .*IWL.Entry.create.*foo.*"autoComplete": \["iwl_demo.pl", {}\].*</script>
+<script .*IWL.Entry.create.*foo.*(?:(?:"autoComplete": \["iwl_demo.pl", {}\]|"blurValue": null),?\s*){2}.*</script>
 </table>
 $)s);
 }

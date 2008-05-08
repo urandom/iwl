@@ -561,6 +561,7 @@ sub getContent {
     my $self    = shift;
     my $content = '';
 
+    return '' if $self->bad;
     if (!$self->{_realized}) {
         $self->{_realized} = 1;
         $self->_realize;
@@ -656,6 +657,7 @@ sub getObject {
     my $objects  = [];
     my $scripts  = [];
 
+    return {} if $self->bad;
     if (!$self->{_realized}) {
         $self->{_realized} = 1;
         $self->_realize;
