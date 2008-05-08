@@ -62,7 +62,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (this.value.empty())
             setTextState.call(this, IWL.Entry.TextState.DEFAULT, this.defaultText);
         else if (this.blurValue !== null)
-            setTextState.call(this, IWL.Entry.TextState.BLURRED, this.blurValue);
+            setTextState.call(this, IWL.Entry.TextState.BLUR, this.blurValue);
         else
             setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
     }
@@ -133,7 +133,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 if (value != '')
                     this.control.value = value;
                 break;
-            case IWL.Entry.TextState.BLURRED:
+            case IWL.Entry.TextState.BLUR:
                 this.control.addClassName(className + '_text_blurred');
                 if (value != '')
                     this.control.value = value;
@@ -188,7 +188,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (this.value.empty())
                 setTextState.call(this, IWL.Entry.TextState.DEFAULT, this.defaultText);
             else if (!this.focused && this.blurValue !== null)
-                setTextState.call(this, IWL.Entry.TextState.BLURRED, this.blurValue);
+                setTextState.call(this, IWL.Entry.TextState.BLUR, this.blurValue);
             else
                 setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
             return this.emitSignal("iwl:change");
@@ -228,7 +228,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         /**
          * @returns One of the following:
          *          - IWL.Entry.TextState.DEFAULT: The entry's real value is empty and the entry is not focused
-         *          - IWL.Entry.TextState.BLURRED: The entry's blurred value is given, and the entry is blurred
+         *          - IWL.Entry.TextState.BLUR: The entry's blurred value is given, and the entry is blurred
          *          - IWL.Entry.TextState.NORMAL: The entry's real value is shown.
          * */
         getTextState: function() {
@@ -328,7 +328,7 @@ IWL.Entry.TextState = (function () {
 
     return {
         DEFAULT: ++index,
-        BLURRED: ++index,
+        BLUR: ++index,
         NORMAL: ++index
     };
 })();
