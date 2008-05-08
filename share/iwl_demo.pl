@@ -490,7 +490,8 @@ sub generate_entries {
         $image_entry, $useless, IWL::Break->new, $label, $completion);
     $normal_entry->setDefaultText('Type here');
     $password_entry->setPassword(1);
-    $cleanup_entry->addClearButton;
+    $cleanup_entry->addClearButton->setValue('__cleanHere = 1', 'Clean me!');
+    $cleanup_entry->{text}->setStyle(width => '160px');
     $image_entry->setIconFromStock('IWL_STOCK_SAVE', 'left', 1);
     $image_entry->{image1}->signalConnect(click => updaterCallback(
 	    'entries_container', 'iwl_demo.pl',

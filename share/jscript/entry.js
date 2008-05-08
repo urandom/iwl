@@ -108,7 +108,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
     function setTextState(state, value) {
         var className = $A(this.classNames()).first();
-        this.control.removeClassName(className + '_text_default').removeClassName(className + '_text_blurred');
+        this.control.removeClassName(className + '_text_default').removeClassName(className + '_text_blur');
         switch (state) {
             case IWL.Entry.TextState.DEFAULT:
                 this.control.addClassName(className + '_text_default');
@@ -116,7 +116,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                     this.control.value = value;
                 break;
             case IWL.Entry.TextState.BLUR:
-                this.control.addClassName(className + '_text_blurred');
+                this.control.addClassName(className + '_text_blur');
                 if (value != '')
                     this.control.value = value;
                 break;

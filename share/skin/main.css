@@ -225,7 +225,7 @@ button.button, input.inputbutton {
     margin: 1px 0;
 }
 
-input.entry_text, input.entry_text_default, .spinner_text {
+input.entry_text, .spinner_text {
     color: #525C65;
     border: none;
     background: none;
@@ -235,6 +235,9 @@ input.entry_text, input.entry_text_default, .spinner_text {
 
 input.entry_text_default {
     color: #9aadbe;
+}
+input.entry_text_blur {
+    font-style: italic;
 }
 
 .entry_left, .entry_right,

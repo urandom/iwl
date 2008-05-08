@@ -70,6 +70,20 @@ The right icon of the entry
 
 =back
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the entry has finished loading.
+
+=item B<text_state_change>
+
+Fires when the entry text state has changed. It receives the new state of the entry as the second parameter.
+
+=back
+
 =cut
 
 sub new {
@@ -148,9 +162,27 @@ sub isReadonly {
     return shift->{text}->hasAttribute('readonly');
 }
 
+=item B<setValue> (B<VALUE>, B<BLUR>)
+
+Sets the text of the entry, as well as the blur value, if any
+
+Parameters: B<VALUE> - the text of the entry, B<BLUR> - the blur text of the entry, will appear if it is defined and the entry has lost focus
+
+=cut
+
+sub setValue {
+    my ($self, $value, $blur) = @_;
+
+    $self->{_options}{blurValue} = $blur if defined $value && $value ne '';
+
+    return $self->setText($value);
+}
+
 =item B<setText> (B<TEXT>)
 
 Sets the text of the entry
+
+Note: for setting both the text and blur value, see L<IWL::Entry::setValue()>
 
 Parameter: B<TEXT> - the text.
 
@@ -468,6 +500,7 @@ sub _init {
 
     $self->{_options} = {};
 
+    $self->{_customSignals} = {text_state_change => [], load => []};
     $self->requiredJs('base.js', 'entry.js');
 
     return $self;
