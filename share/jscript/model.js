@@ -177,6 +177,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       else
         options = this.sortMethods[index];
 
+      if (!options) return;
       this.sortColumn = {index: index, sortType: sortType || IWL.TreeModel.SortTypes.DESCENDING};
       var asc = this.sortColumn.sortType == IWL.TreeModel.SortTypes.ASCENDING;
 
@@ -327,10 +328,24 @@ Object.extend(IWL.TreeModel, (function() {
 IWL.TreeModel.Node = Class.create(Enumerable, (function() {
   function addModel(model, node) {
     node.model = model;
+    if (node.columns) {
+      if (!compareColumns(node.columns, model.columns))
+        node.values = [];
+    }
   }
 
   function removeModel(node) {
     node.model = undefined;
+  }
+
+  function compareColumns(columns1, columns2) {
+    if (columns1.length != columns2.length) return false;
+    for (var i = 0, l = columns1.length; i < l; i++) {
+      if (columns1[i].type != columns2[i].type)
+        return false;
+    }
+
+    return true;
   }
 
   return {
@@ -376,6 +391,8 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         next.previousSibling = this;
         this.nextSibling = next;
       }
+
+      this.columns = model.columns.clone();
 
       if (!this.model.isFrozen()) {
         this.model.emitSignal('iwl:node_insert', this);
@@ -478,6 +495,8 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       var v = this.values;
       while (args.length) {
         var tuple = args.splice(0, 2);
+        if (!this.columns[tuple[0]])
+          continue;
         v[tuple[0]] = tuple[1];
       }
 
