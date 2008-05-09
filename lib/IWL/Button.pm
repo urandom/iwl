@@ -107,7 +107,7 @@ Parameters: B<TEXT> - the text for the label
 sub setLabel {
     my ($self, $text) = @_;
 
-    $self->{_options}{label} = $text || '';
+    $self->{__anchor}->appendChild(IWL::Text->new($self->{_options}{label} = $text || ''));
     return $self;
 }
 
@@ -211,12 +211,8 @@ Parameters: B<URL> - the url of the href
 sub setHref {
     my ($self, $url) = @_;
 
-    if (!$self->{__nsAnchor}{added}) {
-	$self->appendChild($self->{__nsAnchor});
-	$self->{__nsAnchor}{added} = 1;
-    }
-    $self->{__nsAnchor}->setHref($url);
-    if ($url =~ /JavaScript/i) {
+    $self->{__anchor}->setHref($url);
+    if ($url =~ /javascript/i) {
         $self->signalConnect(click => $url);
     } else {
         $self->signalConnect(click => "document.location.href = '$url'");
@@ -286,7 +282,7 @@ sub getSrc {
 }
 
 sub getHref {
-    return shift->{__nsAnchor}->getHref;
+    return shift->{__anchor}->getHref;
 }
 
 # Protected
@@ -298,6 +294,9 @@ sub _realize {
     my $options    = {};
 
     $self->SUPER::_realize;
+
+    $self->{__anchor}->prependChild($self->{image}->clone)
+        unless $self->getLabel;
 
     $self->{_options}{visibility} = $visibility if $visibility;
     $self->setStyle(visibility => 'hidden');
@@ -324,13 +323,12 @@ sub _init {
     my $image  = IWL::Image->new;
     my $id     = $args{id};
 
-    $self->{_defaultClass}     = 'button';
-    $image->{_ignore}          = 1;
+    $self->{_defaultClass}   = 'button';
+    $image->{_ignore}        = 1;
 
-    $self->{image}             = $image;
-    $self->{__nsAnchor}        = $anchor;
-    $self->{__nsAnchor}{added} = 0;
-    $self->{__parts}           = [IWL::Widget->newMultiple(9)];
+    $self->{image}           = $image;
+    $self->{__anchor}        = $anchor;
+    $self->{__parts}         = [IWL::Widget->newMultiple(9)];
 
     $id = randomize($self->{_defaultClass}) unless $id;
     $self->{_tag} = 'div';
@@ -339,6 +337,7 @@ sub _init {
         $self->appendChild($_);
     }
     $self->{__parts}[4]->appendChild($image);
+    $self->appendChild(IWL::Container->new(tag => 'noscript')->appendChild($anchor));
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
