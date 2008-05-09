@@ -248,16 +248,20 @@ sub prependFooter {
 # Protected
 #
 sub _realize {
-    my $self    = shift;
-    my $cell    = IWL::Tree::Cell->new;
-    my $b       = escape($cell->_blank_indent->getJSON);
-    my $i       = escape($cell->_row_indent->getJSON);
-    my $l       = escape($cell->_l_junction->getJSON);
-    my $l_e     = escape($cell->_l_expand->getJSON);
-    my $l_c     = escape($cell->_l_collapse->getJSON);
-    my $t       = escape($cell->_t_junction->getJSON);
-    my $t_e     = escape($cell->_t_expand->getJSON);
-    my $t_c     = escape($cell->_t_collapse->getJSON);
+    my $self  = shift;
+    my $images = '{}';
+    unless ($self->{_options}{list}) {
+        my $cell = IWL::Tree::Cell->new;
+        my $b    = escape($cell->_blank_indent->getJSON);
+        my $i    = escape($cell->_row_indent->getJSON);
+        my $l    = escape($cell->_l_junction->getJSON);
+        my $l_e  = escape($cell->_l_expand->getJSON);
+        my $l_c  = escape($cell->_l_collapse->getJSON);
+        my $t    = escape($cell->_t_junction->getJSON);
+        my $t_e  = escape($cell->_t_expand->getJSON);
+        my $t_c  = escape($cell->_t_collapse->getJSON);
+        $images = qq({b:"$b",i:"$i",l:"$l",l_e:"$l_e",l_c:"$l_c",t:"$t",t_e:"$t_e",t_c:"$t_c"});
+    }
     my $id      = $self->getId;
     my $options = {};
     my $script;
@@ -272,7 +276,6 @@ sub _realize {
 
     $self->_set_alternate if $self->{_options}{alternate};
 
-    my $images = qq({b:"$b",i:"$i",l:"$l",l_e:"$l_e",l_c:"$l_c",t:"$t",t_e:"$t_e",t_c:"$t_c"});
     $script = "IWL.Tree.create('$id', $images, $options);";
     foreach my $sortable (@{$self->{__sortables}}) {
 	$script .= "\$('$id').setCustomSortable($sortable->[0], $sortable->[1]);";
