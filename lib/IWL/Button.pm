@@ -177,7 +177,7 @@ sub setFromStock {
     my $label = $stock->getLabel($stock_id);
 
     $self->setLabel($label);
-    $self->setImage($image, $label, $label);
+    $self->setImage($image, $label);
     return $self;
 }
 
@@ -342,8 +342,10 @@ sub _init {
 
     $self->{_options}{size} = $args{size} || 'default';
     $self->{_options}{disabled} = $args{disabled} ? 1 : 0;
+    $self->setImage($args{image}, $args{alt}) if defined $args{image};
+    $self->setLabel($args{label})             if defined $args{label};
 
-    delete @args{qw(size id)};
+    delete @args{qw(size id image label alt)};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'button.js');
 
