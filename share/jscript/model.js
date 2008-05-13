@@ -2,7 +2,8 @@
 IWL.ObservableModel = Class.create(Enumerable, (function() {
   return {
     initialize: function() {
-      this.__emitter = new Element('div');
+      this.__emitter = new Element('div', {style: "display: none"});
+      document.body.appendChild(this.__emitter);
     },
     
     signalConnect: function(name, observer) {
@@ -87,6 +88,21 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       if (n.children && n.children.length)
         loadNodes.call(this, n.children, node, {});
     }.bind(this))
+  }
+
+  function getNodes(parentNode) {
+    var childNodes = parentNode ? parentNode.childNodes : this.rootNodes;
+    var ret = [];
+
+    childNodes.each(function(n) {
+      var node = {};
+      node.values = n.getValues();
+      if (n.children && n.children.length)
+        node.children = getNodes(n);
+      ret.push(node);
+    }.bind(this));
+
+    return ret;
   }
 
   return {
@@ -289,8 +305,18 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       this.freeze();
       loadNodes.call(this, data.nodes, options.parentNode, options);
 
-      this.emitSignal('iwl:load_data', options);
+      this.emitSignal('iwl:load_data');//, options);
       return this.thaw();
+    },
+
+    getData: function() {
+      var data = Object.extend({}, arguments[0]);
+      if (Object.isArray(data.parentNode))
+        data.parentNode = this.getNodeByPath(data.parentNode);
+
+      data.nodes = getNodes.call(this, data.parentNode);
+
+      return data;
     },
 
     _each: function(iterator) {

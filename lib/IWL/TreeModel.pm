@@ -108,7 +108,9 @@ sub dataReader {
     }
 
     if ($options{type} eq 'storable') {
-        eval "require Storable" or die $@;
+        eval "require Storable" or $self
+            ? $self->_pushFatalError($@)
+            : die $@;
 
         $data = Storable::thaw($content);
         if ($options{subtype} eq 'array') {
