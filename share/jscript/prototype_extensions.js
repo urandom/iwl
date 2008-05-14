@@ -345,9 +345,11 @@ Object.extend(Event, (function() {
     },
     truncate: function(element) {
       if (!(element = $(element))) return;
-      element.setStyle({overflow: 'hidden', whiteSpace: 'nowrap'});
+      element.setStyle({overflow: 'hidden'});
       if (element.getWidth() == element.scrollWidth) return;
-      var abbr = new Element('abbr', {title: element.getText(), className: 'ellipsis'}).update('&hellip;');
+      var abbr = element.select('abbr.ellipsis')[0]
+              || new Element('abbr', {className: 'ellipsis'}).update('&hellip;');
+      abbr.writeAttribute({title: element.getText()});
       element.appendChild(abbr);
       abbr.setStyle({marginLeft: '-' + (element.scrollWidth - element.getWidth()) + 'px'})
 
