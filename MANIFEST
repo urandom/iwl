@@ -27,6 +27,7 @@ lib/IWL/Canvas.pm
 lib/IWL/Checkbox.pm
 lib/IWL/Combo.pm
 lib/IWL/Combo/Option.pm
+lib/IWL/ComboView.pm
 lib/IWL/Comment.pm
 lib/IWL/Config.pm
 lib/IWL/Container.pm
@@ -92,7 +93,6 @@ lib/IWL/Tooltip.pm
 lib/IWL/Tree.pm
 lib/IWL/Tree/Cell.pm
 lib/IWL/Tree/Row.pm
-lib/IWL/TreeModel.pm
 lib/IWL/Upload.pm
 lib/IWL/VBox.pm
 lib/IWL/Widget.pm
@@ -149,6 +149,7 @@ share/icons/upload.gif
 share/images/button/button_static.gif
 share/images/button/button_horizontal.gif
 share/images/button/button_vertical.gif
+share/images/comboview/button.png
 share/images/contentbox/arrow_left.gif
 share/images/contentbox/arrow_right.gif
 share/images/contentbox/bg_ft_alt0.gif
@@ -242,7 +243,6 @@ share/jscript/entry.js
 share/jscript/google/map.js
 share/jscript/iconbox.js
 share/jscript/menu.js
-share/jscript/model.js
 share/jscript/navbar.js
 share/jscript/notebook.js
 share/jscript/pagecontrol.js
