@@ -20,11 +20,11 @@ L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::Input> -> L<IWL::Ent
 
 =head1 DESCRIPTION
 
-The entry widget is a single-line, text entry, also capable of showing password-type fields.
+The spinner widget is a special entry, that can show a numerical counter
 
 =head1 CONSTRUCTOR
 
-IWL::Entry->new ([B<%ARGS>])
+IWL::Spinner->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 

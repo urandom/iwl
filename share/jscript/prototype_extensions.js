@@ -345,7 +345,6 @@ Object.extend(Event, (function() {
     },
     truncate: function(element) {
       if (!(element = $(element))) return;
-      element.setStyle({overflow: 'hidden'});
       if (element.getWidth() == element.scrollWidth) return;
       var abbr = element.select('abbr.ellipsis')[0]
               || new Element('abbr', {className: 'ellipsis'}).update('&hellip;');
