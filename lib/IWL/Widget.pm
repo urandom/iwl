@@ -227,7 +227,7 @@ Disconnects all of the expressions from the signal handler
 
 Parameters: B<SIGNAL> - the signal
 
-B<DEPRECATED> - use L<IWL::Widget::signalConnect> without an expression parameter instead.
+B<DEPRECATED> - use L<IWL::Widget::signalDisconnect> without an expression parameter instead.
 
 =cut
 
