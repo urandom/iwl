@@ -343,6 +343,16 @@ Object.extend(Event, (function() {
       }
       return true;
     },
+    truncate: function(element) {
+      if (!(element = $(element))) return;
+      element.setStyle({overflow: 'hidden', whiteSpace: 'nowrap'});
+      if (element.getWidth() == element.scrollWidth) return;
+      var abbr = new Element('abbr', {title: element.getText(), className: 'ellipsis'}).update('&hellip;');
+      element.appendChild(abbr);
+      abbr.setStyle({marginLeft: '-' + (element.scrollWidth - element.getWidth()) + 'px'})
+
+      return element;
+    },
     signalConnect: function() {
       Event.signalConnect.apply(Event, arguments);
       return $A(arguments).first();
