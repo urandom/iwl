@@ -134,6 +134,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     getColumnName: function(index) {
       return this.columns[index] ? this.columns[index].name : undefined;
     },
+    getColumnCount: function() {
+      return this.columns.length;
+    },
     setColumn: function(index, type, name) {
       this.columns[index] = {
         type: type,

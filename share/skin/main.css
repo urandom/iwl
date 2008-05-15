@@ -1583,6 +1583,7 @@ div.tooltip_content {
     background: url('/iwl/skin/default/images/comboview/button.png') no-repeat;
     width: 16px;
     height: 16px;
+    margin: 0px 1px;
 }
 .comboview_button_off {
     background-position: 0px 0px;
