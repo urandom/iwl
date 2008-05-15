@@ -10,7 +10,7 @@ Release: 0.60 -
       . Rewrite of the shared resource management
         * No more global hash for storing shared resources
         * Addition of a 'requiredCSS' method
-        * New IWL::SnippetManager pseudo-root object, for use with html snippets
+        * New IWL::Environment pseudo-root object, for mixing IWL::Objects with html snippets
         * Javascript files are placed at the last possible moment
         * CSS files are placed as early as possible
         * 'iwl:independant' attribute for scripts, if they don't require any shared resources
