@@ -93,6 +93,7 @@ lib/IWL/Tooltip.pm
 lib/IWL/Tree.pm
 lib/IWL/Tree/Cell.pm
 lib/IWL/Tree/Row.pm
+lib/IWL/TreeModel.pm
 lib/IWL/Upload.pm
 lib/IWL/VBox.pm
 lib/IWL/Widget.pm
@@ -226,6 +227,7 @@ share/iwl_demo.pl
 share/jscript/base.js
 share/jscript/button.js
 share/jscript/calendar.js
+share/jscript/comboview.js
 share/jscript/contentbox.js
 share/jscript/demo.js
 share/jscript/dist/accordion.js
@@ -243,6 +245,7 @@ share/jscript/entry.js
 share/jscript/google/map.js
 share/jscript/iconbox.js
 share/jscript/menu.js
+share/jscript/model.js
 share/jscript/navbar.js
 share/jscript/notebook.js
 share/jscript/pagecontrol.js

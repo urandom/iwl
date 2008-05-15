@@ -18,6 +18,10 @@ sub new {
     return $self;
 }
 
+sub getName {
+    return shift->{__name};
+}
+
 =head1
 
 Data:

@@ -12,6 +12,8 @@ use IWL::Table::Row;
 use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
 
+use Locale::TextDomain qw(org.bloka.iwl);
+
 =head1 NAME
 
 IWL::ComboView - a combo widget
@@ -65,7 +67,9 @@ Parameter: B<MODEL> - an L<IWL::TreeModel>
 sub setModel {
     my ($self, $model) = @_;
 
+    $self->{_model}->remove if $self->{_model};
     $self->{_model} = $model;
+    $self->{__content}{parentNode}->appendChild($model);
 
     return $self;
 }
@@ -79,17 +83,6 @@ Returns the currently assigned model of the view
 sub getModel {
     return shift->{_model};
 }
-
-# Overrides
-#
-sub addClearButton {}
-sub setPassword {}
-sub isPassword {}
-sub setText {}
-sub getText {}
-sub setDefaultText {}
-sub getDefaultText {}
-sub setAutoComplete {}
 
 # Protected
 #
@@ -105,10 +98,25 @@ sub _realize {
     my $self    = shift;
     my $id      = $self->getId;
 
+    return $self->_pushFatalError(__"No model was given!")
+        unless $self->{_model};
+
     $self->SUPER::_realize;
+
+    my $model = $self->{_model}->getName;
+    $self->{_model}->getContent;
+
+    if (my @width = @{$self->{_options}{columnWidth}}) {
+        my $width = 0;
+        $width += $_ foreach @width;
+        $self->{__content}->setStyle(width => $width . 'px');
+    }
+    $self->{__content}->setStyle(height => $self->{_options}{nodeHeight} . 'px')
+        if $self->{_options}{nodeHeight};
+
     my $options = toJSON($self->{_options});
 
-    $self->_appendInitScript("IWL.ComboView.create('$id', $options);");
+    $self->_appendInitScript("IWL.ComboView.create('$id', $model, $options);");
 }
 
 sub _init {
@@ -122,14 +130,24 @@ sub _init {
     $self->appendChild($body);
     $body->appendChild($row);
     $row->appendCell($content);
-    $row->appendCell($button);
+    $row->appendCell($button)->appendClass('comboview_button_cell');
 
     $self->{_defaultClass} = 'comboview';
     $args{id} ||= randomize('comboview');
 
     $self->{_tag} = 'table';
+    $self->{_options}  = {columnWidth => []};
     $self->{__button}  = $button;
     $self->{__content} = $content;
+
+    $self->{_options}{columnWidth} = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
+    $self->{_options}{columnClass} = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};
+    $self->{_options}{nodeHeight}  = $args{nodeHeight}  if $args{nodeHeight};
+
+    $self->setModel($args{model}) if defined $args{model};
+
+    delete @args{qw(columnWidth columnClass nodeHeight model)};
+
     $self->requiredJs('comboview.js');
     $self->_constructorArguments(%args);
 

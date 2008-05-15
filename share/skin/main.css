@@ -1574,16 +1574,31 @@ div.tooltip_content {
     padding: 0px;
 }
 
+.comboview_button_cell {
+    background-color: white;
+    border-left: 1px solid #bbbbbb;
+}
+
 .comboview_button {
-    background: url('/iwl/skin/default/images/comboview/button.png') no-repeat 0px 0px;
+    background: url('/iwl/skin/default/images/comboview/button.png') no-repeat;
     width: 16px;
     height: 16px;
 }
-
-.comboview_button_pressed {
-    background: url('/iwl/skin/default/images/comboview/button.png') no-repeat -16px 0px;
+.comboview_button_off {
+    background-position: 0px 0px;
 }
-
+.comboview_button_off_hover {
+    background-position: -16px 0px;
+}
+.comboview_button_off_press {
+    background-position: -32px 0px;
+}
 .comboview_button_on {
-    background: url('/iwl/skin/default/images/comboview/button.png') no-repeat -32px 0px;
+    background-position: -48px 0px;
+}
+.comboview_button_on_hover {
+    background-position: -64px 0px;
+}
+.comboview_button_on_press {
+    background-position: -80px 0px;
 }
