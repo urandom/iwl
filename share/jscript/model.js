@@ -2,7 +2,8 @@
 IWL.ObservableModel = Class.create(Enumerable, (function() {
   return {
     initialize: function() {
-      this.__emitter = new Element('div');
+      this.__emitter = new Element('div', {style: "display: none"});
+      document.body.appendChild(this.__emitter);
     },
     
     signalConnect: function(name, observer) {
@@ -89,6 +90,25 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     }.bind(this))
   }
 
+  function getNodes(parentNode) {
+    var childNodes = parentNode ? parentNode.childNodes : this.rootNodes;
+    var ret = [];
+
+    childNodes.each(function(n) {
+      var node = {};
+      node.values = n.getValues();
+      if (n.children && n.children.length)
+        node.children = getNodes(n);
+      ret.push(node);
+    }.bind(this));
+
+    return ret;
+  }
+
+  function flatIterator(node) {
+    return node.hasChildren() > 0;
+  }
+
   return {
     initialize: function($super) {
       $super();
@@ -118,6 +138,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     getColumnName: function(index) {
       return this.columns[index] ? this.columns[index].name : undefined;
     },
+    getColumnCount: function() {
+      return this.columns.length;
+    },
     setColumn: function(index, type, name) {
       this.columns[index] = {
         type: type,
@@ -138,6 +161,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         node = node.childNodes[path[i]];
 
       return node;
+    },
+    isFlat: function() {
+      return this.rootNodes.any(flatIterator);
     },
 
     freeze: function() {
@@ -291,6 +317,16 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
       this.emitSignal('iwl:load_data', options);
       return this.thaw();
+    },
+
+    getData: function() {
+      var data = Object.extend({}, arguments[0]);
+      if (Object.isArray(data.parentNode))
+        data.parentNode = this.getNodeByPath(data.parentNode);
+
+      data.nodes = getNodes.call(this, data.parentNode);
+
+      return data;
     },
 
     _each: function(iterator) {
