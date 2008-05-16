@@ -1563,14 +1563,15 @@ div.tooltip_content {
 .comboview {
     border: 1px solid #7F9DB9;
     background-color: white;
+    color: #111;
     margin: 1px 0;
 }
 .comboview_editable {
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    color: #525C65;
 }
 
 .comboview_content {
-    color: #525C65;
     border: none;
     background: none;
     vertical-align: middle;

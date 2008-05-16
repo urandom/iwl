@@ -7,11 +7,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var mouseout = function() {
             setState.call(this, this.state & ~IWL.ComboView.State.HOVER);
         }.bind(this);
-        var mousedown = function() {
+        var mousedown = function(event) {
             setState.call(this, (this.state & IWL.ComboView.State.SHOW) | IWL.ComboView.State.PRESS);
+            Event.stop(event);
         }.bind(this);
-        var mouseup = function() {
+        var mouseup = function(event) {
             setState.call(this, (this.state & IWL.ComboView.State.SHOW ? 0 : IWL.ComboView.State.SHOW) | IWL.ComboView.State.HOVER);
+            Event.stop(event);
         }.bind(this);
 
         var cell = this.button.up();
@@ -34,7 +36,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function generateNodeTemplate(flat) {
         /* Individual rows can't be dragged. Each node has to be a full table */
-        var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node #{nodePosition}"><tbody><tr>'];
+        var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node #{nodePosition}" iwl:nodePath="#{nodePath}"><tbody><tr>'];
 
         for (var i = 0, l = this.model.getColumnCount(); i < l; i++) {
             var classNames = ['comboview_column', 'comboview_column' + i], width = '';
@@ -63,6 +65,38 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         });
     }
 
+    function cellRenderer(values) {
+        var renderers = {};
+        for (var i = 0, l = values.length; i < l; i++) {
+            var render = this.options.cellAttributes[i] && this.options.cellAttributes[i].renderTemplate;
+            if (render) {
+                render = new Template(render);
+                renderers['column' + i] = Object.isObject(values[i])
+                    ? render.evaluate(values[i])
+                    : render.evaluate({cellValue: values[i]});
+            } else {
+                if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.STRING)
+                    renderers['column' + i] = values[i].toString();
+                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.INT)
+                    renderers['column' + i] = parseInt(values[i])
+                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.FLOAT)
+                    renderers['column' + i] = parseFloat(values[i])
+                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.BOOLEAN)
+                    renderers['column' + i] = values[i].toString();
+                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.CHECKBOX)
+                    renderers['column' + i] = '<input type="checkbox" value="' + values[i] + '"/>';
+                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.RADIO)
+                    renderers['column' + i] = '<input type="radio" value="' + values[i] + '" name="comboview_radio_group"/>';
+                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.COUNT) {
+                    var count = 0;
+                    this.model.each(function(n) { count++; if (n == node) throw $break; });
+                    renderers['column' + i] = count;
+                }
+            }
+        }
+        return renderers;
+    }
+
     function createNodes(nodes, template, flat) {
         var html = [];
         var container = new Element('div', {className: 'comboview_node_container'});
@@ -72,41 +106,15 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var index = 0, length = nodes.length;
         nodes.each(function(node) {
             var values = node.getValues();
-            var cellValues = {};
-            for (var i = 0, l = values.length; i < l; i++) {
-                var render = this.options.cellAttributes[i] && this.options.cellAttributes[i].renderTemplate;
-                if (render) {
-                    render = new Template(render);
-                    cellValues['column' + i] = Object.isObject(values[i])
-                        ? render.evaluate(values[i])
-                        : render.evaluate({cellValue: values[i]});
-                } else {
-                    if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.STRING)
-                        cellValues['column' + i] = values[i].toString();
-                    else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.INT)
-                        cellValues['column' + i] = parseInt(values[i])
-                    else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.FLOAT)
-                        cellValues['column' + i] = parseFloat(values[i])
-                    else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.BOOLEAN)
-                        cellValues['column' + i] = values[i].toString();
-                    else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.CHECKBOX)
-                        cellValues['column' + i] = '<input type="checkbox" value="' + values[i] + '"/>';
-                    else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.RADIO)
-                        cellValues['column' + i] = '<input type="radio" value="' + values[i] + '" name="comboview_radio_group"/>';
-                    else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.COUNT) {
-                        var count = 0;
-                        this.model.each(function(n) { count++; if (n == node) throw $break; });
-                        cellValues['column' + i] = count;
-                    }
-                }
-            }
+            var renderers = cellRenderer.call(this, values);
             if (!flat && node.hasChildren() > 0)
-                cellValues.parentalArrow = '>';
+                renderers.parentalArrow = '>';
             if (index == 0)
-                cellValues.nodePosition = 'comboview_node_first'
+                renderers.nodePosition = 'comboview_node_first'
             else if (index + 1 == length)
-                cellValues.nodePosition = 'comboview_node_last'
-            html.push(template.evaluate(cellValues));
+                renderers.nodePosition = 'comboview_node_last'
+            renderers.nodePath = node.getPath().toJSON();
+            html.push(template.evaluate(renderers));
             ++index;
         }.bind(this));
         container.update(html.join(''));
@@ -179,6 +187,16 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 setupScrolling.call(this, this.container);
 
             this.container.positioned = true;
+            document.observe('click', function(event) {
+                var inside = Event.checkElement(event, this.container);
+                if (!inside && !Event.checkElement(event, this))
+                    return this.popDown();
+                else if (inside) {
+                    var path = Event.element(event).up('table.comboview_node').readAttribute('iwl:nodePath').evalJSON();
+                    this.setActive(path);
+                    return this.popDown();
+                }
+            }.bind(this));
         }
         this.container.setStyle({visibility: 'visible'});
     }
@@ -205,6 +223,22 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         popDown: function() {
             if (!(this.state & IWL.ComboView.State.SHOW)) return;
             setState.call(this, (this.state & ~IWL.ComboView.State.SHOW));
+        },
+        /**
+         * Sets the active item of the ComboView
+         * @param path The path (or index for flat models) of the item to be set as active
+         * @returns The object
+         * */
+        setActive: function(path) {
+            this.selectedpath = path;
+            if (!Object.isArray(path)) path = [path];
+            var node = this.model.getNodeByPath(path);
+            if (!node) return;
+            this.values = node.getValues();
+            var renderers = cellRenderer.call(this, this.values);
+            this.content.update(generateNodeTemplate.call(this, true).evaluate(renderers));
+
+            return this;
         },
 
         _init: function(id, model) {
