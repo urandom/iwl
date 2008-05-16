@@ -84,11 +84,50 @@ sub getModel {
     return shift->{_model};
 }
 
+=item B<setCellAttributes> (B<INDEX>, B<ATTRIBUTES>)
+
+Sets the cell attributes for a particular cell index
+
+Parameter: B<INDEX> - a cell index, B<ATTRIBUTES> - a hash reference of attributes, with the following possible keys:
+
+=over 8
+
+=item B<renderTemplate>
+
+=item B<renderFunction>
+
+=back
+
+=cut
+
+sub setCellAttributes {
+    my ($self, $index, $attr) = @_;
+    return unless %$attr;
+
+    $self->{_options}{cellAttributes}[$index] = $attr;
+
+    return $self;
+}
+
+=item B<getCellAttributes> (B<INDEX>)
+
+Sets the get attributes for a particular cell index
+
+Parameter: B<INDEX> - a cell index
+
+=cut
+
+sub getCellAttributes {
+    return shift->{_options}{cellAttributes}[shift];
+}
+
 # Protected
 #
 sub _setupDefaultClass {
     my $self = shift;
 
+    $self->prependClass($self->{_defaultClass} . '_editable')
+        if $self->{_options}{editable};
     $self->prependClass($self->{_defaultClass});
     $self->{__button}->prependClass($self->{_defaultClass} . '_button');
     $self->{__content}->prependClass($self->{_defaultClass} . '_content');
@@ -136,17 +175,23 @@ sub _init {
     $args{id} ||= randomize('comboview');
 
     $self->{_tag} = 'table';
-    $self->{_options}  = {columnWidth => []};
+    $self->{_options}  = {columnWidth => [], cellAttributes => []};
     $self->{__button}  = $button;
     $self->{__content} = $content;
 
-    $self->{_options}{columnWidth} = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
-    $self->{_options}{columnClass} = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};
-    $self->{_options}{nodeHeight}  = $args{nodeHeight}  if $args{nodeHeight};
+    $self->{_options}{columnWidth}    = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
+    $self->{_options}{columnClass}    = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};
+    $self->{_options}{nodeHeight}     = $args{nodeHeight}  if $args{nodeHeight};
 
     $self->setModel($args{model}) if defined $args{model};
 
-    delete @args{qw(columnWidth columnClass nodeHeight model)};
+    if ('ARRAY' eq ref $args{cellAttributes}) {
+        my $index = 0;
+        $self->setCellAttributes($index++, $_)
+            foreach @{$args{cellAttributes}};
+    }
+
+    delete @args{qw(columnWidth columnClass cellAttributes nodeHeight model)};
 
     $self->requiredJs('comboview.js');
     $self->_constructorArguments(%args);

@@ -105,6 +105,10 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     return ret;
   }
 
+  function flatIterator(node) {
+    return node.hasChildren() > 0;
+  }
+
   return {
     initialize: function($super) {
       $super();
@@ -157,6 +161,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         node = node.childNodes[path[i]];
 
       return node;
+    },
+    isFlat: function() {
+      return this.rootNodes.any(flatIterator);
     },
 
     freeze: function() {
@@ -308,7 +315,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       this.freeze();
       loadNodes.call(this, data.nodes, options.parentNode, options);
 
-      this.emitSignal('iwl:load_data');//, options);
+      this.emitSignal('iwl:load_data', options);
       return this.thaw();
     },
 

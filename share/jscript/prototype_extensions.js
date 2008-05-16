@@ -399,6 +399,13 @@ Object.extend(String.prototype, {
   },
   parseFloat: function() {
     return parseFloat(this);
+  },
+  objectize: function() {
+    return this.split('.').inject(window, function(acc, n) {
+      if (Object.isUndefined(acc)) throw $break;
+      if (n in acc) return acc[n];
+      else return undefined;
+    });
   }
 });
 

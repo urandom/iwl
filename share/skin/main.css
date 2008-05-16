@@ -1562,8 +1562,11 @@ div.tooltip_content {
 /* ComboView */
 .comboview {
     border: 1px solid #7F9DB9;
-    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    background-color: white;
     margin: 1px 0;
+}
+.comboview_editable {
+    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
 }
 
 .comboview_content {
@@ -1577,13 +1580,14 @@ div.tooltip_content {
 .comboview_button_cell {
     background-color: white;
     border-left: 1px solid #bbbbbb;
+    cursor: pointer;
 }
 
 .comboview_button {
     background: url('/iwl/skin/default/images/comboview/button.png') no-repeat;
     width: 16px;
     height: 16px;
-    margin: 0px 1px;
+    margin: 0 auto;
 }
 .comboview_button_off {
     background-position: 0px 0px;
@@ -1602,4 +1606,28 @@ div.tooltip_content {
 }
 .comboview_button_on_press {
     background-position: -80px 0px;
+}
+.comboview_node_container {
+    padding: 1px 2px;
+    border: 1px solid #7F9DB9;
+    position: absolute;
+    background: white;
+    color: black;
+    z-index: 99;
+}
+.comboview_node_highlight {
+    background: #8ac6f2
+}
+.comboview_column {
+    border-right: 1px dotted gray;
+    padding: 1px;
+}
+.comboview_column_last {
+    border-right: none;
+}
+.comboview_node {
+    border-bottom: 1px dotted gray;
+}
+.comboview_node_last, .comboview_content .comboview_node {
+    border-bottom: none;
 }
