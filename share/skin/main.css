@@ -1590,6 +1590,18 @@ div.tooltip_content {
     height: 16px;
     margin: 0 auto;
 }
+.comboview_parental_arrow_column {
+    width: 13px;
+    height: 16px;
+}
+.comboview_parental_arrow {
+    width: 6px;
+    height: 7px;
+    background: url('/iwl/skin/default/images/comboview/arrow.png') no-repeat 0px 0px;
+}
+.comboview_node_highlight .comboview_parental_arrow {
+    background-position: -6px 0px;
+}
 .comboview_button_off {
     background-position: 0px 0px;
 }

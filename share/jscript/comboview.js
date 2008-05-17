@@ -30,11 +30,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function setContent() {
-        this.content.update(generateNodeTemplate.call(this, true).evaluate({}));
+    function setContent(renderers) {
+        this.content.update(generateNodeTemplate.call(this, true, true).evaluate(renderers || {}));
     }
 
-    function generateNodeTemplate(flat) {
+    function generateNodeTemplate(flat, content) {
         /* Individual rows can't be dragged. Each node has to be a full table */
         var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node #{nodePosition}" iwl:nodePath="#{nodePath}"><tbody><tr>'];
 
@@ -46,10 +46,10 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             else if (i == l - 1) classNames.push('comboview_column_last');
             if (this.options.columnWidth[i])
                 width = ' style="width: ' + this.options.columnWidth[i] + 'px;"';
-            node.push('<td class="', classNames.join(' '), width, '">#{column', i, '}</td>');
+            node.push('<td class="', classNames.join(' '), '"', width, '>#{column', i, '}</td>');
         }
-        if (!flat)
-            node.push('<td class="comboview_parental_arrow">#{parentalArrow}</td>');
+        if (!content)
+            node.push('<td class="comboview_parental_arrow_column">#{parentalArrow}</td>');
         node.push('</tr></tbody></table>');
 
         return new Template(node.join(''));
@@ -63,6 +63,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             node.observe('mouseover', node.addClassName.bind(node, 'comboview_node_highlight'));
             node.observe('mouseout', node.removeClassName.bind(node, 'comboview_node_highlight'));
         });
+        this.setActive(this.options.initialPath);
     }
 
     function cellRenderer(values) {
@@ -108,7 +109,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var values = node.getValues();
             var renderers = cellRenderer.call(this, values);
             if (!flat && node.hasChildren() > 0)
-                renderers.parentalArrow = '>';
+                renderers.parentalArrow = '<div class="comboview_parental_arrow"></div>';
             if (index == 0)
                 renderers.nodePosition = 'comboview_node_first'
             else if (index + 1 == length)
@@ -146,14 +147,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var height = container.getStyle('height');
         if (this.options.maxHeight > parseFloat(height)) return;
         var scrollbar = document.viewport.getScrollbarSize();
-        if (container == this.container) {
-            var diff = this.getWidth() - container.getWidth() - scrollbar;
-            if (diff > 0) scrollbar += diff;
-            else if (diff < 0) {
-                var cell = this.button.up();
-                cell.setStyle({width: parseFloat(cell.getStyle('width')) - diff + 'px'});
-            }
-        }
         var new_width = parseInt(width) + scrollbar;
         container.addClassName('scrolling_menu');
         if (Prototype.Browser.Opera)
@@ -230,13 +223,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setActive: function(path) {
-            this.selectedpath = path;
+            this.selectedPath = path;
             if (!Object.isArray(path)) path = [path];
             var node = this.model.getNodeByPath(path);
             if (!node) return;
             this.values = node.getValues();
             var renderers = cellRenderer.call(this, this.values);
-            this.content.update(generateNodeTemplate.call(this, true).evaluate(renderers));
+            setContent.call(this, renderers);
 
             return this;
         },
@@ -246,6 +239,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 columnWidth: [],
                 columnClass: [],
                 cellAttributes: [],
+                initialPath: [0],
                 maxHeight: 400
             }, arguments[2]);
             this.model = model;

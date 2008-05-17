@@ -7,6 +7,7 @@ use strict;
 
 use base 'IWL::Widget';
 
+use IWL::Container;
 use IWL::Table::Container;
 use IWL::Table::Row;
 use IWL::String qw(randomize);
@@ -145,11 +146,6 @@ sub _realize {
     my $model = $self->{_model}->getName;
     $self->{_model}->getContent;
 
-    if (my @width = @{$self->{_options}{columnWidth}}) {
-        my $width = 0;
-        $width += $_ foreach @width;
-        $self->{__content}->setStyle(width => $width . 'px');
-    }
     $self->{__content}->setStyle(height => $self->{_options}{nodeHeight} . 'px')
         if $self->{_options}{nodeHeight};
 
@@ -182,6 +178,7 @@ sub _init {
     $self->{_options}{columnWidth}    = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
     $self->{_options}{columnClass}    = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};
     $self->{_options}{nodeHeight}     = $args{nodeHeight}  if $args{nodeHeight};
+    $self->{_options}{maxHeight}      = $args{maxHeight}   if defined $args{maxHeight};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -191,7 +188,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columnWidth columnClass cellAttributes nodeHeight model)};
+    delete @args{qw(columnWidth columnClass cellAttributes nodeHeight maxHeight model)};
 
     $self->requiredJs('comboview.js');
     $self->_constructorArguments(%args);

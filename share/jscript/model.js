@@ -163,7 +163,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return node;
     },
     isFlat: function() {
-      return this.rootNodes.any(flatIterator);
+      return !this.rootNodes.any(flatIterator);
     },
 
     freeze: function() {
