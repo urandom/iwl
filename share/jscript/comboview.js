@@ -98,13 +98,21 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         node.viewRow = element;
         node.viewContainer = container;
         node.viewCells = $A(element.rows[0].cells);
-        if (node.hasChildren() > 0 && node.viewChildContainer) {
-            var childContainer = node.viewChildContainer;
+        var childContainer = node.viewChildContainer;
+
+        element.signalConnect('dom:mouseenter', function(event) {
+            element.addClassName('comboview_node_highlight');
+            if (!childContainer || !Object.isElement(childContainer.parentNode) || !childContainer.visible())
+                container.childContainers.each(function(c) { popDown.call(this, c) }.bind(this));
+        }.bind(this));
+        element.signalConnect('dom:mouseleave', function(event) {
+            element.removeClassName('comboview_node_highlight');
+        }.bind(this));
+
+        if (node.hasChildren() > 0 && childContainer) {
             childContainer.parentRow = element;
             element.signalConnect('dom:mouseenter', function(event) {
                 clearTimeout(childContainer.popDownDelay);
-                if (!Object.isElement(childContainer.parentNode) || !childContainer.visible())
-                    container.childContainers.each(function(c) { popDown.call(this, c) }.bind(this));
                 popUp.call(this, childContainer);
             }.bind(this));
             element.signalConnect('dom:mouseleave', function(event) {
@@ -194,7 +202,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (this.options.maxHeight > parseFloat(height)) return;
         var scrollbar = document.viewport.getScrollbarSize();
         var new_width = parseInt(width) + scrollbar;
-        container.addClassName('scrolling_menu');
         if (Prototype.Browser.Opera)
             container.setStyle({width: new_width + 'px', height: this.options.maxHeight + 'px', overflow: 'auto'});
         else
@@ -211,33 +218,40 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!Object.isElement(container.parentNode))
             (container.parentContainer || this).insert({after: container});
 
-        if (!container.positioned) {
-            container.select('.comboview_node').each(function(node) {
-                node.observe('mouseover', node.addClassName.bind(node, 'comboview_node_highlight'));
-                node.observe('mouseout', node.removeClassName.bind(node, 'comboview_node_highlight'));
-            });
-            if (container.parentRow) {
-                var parent_position = container.parentRow.cumulativeOffset();
-                parent_position[0] += this.content.down('.comboview_node').getWidth();
-            } else {
-                var parent_position = this.getStyle('position') == 'absolute'
-                    ? this.cumulativeOffset()
-                    : this.positionedOffset();
-                parent_position[1] += this.getHeight();
-            }
-            container.setStyle({
-                left: parent_position[0] + 'px',
-                top: parent_position[1] + 'px'
-            });
+        var width = document.viewport.getWidth() + document.viewport.getScrollOffsets().left,
+            container_width = this.container.getWidth();
+        if (container.parentRow) {
+            var parent_position = [parseFloat(container.parentContainer.getStyle('left')), parseFloat(container.parentContainer.getStyle('top'))];
+            if (parent_position[0] + 2 * container_width > width) {
+                if (parent_position[0] - container_width > 5)
+                    parent_position[0] -= container_width;
+                else {
+                    parent_position[0] += 20;
+                    parent_position[1] += container.parentRow.getHeight() * 2 / 3;
+                }
+            } else parent_position[0] += this.content.down('.comboview_node').getWidth();
+            parent_position[1] += (container.parentRow.offsetTop - container.parentContainer.scrollTop);
+        } else {
+            var parent_position = this.getStyle('position') == 'absolute'
+                ? this.cumulativeOffset()
+                : this.positionedOffset();
+            parent_position[1] += this.getHeight();
+        }
+        container.setStyle({
+            left: parent_position[0] + 'px',
+            top: parent_position[1] + 'px'
+        });
 
+        if (!container.initialized) {
             var table = container.down();
             container.style.width = table.getWidth()
                 + parseFloat(table.getStyle('margin-left') || 0)
                 + parseFloat(table.getStyle('margin-right') || 0) + 'px';
+
             if (this.options.maxHeight)
                 setupScrolling.call(this, container);
 
-            container.positioned = true;
+            container.initialized = true;
 
             document.observe('click', function(event) {
                 var inside = Event.checkElement(event, container);
