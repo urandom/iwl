@@ -203,6 +203,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 number = number.toFixed(this.options.precision);
             this.value = parseFloat(number);
             this.input.value = this.mask ? this.mask.evaluate({number: number}) : number;
+            this.control.emitSignal("change");
             return this.emitSignal("iwl:change");
         },
         /**
