@@ -122,6 +122,22 @@ sub getCellAttributes {
     return shift->{_options}{cellAttributes}[shift];
 }
 
+=item B<setActive> (B<PATH>)
+
+Sets the active item of the L<IWL::ComboView>
+
+Parameters: B<PATH> - the model path (or an index for flat models) for the item
+
+=cut
+
+sub setActive {
+    my ($self, $path) = @_;
+    $path = [$path] unless 'ARRAY' eq ref $path;
+    $self->{_options}{initialPath} = $path;
+
+    return $self;
+}
+
 # Protected
 #
 sub _setupDefaultClass {
