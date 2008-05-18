@@ -62,8 +62,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.setActive(this.options.initialPath);
     }
 
-    function cellTemplateRenderer(values) {
-        var cellTemplate = {};
+    function cellTemplateRenderer(node) {
+        var values = node.getValues(), cellTemplate = {};
         for (var i = 0, l = values.length; i < l; i++) {
             var render = this.options.cellAttributes[i] && this.options.cellAttributes[i].renderTemplate;
             if (render) {
@@ -152,8 +152,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
         var index = 0, length = nodes.length;
         nodes.each(function(node) {
-            var values = node.getValues();
-            var cellTemplate = cellTemplateRenderer.call(this, values);
+            var cellTemplate = cellTemplateRenderer.call(this, node);
             if (!flat && node.hasChildren() > 0) {
                 cellTemplate.parentalArrow = '<div class="comboview_parental_arrow"></div>';
                 createNodes.call(this, node.children(), template);
@@ -303,7 +302,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             if (!node) return;
             this.values = node.getValues();
-            var cellTemplate = cellTemplateRenderer.call(this, this.values);
+            var cellTemplate = cellTemplateRenderer.call(this, node);
             setContent.call(this, cellTemplate);
 
             return this;
