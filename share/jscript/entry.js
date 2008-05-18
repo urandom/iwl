@@ -37,8 +37,8 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
         setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value = '');
     }
 
-    function changeCallback() {
-        if (this.textState == IWL.Entry.TextState.NORMAL) {
+    function changeCallback(event, skip) {
+        if (!skip && this.textState == IWL.Entry.TextState.NORMAL) {
             this.value = this.control.value;
             this.blurValue = null;
         }
@@ -173,6 +173,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 setTextState.call(this, IWL.Entry.TextState.BLUR, this.blurValue);
             else
                 setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
+	    this.control.emitSignal('change', true);
             return this.emitSignal("iwl:change");
         },
         /**

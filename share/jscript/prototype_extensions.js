@@ -42,7 +42,38 @@ Object.extend(Prototype.Browser, {
   Object.extend(Event, EventMethods);
 })();
 
+Event.Options = Class.create({
+  initialize: function() {
+    Object.extend(this, arguments[0] || {});
+  }
+});
 Object.extend(Event, (function() {
+  var cache = {};
+  var eventMapping = {
+    click:     [createMouseEvent],
+    dblclick:  [createMouseEvent],
+    mouseover: [createMouseEvent],
+    mouseout:  [createMouseEvent],
+    mousedown: [createMouseEvent],
+    mouseup:   [createMouseEvent],
+    mousemove: [createMouseEvent],
+    keypress:  [createKeyEvent],
+    keydown:   [createKeyEvent],
+    keyup:     [createKeyEvent],
+    load:      [createHTMLEvent, { bubbles: false, cancelable: false}],
+    unload:    [createHTMLEvent, { bubbles: false, cancelable: false}],
+    abort:     [createHTMLEvent, { bubbles: true,  cancelable: false}],
+    error:     [createHTMLEvent, { bubbles: true,  cancelable: false}],
+    select:    [createHTMLEvent, { bubbles: true,  cancelable: false}],
+    change:    [createHTMLEvent, { bubbles: true,  cancelable: false}],
+    submit:    [createHTMLEvent, { bubbles: true,  cancelable: true}],
+    reset:     [createHTMLEvent, { bubbles: true,  cancelable: false}],
+    focus:     [createHTMLEvent, { bubbles: false, cancelable: false}],
+    blur:      [createHTMLEvent, { bubbles: false, cancelable: false}],
+    resize:    [createHTMLEvent, { bubbles: true,  cancelable: false}],
+    scroll:    [createHTMLEvent, { bubbles: true,  cancelable: false}]
+  };
+
   function callbackWrapper(observer) {
     return function(event) {
       var args = event.memo
@@ -80,7 +111,95 @@ Object.extend(Event, (function() {
         cache[id][eventName] = null;
   }
 
-  var cache = {};
+  function createMouseEvent(element, eventName) {
+    var options = Object.extend({
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      detail: 1,
+      screenX: 0,
+      screenY: 0,
+      clientX: 0,
+      clientY: 0,
+      ctrlKey: false,
+      altKey: false,
+      shiftKey: false,
+      metaKey: false,
+      button: 0,
+      relatedTarget: undefined
+    }, arguments[2]);
+
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('MouseEvents');
+      event.initMouseEvent(
+          eventName, options.bubbles, options.cancelable, options.view,
+          options.detail, options.screenX, options.screenY, options.clientX,
+          options.clientY, options.ctrlKey, options.altKey, options.shiftKey,
+          options.metaKey, options.button, options.relatedTarget
+        );
+    } else if (document.createEventObject) {
+      event = document.createEventObject();
+      Object.extend(event, options);
+      event.button = options.button == 0
+        ? 1 : options.button == 1
+          ? 4 : options.button == 2
+            ? 2 : 0;
+    }
+
+    return event;
+  }
+
+  function createKeyEvent(element, eventName) {
+    var options = Object.extend({
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      ctrlKey: false,
+      altKey: false,
+      shiftKey: false,
+      metaKey: false,
+      keyCode: 0,
+      charCode: 0
+    }, arguments[2]);
+
+    var event;
+    if (document.createEvent) {
+      if (Prototype.Browser.Gecko) {
+        event = document.createEvent('KeyEvents');
+        event.initKeyEvent(
+          eventName, options.bubbles, options.cancelable, options.view,
+          options.ctrlKey, options.altKey, options.shiftKey, options.metaKey,
+          options.keyCode, options.charCode
+        );
+      } else {
+        event = document.createEvent('Events');
+        event.initEvent(eventName, options.bubbles, options.cancelable);
+        delete options.bubbles; delete options.cancelable;
+        Object.extend(event, options);
+      }
+    } else if (document.createEventObject) {
+      event = document.createEventObject();
+      Object.extend(event, options);
+    }
+
+    return event;
+  }
+
+  function createHTMLEvent(element, eventName) {
+    var options = Object.extend(arguments[3], arguments[2]);
+
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, options.bubbles, options.cancelable);
+    } else if (document.createEventObject) {
+      event = document.createEventObject();
+      Object.extend(event, options);
+    }
+
+    return event;
+  }
 
   var customEvents = {
     'dom:mouseenter': {
@@ -169,7 +288,40 @@ Object.extend(Event, (function() {
       var args = $A(arguments);
       var element = args.shift();
       var name = args.shift();
-      return Event.fire(element, name, args);
+      var options;
+      if (args.last() instanceof Event.Options)
+	options = args.pop();
+      return Event.fire(element, name, args, options);
+    },
+    fire: function(element, eventName, memo, options) {
+      element = $(element);
+      if (element == document && document.createEvent && !element.dispatchEvent)
+        element = document.documentElement;
+
+      var event;
+      if (eventMapping[eventName] && Object.isFunction(eventMapping[eventName][0])) {
+        event = eventMapping[eventName][0](element, eventName, options, eventMapping[eventName][1]);
+        event.eventType = "on" + eventName;
+      } else {
+	if (document.createEvent) {
+	  event = document.createEvent("HTMLEvents");
+	  event.initEvent("dataavailable", true, true);
+	} else {
+	  event = document.createEventObject();
+	  event.eventType = "ondataavailable";
+	}
+      }
+
+      event.eventName = eventName;
+      event.memo = memo || { };
+
+      if (document.createEvent) {
+        element.dispatchEvent(event);
+      } else {
+        element.fireEvent(event.eventType, event);
+      }
+
+      return Event.extend(event);
     }
   };
 })());
