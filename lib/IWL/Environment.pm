@@ -1,7 +1,7 @@
 #! /bin/false
 # vim: set autoindent shiftwidth=4 tabstop=8:
 
-package IWL::SnippetManager;
+package IWL::Environment;
 
 use strict;
 
@@ -9,22 +9,22 @@ use base qw(IWL::Object);
 
 =head1 NAME
 
-IWL::SnippetManager - A snippet manager pseudo-object
+IWL::Environment - An environment pseudo-object
 
 =head1 INHERITANCE
 
-L<IWL::Error> -> L<IWL::Object> -> L<IWL::SnippetManager>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Environment>
 
 =head1 DESCRIPTION
 
-The IWL::SnippetManager provides a pseudo-object, used to manage snippets of L<IWL::Object>s for a page. Its main purpose is managing shared resources, such as javascript files, whenever L<IWL::Page> is not used. Unlike L<IWL::Page>, L<IWL::SnippetManager> does not produce any code, only the code of its children.
+The IWL::Environment provides a pseudo-object, used to manage snippets of L<IWL::Object>s for a page. Its main purpose is managing shared resources, such as javascript files, whenever L<IWL::Page> is not used. Unlike L<IWL::Page>, L<IWL::Environment> does not produce any code, only the code of its children.
 
 =head1 SINOPSYS
 
  use IWL;
- use IWL::SnippetManager;
+ use IWL::Environment;
 
- my $manager = IWL::SnippetManager->new;
+ my $env = IWL::Environment->new;
 
  # Building some IWL hierarchy
  my $container = IWL::Container->new;
@@ -35,37 +35,37 @@ The IWL::SnippetManager provides a pseudo-object, used to manage snippets of L<I
  $button->setLabel('Click me!');
  $container->appendChild($label, $button);
 
- $manager->appendChild($container);
+ $env->appendChild($container);
 
  ...
 
- # Print out the manager content,
+ # Print out the env content,
  # as was as any shared resource (in this case, 'button.js')
- # The manager child stack is cleared
- $html .= $manager->getContent;
+ # The environment child stack is cleared
+ $html .= $env->getContent;
 
  ...
 
  my $button2 = IWL::Button->newFromStock('IWL_STOCK_NEW');
- $manager->appendChild($button2);
+ $env->appendChild($button2);
 
  ...
 
  # Print out only $button2, since the previous content was
  # already obtained. The shared resource, 'button.js',
  # is not printed again.
- $html .= $manager->getContent;
+ $html .= $env->getContent;
 
  ...
 
  # Adding scripts as shared resources
- $manager->requiredJs('/foo/bar.js');
+ $env->requiredJs('/foo/bar.js');
 
- $html .= $manager->getContent;
+ $html .= $env->getContent;
 
 =head1 CONSTRUCTOR
 
-IWL::SnippetManager->new ([B<%ARGS>])
+IWL::Environment->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
@@ -86,7 +86,7 @@ sub new {
 
 =item B<getContent>
 
-Returns the markup for the manager's children, and removes them from its stack.
+Returns the markup for the environment's children, and removes them from its stack.
 
 =cut
 
@@ -107,7 +107,7 @@ sub getContent {
 
 =item B<getObject>
 
-Returns the manager's children as a new object, with a structure needed for JSON
+Returns the environment's children as a new object, with a structure needed for JSON
 
 =cut
 
@@ -116,7 +116,7 @@ sub getObject {
     my $object = $self->SUPER::getObject;
 
     delete $object->{$_} foreach qw(tag attributes text);
-    $object->{snippetManager} = 1;
+    $object->{environment} = 1;
 
     $self->{childNodes} = [];
 

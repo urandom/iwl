@@ -495,6 +495,17 @@ Object.extend(Event, (function() {
       }
       return true;
     },
+    truncate: function(element) {
+      if (!(element = $(element))) return;
+      if (element.getWidth() == element.scrollWidth) return;
+      var abbr = element.select('abbr.ellipsis')[0]
+              || new Element('abbr', {className: 'ellipsis'}).update('&hellip;');
+      abbr.writeAttribute({title: element.getText()});
+      element.appendChild(abbr);
+      abbr.setStyle({marginLeft: '-' + (element.scrollWidth - element.getWidth()) + 'px'})
+
+      return element;
+    },
     signalConnect: function() {
       Event.signalConnect.apply(Event, arguments);
       return $A(arguments).first();
