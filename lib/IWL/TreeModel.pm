@@ -166,7 +166,7 @@ sub _realize {
 
     my ($even, @script) = (1);
     push @script, 'window.' . $self->{__name} . ' = new IWL.TreeModel(';
-    push @script, join ', ', map {($even = !$even) ? "'$_'" : $_} @{$self->{__columns}};
+    push @script, join ', ', (map {($even = !$even) ? "'$_'" : $_} @{$self->{__columns}}), qq|{"name": "$self->{__name}"}|;
     push @script, ');';
 
     push @script, $self->{__name} . '.loadData(' . toJSON($self->{__data}) . ');'
@@ -184,7 +184,8 @@ sub _sortColumnEvent {
               ascending => $event->{options}{ascending},
               columnValues => 
                   $event->{options}{columnValues} ? evalJSON($event->{options}{columnValues}, 1) : undef,
-              defaultOrder => $event->{options}{defaultOrder}
+              defaultOrder => $event->{options}{defaultOrder},
+              name => $event->{options}{name}
           })
       : (undef, undef);
     $data = toJSON($data);

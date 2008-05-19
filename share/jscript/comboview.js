@@ -84,6 +84,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     var count = 0;
                     this.model.each(function(n) { count++; if (n == node) throw $break; });
                     cellTemplate['column' + i] = count;
+                    node.setValues(i, count);
                 }
             }
         }
@@ -257,7 +258,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!inside && !Event.checkElement(event, this))
                     return this.popDown();
                 else if (inside) {
-                    var path = Event.element(event).up('table.comboview_node').readAttribute('iwl:nodePath').evalJSON();
+                    var element = Event.element(event).up('.comboview_node');
+                    if (!element || element.descendantOf(this)) return;
+                    var path = element.readAttribute('iwl:nodePath').evalJSON();
                     this.setActive(path);
                     return this.popDown();
                 }
@@ -306,7 +309,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             setContent.call(this, cellTemplate);
 
-            return this;
+            return this.emitSignal('iwl:change', this.values);
         },
         /**
          * @returns The active item of the ComboView
