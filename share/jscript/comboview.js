@@ -31,7 +31,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setContent(cellTemplate) {
-        this.content.update(generateNodeTemplate.call(this, true, true).evaluate(cellTemplate || {}));
+        this.content.innerHTML = generateNodeTemplate.call(this, true, true).evaluate(cellTemplate || {});
     }
 
     function generateNodeTemplate(flat, content) {
@@ -110,7 +110,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             childContainer.parentRow = element;
             element.signalConnect('dom:mouseenter', function(event) {
                 clearTimeout(childContainer.popDownDelay);
-                popUp.call(this, childContainer);
+                /* Race condition by incorrect event sequence in IE */
+                popUp.bind(this, childContainer).delay(0.001);
             }.bind(this));
             element.signalConnect('dom:mouseleave', function(event) {
                 childContainer.popDownDelay = popDown.bind(this, childContainer).delay(this.options.popDownDelay);
@@ -147,25 +148,23 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         } else {
             this.container = container;
         }
-        var index = 0, length = nodes.length;
-        nodes.each(function(node) {
+        for (var i = 0, l = nodes.length, node = nodes[0]; i < l; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             if (!flat && node.hasChildren() > 0) {
                 cellTemplate.parentalArrow = '<div class="comboview_parental_arrow"></div>';
                 createNodes.call(this, node.children(), template);
             }
 
-            if (index + 1 == length && index == 0)
+            if (i + 1 == l && i == 0)
                 cellTemplate.nodePosition = 'comboview_node_first comboview_node_last'
-            else if (index == 0)
+            else if (i == 0)
                 cellTemplate.nodePosition = 'comboview_node_first'
-            else if (index + 1 == length)
+            else if (i + 1 == l)
                 cellTemplate.nodePosition = 'comboview_node_last'
             cellTemplate.nodePath = node.getPath().toJSON();
             html.push(template.evaluate(cellTemplate));
-            ++index;
-        }.bind(this));
-        container.update(html.join(''));
+        };
+        container.innerHTML = html.join('');
         var children = container.childElements();
         for (var i = 0, l = nodes.length; i < l; i++) {
             setNodeAttributes.call(this, container, children[i], nodes[i]);
