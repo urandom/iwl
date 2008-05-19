@@ -33,7 +33,7 @@ sub new {
     my ($proto, $content) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new;
 
     $self->{__content} = $content || "";
     $self->{__expr}    = '';

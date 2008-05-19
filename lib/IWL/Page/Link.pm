@@ -37,7 +37,7 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new(%args);
 
     $self->{_tag}  = "link";
     $self->{_noChildren} = 1;
