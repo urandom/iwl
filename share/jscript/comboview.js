@@ -207,6 +207,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function popUp(container) {
         var container = Object.isElement(container)
             ? container : this.container;
+        if (!container) return;
         if (container.popped) return;
         container.setStyle({display: 'block', visibility: 'hidden'});
         container.popped = true;
@@ -265,6 +266,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function popDown(container) {
         var container = Object.isElement(container) ? container : this.container;
+        if (!container) return;
         container.childContainers.each(function(c) { popDown.call(this, c) }.bind(this));
         if (!container.popped) return;
         container.style.display = 'none';
@@ -336,7 +338,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 window.attachEvent("onunload", function() { this.model = null });
 
             onDataLoad.call(this, null, this.model.options);
-            this.model.signalConnect('iwl:load_data', onDataLoad.bind(this));
+            var callback = onDataLoad.bind(this);
+            this.model.signalConnect('iwl:load_data', callback);
+            this.model.signalConnect('iwl:sort_column_change', callback);
         }
     }
 })());
