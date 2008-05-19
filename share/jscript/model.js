@@ -347,9 +347,7 @@ Object.extend(IWL.TreeModel, (function() {
       INT:      ++index,
       FLOAT:    ++index,
       BOOLEAN:  ++index,
-      COUNT:    ++index,
-      CHECKBOX: ++index,
-      RADIO:    ++index
+      COUNT:    ++index
     },
     addColumnType: function(type) {
       IWL.TreeModel.Types[type] = ++index;

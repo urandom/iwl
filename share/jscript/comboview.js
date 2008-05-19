@@ -80,10 +80,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     cellTemplate['column' + i] = parseFloat(values[i])
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.BOOLEAN)
                     cellTemplate['column' + i] = values[i].toString();
-                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.CHECKBOX)
-                    cellTemplate['column' + i] = '<input type="checkbox" value="' + values[i] + '"/>';
-                else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.RADIO)
-                    cellTemplate['column' + i] = '<input type="radio" value="' + values[i] + '" name="comboview_radio_group"/>';
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.COUNT) {
                     var count = 0;
                     this.model.each(function(n) { count++; if (n == node) throw $break; });
@@ -220,10 +216,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var width = document.viewport.getWidth() + document.viewport.getScrollOffsets().left,
             container_width = this.container.getWidth();
         if (container.parentRow) {
-            var parent_position = [parseFloat(container.parentContainer.getStyle('left')), parseFloat(container.parentContainer.getStyle('top'))];
+            var parent_position = [parseFloat(container.parentContainer.getStyle('left')), parseFloat(container.parentContainer.getStyle('top'))],
+                view_width = this.getWidth();
             if (parent_position[0] + 2 * container_width > width) {
-                if (parent_position[0] - container_width > 5)
-                    parent_position[0] -= container_width;
+                if (parent_position[0] - view_width > 5)
+                    parent_position[0] -= view_width;
                 else {
                     parent_position[0] += 20;
                     parent_position[1] += container.parentRow.getHeight() * 2 / 3;
