@@ -43,7 +43,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (this.options.columnClass[i])
                 classNames.push(this.options.columnClass[i]);
             if (i == 0) classNames.push('comboview_column_first');
-            else if (i == l - 1) classNames.push('comboview_column_last');
+            if (i == l - 1) classNames.push('comboview_column_last');
             if (this.options.columnWidth[i])
                 width = ' style="width: ' + this.options.columnWidth[i] + 'px;"';
             node.push('<td class="', classNames.join(' '), '"', width, '>#{column', i, '}</td>');
@@ -154,7 +154,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 createNodes.call(this, node.children(), template);
             }
 
-            if (index == 0)
+            if (index + 1 == length && index == 0)
+                cellTemplate.nodePosition = 'comboview_node_first comboview_node_last'
+            else if (index == 0)
                 cellTemplate.nodePosition = 'comboview_node_first'
             else if (index + 1 == length)
                 cellTemplate.nodePosition = 'comboview_node_last'
@@ -224,7 +226,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     parent_position[0] -= view_width;
                 else {
                     parent_position[0] += 20;
-                    parent_position[1] += container.parentRow.getHeight() * 2 / 3;
+                    parent_position[1] += container.parentRow.getHeight() * 4 / 5;
                 }
             } else parent_position[0] += this.content.down('.comboview_node').getWidth();
             parent_position[1] += (container.parentRow.offsetTop - container.parentContainer.scrollTop);
