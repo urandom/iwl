@@ -227,7 +227,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     parent_position[0] -= view_width;
                 else {
                     parent_position[0] += 20;
-                    parent_position[1] += container.parentRow.getHeight() * 4 / 5;
+                    parent_position[1] += container.parentRow.getHeight() * 7 / 8;
                 }
             } else parent_position[0] += this.content.down('.comboview_node').getWidth();
             parent_position[1] += (container.parentRow.offsetTop - container.parentContainer.scrollTop);
