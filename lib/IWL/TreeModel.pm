@@ -108,7 +108,7 @@ sub addColumnType {
 Data:
   {
     totalCount => int,
-    size => int,
+    limit => int,
     offset => int,
     preserve => boolean,
     index => int,
@@ -132,7 +132,7 @@ Data:
 
 
 sub dataReader {
-    my ($self, %options) = (@_ % 2 ? (shift @_, @_) : (undef, @_));
+    my ($self, %options) = @_;
     my ($content, $data, $modifiers) = ('', undef, {});
 
     if ($options{file}) {
@@ -199,37 +199,32 @@ sub dataReader {
 
         $data = Storable::thaw($content);
         if ($options{subtype} eq 'array') {
-            $data = __readArray($data, %options);
+            $self->__readArray($data, %options);
         } else {
-            ($data, $modifiers) = __readHashList($data, %options);
+            $modifiers = $self->__readHashList($data, %options);
         }
     } elsif ($options{type} eq 'json') {
         $data = evalJSON($content, 1);
         if ($options{subtype} eq 'array') {
-            $data = __readArray($data, %options);
+            $self->__readArray($data, %options);
         } else {
-            ($data, $modifiers) = __readHashList($data, %options);
+            $modifiers = $self->__readHashList($data, %options);
         }
     } elsif ($options{type} eq 'array') {
-        $data = __readArray($data, %options);
+        $self->__readArray($data, %options);
     } else {
-        ($data, $modifiers) = __readHashList($data, %options);
+        $modifiers = $self->__readHashList($data, %options);
     }
-    $modifiers = {
+    $self->{_options} = {
+        %{$self->{_options}},
         %$modifiers,
         preserve => defined $options{preserve} ? $options{preserve} : 1,
     };
 
-    $modifiers->{$_} = $options{$_} foreach
-        grep {defined $options{$_}} qw(totalCount size offset index parentNode);
+    $self->{_options}{$_} = $options{$_} foreach
+        grep {defined $options{$_}} qw(totalCount limit offset index parentNode);
 
-    my $ret = {%$modifiers, nodes => $data};
-    if ($self) {
-        $self->{__data} = $ret;
-        return $self;
-    } else {
-        return $ret
-    }
+    return $self;
 }
 
 # Overrides
@@ -249,9 +244,6 @@ sub _realize {
     push @script, 'window.' . $self->{_options}{name} . ' = new IWL.TreeModel(';
     push @script, join ', ', (map {($even = !$even) ? "'$_'" : $_} @{$self->{columns}}), qq|{"name": "$self->{_options}{name}"}|;
     push @script, ');';
-
-    push @script, $self->{_options}{name} . '.loadData(' . toJSON($self->{__data}) . ');'
-        if $self->{__data};
 
     $self->_appendInitScript(join "\n", @script);
 }
@@ -302,28 +294,28 @@ sub _init {
 =cut
 
 sub __readArray {
-    my ($array, %options) = @_;
+    my ($self, $array, %options) = @_;
 
     my $values = $options{valuesIndex};
     my $children = $options{childrenIndex};
-    my $data = [];
     foreach my $item (@$array) {
+        my $node = IWL::TreeModel::Node->new;
         unless (defined $values || defined $children) {
-            push @$data, {values => $item};
+            my $index = 0;
+            $node->setValues($index++, $_) foreach ('ARRAY' eq ref $item ? @$item : $item);
         } else {
-            my $node = {};
             for (my $i = 0; $i < @$item; $i++) {
                 if (defined $values && $values eq $i) {
-                    $node->{values} = $item->[$i];
+                    my $index = 0;
+                    $node->setValues($index++, $_)
+                        foreach ('ARRAY' eq ref $item->[$i] ? @{$item->[$i]} : $item->[$i]);
                 } elsif (defined $children && $children eq $i) {
-                    $node->{children} = __readArray($item->[$i]);
+                    $self->__readArray($item->[$i], parent => $node);
                 }
             }
-            push @$data, $node;
+            $self->appendNode($options{parent});
         }
     }
-
-    return $data;
 }
 
 =head1
@@ -355,8 +347,7 @@ sub __readArray {
 =cut
 
 sub __readHashList {
-    my ($list, %options) = @_;
-    my $data = [];
+    my ($self, $list, %options) = @_;
     my $modifiers = {};
     my $values = $options{valuesProperty} || 'values';
     my $indices = 'ARRAY' eq ref $options{valuesIndices} ? $options{valuesIndices} : undef;
@@ -364,7 +355,7 @@ sub __readHashList {
 
     if (ref $list eq 'HASH') {
         $modifiers->{totalCount} = $list->{$options{totalCountProperty}};
-        $modifiers->{size} = $list->{$options{sizeProperty}};
+        $modifiers->{limit} = $list->{$options{sizeProperty}};
         $modifiers->{offset} = $list->{$options{offsetProperty}};
 
         $list = $list->{$options{nodesProperty}} || [];
@@ -372,25 +363,28 @@ sub __readHashList {
 
     foreach my $item (@$list) {
         next unless 'HASH' eq ref $item;
-        my $node = {};
-        ($node->{children}) = __readHashList($item->{$children}, %options)
+        my $node = IWL::TreeModel::Node->new;
+        $self->__readHashList($item->{$children}, %options, parent => $node)
             if ref $item->{$children} eq 'ARRAY';
         if (ref $item->{$values} eq 'ARRAY') {
             if ($indices) {
-                $node->{values} = [];
+                my $i = 0;
                 foreach my $index (@$indices) {
-                    push @{$node->{values}}, (defined $index ? $item->{$values}[$index] : undef);
+                    $node->setValues($i++, defined $index ? $item->{$values}[$index] : undef)
                 }
             } else {
-                $node->{values} = $item->{$values};
+                my $index = 0;
+                $node->setValues($index++, $_)
+                    foreach @{$item->[$values]};
             }
         } elsif (ref $options{valueProperties} eq 'ARRAY') {
-            $node->{values} = [map {$item->{$_}} @{$options{valueProperties}}];
+            my $index = 0;
+            $node->setValues($index++, $item->{$_}) foreach @{$options{valueProperties}};
         }
-        push @$data, $node;
+        $self->appendNode($options{parent});
     }
 
-    return $data, $modifiers;
+    return $modifiers;
 }
 
 1;
