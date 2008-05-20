@@ -94,6 +94,7 @@ lib/IWL/Tree.pm
 lib/IWL/Tree/Cell.pm
 lib/IWL/Tree/Row.pm
 lib/IWL/TreeModel.pm
+lib/IWL/TreeModel/Node.pm
 lib/IWL/Upload.pm
 lib/IWL/VBox.pm
 lib/IWL/Widget.pm

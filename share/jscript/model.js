@@ -518,7 +518,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       var args = $A(arguments);
       if (!args.length)
         return this.values;
-      var index, ret = [];
+      var ret = [];
       while (args.length)
         ret.push(this.values[args.shift()]);
       return ret;
