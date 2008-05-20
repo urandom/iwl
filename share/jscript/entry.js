@@ -161,20 +161,29 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
          * */
         setValue: function(value, blur) {
             if (Object.isUndefined(value) || value === null) value = '';
-            this.value = value.toString();
-            this.blurValue = this.value
+            value = value.toString();
+            blur = value
                 ? Object.isUndefined(blur) || blur === null
                     ? null
                     : blur.toString()
                 : null;
-            if (this.value.empty())
+            if (value.empty())
                 setTextState.call(this, IWL.Entry.TextState.DEFAULT, this.defaultText);
-            else if (!this.focused && this.blurValue !== null)
-                setTextState.call(this, IWL.Entry.TextState.BLUR, this.blurValue);
+            else if (!this.focused && blur !== null)
+                setTextState.call(this, IWL.Entry.TextState.BLUR, blur);
             else
-                setTextState.call(this, IWL.Entry.TextState.NORMAL, this.value);
-	    this.control.emitSignal('change', true);
-            return this.emitSignal("iwl:change");
+                setTextState.call(this, IWL.Entry.TextState.NORMAL, value);
+
+            if (this.value == value && this.blurValue == blur) return;
+            this.value = value;
+            this.blurValue = blur;
+
+            if (!this.__initFlag) {
+                this.control.emitSignal('change', true);
+                this.emitSignal("iwl:change");
+            }
+            
+            return this;
         },
         /**
          * @returns The current value of the entry
@@ -273,7 +282,10 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.control.signalConnect('keyup', keyUpCallback.bind(this));
             this.control.signalConnect('change', changeCallback.bind(this));
             this.defaultText = this.options.defaultText.toString();
+
+            this.__initFlag = true;
             this.setValue(this.control.value, this.options.blurValue);
+            this.__initFlag = undefined;
 
             setupAutoComplete.call(this);
 
