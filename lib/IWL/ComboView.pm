@@ -165,6 +165,11 @@ sub _realize {
     $self->{__content}->setStyle(height => $self->{_options}{nodeHeight} . 'px')
         if $self->{_options}{nodeHeight};
 
+    foreach my $attrs (@{$self->{_options}{cellAttributes}}) {
+        next unless 'HASH' eq ref $attrs;
+        $attrs->{renderTemplate} = $attrs->{renderTemplate}->getContent
+            if $attrs->{renderTemplate};
+    }
     my $options = toJSON($self->{_options});
 
     $self->_appendInitScript("IWL.ComboView.create('$id', $model, $options);");

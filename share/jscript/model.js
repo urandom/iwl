@@ -115,8 +115,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       var args = $A(arguments), index = -1;
       args.shift();
 
-      this.options = Object.extend({
-      }, args.length % 2 ? args.pop() : {});
+      this.options = Object.extend({}, args.length % 2 ? args.pop() : {});
 
       this.rootNodes = [];
       this.frozen = false;
@@ -182,14 +181,20 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     setSortMethod: function(index, options) {
       this.sortMethods[index] = options;
       if (Object.isString(options.url) && !options.url.blank()) {
-        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {responseCallback: sortResponse.bind(this)});
+        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {
+          responseCallback: sortResponse.bind(this),
+          name: this.options.name
+        });
       }
       return this;
     },
     setDefaultOrderMethod: function(options) {
       this.defaultOrderMethod = options;
       if (Object.isString(options.url) && !options.url.blank()) {
-        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {responseCallback: sortResponse.bind(this)});
+        this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {
+          responseCallback: sortResponse.bind(this),
+          name: this.options.name
+        });
       }
       return this;
     },

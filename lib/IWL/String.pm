@@ -9,7 +9,7 @@ use strict;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK);
-@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape unescape escapeHTML unescapeHTML randomize);
+@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape unescape escapeHTML unescapeHTML randomize templateSymbol);
 
 =head1 NAME
 
@@ -186,6 +186,18 @@ sub randomize {
     $string =~ s/\.//g;
 
     return $string;
+}
+
+=item B<templateSymbol> (B<NAME>)
+
+Turns the given B<NAME> into a template symbol
+
+Parameters: B<NAME> - the template symbol name (Alphanumeric)
+
+=cut
+
+sub templateSymbol {
+    return '#{' . (shift) . '}';
 }
 
 1;

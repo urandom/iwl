@@ -31,7 +31,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setContent(cellTemplate) {
-        this.content.update(generateNodeTemplate.call(this, true, true).evaluate(cellTemplate || {}));
+        this.content.innerHTML = generateNodeTemplate.call(this, true, true).evaluate(cellTemplate || {});
     }
 
     function generateNodeTemplate(flat, content) {
@@ -43,7 +43,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (this.options.columnClass[i])
                 classNames.push(this.options.columnClass[i]);
             if (i == 0) classNames.push('comboview_column_first');
-            else if (i == l - 1) classNames.push('comboview_column_last');
+            if (i == l - 1) classNames.push('comboview_column_last');
             if (this.options.columnWidth[i])
                 width = ' style="width: ' + this.options.columnWidth[i] + 'px;"';
             node.push('<td class="', classNames.join(' '), '"', width, '>#{column', i, '}</td>');
@@ -84,6 +84,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     var count = 0;
                     this.model.each(function(n) { count++; if (n == node) throw $break; });
                     cellTemplate['column' + i] = count;
+                    node.setValues(i, count);
                 }
             }
         }
@@ -109,7 +110,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             childContainer.parentRow = element;
             element.signalConnect('dom:mouseenter', function(event) {
                 clearTimeout(childContainer.popDownDelay);
-                popUp.call(this, childContainer);
+                /* Race condition by incorrect event sequence in IE */
+                popUp.bind(this, childContainer).delay(0.001);
             }.bind(this));
             element.signalConnect('dom:mouseleave', function(event) {
                 childContainer.popDownDelay = popDown.bind(this, childContainer).delay(this.options.popDownDelay);
@@ -146,23 +148,23 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         } else {
             this.container = container;
         }
-        var index = 0, length = nodes.length;
-        nodes.each(function(node) {
+        for (var i = 0, l = nodes.length, node = nodes[0]; i < l; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             if (!flat && node.hasChildren() > 0) {
                 cellTemplate.parentalArrow = '<div class="comboview_parental_arrow"></div>';
                 createNodes.call(this, node.children(), template);
             }
 
-            if (index == 0)
+            if (i + 1 == l && i == 0)
+                cellTemplate.nodePosition = 'comboview_node_first comboview_node_last'
+            else if (i == 0)
                 cellTemplate.nodePosition = 'comboview_node_first'
-            else if (index + 1 == length)
+            else if (i + 1 == l)
                 cellTemplate.nodePosition = 'comboview_node_last'
             cellTemplate.nodePath = node.getPath().toJSON();
             html.push(template.evaluate(cellTemplate));
-            ++index;
-        }.bind(this));
-        container.update(html.join(''));
+        };
+        container.innerHTML = html.join('');
         var children = container.childElements();
         for (var i = 0, l = nodes.length; i < l; i++) {
             setNodeAttributes.call(this, container, children[i], nodes[i]);
@@ -224,7 +226,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     parent_position[0] -= view_width;
                 else {
                     parent_position[0] += 20;
-                    parent_position[1] += container.parentRow.getHeight() * 2 / 3;
+                    parent_position[1] += container.parentRow.getHeight() * 7 / 8;
                 }
             } else parent_position[0] += this.content.down('.comboview_node').getWidth();
             parent_position[1] += (container.parentRow.offsetTop - container.parentContainer.scrollTop);
@@ -255,7 +257,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!inside && !Event.checkElement(event, this))
                     return this.popDown();
                 else if (inside) {
-                    var path = Event.element(event).up('table.comboview_node').readAttribute('iwl:nodePath').evalJSON();
+                    var element = Event.element(event).up('.comboview_node');
+                    if (!element || element.descendantOf(this)) return;
+                    var path = element.readAttribute('iwl:nodePath').evalJSON();
                     this.setActive(path);
                     return this.popDown();
                 }
@@ -304,7 +308,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             setContent.call(this, cellTemplate);
 
-            return this;
+            return this.emitSignal('iwl:change', this.values);
         },
         /**
          * @returns The active item of the ComboView

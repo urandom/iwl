@@ -166,7 +166,7 @@ sub _realize {
 
     my ($even, @script) = (1);
     push @script, 'window.' . $self->{__name} . ' = new IWL.TreeModel(';
-    push @script, join ', ', map {($even = !$even) ? "'$_'" : $_} @{$self->{__columns}};
+    push @script, join ', ', (map {($even = !$even) ? "'$_'" : $_} @{$self->{__columns}}), qq|{"name": "$self->{__name}"}|;
     push @script, ');';
 
     push @script, $self->{__name} . '.loadData(' . toJSON($self->{__data}) . ');'
@@ -184,7 +184,8 @@ sub _sortColumnEvent {
               ascending => $event->{options}{ascending},
               columnValues => 
                   $event->{options}{columnValues} ? evalJSON($event->{options}{columnValues}, 1) : undef,
-              defaultOrder => $event->{options}{defaultOrder}
+              defaultOrder => $event->{options}{defaultOrder},
+              name => $event->{options}{name}
           })
       : (undef, undef);
     $data = toJSON($data);
@@ -271,6 +272,7 @@ sub __readHashList {
     my $data = [];
     my $modifiers = {};
     my $values = $options{valuesProperty} || 'values';
+    my $indices = 'ARRAY' eq ref $options{valuesIndices} ? $options{valuesIndices} : undef;
     my $children = $options{childrenProperty} || 'children';
 
     if (ref $list eq 'HASH') {
@@ -287,7 +289,14 @@ sub __readHashList {
         ($node->{children}) = __readHashList($item->{$children}, %options)
             if ref $item->{$children} eq 'ARRAY';
         if (ref $item->{$values} eq 'ARRAY') {
-            $node->{values} = $item->{$values};
+            if ($indices) {
+                $node->{values} = [];
+                foreach my $index (@$indices) {
+                    push @{$node->{values}}, (defined $index ? $item->{$values}[$index] : undef);
+                }
+            } else {
+                $node->{values} = $item->{$values};
+            }
         } elsif (ref $options{valueProperties} eq 'ARRAY') {
             $node->{values} = [map {$item->{$_}} @{$options{valueProperties}}];
         }
