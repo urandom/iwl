@@ -103,10 +103,70 @@ sub setValues {
     return $self;
 }
 
+sub getIndex {
+    my $self = shift;
+    return -1 unless $self->{model};
+    my @list = $self->{parentNode}
+        ? @{$self->{parentNode}{childNodes}}
+        : @{$self->{model}{rootNodes}};
+    my $index = 0;
+    foreach (@list) {
+        return $index if $_ == $self;
+        ++$index;
+    }
+    return -1;
+}
+
+sub getDepth {
+    my $self = shift;
+    return -1 unless $self->{model};
+    my ($depth, $node) = (0, $self);
+    $depth++ while $node = $node->{parentNode};
+
+    return $depth;
+}
+
+sub getPath {
+    my $self = shift;
+    return unless $self->{model};
+    my ($path, $node) = ($self->getIndex, $self->{parentNode});
+    if ($node) {
+        do {
+            unshift @$path, $node->getIndex;
+        } while ($node = $node->{parentNode});
+    }
+
+    return $path;
+}
+
+sub isAncestor {
+    my ($self, $descendant) = @_;
+    my $ret;
+    $self->each(sub {
+        if (shift == $descendant) {
+            $ret = 1;
+            return 'last';
+        }
+    });
+
+    return $ret;
+}
+
+sub isDescendant {
+    my ($self, $ancestor) = @_;
+    my $node = $self->{parentNode};
+    return unless $node;
+    do {
+        return 1 if $node == $ancestor;
+    } while ($node = $node->{parentNode});
+    return;
+}
+
 sub each {
     my ($self, $iterator) = @_;
     foreach (@{$self->{childNodes}}) {
-        $iterator->($_);
+        my $ret = $iterator->($_);
+        last if $ret && 'last' eq $ret;
         $_->each($iterator);
     }
 }
