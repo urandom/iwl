@@ -1,10 +1,11 @@
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use IWL::Page;
 
 {
 	my $page = IWL::Page->new;
 	isa_ok($page->appendMetaEquiv(foo => 'bar'), 'IWL::Page::Meta');
+    isa_ok($page->getEnvironment, 'IWL::Environment');
 	is($page->appendHeader(IWL::Object->new), $page);
 	is($page->prependHeader(IWL::Object->new), $page);
 	is($page->setTitle('Some title'), $page);
@@ -12,6 +13,7 @@ use IWL::Page;
 	is($page->setDeclaration('html401'), $page);
 	is($page->getDeclaration, 'DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd"');
+    like($page->getContent, qr(.*prototype.js.*prototype_extensions.js.*effects.js.*controls.js.*scriptaculous_extensions.js.*base.js.*)s);
 }
 
 {

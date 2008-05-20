@@ -73,14 +73,3 @@ Object.extend(Effect, {
     }}) }});
   }
 });
-
-Object.extend(Ajax.Autocompleter.prototype, {
-  fixIEOverlapping: function() {
-    Position.clone(this.update, this.iefix, {setTop:(!this.update.style.height)});
-    var completionIndex = $$('ul.completion')[0];
-    completionIndex = completionIndex ? completionIndex.getStyle('zIndex') : 2;
-    this.iefix.style.zIndex = completionIndex - 1;
-    this.update.style.zIndex = completionIndex;
-    Element.show(this.iefix);
-  }
-});
