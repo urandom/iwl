@@ -127,8 +127,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       }
     },
 
-    addColumnType: function(type) {
-      IWL.TreeModel.addColumnType(type);
+    addColumnType: function() {
+      IWL.TreeModel.addColumnType.apply(this, arguments);
       return this;
     },
     getColumnType: function(index) {
@@ -346,6 +346,10 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 Object.extend(IWL.TreeModel, (function() {
   var index = -1;
   return {
+    SortTypes: {
+      DESCENDING: 1,
+      ASCENDING:  2
+    },
     DataTypes: {
       NONE:     ++index,
       STRING:   ++index,
@@ -354,12 +358,14 @@ Object.extend(IWL.TreeModel, (function() {
       BOOLEAN:  ++index,
       COUNT:    ++index
     },
-    addColumnType: function(type) {
-      IWL.TreeModel.Types[type] = ++index;
+    addColumnType: function() {
+      var types = $A(arguments);
+      while (types)
+        IWL.TreeModel.Types[types.shift()] = ++index;
     },
-    SortTypes: {
-      DESCENDING: 1,
-      ASCENDING:  2
+    _overrideDefaultDataTypes: function(types) {
+      IWL.TreeModel.DataTypes = types;
+      index = Math.max.apply(Math, types);
     }
   }
 })());

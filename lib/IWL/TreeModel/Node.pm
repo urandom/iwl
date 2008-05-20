@@ -167,6 +167,7 @@ sub each {
     foreach (@{$self->{childNodes}}) {
         my $ret = $iterator->($_);
         last if $ret && 'last' eq $ret;
+        next if $ret && 'next' eq $ret;
         $_->each($iterator);
     }
 }

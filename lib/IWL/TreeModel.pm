@@ -6,7 +6,20 @@ use strict;
 
 use base 'IWL::Object';
 
+use IWL::TreeModel::Node;
+
+use IWL::String qw(randomize);
 use IWL::JSON qw(evalJSON toJSON);
+
+my $typeIndex = -1;
+my $Types = {
+    NONE    => ++$typeIndex,
+    STRING  => ++$typeIndex,
+    INT     => ++$typeIndex,
+    FLOAT   => ++$typeIndex,
+    BOOLEAN => ++$typeIndex,
+    COUNT   => ++$typeIndex,
+};
 
 sub new {
     my $proto = shift;
@@ -19,7 +32,75 @@ sub new {
 }
 
 sub getName {
-    return shift->{__name};
+    return shift->{_options}{name};
+}
+
+sub getNodeByPath {
+    my ($self, $path) = @_;
+    return unless 'ARRAY' eq ref $path;
+    my $node = $self->{rootNodes}[shift @$path];
+    $node = $node->{childNodes}[$_] foreach @$path;
+
+    return $node;
+}
+
+sub isFlat {
+    my $self = shift;
+    my $ret = '';
+    $self->each(sub {
+        return 'last' if $ret = !(!(shift->{childNodes} > 0))
+    });
+    return $ret;
+}
+
+sub insertNode {
+    my ($self, $parent, $index) = @_;
+    return IWL::TreeModel::Node->new($self, $parent, $index);
+}
+
+sub insertNodeBefore {
+    my ($self, $parent, $sibling) = @_;
+    return IWL::TreeModel::Node->new($self, $parent, $sibling->getIndex);
+}
+
+sub insertNodeAfter {
+    my ($self, $parent, $sibling) = @_;
+    return IWL::TreeModel::Node->new($self, $parent, $sibling->getIndex + 1);
+}
+
+sub prependNode {
+    my ($self, $parent) = @_;
+    return IWL::TreeModel::Node->new($self, $parent, 0);
+}
+
+sub appendNode {
+    my ($self, $parent) = @_;
+    return IWL::TreeModel::Node->new($self, $parent, -1);
+}
+
+sub clear {
+    my $self = shift;
+    $_->remove foreach @{$self->{rootNodes}};
+    return $self;
+}
+
+sub each {
+    my ($self, $iterator) = @_;
+    foreach (@{$self->{rootNodes}}) {
+        my $ret = $iterator->($_);
+        last if $ret && 'last' eq $ret;
+        next if $ret && 'next' eq $ret;
+        $_->each($iterator);
+    }
+}
+
+sub addColumnType {
+    my $self = UNIVERSAL::isa($_[0], 'IWL::TreeModel') ? shift : undef;
+    foreach (@_) {
+        $Types->{$_} = ++$typeIndex unless exists $Types->{$_};
+    }
+
+    return $self;
 }
 
 =head1
@@ -165,11 +246,11 @@ sub _realize {
     my $self = shift;
 
     my ($even, @script) = (1);
-    push @script, 'window.' . $self->{__name} . ' = new IWL.TreeModel(';
-    push @script, join ', ', (map {($even = !$even) ? "'$_'" : $_} @{$self->{__columns}}), qq|{"name": "$self->{__name}"}|;
+    push @script, 'window.' . $self->{_options}{name} . ' = new IWL.TreeModel(';
+    push @script, join ', ', (map {($even = !$even) ? "'$_'" : $_} @{$self->{columns}}), qq|{"name": "$self->{_options}{name}"}|;
     push @script, ');';
 
-    push @script, $self->{__name} . '.loadData(' . toJSON($self->{__data}) . ');'
+    push @script, $self->{_options}{name} . '.loadData(' . toJSON($self->{__data}) . ');'
         if $self->{__data};
 
     $self->_appendInitScript(join "\n", @script);
@@ -199,10 +280,16 @@ sub _sortColumnEvent {
 }
 
 sub _init {
-    my ($self, $name, $columns, %args) = @_;
+    my ($self, $columns, %args) = @_;
+    my $index = 0;
 
-    $self->{__name} = $name;
-    $self->{__columns} = $columns;
+    $self->{_options}{name} = $args{name} || randomize('treemodel');
+    $self->{columns} = [];
+    $self->{rootNodes} = [];
+    while (@$columns) {
+        my @tuple = splice @$columns, 0, 2;
+        $self->{columns}[$index++] = {type => $Types->{$tuple[0]}, name => $tuple[1]};
+    }
 }
 
 # Internal
