@@ -12,6 +12,7 @@ use IWL::Page::Head;
 use IWL::Page::Link;
 use IWL::Page::Meta;
 use IWL::Page::Title;
+use IWL::Environment;
 use IWL::Script;
 use IWL::Comment;
 use IWL::Config qw(%IWLConfig);
@@ -73,7 +74,7 @@ sub new {
     my ($proto, %args) = @_;
     my $class = ref($proto) || $proto;
 
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new(%args);
 
     $self->{_tag} = "html";
     $self->setDeclaration('xhtml1');
@@ -201,6 +202,16 @@ sub getDeclaration {
     return shift->{_declaration};
 }
 
+=item B<getEnvironment>
+
+Returns the L<IWL::Environment> object for the page
+
+=cut
+
+sub getEnvironment {
+    return shift->{environment};
+}
+
 # Overrides
 #
 sub signalConnect {
@@ -224,7 +235,7 @@ sub registerEvent {
 }
 
 sub requiredJs {
-    return shift->{_body}->requiredJs(@_);
+    return shift->{environment}->requiredJs(@_);
 }
 
 # Protected
@@ -247,7 +258,6 @@ sub _init {
     my $ie6  = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
 
     my $conditional = IWL::Comment->new;
-    $self->requiredJs('base.js');
 
     my $script = IWL::Script->new->setAttribute('iwl:independant');
     $script->appendScript(IWL::Config::getJSConfig);
@@ -258,6 +268,8 @@ sub _init {
     $conditional->setConditionalData('IE', $ie);
     $conditional = IWL::Comment->new;
     $head->appendChild($conditional);
+    $self->{environment} = IWL::Environment->new unless $self->{environment};
+    $self->requiredJs('base.js');
     return $conditional->setConditionalData('lt IE 7', $ie6);
 }
 

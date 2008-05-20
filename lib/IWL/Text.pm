@@ -30,7 +30,7 @@ Where B<CONTENT> is an optional parameter that holds the contents of the text ob
 sub new {
     my ($proto, $content) = @_;
     my $class = ref($proto) || $proto;
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new;
 
     $self->{_textContent} = defined $content ? $content : "";
 

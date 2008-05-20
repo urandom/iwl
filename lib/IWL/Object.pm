@@ -38,7 +38,15 @@ This is the base object module for IWL. Every other module will inherit from it.
 
 =head1 CONSTRUCTOR
 
-IWL::Object->new
+IWL::Object->new (environment => L<IWL::Environment>)
+
+=over 4
+
+=item B<environment>
+
+If an L<IWL::Environment> object is given as the value of the B<environment> argument, and the object is a root object, that environment will be used to manage the shared resources of the object and its children.
+
+=back
 
 IWL::Object->newMultiple (B<ARGS>, B<ARGS>, ...)
 
@@ -63,7 +71,7 @@ The parent for the current object. Null if it has no parent.
 =cut
 
 sub new {
-    my $class = shift;
+    my ($class, %args) = @_;
     my $self  = bless {}, $class;
 
     $self->{childNodes} = [];
@@ -89,6 +97,11 @@ sub new {
     $self->{_initScripts} = [];
 
     $self->{_tailObjects} = [];
+
+    $self->{environment} = ref $args{environment} eq 'IWL::Environment'
+        ? $args{environment} : undef;
+
+    delete $args{environment};
 
     return $self;
 }
@@ -1499,8 +1512,11 @@ sub _realize {
 
     return if $self->{parentNode};
     my @descendants = ($self, $self->getDescendants);
-    my %required = (js => []);
-    my ($script, $head, @scripts);
+    my $env = $self->{environment} || {};
+    my ($script, $head, $body, @scripts, %required);
+
+    push @{$self->{_required}{$_}}, @{$env->{_required}{$_}}
+        foreach keys %{$env->{_required}};
 
     foreach my $object (@descendants) {
         $script = $object
@@ -1508,11 +1524,12 @@ sub _realize {
                    || !UNIVERSAL::isa($object, 'IWL::Script')
                    || $object->hasAttribute('iwl:independant');
         $head = $object if UNIVERSAL::isa($object, 'IWL::Page::Head');
+        $body = $object if UNIVERSAL::isa($object, 'IWL::Page::Body');
 
         foreach my $resource (keys %{$object->{_required}}) {
             foreach (@{$object->{_required}{$resource}}) {
-                next if $self->{_shared}{$resource}{$_};
-                $self->{_shared}{$resource}{$_} = 1;
+                next if $self->{_shared}{$resource}{$_} || $env->{_shared}{$resource}{$_};
+                $self->{_shared}{$resource}{$_} = $env->{_shared}{$resource}{$_} = 1;
                 push @{$required{$resource}}, $_;
             }
         }
@@ -1525,7 +1542,9 @@ sub _realize {
         ? $script->{parentNode}
             ? undef
             : $script
-        : $self->lastChild;
+        : $body
+            ? undef
+            : $self->lastChild;
     if (ref $required{js} eq 'ARRAY') {
         if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
             my @required = @{$required{js}};
@@ -1545,7 +1564,7 @@ sub _realize {
         ? $script->{parentNode}->insertBefore($script, @scripts)
         : $pivot
             ? $self->insertAfter($pivot, @scripts)
-            : $self->appendChild(@scripts);
+            : ($body || $self)->appendChild(@scripts);
 
     if (ref $required{css} eq 'ARRAY') {
         if ($head) {
