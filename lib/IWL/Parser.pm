@@ -8,6 +8,7 @@ use strict;
 use IWL::Text;
 use IWL::Widget;
 use IWL::Comment;
+use IWL::JSON 'evalJSON';
 use base 'HTML::Parser';
 
 =head1 NAME
@@ -100,6 +101,35 @@ sub comment {
     return $self->{__current}->appendChild($obj);
 }
 
+sub process {
+    my ($self, $process) = @_;
+    $process =~ s/^\s*//;
+    $process =~ s/\s*$//;
+    if (index ($process, 'iwl') == 0) {
+        $process = substr $process, 3;
+        $process =~ s/^\s*//;
+        my $data = evalJSON($process);
+        do {{
+            next unless $data->{package};
+            eval "require $data->{package}";
+            next if $@;
+            my $object = $data->{package}->new;
+            foreach (@{$data->{methods} || []}) {
+                my $method = (keys %$_)[0];
+                next unless $object->can($method);
+                my $arguments = $_->{$method};
+                $object->$method('ARRAY' eq ref $arguments ? @$arguments : $arguments);
+            }
+            $self->{__current}
+                ? $self->{__current}->appendChild($object)
+                : do {
+                    push @{$self->{__objects}}, $object;
+                };
+        }}
+    }
+    $self->processParser($process);
+}
+
 sub start {
     my ($self, $tag, $attr, $attrseq, $origtext) = @_;
     # $attr is reference to a HASH, $attrseq is reference to an ARRAY
@@ -159,6 +189,10 @@ sub commentParser {
     # $objref - the referebce to the iwl comment, 
     # $comment - the comment text,
     # $attr - the attribute where the comment was found, if it wasn't a comment
+}
+
+sub processParser {
+    my ($self, $process) = @_;
 }
 
 1;

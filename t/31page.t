@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use IWL::Page;
 
@@ -14,6 +14,8 @@ use IWL::Page;
 	is($page->getDeclaration, 'DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd"');
     like($page->getContent, qr(.*prototype.js.*prototype_extensions.js.*effects.js.*controls.js.*scriptaculous_extensions.js.*base.js.*)s);
+    isa_ok($page->{childNodes}[0]{childNodes}[2]->getEnvironment, 'IWL::Environment');
+    is($page->{childNodes}[0]{childNodes}[2]->getEnvironment, $page->getEnvironment);
 }
 
 {
