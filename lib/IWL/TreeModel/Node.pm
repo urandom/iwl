@@ -1,6 +1,6 @@
 #!/bin/false
 
-package IWL::TreeModel;
+package IWL::TreeModel::Node;
 
 use strict;
 
@@ -87,7 +87,7 @@ sub getValues {
     return unless $self->{model};
     return $self->{values} unless @_;
     my @ret;
-    push @ret, $self->{values}{$_} foreach @_;
+    push @ret, $self->{values}[$_] foreach @_;
     return @ret;
 }
 

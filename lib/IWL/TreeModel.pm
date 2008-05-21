@@ -193,9 +193,8 @@ sub dataReader {
     }
 
     if ($options{type} eq 'storable') {
-        eval "require Storable" or $self
-            ? $self->_pushFatalError($@)
-            : die $@;
+        eval "require Storable" or return
+            $self->_pushFatalError($@);
 
         $data = Storable::thaw($content);
         if ($options{subtype} eq 'array') {
@@ -299,7 +298,7 @@ sub __readArray {
     my $values = $options{valuesIndex};
     my $children = $options{childrenIndex};
     foreach my $item (@$array) {
-        my $node = IWL::TreeModel::Node->new;
+        my $node = $self->appendNode($options{parent});
         unless (defined $values || defined $children) {
             my $index = 0;
             $node->setValues($index++, $_) foreach ('ARRAY' eq ref $item ? @$item : $item);
@@ -313,7 +312,6 @@ sub __readArray {
                     $self->__readArray($item->[$i], parent => $node);
                 }
             }
-            $self->appendNode($options{parent});
         }
     }
 }
@@ -363,7 +361,7 @@ sub __readHashList {
 
     foreach my $item (@$list) {
         next unless 'HASH' eq ref $item;
-        my $node = IWL::TreeModel::Node->new;
+        my $node = $self->appendNode($options{parent});
         $self->__readHashList($item->{$children}, %options, parent => $node)
             if ref $item->{$children} eq 'ARRAY';
         if (ref $item->{$values} eq 'ARRAY') {
@@ -375,13 +373,12 @@ sub __readHashList {
             } else {
                 my $index = 0;
                 $node->setValues($index++, $_)
-                    foreach @{$item->[$values]};
+                    foreach @{$item->{$values}};
             }
         } elsif (ref $options{valueProperties} eq 'ARRAY') {
             my $index = 0;
             $node->setValues($index++, $item->{$_}) foreach @{$options{valueProperties}};
         }
-        $self->appendNode($options{parent});
     }
 
     return $modifiers;
