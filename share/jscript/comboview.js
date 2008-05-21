@@ -81,10 +81,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.BOOLEAN)
                     cellTemplate['column' + i] = values[i].toString();
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.COUNT) {
-                    var count = 0;
-                    this.model.each(function(n) { count++; if (n == node) throw $break; });
-                    cellTemplate['column' + i] = count;
-                    node.setValues(i, count);
+                    cellTemplate['column' + i] = node.getIndex() + 1;
                 }
             }
         }

@@ -2,10 +2,23 @@
 IWL.ObservableModel = Class.create(Enumerable, (function() {
   return {
     initialize: function() {
+      this.frozen = false;
       this.__emitter = new Element('div', {style: "display: none"});
       document.body.appendChild(this.__emitter);
     },
     
+    freeze: function() {
+      this.frozen = true;
+      return this;
+    },
+    thaw: function() {
+      this.frozen = false;
+      return this;
+    },
+    isFrozen: function() {
+      return this.frozen;
+    },
+
     signalConnect: function(name, observer) {
       this.__emitter.signalConnect(name, observer);
       return this;
@@ -77,13 +90,13 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
   function loadNodes(nodes, parentNode, options) {
     if ('preserve' in options && !options.preserve)
-      parentNode ? parentNode.childNodes = [] : this.clear();
+      parentNode ? parentNode.childNodes = [] : this.rootNodes.invoke('remove');
 
     nodes.each(function(n) {
       var node = this.insertNode(parentNode, options.index);
       if (n.values && n.values.length) {
         for (var i = 0, l = n.values.length; i < l; i++)
-          node.setValues(i, n.values[i]);
+          node.values[i] = n.values[i];
       }
       if (n.childNodes && n.childNodes.length)
         loadNodes.call(this, n.childNodes, node, {});
@@ -115,7 +128,6 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       this.options = Object.extend({}, arguments[2]);
 
       this.rootNodes = [];
-      this.frozen = false;
       this.columns = new Array(parseInt(columns.length / 2));
       this.sortMethods = [];
       var index = -1;
@@ -161,18 +173,6 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     },
     isFlat: function() {
       return !this.rootNodes.any(flatIterator);
-    },
-
-    freeze: function() {
-      this.frozen = true;
-      return this;
-    },
-    thaw: function() {
-      this.frozen = false;
-      return this;
-    },
-    isFrozen: function() {
-      return this.frozen;
     },
 
     /* Sortable Interface */
@@ -439,7 +439,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
       this.columns = model.columns.clone();
 
-      if (!this.model.isFrozen()) {
+      if (!this.model.frozen) {
         this.model.emitSignal('iwl:node_insert', this);
         if ((parent && parent.childNodes.length == 1) || this.model.rootNodes.length == 1)
           this.model.emitSignal('iwl:node_has_child_toggle', parent);
@@ -466,7 +466,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         this.each(removeModel);
       }
 
-      if (!this.model.isFrozen()) {
+      if (!this.model.frozen) {
         this.model.emitSignal('iwl:node_remove', this);
         if ((parent && !parent.childNodes.length) || !this.model.rootNodes.length)
           this.model.emitSignal('iwl:node_has_child_toggle', parent);
@@ -545,7 +545,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         v[tuple[0]] = tuple[1];
       }
 
-      if (!this.model.isFrozen())
+      if (!this.model.frozen)
         this.model.emitSignal('iwl:node_change', this);
 
       return this;
