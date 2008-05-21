@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use IWL::Parser;
 
@@ -14,12 +14,20 @@ use IWL::Parser;
 	<div id="1">
 		<a href="bla">Foo</a>
 	</div>
+    <? iwl {
+        package: "IWL::Label",
+        methods: [
+            {setText: "Foo"}
+        ]
+      } >
 	<div id="2">Bar</div>
 EOF
-	my ($div1, $div2) = $parser->createObject($html);
+	my ($div1, $span, $div2) = $parser->createObject($html);
 
 	isa_ok($div1, 'IWL::Object');
+	isa_ok($span, 'IWL::Label');
 	isa_ok($div2, 'IWL::Object');
 	like($div1->getContent, qr(^<div id="1">\s*<a href="bla">Foo</a>\s*</div>$)s);
+	like($span->getContent, qr(^<span id="label_\d+">\s*Foo\s*</span>$)s);
 	like($div2->getContent, qr(^<div id="2">Bar</div>\n$));
 }
