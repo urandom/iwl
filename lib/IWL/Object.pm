@@ -1471,6 +1471,19 @@ sub match {
     return;
 }
 
+=item B<getEnvironment>
+
+Returns the L<IWL::Environment> of the object's top ancestor, if an environment is set
+
+=cut
+
+sub getEnvironment {
+    my $self = shift;
+    my $top = $self->up(options => {last => 1}) || $self;
+
+    return $top->{environment};
+}
+
 =head1 PROTECTED METHODS
 
 The following methods should only be used by classes that inherit
