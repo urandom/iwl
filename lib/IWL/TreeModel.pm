@@ -4,35 +4,25 @@ package IWL::TreeModel;
 
 use strict;
 
-use base 'IWL::Object';
+use base 'IWL::Error';
 
 use IWL::TreeModel::Node;
 
 use IWL::String qw(randomize);
-use IWL::JSON qw(evalJSON toJSON);
-
-my $typeIndex = -1;
-my $Types = {
-    NONE    => ++$typeIndex,
-    STRING  => ++$typeIndex,
-    INT     => ++$typeIndex,
-    FLOAT   => ++$typeIndex,
-    BOOLEAN => ++$typeIndex,
-    COUNT   => ++$typeIndex,
-};
+use IWL::JSON qw(evalJSON);
 
 sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
-    my $self = $class->SUPER::new;
+    my $self = bless {}, $class;
     
     $self->_init(@_);
 
     return $self;
 }
 
-sub getName {
-    return shift->{_options}{name};
+sub getId {
+    return shift->{_options}{id};
 }
 
 sub getNodeByPath {
@@ -94,6 +84,9 @@ sub each {
     }
 }
 
+my $typeIndex = -1;
+my $Types = {};
+
 sub addColumnType {
     my $self = UNIVERSAL::isa($_[0], 'IWL::TreeModel') ? shift : undef;
     foreach (@_) {
@@ -103,37 +96,10 @@ sub addColumnType {
     return $self;
 }
 
-=head1
-
-Data:
-  {
-    totalCount => int,
-    limit => int,
-    offset => int,
-    preserve => boolean,
-    index => int,
-    parentNode => [path],
-    nodes => [
-      {
-        values => ['Sample', 15],
-        children => [
-                    {
-                      ...
-                    }
-                  ],
-      },
-      {
-        ...
-      }
-    ]
-  }
-
-=cut
-
-
 sub dataReader {
     my ($self, %options) = @_;
     my ($content, $data, $modifiers) = ('', undef, {});
+    %options = (type => '', subtype => '', %options);
 
     if ($options{file}) {
         local *FILE;
@@ -226,27 +192,63 @@ sub dataReader {
     return $self;
 }
 
-# Overrides
-#
-sub getContent {
-    shift->SUPER::getContent;
+sub getScript {
+    my $self = shift;
 
-    return '';
+    my ($even, @script) = (1);
+    push @script, 'window.' . $self->{_options}{id} . ' = new IWL.TreeModel();';
+
+    return join "\n", @script;
+}
+
+=head1
+
+Data:
+  {
+      options => {
+          id => '',
+          columnTypes => {},
+          totalCount => int,
+          limit => int,
+          offset => int,
+          preserve => boolean,
+          index => int,
+      },
+      parentNode => {},
+      nodes => [
+        {
+          values => ['Sample', 15],
+          childNodes =>
+              [
+                   {
+                       ...
+                   }
+              ],
+        },
+        {
+          ...
+        }
+      ]
+  }
+
+=cut
+
+
+sub toObject {
+    my $self = shift;
+    my $object = {options => {%{$self->{_options}}, columnTypes => $Types}};
+    $object->{columns} = [map {$_->{type}, $_->{name}} @{$self->{columns}}];
+    $object->{nodes} = [map {$_->toObject} @{$self->{rootNodes}}];
+
+    return $object;
+}
+
+sub toJSON {
+    return IWL::JSON::toJSON(shift->toObject);
 }
 
 # Protected
 #
-sub _realize {
-    my $self = shift;
-
-    my ($even, @script) = (1);
-    push @script, 'window.' . $self->{_options}{name} . ' = new IWL.TreeModel(';
-    push @script, join ', ', (map {($even = !$even) ? "'$_'" : $_} @{$self->{columns}}), qq|{"name": "$self->{_options}{name}"}|;
-    push @script, ');';
-
-    $self->_appendInitScript(join "\n", @script);
-}
-
 sub _sortColumnEvent {
     my ($event, $handler) = @_;
     my $response = IWL::Response->new;
@@ -257,15 +259,15 @@ sub _sortColumnEvent {
               columnValues => 
                   $event->{options}{columnValues} ? evalJSON($event->{options}{columnValues}, 1) : undef,
               defaultOrder => $event->{options}{defaultOrder},
-              name => $event->{options}{name}
+              id => $event->{options}{id}
           })
       : (undef, undef);
-    $data = toJSON($data);
+    $data = UNIVERSAL::isa($data, 'IWL::TreeModel') ? $data->toJSON : IWL::JSON::toJSON($data);
 
     require IWL::Object;
 
     $response->send(
-        content => '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}',
+        content => '{data: ' . $data . ', extras: ' . (IWL::JSON::toJSON($extras) || 'null') . '}',
         header => IWL::Object::getJSONHeader()
     );
 }
@@ -274,9 +276,10 @@ sub _init {
     my ($self, $columns, %args) = @_;
     my $index = 0;
 
-    $self->{_options}{name} = $args{name} || randomize('treemodel');
+    $self->{_options}{id} = $args{id} || randomize('treemodel');
     $self->{columns} = [];
     $self->{rootNodes} = [];
+    $columns = [] unless 'ARRAY' eq ref $columns;
     while (@$columns) {
         my @tuple = splice @$columns, 0, 2;
         $self->{columns}[$index++] = {type => $Types->{$tuple[0]}, name => $tuple[1]};
@@ -383,5 +386,7 @@ sub __readHashList {
 
     return $modifiers;
 }
+
+addColumnType(qw(NONE STRING INT FLOAT BOOLEAN COUNT));
 
 1;

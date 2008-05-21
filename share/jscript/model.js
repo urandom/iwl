@@ -85,8 +85,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         for (var i = 0, l = n.values.length; i < l; i++)
           node.setValues(i, n.values[i]);
       }
-      if (n.children && n.children.length)
-        loadNodes.call(this, n.children, node, {});
+      if (n.childNodes && n.childNodes.length)
+        loadNodes.call(this, n.childNodes, node, {});
     }.bind(this))
   }
 
@@ -97,8 +97,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     childNodes.each(function(n) {
       var node = {};
       node.values = n.getValues();
-      if (n.children && n.children.length)
-        node.children = getNodes(n);
+      if (n.childNodes && n.childNodes.length)
+        node.childNodes = getNodes(n);
       ret.push(node);
     }.bind(this));
 
@@ -110,19 +110,17 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   }
 
   return {
-    initialize: function($super) {
+    initialize: function($super, columns) {
       $super();
-      var args = $A(arguments), index = -1;
-      args.shift();
-
-      this.options = Object.extend({}, args.length % 2 ? args.pop() : {});
+      this.options = Object.extend({}, arguments[2]);
 
       this.rootNodes = [];
       this.frozen = false;
-      this.columns = new Array(parseInt(args.length / 2));
+      this.columns = new Array(parseInt(columns.length / 2));
       this.sortMethods = [];
-      while (args.length) {
-        var tuple = args.splice(0, 2);
+      var index = -1;
+      while (columns.length) {
+        var tuple = columns.splice(0, 2);
         this.setColumn(++index, tuple[0], tuple[1]);
       }
     },
@@ -156,7 +154,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     getNodeByPath: function(path) {
       if (!Object.isArray(path)) return;
       var node = this.rootNodes[path.shift()];
-      for (var i = 0, l = path.length; i < l; i++)
+      for (var i = 0, l = path.length; node && i < l; i++)
         node = node.childNodes[path[i]];
 
       return node;
@@ -183,7 +181,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       if (Object.isString(options.url) && !options.url.blank()) {
         this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {
           responseCallback: sortResponse.bind(this),
-          name: this.options.name
+          id: this.options.id
         });
       }
       return this;
@@ -193,7 +191,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       if (Object.isString(options.url) && !options.url.blank()) {
         this.registerEvent('IWL-TreeModel-sortColumn', options.url, {}, {
           responseCallback: sortResponse.bind(this),
-          name: this.options.name
+          id: this.options.id
         });
       }
       return this;
@@ -307,20 +305,22 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
     loadData: function(data) {
       if (!Object.isObject(data) || !Object.isArray(data.nodes)) return;
-      var options = {
-        totalCount: data.totalCount,
-        size: data.size,
-        offset: data.offset,
-        index: data.index,
-        parentNode: this.getNodeByPath(data.parentNode)
-      };
-      if ('preserve' in data)
-        options.preserve = !!data.preserve;
+      if (!Object.isObject(data.options)) data.options = {};
+      Object.extend(this.options, {
+        totalCount: data.options.totalCount,
+        size: data.options.size,
+        offset: data.options.offset,
+        index: data.options.index,
+        id: data.options.id
+      });
+      if ('preserve' in data.options)
+        this.options.preserve = !!data.options.preserve;
+      var parentNode = this.getNodeByPath(data.parentNode);
 
       this.freeze();
-      loadNodes.call(this, data.nodes, options.parentNode, options);
+      loadNodes.call(this, data.nodes, parentNode, this.options);
 
-      this.emitSignal('iwl:load_data', options);
+      this.emitSignal('iwl:load_data');
       return this.thaw();
     },
 
@@ -363,9 +363,9 @@ Object.extend(IWL.TreeModel, (function() {
       while (types)
         IWL.TreeModel.Types[types.shift()] = ++index;
     },
-    _overrideDefaultDataTypes: function(types) {
+    overrideDefaultDataTypes: function(types) {
       IWL.TreeModel.DataTypes = types;
-      index = Math.max.apply(Math, types);
+      index = Math.max.apply(Math, Object.values(types));
     }
   }
 })());

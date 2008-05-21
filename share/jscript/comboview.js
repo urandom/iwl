@@ -55,7 +55,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         return new Template(node.join(''));
     }
 
-    function onDataLoad(event, options) {
+    function onDataLoad(event) {
         var flat = this.model.isFlat();
         var template = generateNodeTemplate.call(this, flat)
         createNodes.call(this, this.model.getRootNodes(), template, flat);
@@ -325,7 +325,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 initialPath: [0],
                 maxHeight: 400
             }, arguments[2]);
-            this.model = model;
+            if (Object.keys(model.options.columnTypes).length)
+                IWL.TreeModel.overrideDefaultDataTypes(model.options.columnTypes);
+            this.model = new IWL.TreeModel(model.columns).loadData(model);
             this.button = this.down('.comboview_button');
             this.content = this.down('.comboview_content');
             this.contentColumns = [];

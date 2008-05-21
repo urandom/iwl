@@ -4,14 +4,14 @@ package IWL::TreeModel::Node;
 
 use strict;
 
-use base 'IWL::Object';
+use IWL::JSON;
 
-use IWL::JSON qw(evalJSON toJSON);
+use base 'IWL::Error';
 
 sub new {
     my $proto = shift;
     my $class = ref($proto) || $proto;
-    my $self = $class->SUPER::new;
+    my $self = bless {}, $class;
     
     $self->_init(@_);
 
@@ -25,7 +25,7 @@ sub insert {
     return unless $model;
 
     $self->remove;
-    if ($self->{model} != $model) {
+    if (!$self->{model} || $self->{model} != $model) {
         $addModel->($model, $self);
         $self->each(sub { $addModel->($model, shift) });
     }
@@ -172,11 +172,27 @@ sub each {
     }
 }
 
+sub toObject {
+    my $self = shift;
+    return {
+        values => $self->{values},
+        childNodes => [map {$_->toObject} @{$self->{childNodes}}]
+    };
+}
+
+sub toJSON {
+    return IWL::JSON::toJSON(shift->toObject);
+}
+
+
 # Protected
 #
 sub _init {
     my $self = shift;
 
+    $self->{childNodes} = [];
+    $self->{values} = [];
+    $self->{previousSibling} = $self->{nextSibling} = undef;
     $self->insert(@_) if $_[0];
 }
 

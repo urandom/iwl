@@ -159,8 +159,7 @@ sub _realize {
 
     $self->SUPER::_realize;
 
-    my $model = $self->{_model}->getName;
-    $self->{_model}->getContent;
+    my $model = $self->{_model}->toJSON;
 
     $self->{__content}->setStyle(height => $self->{_options}{nodeHeight} . 'px')
         if $self->{_options}{nodeHeight};
