@@ -138,6 +138,31 @@ sub setActive {
     return $self;
 }
 
+=item B<getActive>
+
+Returns the active item path
+
+=cut
+
+sub getActive {
+    return shift->{_options}{initialPath};
+}
+
+=item B<pageControlSettings>
+
+Sets the L<IWL::PageControl> bind settings, if the used model requires page control.
+
+For parameter documentation, see L<IWL::PageControl::bindToWidget>
+
+=cut
+
+sub pageControlSettings {
+    my $self = shift;
+    $self->{__pageControlSettings} = \@_;
+
+    return $self;
+}
+
 # Protected
 #
 sub _setupDefaultClass {
@@ -159,7 +184,21 @@ sub _realize {
 
     $self->SUPER::_realize;
 
-    my $model = $self->{_model}->toJSON;
+    my $model = $self->{_model};
+    if ($model->{options}{limit} && $model->isFlat) {
+        require IWL::PageControl;
+        my $limit = $model->{options}{limit};
+        my $pager = IWL::PageControl->new(
+            pageCount => int(($model->{options}{totalCount} -1 ) / $limit) + 1,
+            pageSize => $limit,
+            page => int($model->{options}{offset} / $limit) + 1,
+            id => $id . '_pagecontrol',
+            style => {position => 'absolute', left => '-1000px'},
+        );
+        $pager->bindToWidget($self, @{$self->{__pageControlSettings}});
+        $self->appendAfter($pager);
+        $self->{_options}{pageControl} = $id . '_pagecontrol';
+    }
 
     $self->{__content}->setStyle(height => $self->{_options}{nodeHeight} . 'px')
         if $self->{_options}{nodeHeight};
@@ -171,7 +210,7 @@ sub _realize {
     }
     my $options = toJSON($self->{_options});
 
-    $self->_appendInitScript("IWL.ComboView.create('$id', $model, $options);");
+    $self->_appendInitScript("IWL.ComboView.create('$id', @{[$model->toJSON]}, $options);");
 }
 
 sub _init {
@@ -194,6 +233,7 @@ sub _init {
     $self->{_options}  = {columnWidth => [], cellAttributes => []};
     $self->{__button}  = $button;
     $self->{__content} = $content;
+    $self->{__pageControlSettings} = [];
 
     $self->{_options}{columnWidth}    = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
     $self->{_options}{columnClass}    = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};

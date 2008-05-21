@@ -22,7 +22,7 @@ sub new {
 }
 
 sub getId {
-    return shift->{_options}{id};
+    return shift->{options}{id};
 }
 
 sub getNodeByPath {
@@ -38,9 +38,9 @@ sub isFlat {
     my $self = shift;
     my $ret = '';
     $self->each(sub {
-        return 'last' if $ret = !(!(shift->{childNodes} > 0))
+        return 'last' if $ret = $_[0]->{childNodes} && @{$_[0]->{childNodes}} > 0
     });
-    return $ret;
+    return !$ret;
 }
 
 sub insertNode {
@@ -180,13 +180,13 @@ sub dataReader {
     } else {
         $modifiers = $self->__readHashList($data, %options);
     }
-    $self->{_options} = {
-        %{$self->{_options}},
+    $self->{options} = {
+        %{$self->{options}},
         %$modifiers,
         preserve => defined $options{preserve} ? $options{preserve} : 1,
     };
 
-    $self->{_options}{$_} = $options{$_} foreach
+    $self->{options}{$_} = $options{$_} foreach
         grep {defined $options{$_}} qw(totalCount limit offset index parentNode);
 
     return $self;
@@ -196,7 +196,7 @@ sub getScript {
     my $self = shift;
 
     my ($even, @script) = (1);
-    push @script, 'window.' . $self->{_options}{id} . ' = new IWL.TreeModel();';
+    push @script, 'window.' . $self->{options}{id} . ' = new IWL.TreeModel();';
 
     return join "\n", @script;
 }
@@ -236,7 +236,7 @@ Data:
 
 sub toObject {
     my $self = shift;
-    my $object = {options => {%{$self->{_options}}, columnTypes => $Types}};
+    my $object = {options => {%{$self->{options}}, columnTypes => $Types}};
     $object->{columns} = [map {$_->{type}, $_->{name}} @{$self->{columns}}];
     $object->{nodes} = [map {$_->toObject} @{$self->{rootNodes}}];
 
@@ -276,7 +276,11 @@ sub _init {
     my ($self, $columns, %args) = @_;
     my $index = 0;
 
-    $self->{_options}{id} = $args{id} || randomize('treemodel');
+    $self->{options}{id} = $args{id} || randomize('treemodel');
+    $self->{options}{totalCount} = $args{totalCount} if $args{totalCount};
+    $self->{options}{offset}     = $args{offset}     if $args{offset};
+    $self->{options}{limit}      = $args{limit}      if $args{limit};
+
     $self->{columns} = [];
     $self->{rootNodes} = [];
     $columns = [] unless 'ARRAY' eq ref $columns;

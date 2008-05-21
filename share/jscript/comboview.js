@@ -143,6 +143,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 : this.container;
             container.parentContainer.childContainers.push(container);
         } else {
+            if (this.options.pageControl) {
+                var pageContainer = new Element('div', {className: 'comboview_page_container'});
+                pageContainer.appendChild(container);
+                pageContainer.appendChild(this.options.pageControl);
+                this.options.pageControl.setStyle({position: '', left: ''});
+                container.pageContainer = pageContainer;
+            }
             this.container = container;
         }
         for (var i = 0, l = nodes.length, node = nodes[0]; i < l; node = nodes[++i]) {
@@ -205,7 +212,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function popUp(container) {
         var container = Object.isElement(container)
-            ? container : this.container;
+            ? container : this.container.pageContainer || this.container;
         if (!container) return;
         if (container.popped) return;
         container.setStyle({display: 'block', visibility: 'hidden'});
@@ -245,7 +252,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 + parseFloat(table.getStyle('margin-right') || 0) + 'px';
 
             if (this.options.maxHeight)
-                setupScrolling.call(this, container);
+                setupScrolling.call(this, container == this.container.pageContainer ? this.container : container);
 
             container.initialized = true;
 
@@ -266,9 +273,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function popDown(container) {
-        var container = Object.isElement(container) ? container : this.container;
+        var container = Object.isElement(container)
+            ? container
+            : this.container.pageContainer || this.container;
         if (!container) return;
-        container.childContainers.each(function(c) { popDown.call(this, c) }.bind(this));
+        (container == this.container.pageContainer ? this.container : container).childContainers.each(
+            function(c) { popDown.call(this, c) }.bind(this)
+        );
         if (!container.popped) return;
         container.style.display = 'none';
         container.popped = false;
@@ -330,6 +341,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.contentColumns = [];
             if (!this.options.popDownDelay)
                 this.options.popDownDelay = 0.3;
+            if (this.options.pageControl)
+                this.options.pageControl = $(this.options.pageControl);
 
             connectSignals.call(this);
             setContent.call(this);
