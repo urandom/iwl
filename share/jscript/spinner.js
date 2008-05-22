@@ -21,13 +21,13 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
         this.rightSpinner.signalConnect('mouseup', rightSpinnerMouseUp.bindAsEventListener(this));
         this.rightSpinner.signalConnect('mouseout', mouseOutEvent);
 
-        this.input.signalConnect('blur', inputBlur.bindAsEventListener(this));
-        this.input.signalConnect('focus', inputFocus.bindAsEventListener(this));
-        this.input.signalConnect('keypress', inputKeyPress.bindAsEventListener(this));
-        this.input.signalConnect('keydown', inputKeyDown.bindAsEventListener(this));
-        this.input.signalConnect('keyup', inputKeyUp.bindAsEventListener(this));
+        this.control.signalConnect('blur', inputBlur.bindAsEventListener(this));
+        this.control.signalConnect('focus', inputFocus.bindAsEventListener(this));
+        this.control.signalConnect('keypress', inputKeyPress.bindAsEventListener(this));
+        this.control.signalConnect('keydown', inputKeyDown.bindAsEventListener(this));
+        this.control.signalConnect('keyup', inputKeyUp.bindAsEventListener(this));
 
-        this.input.signalConnect('mousedown', spinnerMouseDown.bindAsEventListener(this));
+        this.control.signalConnect('mousedown', spinnerMouseDown.bindAsEventListener(this));
         Event.observe(document, "mousemove", documentMouseMove.bindAsEventListener(this));
         Event.observe(document, "mouseup", documentMouseUp.bindAsEventListener(this));
     }
@@ -84,25 +84,25 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function inputBlur(event) {
-        this.input.removeClassName('spinner_text_selected');
+        this.control.removeClassName('spinner_text_selected');
         this.setValue(this.preciseValue);
     }
     function inputFocus(event) {
-        this.input.addClassName('spinner_text_selected');
+        this.control.addClassName('spinner_text_selected');
         var value = this.preciseValue;
         if (Object.isNumber(this.options.precision) && !isNaN(this.options.precision))
             value = value.toFixed(this.options.precision);
-        this.input.value = value;
+        this.control.value = value;
     }
     function inputKeyPress(event) {
-        var value = this.input.value;
+        var value = this.control.value;
         value = value - 0;
         if (isNaN(value)) return;
         switch (Event.getKeyCode(event)) {
             case Event.KEY_RETURN:
                 this.setValue(value);
             case Event.KEY_ESC:
-                this.input.blur();
+                this.control.blur();
                 break;
             default:
                 break;
@@ -135,13 +135,13 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function inputPeriodical(pe) {
-        var new_value = this.input.value - 0;
+        var new_value = this.control.value - 0;
         new_value = this.spinDirection == 'left' ? new_value - this.speed : new_value + this.speed;
         new_value = wrapValue.call(this, new_value);
         if (!isNaN(new_value)) {
             if (Object.isNumber(this.options.precision) && !isNaN(this.options.precision))
                 new_value = new_value.toFixed(this.options.precision);
-            this.input.value = new_value;
+            this.control.value = new_value;
         }
     }
 
@@ -202,8 +202,8 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (Object.isNumber(this.options.precision) && !isNaN(this.options.precision))
                 number = number.toFixed(this.options.precision);
             this.value = parseFloat(number);
-            this.input.value = this.mask ? this.mask.evaluate({number: number}) : number;
-            this.control.emitSignal("change");
+            this.control.value = this.mask ? this.mask.evaluate({number: number}) : number;
+            this.control.emitSignal("change", true);
             return this.emitSignal("iwl:change");
         },
         /**
@@ -227,7 +227,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 precision: false,
                 mask: null
             }, arguments[1] || {});
-            this.input = this.select('.spinner_text')[0];
+            this.input = this.control = this.select('.spinner_text')[0];
             this.leftSpinner = this.select('.spinner_left')[0];
             this.rightSpinner = this.select('.spinner_right')[0];
             this.speed = this.options.stepIncrement;
