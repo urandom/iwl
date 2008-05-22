@@ -113,8 +113,21 @@ sub dataReader {
         $options{proto} ||= 'tcp';
         require IO::Socket;
 
+        my $uri = $options{uri};
+        if (defined $options{offset}) {
+            $uri .=
+                  (index($uri, '?') > -1 ? '&' : '?')
+                . ($options{offsetParameter} || 'offset')
+                . '=' . $options{offset};
+        }
+        if (defined $options{limit}) {
+            $uri .=
+                  (index($uri, '?') > -1 ? '&' : '?')
+                . ($options{limitParameter} || 'limit')
+                . '=' . $options{limit};
+        }
         my $r = IO::Socket::INET->new(Proto => $options{proto}, PeerAddr => $options{host}, PeerPort => $options{port});
-        my @printer = ("GET $options{uri} HTTP/1.1", "Host: $options{host}:$options{port}");
+        my @printer = ("GET $uri HTTP/1.1", "Host: $options{host}:$options{port}");
         my $body;
 
         binmode $r;

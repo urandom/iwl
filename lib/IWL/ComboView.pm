@@ -97,6 +97,32 @@ Parameter: B<INDEX> - a cell index, B<ATTRIBUTES> - a hash reference of attribut
 
 =item B<renderFunction>
 
+A function which can manipulate the given cell for every node. It will receive the following parameters:
+
+=over 12
+
+=item B<cell>
+
+The view cell for the particular node
+
+=item B<type>
+
+The data type for that cell
+
+=item B<value>
+
+The value of the cell
+
+=item B<node>
+
+The current node
+
+=back
+
+=item B<renderClass> (name => className, options => {})
+
+I<renderFunction> and I<renderClass> are mutually exclusive. If a I<renderClass> is defined, it will be instantiated, and if it has a B<render> method, it will be used as a I<renderFunction>.
+
 =back
 
 =cut
