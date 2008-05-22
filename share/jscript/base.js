@@ -272,6 +272,7 @@ Object.extend(IWL, (function() {
 
                 var rail = new Element('div', {id: "disabled_view_rail",
                             className: "disabled_view_rail", style: 'visibility: hidden'});
+                var element = $(options.element);
                 if (options.fullCover) {
                     var page_dims = document.viewport.getMaxDimensions();
                     var container = new Element('div', {id: "disabled_view",
@@ -293,11 +294,42 @@ Object.extend(IWL, (function() {
                             width: page_dims.width + 'px'
                         });
                     }.bind(this));
+                } else if (element && element.parentNode) {
+                    var dims = element.getDimensions();
+                    var container = new Element('div', {id: "disabled_view",
+                                className: "disabled_view", style: 'visibility: hidden'});
+                    container.addClassName('element_cover');
+                    container.setStyle({
+                        height: dims.height + 'px',
+                        width: dims.width + 'px'
+                    });
+                    element.insert({after: container});
+                    if (options.opacity < 1.0)
+                        container.setOpacity(options.opacity);
+
+                    var offset = [0, 0];
+                    if (Element.extend(element.parentNode).getStyle('position') != 'absolute') {
+                        offset = element.positionedOffset();
+                        container.style.left = offset[0] + 'px';
+                        container.style.top = offset[1] + 'px';
+                    }
+                    rail.style.left = "-1000px";
+                    container.insert({after: rail});
+                    var rail_dims = rail.getDimensions();
+                    if (rail_dims.height < dims.height) {
+                        rail.setStyle({
+                            top: (dims.height - rail_dims.height) / 2 + offset[0] + 'px',
+                            left: (dims.width - rail_dims.width) / 2 + offset[1] + 'px'
+                        });
+                    } else rail.remove();
+                    container.setStyle({visibility: 'visible'});
                 }
-                document.body.appendChild(rail);
+                if (!element || !element.parentNode) {
+                    document.body.appendChild(rail);
+                    rail.positionAtCenter();
+                }
                 if (!options.fullCover && options.opacity < 1.0)
                     rail.setOpacity(options.opacity);
-                rail.positionAtCenter();
                 rail.setStyle({visibility: 'visible'});
             }
         },
@@ -312,8 +344,8 @@ Object.extend(IWL, (function() {
                 disabled_view_cnt = 0;
 
                 var rail = $('disabled_view_rail');
-                if (!rail) return;
-                rail.remove();
+                if (rail)
+                    rail.remove();
                 var container = $('disabled_view');
                 if (container)
                     container.remove();
@@ -467,6 +499,12 @@ IWL.keyLogger = function(element, callback) {
         keyLogger: function(element, callback) {
             IWL.keyLogger.apply(IWL, arguments);
             return element;
+        },
+        disableView: function(element) {
+            IWL.View.disable({element: element});
+        },
+        enableView: function(element) {
+            IWL.View.enable();
         }
     };
     Element.addMethods(ElementMethods);

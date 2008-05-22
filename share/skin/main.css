@@ -1085,7 +1085,7 @@ div.disabled_view {
     top: 0px;
     left: 0px;
     margin: auto;
-    z-index: 90;
+    z-index: 100;
     background-color: #858c96;
 }
 div.disabled_view_rail {
@@ -1093,7 +1093,7 @@ div.disabled_view_rail {
     position: absolute;
     width: 64px;
     height: 64px;
-    z-index: 99;
+    z-index: 101;
     background-color: #858c96;
     color: black;
     border: 1px solid #454545;
