@@ -174,7 +174,7 @@ sub getActive {
     return shift->{_options}{initialPath};
 }
 
-=item B<pageControlSettings>
+=item B<pageControlSettings> (B<URL>, [B<PARAMS>, B<OPTIONS>])
 
 Sets the L<IWL::PageControl> bind settings, if the used model requires page control.
 
