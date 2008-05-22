@@ -1648,10 +1648,13 @@ div.tooltip_content {
 .comboview_page_container {
     z-index: 99;
     position: absolute;
+    background: #eee;
+    border: 1px solid #7F9DB9;
 }
 .comboview_page_container .comboview_node_container {
     position: static;
     z-index: 1;
+    border: 1px solid #444;
 }
 .comboview_page_container .pagecontrol {
     margin: 0 auto;
