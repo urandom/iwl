@@ -219,6 +219,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function popUp(container) {
         var container = Object.isElement(container)
             ? container : this.container.pageContainer || this.container;
+        var inner = this.container.pageContainer ? this.container : container;
         if (!container) return;
         if (container.popped) return;
         container.setStyle({display: 'block', visibility: 'hidden'});
@@ -252,13 +253,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         });
 
         if (!container.initialized) {
-            var table = container.down();
+            var table = inner.down();
             container.style.width = table.getWidth()
                 + parseFloat(table.getStyle('margin-left') || 0)
                 + parseFloat(table.getStyle('margin-right') || 0) + 'px';
 
             if (this.options.maxHeight)
-                setupScrolling.call(this, container == this.container.pageContainer ? this.container : container, this.container.pageContainer);
+                setupScrolling.call(this, inner, this.container.pageContainer);
 
             container.initialized = true;
 
