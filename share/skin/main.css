@@ -1575,7 +1575,7 @@ div.tooltip_content {
     border: none;
     background: none;
     vertical-align: middle;
-    padding: 0px;
+    padding: 0px 0px 0px 2px;
 }
 
 .comboview_button_cell {
@@ -1591,7 +1591,7 @@ div.tooltip_content {
     margin: 0 auto;
 }
 .comboview_parental_arrow_column {
-    width: 13px;
+    width: 15px;
     height: 16px;
 }
 .comboview_parental_arrow {
