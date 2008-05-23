@@ -253,11 +253,61 @@ sub handleEvent {
     return;
 }
 
+=item B<eventResponse> (B<EVENT>, B<RESPONSE>)
+
+Used by widget event handlers to return a response for for a given event. It is only useful for widget implementation.
+
+Parameters: B<EVENT> - the RPC event. B<RESPONSE> - the response for the event. The response is a hash, with the following recognized key-value pairs:
+
+B<NOTE>: This method can be used as a class method, or as an instance method.
+
+=over 8
+
+=item B<data>
+
+The main response data
+
+=item B<extras>
+
+Any extra information that the client-side code should expect
+
+=item B<header>
+
+Additional header values for the response
+
+=back
+
+=cut
+
+sub eventResponse {
+    shift if 'IWL::RPC' eq ref $_[0];
+    my ($event, $responseData) = @_;
+    my $data = $responseData->{data};
+    my $extras = $responseData->{extras};
+    my $header = $responseData->{header} || {};
+    my $response = IWL::Response->new;
+
+    if ($event->{options}{update}) {
+        if (UNIVERSAL::isa($data, 'IWL::Object')) {
+            $data->send(type => 'html');
+        } else {
+            $response->send(
+                content => $data,
+                header => {%{IWL::Object::getHTMLHeader()}, %$header}
+            );
+        }
+    } else {
+        $response->send(
+            content => '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}',
+            header => {%{IWL::Object::getJSONHeader()}, %$header}
+        );
+    }
+}
+
 # Internal
 #
 sub __defaultEvent {
     my ($self, $event, $handler) = @_;
-    my $response = IWL::Response->new;
 
     my ($data, $extras) = ('CODE' eq ref $handler)
       ? $handler->($event->{params}, $event->{options}{id},
@@ -271,18 +321,7 @@ sub __defaultEvent {
         $data = qq|"$data"| unless $event->{options}{update};
     }
 
-    if ($event->{options}{update}) {
-        if (UNIVERSAL::isa($data, 'IWL::Object')) {
-            $data->send(type => 'html');
-        } else {
-            $response->send(content => $data, header => IWL::Object::getHTMLHeader);
-        }
-    } else {
-        $response->send(
-            content => '{data: ' . $data . ', extras: ' . (toJSON($extras) || 'null') . '}',
-            header => IWL::Object::getJSONHeader
-        );
-    }
+    $self->eventResponse($event, {data => $data, extras => $extras});
 }
 
 sub __getBoundary {

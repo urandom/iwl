@@ -174,10 +174,10 @@ sub each {
 
 sub toObject {
     my $self = shift;
-    return {
-        values => $self->{values},
-        childNodes => [map {$_->toObject} @{$self->{childNodes}}]
-    };
+    my $object = {values => $self->{values}};
+    $object->{childNodes} = [map {$_->toObject} @{$self->{childNodes}}]
+        if @{$self->{childNodes}};
+    return $object;
 }
 
 sub toJSON {

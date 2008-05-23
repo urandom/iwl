@@ -125,24 +125,30 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   function RPCStartCallback(event, params, options) {
     if (event.endsWith('refresh')) {
       options.totalCount = this.options.totalCount;
-      options.size = this.options.size;
+      options.limit = this.options.limit;
       options.offset = this.options.offset;
+      options.columns = this.columns;
+      options.id = this.options.id;
     }
+  }
+
+  function refreshResponse(json, params, options) {
+    this.loadData(json.data);
   }
 
   return {
     initialize: function($super, columns) {
       $super();
-      this.options = Object.extend({}, arguments[2]);
 
       this.rootNodes = [];
-      this.columns = new Array(parseInt(columns.length / 2));
+      this.columns = new Array(columns.length);
       this.sortMethods = [];
-      var index = -1;
-      while (columns.length) {
-        var tuple = columns.splice(0, 2);
-        this.setColumn(++index, tuple[0], tuple[1]);
+      for (var i = 0, l = columns.length; i < l; i++) {
+        this.setColumn(i, columns[i]);
       }
+      this.options = {};
+      this.loadData(arguments[2]);
+      this._emitter._refreshResponse = refreshResponse.bind(this);
     },
 
     addColumnType: function() {
@@ -159,10 +165,13 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return this.columns.length;
     },
     setColumn: function(index, type, name) {
-      this.columns[index] = {
-        type: type,
-        name: name
-      };
+      if (Object.isObject(type))
+        this.columns[index] = type;
+      else
+        this.columns[index] = {
+          type: type,
+          name: name
+        };
     },
 
     getFirstNode: function() {
@@ -312,11 +321,11 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     },
 
     loadData: function(data) {
-      if (!Object.isObject(data) || !Object.isArray(data.nodes)) return;
+      if (!Object.isObject(data)) return;
       if (!Object.isObject(data.options)) data.options = {};
       Object.extend(this.options, {
         totalCount: data.options.totalCount,
-        size: data.options.size,
+        limit: data.options.limit,
         offset: data.options.offset,
         id: data.options.id
       });
@@ -327,7 +336,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       if (data.options.handlers) {
         var events = data.options.handlers;
         for (var name in events) {
-          var options = Object.extend(events[name][1] || {}, {
+          var options = Object.extend(events[name][2] || {}, {
             startCallback: RPCStartCallback.bind(this)
           });
           IWL.RPC.registerEvent(this._emitter, name, events[name][0], events[name][1], options);
@@ -335,6 +344,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       }
       var parentNode = this.getNodeByPath(data.options.parentNode);
 
+      if (!Object.isArray(data.nodes)) return this;
       this.freeze();
       loadNodes.call(this, data.nodes, parentNode, this.options);
 

@@ -99,7 +99,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.BOOLEAN)
                     cellTemplate['column' + i] = values[i].toString();
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.COUNT) {
-                    cellTemplate['column' + i] = node.getIndex() + 1;
+                    cellTemplate['column' + i] = node.getIndex() + 1 + this.model.options.offset;
                 }
             }
         }
@@ -153,9 +153,14 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function createNodes(nodes, template, flat) {
         var html = [];
-        var container = new Element('div', {className: 'comboview_node_container'});
-        container.childContainers = [];
+        var container;
         if (nodes[0] && nodes[0].parentNode) {
+            var path = nodes[0].parentNode.getPath().toString();
+            container = this.containers[path];
+            if (!container)
+                container = new Element('div', {className: 'comboview_node_container'});
+            this.containers[path] = container;
+
             nodes[0].parentNode.viewChildContainer = container;
             container.parentContainer = nodes[0].parentNode.parentNode
                                      && nodes[0].parentNode.parentNode.viewChildContainer
@@ -163,7 +168,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 : this.container;
             container.parentContainer.childContainers.push(container);
         } else {
-            if (this.pageControl) {
+            container = this.container;
+            if (!container) {
+                container = new Element('div', {className: 'comboview_node_container'});
+                container.registerFocus();
+                container.keyLogger(keyEventsCB.bindAsEventListener(this));
+            }
+            if (this.pageControl && !container.pageContainer) {
                 var pageContainer = new Element('div', {className: 'comboview_page_container'});
                 pageContainer.appendChild(container);
                 pageContainer.appendChild(this.pageControl);
@@ -171,9 +182,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 container.pageContainer = pageContainer;
             }
             this.container = container;
-            container.registerFocus();
-            container.keyLogger(keyEventsCB.bindAsEventListener(this));
         }
+        container.childContainers = [];
         for (var i = 0, l = nodes.length, node = nodes[0]; i < l; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             if (!flat && node.hasChildren() > 0) {
@@ -360,6 +370,20 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function onPageChanging() {
+        this.pageChanging = true;
+        IWL.View.disable({element: this.container.pageContainer});
+    }
+
+    function onPageChange() {
+        IWL.View.enable();
+        delete this.pageChanging;
+        if (this.popDownRequest) {
+            delete this.popDownRequest;
+            this.popDown();
+        }
+    }
+
     return {
         /**
          * Pops up (shows) the dropdown list
@@ -375,6 +399,10 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         popDown: function() {
             if (!(this.state & IWL.ComboView.State.SHOW)) return;
+            if (this.pageChanging) {
+                this.popDownRequest = true;
+                return this;
+            }
             setState.call(this, (this.state & ~IWL.ComboView.State.SHOW));
         },
         /**
@@ -416,14 +444,18 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }, arguments[2]);
             if (Object.keys(model.options.columnTypes).length)
                 IWL.TreeModel.overrideDefaultDataTypes(model.options.columnTypes);
-            this.model = new IWL.TreeModel(model.columns).loadData(model);
+            this.model = new IWL.TreeModel(model.columns, model);
             this.button = this.down('.comboview_button');
             this.content = this.down('.comboview_content');
             this.contentColumns = [];
+            this.containers = {};
             if (!this.options.popDownDelay)
                 this.options.popDownDelay = 0.3;
-            if (this.options.pageControl)
+            if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
+                this.pageControl.signalConnect('iwl:current_page_is_changing', onPageChanging.bind(this));
+                this.pageControl.signalConnect('iwl:current_page_change', onPageChange.bind(this));
+            }
             if (this.pageControl && this.options.pageControlEventName)
                 this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
 
