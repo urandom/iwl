@@ -75,7 +75,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   function getColumnValues(index, nodes) {
     var ret = [];
     nodes.each(function(node) {
-      var r = node.getValues(index);
+      var r = node.values[index];
       if (node.hasChildren())
         r.push(getColumnValues.call(this, index, node.children()));
       ret.push(r);
@@ -109,7 +109,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
     childNodes.each(function(n) {
       var node = {};
-      node.values = n.getValues();
+      node.values = n.values;
       if (n.childNodes && n.childNodes.length)
         node.childNodes = getNodes(n);
       ret.push(node);
@@ -237,7 +237,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       } else if (!Object.isFunction(options.sortable)) return;
 
       var wrapper = function(a, b) {
-        var ret = options.sortable(a.getValues(index), b.getValues(index));
+        var ret = options.sortable(a.values[index], b.values[index]);
         return asc ? ret * -1 : ret;
       };
       sortDepth.call(this, this.rootNodes, wrapper);

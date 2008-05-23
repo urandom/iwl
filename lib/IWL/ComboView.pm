@@ -245,6 +245,22 @@ sub _realize {
         $self->appendAfter($pager);
         $self->{_options}{pageControl} = $id . '_pagecontrol';
     }
+    if ($self->{_options}{columnMap}) {
+        foreach my $column (@{$self->{_options}{columnMap}}) {
+            unless ($column =~ /^[0-9]+$/) {
+                my $index = -1;
+                foreach (@{$model->{columns}}) {
+                    ++$index;
+                    if ($_->{name} eq $column) {
+                        $column = $index;
+                        last;
+                    }
+                }
+            }
+        }
+    } else {
+        $self->{_options}{columnMap} = [0 .. @{$model->{columns}} - 1];
+    }
 
     $self->{__content}->setStyle(height => $self->{_options}{nodeHeight} . 'px')
         if $self->{_options}{nodeHeight};
@@ -283,6 +299,7 @@ sub _init {
 
     $self->{_options}{columnWidth}    = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
     $self->{_options}{columnClass}    = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};
+    $self->{_options}{columnMap}      = $args{columnMap}   if 'ARRAY' eq ref $args{columnMap};
     $self->{_options}{nodeHeight}     = $args{nodeHeight}  if $args{nodeHeight};
     $self->{_options}{maxHeight}      = $args{maxHeight}   if defined $args{maxHeight};
 
@@ -294,7 +311,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columnWidth columnClass cellAttributes nodeHeight maxHeight model)};
+    delete @args{qw(columnWidth columnClass columnMap cellAttributes nodeHeight maxHeight model)};
 
     $self->requiredJs('comboview.js');
     $self->_constructorArguments(%args);

@@ -39,7 +39,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         /* Individual rows can't be dragged. Each node has to be a full table */
         var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node"><tbody><tr>'];
 
-        for (var i = 0, l = this.model.columns.length; i < l; i++) {
+        for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
             var classNames = ['comboview_column', 'comboview_column' + i], width = '';
             if (this.options.columnClass[i])
                 classNames.push(this.options.columnClass[i]);
@@ -58,7 +58,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         /* Individual rows can't be dragged. Each node has to be a full table */
         var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node #{nodePosition}" iwl:nodePath="#{nodePath}"><tbody><tr>'];
 
-        for (var i = 0, l = this.model.columns.length; i < l; i++) {
+        for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
             var classNames = ['comboview_column', 'comboview_column' + i], width = '';
             if (this.options.columnClass[i])
                 classNames.push(this.options.columnClass[i]);
@@ -76,7 +76,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function generateSeparator() {
         var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node_separator"><tbody><tr>'];
-        node.push('<td colspan="', this.model.columns.length - 1, '"><div style="width: ', this.contentWidth, 'px;"></div></td>');
+        node.push('<td colspan="', this.options.columnMap.length - 1, '"><div style="width: ', this.contentWidth, 'px;"></div></td>');
         node.push('</tr></tbody></table>');
         return node.join('');
     }
@@ -89,7 +89,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function cellTemplateRenderer(node) {
-        var values = node.getValues(), cellTemplate = {};
+        var cellTemplate = {}, values = [], cMap = this.options.columnMap;
+        for (var i = 0, l = cMap.length; i < l; i++)
+            values.push(node.values[cMap[i]]);
         if (this.nodeSeparatorCallback && this.nodeSeparatorCallback(this.model, node))
             return {separator: true};
         for (var i = 0, l = values.length; i < l; i++) {
@@ -100,7 +102,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     ? render.evaluate(values[i])
                     : render.evaluate({cellValue: values[i]});
             } else {
-                var type = this.model.columns[i] ? this.model.columns[i].type : IWL.TreeModel.DataTypes.NONE;
+                var index = cMap[i];
+                var type = this.model.columns[index] ? this.model.columns[index].type : IWL.TreeModel.DataTypes.NONE;
                 if (type == IWL.TreeModel.DataTypes.STRING)
                     cellTemplate['column' + i] = values[i].toString();
                 else if (type == IWL.TreeModel.DataTypes.INT)
@@ -118,22 +121,21 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setNodeAttributes(container, element, node) {
-        node.viewRow = element;
-        node.viewContainer = container;
-        node.viewCells = $A(element.rows[0].cells);
-        var childContainer = node.viewChildContainer;
+        if (!node.view) node.view = {};
+        node.view.row = element;
+        node.view.container = container;
+        var childContainer = node.view.childContainer;
         var hasChildren = node.hasChildren();
         if (element.hasClassName('comboview_node_separator'))
             return;
 
         element.signalConnect('dom:mouseenter', function(event) {
-            element.addClassName('comboview_node_highlight');
-            this.currentNodeHighlight = node;
+            changeHighlight(node);
             if (!childContainer || !Object.isElement(childContainer.parentNode) || !childContainer.visible())
                 container.childContainers.each(function(c) { popDown.call(this, c) }.bind(this));
         }.bind(this));
         element.signalConnect('dom:mouseleave', function(event) {
-            element.removeClassName('comboview_node_highlight');
+            changeHighlight();
         }.bind(this));
 
         if (hasChildren > 0 && childContainer) {
@@ -156,17 +158,17 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function cellFunctionRenderer(element, values) {
+    function cellFunctionRenderer(element, values, types) {
         for (var i = 0, l = values.length; i < l; i++) {
             var attributes = this.options.cellAttributes[i];
             var render = attributes && attributes.renderFunction;
             if (!Object.isFunction(render)) continue;
-            render.call(attributes.renderInstance || this, element.rows[0].cells[i], this.model.getColumnType(i), values[i], node);
+            render.call(attributes.renderInstance || this, element.rows[0].cells[i], types[i], values[i], node);
         }
     }
 
     function createNodes(nodes, template, flat) {
-        var html = [];
+        var html = [], container, nodeLength = nodes.length;
         var container;
         if (nodes[0] && nodes[0].parentNode) {
             var path = nodes[0].parentNode.getPath().toString();
@@ -175,10 +177,10 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 container = new Element('div', {className: 'comboview_node_container'});
             this.containers[path] = container;
 
-            nodes[0].parentNode.viewChildContainer = container;
+            nodes[0].parentNode.view.childContainer = container;
             container.parentContainer = nodes[0].parentNode.parentNode
-                                     && nodes[0].parentNode.parentNode.viewChildContainer
-                ? nodes[0].parentNode.parentNode.viewChildContainer
+                                     && nodes[0].parentNode.parentNode.view.childContainer
+                ? nodes[0].parentNode.parentNode.view.childContainer
                 : this.container;
             container.parentContainer.childContainers.push(container);
         } else {
@@ -198,7 +200,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.container = container;
         }
         container.childContainers = [];
-        for (var i = 0, l = nodes.length, node = nodes[0]; i < l; node = nodes[++i]) {
+        for (var i = 0, node = nodes[0]; i < nodeLength; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             if (cellTemplate.separator) {
                 html.push(generateSeparator.call(this));
@@ -209,20 +211,26 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 createNodes.call(this, node.children(), template);
             }
 
-            if (i + 1 == l && i == 0)
+            if (i + 1 == nodeLength && i == 0)
                 cellTemplate.nodePosition = 'comboview_node_first comboview_node_last'
             else if (i == 0)
                 cellTemplate.nodePosition = 'comboview_node_first'
-            else if (i + 1 == l)
+            else if (i + 1 == nodeLength)
                 cellTemplate.nodePosition = 'comboview_node_last'
             cellTemplate.nodePath = node.getPath().toJSON();
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
         var children = container.childElements();
-        for (var i = 0, l = nodes.length; i < l; i++) {
-            setNodeAttributes.call(this, container, children[i], nodes[i]);
-            cellFunctionRenderer.call(this, children[i], nodes[i].getValues());
+        for (var i = 0; i < nodeLength; i++) {
+            var values = [], types = [], cMap = this.options.columnMap, node = nodes[i];
+            for (var j = 0, l = cMap.length; j < l; j++) {
+                var index = cMap[j];
+                values.push(node.values[index]);
+                types.push(node.columns[index].type);
+            }
+            setNodeAttributes.call(this, container, children[i], node);
+            cellFunctionRenderer.call(this, children[i], values, types);
         }
     }
 
@@ -343,18 +351,23 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         container.popped = false;
     }
 
-    function changeHighlight(current, node) {
-        if (current)
-            current.viewRow.removeClassName('comboview_node_highlight');
-        if (node)
-            node.viewRow.addClassName('comboview_node_highlight');
+    function changeHighlight(node) {
+        var current = this.currentNodeHighlight;
+        if (current) {
+            current.view.row.removeClassName('comboview_node_highlight');
+            current.view.row.highlight = false;
+        }
+        if (node) {
+            node.view.row.addClassName('comboview_node_highlight');
+            node.view.row.highlight = true;
+        }
         this.currentNodeHighlight = node;
     }
 
     function keyEventsCB(event) {
         var current = this.currentNodeHighlight;
-        var row = current ? current.viewRow : null;
-        if (!row || !row.hasClassName('comboview_node_highlight'))
+        var row = current ? current.view.row : null;
+        if (!row || !row.highlight)
             return;
         var keyCode = Event.getKeyCode(event);
         var row;
@@ -362,15 +375,25 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var nodes = this.model.toArray(), node;
 
         if (keyCode == Event.KEY_UP)  {
-            if (node = nodes[nodes.indexOf(current) - 1])
-                changeHighlight.call(this, current, node);
+            var index = nodes[nodes.indexOf(current)];
+            while (node = nodes[--index]) {
+                if (!node || node.view.row.hasClassName('comboview_node_separator'))
+                    continue;
+                else break;
+            }
+            changeHighlight.call(this, node);
             Event.stop(event);
         } else if (keyCode == Event.KEY_DOWN) {
-            if (node = nodes[nodes.indexOf(current) + 1])
-                changeHighlight.call(this, current, node);
+            var index = nodes[nodes.indexOf(current)];
+            while (node = nodes[++index]) {
+                if (!node || node.view.row.hasClassName('comboview_node_separator'))
+                    continue;
+                else break;
+            }
+            changeHighlight.call(this, node);
             Event.stop(event);
         } else if (keyCode == Event.KEY_RETURN) {
-            if (current.hasClassName('comboview_node_separator')) return;
+            if (current.view.row.hasClassName('comboview_node_separator')) return;
             this.setActive(current);
             this.popDown();
         }
