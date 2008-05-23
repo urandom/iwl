@@ -378,9 +378,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function onPageChange() {
         IWL.View.enable();
-        delete this.pageChanging;
+        this.pageChanging = undefined;
         if (this.popDownRequest) {
-            delete this.popDownRequest;
+            this.popDownRequest = undefined;
             this.popDown();
         }
     }
