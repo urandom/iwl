@@ -1659,3 +1659,12 @@ div.tooltip_content {
 .comboview_page_container .pagecontrol {
     margin: 0 auto;
 }
+.comboview_node_separator {
+    margin: 0 auto;
+}
+.comboview_node_separator div {
+    line-height: 1px;
+    height: 1px;
+    border-bottom: 2px solid #444;
+    margin-bottom: 1px;
+}

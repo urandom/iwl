@@ -189,6 +189,22 @@ sub pageControlSettings {
     return $self;
 }
 
+=item B<setNodeSeparatorCallback> (B<CALLBACK>)
+
+Sets the JavaScript callback which will determine whether a node is rendered as a separator
+
+Parameters: B<CALLBACK> - the JavaScript function. It will receive the B<MODEL> and current B<NODE> as its two parameters. If it returns a true value, the node will be rendered as a separator.
+
+=cut
+
+sub setNodeSeparatorCallback {
+    my ($self, $callback) = @_;
+
+    $self->{_options}{nodeSeparatorCallback} = $callback;
+
+    return $self;
+}
+
 # Protected
 #
 sub _setupDefaultClass {
