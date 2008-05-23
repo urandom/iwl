@@ -46,6 +46,8 @@ Object.extend(IWL, {RPC: (function() {
               var options = Object.extend(Object.extend({}, originalOptions), arguments[1]);
               if (options.onStart)
                   eventStart(options.onStart).call(element, params);
+              if (Object.isFunction(options.startCallback))
+                  options.startCallback.call(element, eventName, params, options);
               var disable = options.disableView ? IWL.View.disable.bind(element, options.disableView) : Prototype.emptyFunction;
 
               if ('update' in options) {

@@ -84,8 +84,7 @@ sub bindToWidget {
 
     return unless $widget && $widget->can('registerEvent') && $id;
 
-    my $event_name = ($widget->can('getModel') ? ref $widget->getModel : ref($widget))
-                   . "::refresh";
+    my $event_name = ref($widget) . "::refresh";
     $event_name =~ s/::/-/g;
     $self->{__bind}{eventName} = $event_name;
     $self->{__bind}{widgetId} = $id;

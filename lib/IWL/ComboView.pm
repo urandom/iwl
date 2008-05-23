@@ -184,8 +184,8 @@ For parameter documentation, see L<IWL::PageControl::bindToWidget>
 
 sub pageControlSettings {
     my $self = shift;
-    $self->{__pageControlSettings} = \@_;
 
+    $self->{__pageControlEvent} = \@_;
     return $self;
 }
 
@@ -212,6 +212,11 @@ sub _realize {
 
     my $model = $self->{_model};
     if ($model->{options}{limit} && $model->isFlat) {
+        my $event = ref($self->{_model}) . "::refresh";
+        $event =~ s/::/-/g;
+        $self->{_options}{pageControlEventName} = $event;
+        $self->{_model}->registerEvent($event, @{$self->{__pageControlEvent}});
+
         require IWL::PageControl;
         my $limit = $model->{options}{limit};
         my $pager = IWL::PageControl->new(
@@ -221,7 +226,6 @@ sub _realize {
             id => $id . '_pagecontrol',
             style => {position => 'absolute', left => '-1000px'},
         );
-        $pager->bindToWidget($self, @{$self->{__pageControlSettings}});
         $self->appendAfter($pager);
         $self->{_options}{pageControl} = $id . '_pagecontrol';
     }
@@ -259,7 +263,7 @@ sub _init {
     $self->{_options}  = {columnWidth => [], cellAttributes => []};
     $self->{__button}  = $button;
     $self->{__content} = $content;
-    $self->{__pageControlSettings} = [];
+    $self->{__pageControlEvent} = [];
 
     $self->{_options}{columnWidth}    = $args{columnWidth} if 'ARRAY' eq ref $args{columnWidth};
     $self->{_options}{columnClass}    = $args{columnClass} if 'ARRAY' eq ref $args{columnClass};

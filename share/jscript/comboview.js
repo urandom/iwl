@@ -163,11 +163,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 : this.container;
             container.parentContainer.childContainers.push(container);
         } else {
-            if (this.options.pageControl) {
+            if (this.pageControl) {
                 var pageContainer = new Element('div', {className: 'comboview_page_container'});
                 pageContainer.appendChild(container);
-                pageContainer.appendChild(this.options.pageControl);
-                this.options.pageControl.setStyle({position: '', left: ''});
+                pageContainer.appendChild(this.pageControl);
+                this.pageControl.setStyle({position: '', left: ''});
                 container.pageContainer = pageContainer;
             }
             this.container = container;
@@ -423,7 +423,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!this.options.popDownDelay)
                 this.options.popDownDelay = 0.3;
             if (this.options.pageControl)
-                this.options.pageControl = $(this.options.pageControl);
+                this.pageControl = $(this.options.pageControl);
+            if (this.pageControl && this.options.pageControlEventName)
+                this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
 
             connectSignals.call(this);
             setContent.call(this);

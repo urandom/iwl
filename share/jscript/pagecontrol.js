@@ -68,6 +68,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
         } else {
             var dims = this.getDimensions();
             this.setStyle({width: dims.width + 'px', height: dims.height + 'px', visibility: 'visible'});
+            this.labelContainer.style.visibility = 'visible';
             toggleButtons.call(this);
             this.input.value = this.currentPage;
         }
@@ -110,6 +111,9 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (this.element) return;
             this.element = $(element);
             this.eventName = event_name;
+            if (!this.element || !this.eventName)
+                return;
+            this.options.bound = true;
             refresh.call(this);
             return this;
         },

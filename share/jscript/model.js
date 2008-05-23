@@ -3,8 +3,8 @@ IWL.ObservableModel = Class.create(Enumerable, (function() {
   return {
     initialize: function() {
       this.frozen = false;
-      this.__emitter = new Element('div', {style: "display: none"});
-      document.body.appendChild(this.__emitter);
+      this._emitter = new Element('div', {style: "display: none"});
+      document.body.appendChild(this._emitter);
     },
     
     freeze: function() {
@@ -20,33 +20,33 @@ IWL.ObservableModel = Class.create(Enumerable, (function() {
     },
 
     signalConnect: function(name, observer) {
-      this.__emitter.signalConnect(name, observer);
+      this._emitter.signalConnect(name, observer);
       return this;
     },
     signalDisconnect: function(name, observer) {
-      this.__emitter.signalDisconnect(name, observer);
+      this._emitter.signalDisconnect(name, observer);
       return this;
     },
     emitSignal: function() {
       var args = $A(arguments);
       var name = args.shift();
-      Event.fire(this.__emitter, name, args);
+      Event.fire(this._emitter, name, args);
       return this;
     },
     registerEvent: function() {
-      this.__emitter.registerEvent.apply(this.__emitter, arguments);
+      this._emitter.registerEvent.apply(this._emitter, arguments);
       return this;
     },
     prepareEvents: function() {
-      this.__emitter.prepareEvents.apply(this.__emitter, arguments);
+      this._emitter.prepareEvents.apply(this._emitter, arguments);
       return this;
     },
     emitEvent: function() {
-      this.__emitter.emitEvent.apply(this.__emitter, arguments);
+      this._emitter.emitEvent.apply(this._emitter, arguments);
       return this;
     },
     hasEvent: function() {
-      return this.__emitter.hasEvent.apply(this.__emitter, arguments);
+      return this._emitter.hasEvent.apply(this._emitter, arguments);
     }
   };
 })());
@@ -120,6 +120,14 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
   function flatIterator(node) {
     return node.hasChildren() > 0;
+  }
+
+  function RPCStartCallback(event, params, options) {
+    if (event.endsWith('refresh')) {
+      options.totalCount = this.options.totalCount;
+      options.size = this.options.size;
+      options.offset = this.options.offset;
+    }
   }
 
   return {
@@ -310,12 +318,22 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         totalCount: data.options.totalCount,
         size: data.options.size,
         offset: data.options.offset,
-        index: data.options.index,
         id: data.options.id
       });
       if ('preserve' in data.options)
         this.options.preserve = !!data.options.preserve;
-      var parentNode = this.getNodeByPath(data.parentNode);
+      if (this.options.id)
+        this._emitter.id = this.options.id;
+      if (data.options.handlers) {
+        var events = data.options.handlers;
+        for (var name in events) {
+          var options = Object.extend(events[name][1] || {}, {
+            startCallback: RPCStartCallback.bind(this)
+          });
+          IWL.RPC.registerEvent(this._emitter, name, events[name][0], events[name][1], options);
+        }
+      }
+      var parentNode = this.getNodeByPath(data.options.parentNode);
 
       this.freeze();
       loadNodes.call(this, data.nodes, parentNode, this.options);

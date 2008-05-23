@@ -4,7 +4,7 @@ package IWL::TreeModel;
 
 use strict;
 
-use base 'IWL::Error';
+use base qw(IWL::Error IWL::RPC::Request);
 
 use IWL::TreeModel::Node;
 
@@ -200,7 +200,7 @@ sub dataReader {
     };
 
     $self->{options}{$_} = $options{$_} foreach
-        grep {defined $options{$_}} qw(totalCount limit offset index parentNode);
+        grep {defined $options{$_}} qw(totalCount limit offset parentNode);
 
     return $self;
 }
@@ -225,9 +225,8 @@ Data:
           limit => int,
           offset => int,
           preserve => boolean,
-          index => int,
+          parentNode => [],
       },
-      parentNode => {},
       nodes => [
         {
           values => ['Sample', 15],
@@ -258,6 +257,14 @@ sub toObject {
 
 sub toJSON {
     return IWL::JSON::toJSON(shift->toObject);
+}
+
+sub registerEvent {
+    my $self = shift;
+    $self->SUPER::registerEvent(@_);
+    $self->{options}{handlers} = $self->{_handlers};
+
+    return $self;
 }
 
 # Protected
