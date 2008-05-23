@@ -330,7 +330,7 @@ Object.extend(IWL, (function() {
                     document.body.appendChild(rail);
                     rail.positionAtCenter();
                 }
-                if (!options.fullCover && options.opacity < 1.0)
+                if (!options.fullCover && !options.element && options.opacity < 1.0)
                     rail.setOpacity(options.opacity);
                 rail.setStyle({visibility: 'visible'});
             }

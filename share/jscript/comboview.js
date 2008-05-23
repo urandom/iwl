@@ -99,7 +99,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.BOOLEAN)
                     cellTemplate['column' + i] = values[i].toString();
                 else if (this.model.getColumnType(i) == IWL.TreeModel.DataTypes.COUNT) {
-                    cellTemplate['column' + i] = node.getIndex() + 1 + this.model.options.offset;
+                    cellTemplate['column' + i] = node.getIndex() + 1 + (this.model.options.offset || 0);
                 }
             }
         }
@@ -209,6 +209,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setState(state) {
+        if (this.pageChanging) return;
         this.state = state;
         var classNames = ['comboview_button'];
         if (state == (IWL.ComboView.State.SHOW | IWL.ComboView.State.HOVER)) {
