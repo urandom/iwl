@@ -174,7 +174,7 @@ sub getActive {
     return shift->{_options}{initialPath};
 }
 
-=item B<pageControlSettings> (B<URL>, [B<PARAMS>, B<OPTIONS>])
+=item B<setPageControlOptions> (B<URL>, [B<PARAMS>, B<OPTIONS>])
 
 Sets the L<IWL::PageControl> bind settings, if the used model requires page control.
 
@@ -182,7 +182,7 @@ For parameter documentation, see L<IWL::PageControl::bindToWidget>
 
 =cut
 
-sub pageControlSettings {
+sub setPageControlOptions {
     my $self = shift;
 
     $self->{__pageControlEvent} = \@_;
@@ -227,7 +227,7 @@ sub _realize {
     $self->SUPER::_realize;
 
     my $model = $self->{_model};
-    if ($model->{options}{limit} && $model->isFlat) {
+    if ($model->{options}{limit} && $model->isFlat && @{$self->{__pageControlEvent}}) {
         my $event = ref($self->{_model}) . "::refresh";
         $event =~ s/::/-/g;
         $self->{_options}{pageControlEventName} = $event;

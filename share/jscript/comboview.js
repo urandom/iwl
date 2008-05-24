@@ -30,8 +30,18 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function setContent(cellTemplate) {
+    function setContent(cellTemplate, node) {
         this.content.innerHTML = generateContentTemplate.call(this).evaluate(cellTemplate || {});
+        if (node) {
+            var values = [], types = [], cMap = this.options.columnMap;
+            for (var j = 0, l = cMap.length; j < l; j++) {
+                var index = cMap[j];
+                values.push(node.values[index]);
+                types.push(node.columns[index].type);
+            }
+            cellFunctionRenderer.call(this, this.content.firstChild.rows[0].cells, values, types, node);
+        }
+
         this.contentWidth = this.content.getWidth();
     }
 
@@ -95,7 +105,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (this.nodeSeparatorCallback && this.nodeSeparatorCallback(this.model, node))
             return {separator: true};
         for (var i = 0, l = values.length; i < l; i++) {
-            var render = this.options.cellAttributes[i] && this.options.cellAttributes[i].renderTemplate;
+            var render = this.options.cellAttributes[i].renderTemplate;
             if (render) {
                 render = new Template(render);
                 cellTemplate['column' + i] = Object.isObject(values[i])
@@ -158,12 +168,12 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function cellFunctionRenderer(element, values, types) {
+    function cellFunctionRenderer(cells, values, types, node) {
         for (var i = 0, l = values.length; i < l; i++) {
             var attributes = this.options.cellAttributes[i];
-            var render = attributes && attributes.renderFunction;
-            if (!Object.isFunction(render)) continue;
-            render.call(attributes.renderInstance || this, element.rows[0].cells[i], types[i], values[i], node);
+            var render = attributes.renderFunction;
+            if (!render) continue;
+            render.call(attributes.renderInstance || this, cells[i], values[i], types[i], node);
         }
     }
 
@@ -230,7 +240,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 types.push(node.columns[index].type);
             }
             setNodeAttributes.call(this, container, children[i], node);
-            cellFunctionRenderer.call(this, children[i], values, types);
+            cellFunctionRenderer.call(this, children[i].rows[0].cells, values, types, node);
         }
     }
 
@@ -323,6 +333,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             container.initialized = true;
 
             document.observe('click', function(event) {
+                if (!Event.isLeftClick(event)) return;
                 var inside = Event.checkElement(event, container);
                 if (!inside && !Event.checkElement(event, this))
                     return this.popDown();
@@ -399,16 +410,31 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function initializeClassRenderers() {
-        for (var i = 0, l = this.options.cellAttributes.length; i < l; i++) {
-            var renderClass = this.options.cellAttributes[i].renderClass;
-            if (!renderClass) continue;
-            var klass = renderClass.name.objectize();
-            if (!Object.isFunction(klass)) continue;
-            var instance = new klass(renderClass.options);
-            if (Object.isFunction(instance.render)) {
-                this.options.cellAttributes[i].renderFunction = instance.render;
-                this.options.cellAttributes[i].renderInstance = instance;
+    function normalizeCellAttributes() {
+        for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
+            var cAttrs = this.options.cellAttributes[i];
+            if (!cAttrs) {
+                this.options.cellAttributes[i] = {};
+                continue;
+            }
+            var renderClass = cAttrs.renderClass;
+            var renderFunction = cAttrs.renderFunction;
+            cAttrs.renderClass = cAttrs.renderFunction = undefined;
+            if (renderClass) {
+                var klass = renderClass.name.objectize();
+                if (Object.isFunction(klass)) {
+                    var instance = new klass(renderClass.options);
+                    if (Object.isFunction(instance.render)) {
+                        cAttrs.renderFunction = instance.render;
+                        cAttrs.renderInstance = instance;
+                    }
+                }
+            } else if (renderFunction) {
+                cAttrs.renderFunction = Object.isString(renderFunction)
+                    ? renderFunction.objectize()
+                    : Object.isFunction(renderFunction)
+                        ? renderFunction
+                        : undefined;
             }
         }
     }
@@ -466,7 +492,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!node) return;
             this.values = node.getValues();
             var cellTemplate = cellTemplateRenderer.call(this, node);
-            setContent.call(this, cellTemplate);
+            setContent.call(this, cellTemplate, node);
 
             return this.emitSignal('iwl:change', this.values);
         },
@@ -516,7 +542,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 : Object.isFunction(this.options.nodeSeparatorCallback)
                     ? this.options.nodeSeparatorCallback : null;
 
-            initializeClassRenderers.call(this);
+            normalizeCellAttributes.call(this);
             onDataLoad.call(this, null, this.model.options);
             var callback = onDataLoad.bind(this);
             this.model.signalConnect('iwl:load_data', callback);
