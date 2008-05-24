@@ -1669,3 +1669,16 @@ div.tooltip_content {
     border-bottom: 2px solid #444;
     margin-bottom: 1px;
 }
+.comboview_composite_container {
+    height: 100px;
+    width: 160px;
+    background: #9da3ab;
+}
+.comboview_composite_throbber {
+    width: 32px;
+    height: 32px;
+    background: transparent url(/iwl/skin/default/images/loader/loader.gif) no-repeat;
+    margin-left: 64px;
+    margin-top: 34px;
+    position: absolute;
+}

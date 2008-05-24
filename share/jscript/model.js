@@ -94,10 +94,10 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
     nodes.each(function(n) {
       var node = this.insertNode(parentNode, options.index);
-      if (n.values && n.values.length) {
-        for (var i = 0, l = n.values.length; i < l; i++)
-          node.values[i] = n.values[i];
-      }
+      if (n.values && n.values.length)
+        node.values = n.values.slice(0, this.columns.length);
+      if (n.attributes)
+        node.attributes = Object.extend({}, n.attributes);
       if (n.childNodes && n.childNodes.length)
         loadNodes.call(this, n.childNodes, node, {});
     }.bind(this))
@@ -110,6 +110,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     childNodes.each(function(n) {
       var node = {};
       node.values = n.values;
+      node.attributes = n.attributes;
       if (n.childNodes && n.childNodes.length)
         node.childNodes = getNodes(n);
       ret.push(node);
@@ -119,7 +120,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   }
 
   function flatIterator(node) {
-    return node.hasChildren() > 0;
+    return node.childNodes.length > 0 || node.attributes.composite;
   }
 
   function RPCStartCallback(event, params, options) {
@@ -423,7 +424,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
   return {
     initialize: function(model, parent, index) {
-      this.childNodes = [], this.values = [];
+      this.childNodes = [], this.values = [], this.attributes = {};
 
       if (model)
         this.insert(model, parent, index);
@@ -551,6 +552,10 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       if (!this.model) return -1;
       return this.childNodes.length;
     },
+    isComposite: function() {
+      if (!this.model) return false;
+      return this.childNodes.length || this.attributes.composite;
+    },
 
     getValues: function() {
       if (!this.model) return;
@@ -576,6 +581,32 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       if (!this.model.frozen)
         this.model.emitSignal('iwl:node_change', this);
 
+      return this;
+    },
+
+    getAttributes: function() {
+      var args = $A(arguments);
+      if (!args.length)
+        return this.attributes;
+      var ret = [];
+      while(args.length) {
+        var key = args.shift();
+        ret.push(this.attributes[key]);
+      }
+
+      return ret;
+    },
+
+    setAttributes: function() {
+      var args = $A(arguments);
+      var attrs = {};
+      if (args.length == 1 && Object.isObject(args[0]))
+        attrs = args[0];
+      else while (args.length) {
+        var pair = args.splice(0, 2);
+        attrs[pair[0]] = pair[1];
+      }
+      Object.extend(this.attributes, attrs);
       return this;
     },
 

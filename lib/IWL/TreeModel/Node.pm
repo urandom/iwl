@@ -103,6 +103,23 @@ sub setValues {
     return $self;
 }
 
+sub getAttributes {
+    my $self = shift;
+    return $self->{attributes} unless @_;
+    my @ret;
+    push @ret, $self->{attributes}{$_} foreach @_;
+    return @ret;
+}
+
+sub setAttributes {
+    my ($self, %attributes) = @_;
+    while (my ($key, $value) = each %attributes) {
+        $self->{attributes}{$key} = $value;
+    }
+
+    return $self;
+}
+
 sub getIndex {
     my $self = shift;
     return -1 unless $self->{model};
@@ -177,6 +194,7 @@ sub toObject {
     my $object = {values => $self->{values}};
     $object->{childNodes} = [map {$_->toObject} @{$self->{childNodes}}]
         if @{$self->{childNodes}};
+    $object->{attributes} = $self->{attributes} if $self->{attributes};
     return $object;
 }
 
@@ -192,6 +210,7 @@ sub _init {
 
     $self->{childNodes} = [];
     $self->{values} = [];
+    $self->{attributes} =  {};
     $self->{previousSibling} = $self->{nextSibling} = undef;
     $self->insert(@_) if $_[0];
 }

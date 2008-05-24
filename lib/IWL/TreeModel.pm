@@ -38,7 +38,9 @@ sub isFlat {
     my $self = shift;
     my $ret = '';
     $self->each(sub {
-        return 'last' if $ret = $_[0]->{childNodes} && @{$_[0]->{childNodes}} > 0
+        return 'last' if $ret = (
+            $_[0]->{childNodes} && @{$_[0]->{childNodes}} > 0
+        ) || $_[0]->{attributes}{isParent}
     });
     return !$ret;
 }
