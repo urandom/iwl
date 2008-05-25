@@ -8,11 +8,12 @@ IWL.ObservableModel = Class.create(Enumerable, (function() {
     },
     
     freeze: function() {
-      this.frozen = true;
+      this.frozen++;
       return this;
     },
     thaw: function() {
-      this.frozen = false;
+      this.frozen--;
+      if (this.frozen < 1) this.frozen = false;
       return this;
     },
     isFrozen: function() {
@@ -28,6 +29,7 @@ IWL.ObservableModel = Class.create(Enumerable, (function() {
       return this;
     },
     emitSignal: function() {
+      if (this.frozen) return;
       var args = $A(arguments);
       var name = args.shift();
       Event.fire(this._emitter, name, args);
@@ -84,8 +86,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   }
 
   function sortResponse(response, params, options) {
-    this.loadData(response.data);
-    this.emitSignal('iwl:sort_column_change');
+    this.freeze().loadData(response.data);
+    this.thaw().emitSignal('iwl:sort_column_change');
   }
 
   function loadNodes(nodes, parentNode, options) {
@@ -150,6 +152,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       this.options = {};
       this.loadData(arguments[2]);
       this._emitter._refreshResponse = refreshResponse.bind(this);
+      this._emitter._requestChildrenResponse = refreshResponse.bind(this);
     },
 
     addColumnType: function() {
@@ -243,8 +246,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       };
       sortDepth.call(this, this.rootNodes, wrapper);
 
-      this.emitSignal('iwl:sort_column_change');
-      return this;
+      return this.emitSignal('iwl:sort_column_change');
     },
     /* !Sortable Interface */
 
@@ -275,8 +277,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     clear: function() {
       this.freeze();
       this.rootNodes.invoke('remove');
-      this.emitSignal('iwl:nodes_reorder');
-      return this.thaw();
+      return this.thaw().emitSignal('iwl:nodes_reorder');
     },
 
     reorder: function(parent, order) {
@@ -294,8 +295,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         child.insert(this, parent, i);
       }
 
-      this.emitSignal('iwl:nodes_reorder', parent);
-      return this.thaw();
+      return this.thaw().emitSignal('iwl:nodes_reorder', parent);
     },
 
     swap: function(node1, node2) {
@@ -307,8 +307,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       node1.insert(this, parent2, index2);
       node2.insert(this, parent1, index1);
 
-      this.emitSignal('iwl:nodes_swap', node1, node2);
-      return this.thaw();
+      return this.thaw().emitSignal('iwl:nodes_swap', node1, node2);
     },
 
     move: function(node, parent, index) {
@@ -316,9 +315,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
       var previous = node.parentNode;
       node.insert(this, parent, index);
-      this.emitSignal('iwl:node_move', parent, previous);
-
-      return this.thaw();
+      return this.thaw().emitSignal('iwl:node_move', parent, previous);
     },
 
     loadData: function(data) {
@@ -349,8 +346,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       this.freeze();
       loadNodes.call(this, data.nodes, parentNode, this.options);
 
-      this.emitSignal('iwl:load_data');
-      return this.thaw();
+      return this.thaw().emitSignal('iwl:load_data', parentNode);
     },
 
     getData: function() {
@@ -422,6 +418,17 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
     return true;
   }
 
+  function RPCStartCallback(event, params, options) {
+    if (event.endsWith('refresh')) {
+      options.totalCount = this.model.options.totalCount;
+      options.limit = this.model.options.limit;
+      options.offset = this.model.options.offset;
+      options.columns = this.model.columns;
+      options.id = this.model.options.id;
+    }
+  }
+
+
   return {
     initialize: function(model, parent, index) {
       this.childNodes = [], this.values = [], this.attributes = {};
@@ -468,11 +475,9 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
       this.columns = model.columns.clone();
 
-      if (!this.model.frozen) {
-        this.model.emitSignal('iwl:node_insert', this);
-        if ((parent && parent.childNodes.length == 1) || this.model.rootNodes.length == 1)
-          this.model.emitSignal('iwl:node_has_child_toggle', parent);
-      }
+      this.model.emitSignal('iwl:node_insert', this);
+      if ((parent && parent.childNodes.length == 1) || this.model.rootNodes.length == 1)
+        this.model.emitSignal('iwl:node_has_child_toggle', parent);
 
       return this;
     },
@@ -495,11 +500,9 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         this.each(removeModel);
       }
 
-      if (!this.model.frozen) {
-        this.model.emitSignal('iwl:node_remove', this);
-        if ((parent && !parent.childNodes.length) || !this.model.rootNodes.length)
-          this.model.emitSignal('iwl:node_has_child_toggle', parent);
-      }
+      this.model.emitSignal('iwl:node_remove', this);
+      if ((parent && !parent.childNodes.length) || !this.model.rootNodes.length)
+        this.model.emitSignal('iwl:node_has_child_toggle', parent);
 
       return this;
     },
@@ -556,6 +559,18 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       if (!this.model) return false;
       return this.childNodes.length || this.attributes.composite;
     },
+    requestChildren: function() {
+      if (!this.model) return;
+      this.model.emitSignal('iwl:request_children', this);
+      var emitOptions = {
+        columns: this.model.columns,
+        id: this.model.options.id,
+        parentNode: this.getPath(),
+        values: this.values
+      };
+
+      return this.model.emitEvent('IWL-TreeModel-requestChildren', {}, emitOptions);
+    },
 
     getValues: function() {
       if (!this.model) return;
@@ -578,8 +593,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         v[tuple[0]] = tuple[1];
       }
 
-      if (!this.model.frozen)
-        this.model.emitSignal('iwl:node_change', this);
+      this.model.emitSignal('iwl:node_change', this);
 
       return this;
     },

@@ -1089,7 +1089,7 @@ div.disabled_view {
     background-color: #858c96;
 }
 div.disabled_view_rail {
-    background: transparent url(/iwl/skin/default/images/loader/loader.gif) no-repeat center;
+    background: transparent url(/iwl/skin/default/images/loader/loader32x32.gif) no-repeat center;
     position: absolute;
     width: 64px;
     height: 64px;
@@ -1599,8 +1599,18 @@ div.tooltip_content {
     height: 7px;
     background: url('/iwl/skin/default/images/comboview/arrow.png') no-repeat 0px 0px;
 }
+.comboview_composite_loading {
+    width: 10px;
+    height: 10px;
+    background: url('/iwl/skin/default/images/loader/loader10x10.gif') no-repeat 0px 0px;
+}
 .comboview_node_highlight .comboview_parental_arrow {
     background-position: -6px 0px;
+}
+.comboview_composite_parental_arrow {
+    width: 6px;
+    height: 7px;
+    background: url('/iwl/skin/default/images/comboview/arrow.png') no-repeat -12px 0px;
 }
 .comboview_button_off {
     background-position: 0px 0px;
@@ -1668,17 +1678,4 @@ div.tooltip_content {
     height: 1px;
     border-bottom: 2px solid #444;
     margin-bottom: 1px;
-}
-.comboview_composite_container {
-    height: 100px;
-    width: 160px;
-    background: #9da3ab;
-}
-.comboview_composite_throbber {
-    width: 32px;
-    height: 32px;
-    background: transparent url(/iwl/skin/default/images/loader/loader.gif) no-repeat;
-    margin-left: 64px;
-    margin-top: 34px;
-    position: absolute;
 }

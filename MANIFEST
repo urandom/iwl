@@ -194,7 +194,9 @@ share/images/demo/moon.gif
 share/images/entry/entry_bg.gif
 share/images/expander/arrows.gif
 share/images/expander/arrows.png
-share/images/loader/loader.gif
+share/images/loader/loader32x32.gif
+share/images/loader/loader16x16.gif
+share/images/loader/loader10x10.gif
 share/images/menu/menu_bg.png
 share/images/menu/menu_next.gif
 share/images/menu/menu_next.png

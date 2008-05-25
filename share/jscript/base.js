@@ -36,14 +36,11 @@ Object.extend(IWL, {RPC: (function() {
           if (element['handlers'][eventName]) return;
 
           element['handlers'][eventName] = function() {
-              var previousRequest = element['handlers'][eventName].ajaxRequest;
-              if (previousRequest && previousRequest.transport) {
-                  previousRequest.transport.abort();
-                  element['handlers'][eventName].ajaxRequest = null;
-              }
+              IWL.RPC.abortCurrentEvent(element, eventName);
 
               var params = Object.extend(Object.extend({}, originalParams), arguments[0]);
               var options = Object.extend(Object.extend({}, originalOptions), arguments[1]);
+
               if (options.onStart)
                   eventStart(options.onStart).call(element, params);
               if (Object.isFunction(options.startCallback))
@@ -96,6 +93,10 @@ Object.extend(IWL, {RPC: (function() {
                       parameters: {IWLEvent: Object.toJSON({eventName: eventName, params: params, options: options})}
                   });
               }
+              Object.extend(element['handlers'][eventName], {
+                  params: params,
+                  options: options
+              });
           };
           return element;
       },
@@ -121,6 +122,15 @@ Object.extend(IWL, {RPC: (function() {
           if (!(element = $(element))) return false;
           if (!('handlers' in element) || !(eventName in element['handlers'])) return false;
           return element['handlers'][eventName];
+      },
+      abortCurrentEvent: function(element, eventName) {
+          var event = element['handlers'][eventName];
+          var request = event.ajaxRequest;
+          if (request && request.transport) {
+              request.transport.abort();
+              element.emitSignal('iwl:event_abort', eventName, event.params, event.options);
+              event.ajaxRequest = null;
+          }
       }
   };
 })()});
@@ -490,6 +500,9 @@ IWL.keyLogger = function(element, callback) {
         },
         hasEvent: function(element, eventName) {
             return IWL.RPC.hasEvent.apply(Event, arguments);
+        },
+        abortCurrentEvent: function(element, eventName) {
+            return IWL.RPC.abortCurrentEvent.apply(Event, arguments);
         },
         createHtmlElement: function(element, json, previousElement) {
             return IWL.createHtmlElement(json, element, previousElement);

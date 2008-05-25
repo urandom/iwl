@@ -306,6 +306,7 @@ sub _init {
     $self->{options}{offset}     = $args{offset}     if $args{offset};
     $self->{options}{limit}      = $args{limit}      if $args{limit};
     $self->{options}{preserve}   = $args{preserve}   if defined $args{preserve};
+    $self->{options}{parentNode} = $args{parentNode} if 'ARRAY' eq ref $args{parentNode};
 
     $self->{columns} = [];
     $self->{rootNodes} = [];
@@ -333,7 +334,7 @@ sub _refreshEvent {
         last => $params{pageCount}
     }->{$params{type}};
     $options{offset} = ($page - 1) * $options{limit};
-    my $model = IWL::TreeModel->new($options{columns}, preserve => 0, map {$_ => $options{$_}} qw(id totalCount limit offset));
+    my $model = ($options{class} || 'IWL::TreeModel')->new($options{columns}, preserve => 0, map {$_ => $options{$_}} qw(id totalCount limit offset));
 
     $model = ('CODE' eq ref $handler)
       ? $handler->(\%params, $model)
@@ -348,13 +349,25 @@ sub _refreshEvent {
     IWL::RPC::eventResponse($event, {data => $model->toJSON, extras => $extras});
 }
 
+sub _requestChildrenEvent {
+    my ($event, $handler) = @_;
+    my %options = %{$event->{options}};
+    my %params = %{$event->{params}};
+    my $model = ($options{class} || 'IWL::TreeModel')->new($options{columns}, preserve => 1, id => $options{id}, parentNode => $options{parentNode});
+
+    $model = ('CODE' eq ref $handler)
+      ? $handler->(\%params, $model, {values => $options{values}})
+      : undef;
+    IWL::RPC::eventResponse($event, {data => $model->toJSON});
+}
+
 sub _registerEvent {
     my ($self, $event, $params, $options) = @_;
 
     if ($event eq 'IWL-TreeModel-refresh') {
         $options->{method} = '_refreshResponse';
-    } else {
-        return $self->SUPER::_registerEvent($event, $params, $options);
+    } elsif ($event eq 'IWL-TreeModel-requestChildren') {
+        $options->{method} = '_requestChildrenResponse';
     }
 
     return $options;
