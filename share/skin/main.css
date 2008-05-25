@@ -1652,8 +1652,14 @@ div.tooltip_content {
 .comboview_node .comboview_parental_arrow_column {
     border-bottom: 1px dotted gray;
 }
-.comboview_node_last, .comboview_content .comboview_node {
+.comboview_node_last {
     border-bottom: none;
+}
+.comboview_node_insensitive {
+    color: #bbb;
+}
+.comboview_composite_node_insensitive {
+    color: inherit;
 }
 
 .comboview_page_container {

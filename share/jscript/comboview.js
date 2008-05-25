@@ -164,6 +164,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (element.hasClassName('comboview_node_separator'))
             return;
 
+        element.sensitivity = true;
         element.signalConnect('dom:mouseenter', function(event) {
             changeHighlight(node);
             if (!childContainer || !Object.isElement(childContainer.parentNode) || !childContainer.visible())
@@ -173,10 +174,12 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             changeHighlight();
         }.bind(this));
 
+        if (node.attributes.insensitive)
+            this.setSensitivity(node, false);
+
         if (childContainer) {
             childContainer.parentRow = element;
             element.signalConnect('dom:mouseenter', function(event) {
-                clearTimeout(childContainer.popDownDelay);
                 /* Race condition by incorrect event sequence in IE */
                 popUp.bind(this, childContainer).delay(0.001);
             }.bind(this));
@@ -368,6 +371,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var container = Object.isElement(container)
             ? container : this.container.pageContainer || this.container;
         var inner = this.container.pageContainer ? this.container : container;
+        clearTimeout(container.popDownDelay);
         if (!container) return;
         if (container.popped) return;
         container.setStyle({display: 'block', visibility: 'hidden'});
@@ -412,18 +416,14 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             container.initialized = true;
 
-            document.observe('click', function(event) {
+            container.observe('click', function(event) {
                 if (!Event.isLeftClick(event)) return;
-                var inside = Event.checkElement(event, container);
-                if (!inside && !Event.checkElement(event, this))
+                var element = Event.element(event).up('.comboview_node');
+                if (!element || element.descendantOf(this)) return;
+                var path = element.readAttribute('iwl:nodePath').evalJSON();
+                if (this.setActive(path))
                     return this.popDown();
-                else if (inside) {
-                    var element = Event.element(event).up('.comboview_node');
-                    if (!element || element.descendantOf(this)) return;
-                    var path = element.readAttribute('iwl:nodePath').evalJSON();
-                    this.setActive(path);
-                    return this.popDown();
-                }
+                else Event.stop(event);
             }.bind(this));
         }
         container.setStyle({visibility: 'visible'});
@@ -433,7 +433,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var container = Object.isElement(container)
             ? container
             : this.container.pageContainer || this.container;
-        if (!container) return;
+        if (!container || !container.popped) return;
         (container == this.container.pageContainer ? this.container : container).childContainers.each(
             function(c) { popDown.call(this, c) }.bind(this)
         );
@@ -449,7 +449,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             current.view.element.highlight = false;
         }
         if (node) {
-            node.view.element.addClassName('comboview_node_highlight');
+            if (node.view.element.sensitivity || node.isComposite())
+                node.view.element.addClassName('comboview_node_highlight');
             node.view.element.highlight = true;
         }
         this.currentNodeHighlight = node;
@@ -569,7 +570,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!Object.isArray(path)) path = [path];
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
-            if (!node) return;
+            if (!node || !node.view.element.sensitivity) return;
             this.values = node.getValues();
             var cellTemplate = cellTemplateRenderer.call(this, node);
             setContent.call(this, cellTemplate, node);
@@ -581,6 +582,29 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         getActive: function() {
             return this.selectedPath;
+        },
+        /**
+         * Sets the sentisitivy of the item
+         * @param path The path (or index for flat models) of the item to be set as active
+         * @param {Boolean} sensitivity If false, the item will be insensitive
+         * @returns The object
+         * */
+        setSensitivity: function(path, sensitivity) {
+            var node;
+            if (path instanceof IWL.TreeModel.Node) {
+                node = path;
+            } else {
+                if (!Object.isArray(path)) path = [path];
+                node = this.model.getNodeByPath(path) || this.model.getFirstNode();
+            }
+            if (!node) return;
+            var element = node.view.element;
+            if (!element) return;
+            var composite = node.childNodes.length || node.attributes.composite;
+            element[sensitivity ? 'removeClassName' : 'addClassName'](composite ? 'comboview_composite_node_insensitive' : 'comboview_node_insensitive');
+            element.sensitivity = !!sensitivity;
+
+            return this.emitSignal('iwl:sensitivity_change', node);
         },
 
         _init: function(id, model) {
@@ -628,6 +652,17 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.model.signalConnect('iwl:load_data', callback);
             this.model.signalConnect('iwl:sort_column_change', callback);
             this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
+
+            document.observe('click', function(event) {
+                if (!Event.isLeftClick(event)) return;
+                var containers = Object.values(this.containers).unshift(this.container);
+                for (var i = 0, l = containers.length; i < l; i++) {
+                    if (Event.checkElement(event, containers[i]))
+                        return;
+                }
+                if (!Event.checkElement(event, this))
+                    return this.popDown();
+            }.bind(this));
 
             this.emitSignal('iwl:load');
         }
