@@ -72,7 +72,7 @@ Parameter: B<ACTION> - the action of form processing
 sub setAction {
     my ($self, $action) = @_;
 
-    return $self->setAttribute(action => $action, 'uri');
+    return $self->setAttribute(action => $action);
 }
 
 =item B<getAction>

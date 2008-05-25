@@ -53,7 +53,7 @@ Parameters: B<SRC> - the source for the IFrame
 sub set {
     my ($self, $src) = @_;
 
-    return $self->setAttribute(src => $src, 'uri');
+    return $self->setAttribute(src => $src);
 }
 
 =item B<getSrc>

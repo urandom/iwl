@@ -87,7 +87,7 @@ sub set {
     my ($self, $src) = @_;
     require IWL::Static;
 
-    return $self->setAttribute(src => IWL::Static->addRequest($src), 'uri');
+    return $self->setAttribute(src => IWL::Static->addRequest($src));
 }
 
 =item B<setAlt> (B<TEXT>)

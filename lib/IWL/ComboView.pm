@@ -214,7 +214,7 @@ sub _setupDefaultClass {
         if $self->{_options}{editable};
     $self->prependClass($self->{_defaultClass});
     $self->{__button}->prependClass($self->{_defaultClass} . '_button');
-    $self->{__content}->prependClass($self->{_defaultClass} . '_content');
+    $self->{__content}->prependClass($self->{_defaultClass} . '_content ' . $self->{_defaultClass} . '_content_empty');
 }
 
 sub _realize {

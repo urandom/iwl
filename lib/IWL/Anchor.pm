@@ -78,7 +78,7 @@ Parameters: B<URL> - the url for the link
 sub setHref {
     my ($self, $url) = @_;
 
-    return $self->setAttribute(href => $url, 'uri');
+    return $self->setAttribute(href => $url);
 }
 
 =item B<getHref>

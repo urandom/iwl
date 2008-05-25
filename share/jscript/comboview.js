@@ -124,18 +124,21 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function cellTemplateRenderer(node) {
-        var cellTemplate = {}, values = [], cMap = this.options.columnMap;
+        var cellTemplate = {}, values = [], cMap = this.options.columnMap, mappedValues = {};
         for (var i = 0, l = cMap.length; i < l; i++)
             values.push(node.values[cMap[i]]);
+        for (var i = 0, l = node.values.length; i < l; i++)
+            mappedValues['value' + i] = node.values[i];
         if (this.nodeSeparatorCallback && this.nodeSeparatorCallback(this.model, node))
             return {separator: true};
         for (var i = 0, l = values.length; i < l; i++) {
             var render = this.options.cellAttributes[i].renderTemplate;
             if (render) {
                 render = new Template(render);
-                cellTemplate['column' + i] = Object.isObject(values[i])
+                var options = Object.isObject(values[i])
                     ? render.evaluate(values[i])
-                    : render.evaluate({cellValue: values[i]});
+                    : Object.extend(Object.clone(mappedValues), {cellValue: values[i]});
+                cellTemplate['column' + i] = render.evaluate(options);
             } else {
                 var index = cMap[i];
                 var type = this.model.columns[index] ? this.model.columns[index].type : IWL.TreeModel.DataTypes.NONE;
@@ -263,9 +266,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             if (!node.previousSibling && !node.nextSibling)
                 cellTemplate.nodePosition = 'comboview_node_first comboview_node_last'
-            else if (node.previousSibling)
+            else if (!node.previousSibling)
                 cellTemplate.nodePosition = 'comboview_node_first'
-            else if (node.nextSibling)
+            else if (!node.nextSibling)
                 cellTemplate.nodePosition = 'comboview_node_last'
             cellTemplate.nodePath = nodePath;
             html = template.evaluate(cellTemplate);
@@ -571,6 +574,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node || !node.view.element.sensitivity) return;
+            this.content.removeClassName('comboview_content_empty');
             this.values = node.getValues();
             var cellTemplate = cellTemplateRenderer.call(this, node);
             setContent.call(this, cellTemplate, node);

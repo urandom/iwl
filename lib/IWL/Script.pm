@@ -62,11 +62,10 @@ sub setSrc {
 
     if (ref $source eq 'ARRAY') {
         return $self->setAttribute(src =>
-            IWL::Static->addMultipleRequest($source, 'text/javascript'),
-            'uri'
+            IWL::Static->addMultipleRequest($source, 'text/javascript')
         );
     } else {
-        return $self->setAttribute(src => IWL::Static->addRequest($source), 'uri');
+        return $self->setAttribute(src => IWL::Static->addRequest($source));
     }
 }
 
