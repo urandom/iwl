@@ -1599,7 +1599,7 @@ div.tooltip_content {
     height: 7px;
     background: url('/iwl/skin/default/images/comboview/arrow.png') no-repeat 0px 0px;
 }
-.comboview_composite_loading {
+.comboview_partial_loading {
     width: 10px;
     height: 10px;
     background: url('/iwl/skin/default/images/loader/loader10x10.gif') no-repeat 0px 0px;
@@ -1607,7 +1607,7 @@ div.tooltip_content {
 .comboview_node_highlight .comboview_parental_arrow {
     background-position: -6px 0px;
 }
-.comboview_composite_parental_arrow {
+.comboview_partial_parental_arrow {
     width: 6px;
     height: 7px;
     background: url('/iwl/skin/default/images/comboview/arrow.png') no-repeat -12px 0px;
@@ -1663,7 +1663,7 @@ div.tooltip_content {
 .comboview_node_insensitive {
     color: #bbb;
 }
-.comboview_composite_node_insensitive {
+.comboview_partial_node_insensitive {
     color: inherit;
 }
 

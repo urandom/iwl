@@ -96,7 +96,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var template = generateNodeTemplate.call(this, flat)
         if (parentNode) {
             var highlight = parentNode.view.element.highlight;
-            createNodes.call(this, parentNode.childNodes, template, flat);
+            if (parentNode.childCount > 0)
+                createNodes.call(this, parentNode.childNodes, template, flat);
             recreateNode.call(this, parentNode, template, flat);
             if (highlight) {
                 changeHighlight(parentNode);
@@ -112,12 +113,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (eventName == 'IWL-TreeModel-requestChildren') {
             var node = this.model.getNodeByPath(options.parentNode);
             var element = node.view.element;
-            var arrow = element.down('.comboview_composite_loading');
-            arrow.removeClassName('comboview_composite_loading').addClassName('comboview_composite_parental_arrow');
+            var arrow = element.down('.comboview_partial_loading');
+            arrow.removeClassName('comboview_partial_loading').addClassName('comboview_partial_parental_arrow');
             var callback = function(event) {
                 element.signalDisconnect('dom:mouseenter', callback);
-                node.requestChildren();
-                arrow.removeClassName('comboview_composite_parental_arrow').addClassName('comboview_composite_loading');
+                if (node.requestChildren())
+                    arrow.removeClassName('comboview_partial_parental_arrow').addClassName('comboview_partial_loading');
+                else arrow.remove();
             }.bind(this);
             element.signalConnect('dom:mouseenter', callback);
         }
@@ -167,7 +169,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (element.hasClassName('comboview_node_separator'))
             return;
 
-        element.sensitivity = true;
+        element.sensitive = true;
         element.signalConnect('dom:mouseenter', function(event) {
             changeHighlight(node);
             if (!childContainer || !Object.isElement(childContainer.parentNode) || !childContainer.visible())
@@ -196,12 +198,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             childContainer.signalConnect('dom:mouseleave', function(event) {
                 childContainer.popDownDelay = popDown.bind(this, childContainer).delay(this.options.popDownDelay);
             }.bind(this));
-        } else if (node.attributes.composite) {
+        } else if (node.childCount == null) {
             var callback = function(event) {
                 element.signalDisconnect('dom:mouseenter', callback);
-                node.requestChildren();
-                var arrow = element.down('.comboview_composite_parental_arrow');
-                arrow.removeClassName('comboview_composite_parental_arrow').addClassName('comboview_composite_loading');
+                var arrow = element.down('.comboview_partial_parental_arrow');
+                if (node.requestChildren())
+                    arrow.removeClassName('comboview_partial_parental_arrow').addClassName('comboview_partial_loading');
+                else arrow.remove();
             }.bind(this);
             element.signalConnect('dom:mouseenter', callback);
         }
@@ -256,11 +259,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (cellTemplate.separator) {
             html = generateSeparator.call(this);
         } else {
-            var childLength = node.childNodes.length;
-            if (!flat && (childLength > 0 || node.attributes.composite)) {
-                var className = childLength ? 'comboview_parental_arrow' : 'comboview_composite_parental_arrow';
+            var childCount = node.childCount;
+            if (!flat && (childCount != 0)) {
+                var className = childCount ? 'comboview_parental_arrow' : 'comboview_partial_parental_arrow';
                 cellTemplate.parentalArrow = ['<div class="', className, '"></div>'].join('');
-                if (childLength)
+                if (childCount)
                     createNodes.call(this, node.childNodes, template);
             }
 
@@ -298,11 +301,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 html.push(generateSeparator.call(this));
                 continue;
             }
-            var childLength = node.childNodes.length;
-            if (!flat && (childLength > 0 || node.attributes.composite)) {
-                var className = childLength ? 'comboview_parental_arrow' : 'comboview_composite_parental_arrow';
+            var childCount = node.childCount;
+            if (!flat && (childCount > 0 || childCount == null)) {
+                var className = childCount ? 'comboview_parental_arrow' : 'comboview_partial_parental_arrow';
                 cellTemplate.parentalArrow = ['<div class="', className, '"></div>'].join('');
-                if (childLength)
+                if (childCount)
                     createNodes.call(this, node.childNodes, template);
             }
 
@@ -452,7 +455,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             current.view.element.highlight = false;
         }
         if (node) {
-            if (node.view.element.sensitivity || node.isComposite())
+            if (node.view.element.sensitive || node.childCount != 0)
                 node.view.element.addClassName('comboview_node_highlight');
             node.view.element.highlight = true;
         }
@@ -573,7 +576,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!Object.isArray(path)) path = [path];
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
-            if (!node || !node.view.element.sensitivity) return;
+            if (!node || !node.view.element.sensitive) return;
             this.content.removeClassName('comboview_content_empty');
             this.values = node.getValues();
             var cellTemplate = cellTemplateRenderer.call(this, node);
@@ -590,10 +593,10 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         /**
          * Sets the sentisitivy of the item
          * @param path The path (or index for flat models) of the item to be set as active
-         * @param {Boolean} sensitivity If false, the item will be insensitive
+         * @param {Boolean} sensitive If false, the item will be insensitive
          * @returns The object
          * */
-        setSensitivity: function(path, sensitivity) {
+        setSensitivity: function(path, sensitive) {
             var node;
             if (path instanceof IWL.TreeModel.Node) {
                 node = path;
@@ -604,9 +607,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!node) return;
             var element = node.view.element;
             if (!element) return;
-            var composite = node.childNodes.length || node.attributes.composite;
-            element[sensitivity ? 'removeClassName' : 'addClassName'](composite ? 'comboview_composite_node_insensitive' : 'comboview_node_insensitive');
-            element.sensitivity = !!sensitivity;
+            var hasChildren = node.childCount != 0;
+            element[sensitive ? 'removeClassName' : 'addClassName'](hasChildren ? 'comboview_partial_node_insensitive' : 'comboview_node_insensitive');
+            element.sensitive = !!sensitive;
 
             return this.emitSignal('iwl:sensitivity_change', node);
         },

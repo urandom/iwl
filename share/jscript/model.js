@@ -94,15 +94,18 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     if ('preserve' in options && !options.preserve)
       parentNode ? parentNode.childNodes = [] : this.rootNodes.invoke('remove');
 
-    nodes.each(function(n) {
-      var node = this.insertNode(parentNode, options.index);
+    var length = nodes.length;
+    if (parentNode) parentNode.childCount = length;
+    for (var i = 0; i < length; i++) {
+      var n = nodes[i], node = this.insertNode(parentNode, options.index);
+      node.childCount = n.childCount;
       if (n.values && n.values.length)
         node.values = n.values.slice(0, this.columns.length);
       if (n.attributes)
         node.attributes = Object.extend({}, n.attributes);
       if (n.childNodes && n.childNodes.length)
         loadNodes.call(this, n.childNodes, node, {});
-    }.bind(this))
+    }
   }
 
   function getNodes(parentNode) {
@@ -113,6 +116,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       var node = {};
       node.values = n.values;
       node.attributes = n.attributes;
+      node.childCount = n.childCount;
       if (n.childNodes && n.childNodes.length)
         node.childNodes = getNodes(n);
       ret.push(node);
@@ -122,7 +126,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   }
 
   function flatIterator(node) {
-    return node.childNodes.length > 0 || node.attributes.composite;
+    return node.childCount != 0;
   }
 
   function RPCStartCallback(event, params, options) {
@@ -431,7 +435,8 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
   return {
     initialize: function(model, parent, index) {
-      this.childNodes = [], this.values = [], this.attributes = {};
+      this.childNodes = [], this.values = [],
+      this.attributes = {}, this.childCount = null;
 
       if (model)
         this.insert(model, parent, index);
@@ -453,6 +458,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       if (parent) {
         this.parentNode = parent;
         nodes = parent.childNodes;
+        parent.childCount++;
       } else nodes = model.rootNodes;
 
       index > -1
@@ -555,12 +561,11 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       if (!this.model) return -1;
       return this.childNodes.length;
     },
-    isComposite: function() {
-      if (!this.model) return false;
-      return this.childNodes.length || this.attributes.composite;
-    },
     requestChildren: function() {
-      if (!this.model) return;
+      if (this.childCount != null
+       || !this.model
+       || !this.model.hasEvent('IWL-TreeModel-requestChildren'))
+         return;
       this.model.emitSignal('iwl:request_children', this);
       var emitOptions = {
         columns: this.model.columns,

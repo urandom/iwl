@@ -36,6 +36,7 @@ sub insert {
     if ($parent) {
         $self->{parentNode} = $parent;
         $nodes = $parent->{childNodes};
+        $parent->{childCount}++;
     } else {
         $nodes = $model->{rootNodes};
     }
@@ -195,6 +196,7 @@ sub toObject {
     $object->{childNodes} = [map {$_->toObject} @{$self->{childNodes}}]
         if @{$self->{childNodes}};
     $object->{attributes} = $self->{attributes} if $self->{attributes};
+    $object->{childCount} = $self->{childCount};
     return $object;
 }
 
@@ -211,6 +213,7 @@ sub _init {
     $self->{childNodes} = [];
     $self->{values} = [];
     $self->{attributes} =  {};
+    $self->{childCount} = undef;
     $self->{previousSibling} = $self->{nextSibling} = undef;
     $self->insert(@_) if $_[0];
 }
