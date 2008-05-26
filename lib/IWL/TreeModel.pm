@@ -213,10 +213,8 @@ sub dataReader {
 sub getScript {
     my $self = shift;
 
-    my ($even, @script) = (1);
-    push @script, 'window.' . $self->{options}{id} . ' = new IWL.TreeModel();';
-
-    return join "\n", @script;
+    my $data = $self->toJSON;
+    return 'window.' . $self->{options}{id} . " = new IWL.TreeModel($data);";
 }
 
 =head1
@@ -357,6 +355,18 @@ sub _requestChildrenEvent {
 
     $model = ('CODE' eq ref $handler)
       ? $handler->(\%params, $model, {values => $options{values}})
+      : undef;
+    IWL::RPC::eventResponse($event, {data => $model->toJSON});
+}
+
+sub _sortColumnEvent {
+    my ($event, $handler) = @_;
+    my %options = %{$event->{options}};
+    my %params = %{$event->{params}};
+    my $model = ($options{class} || 'IWL::TreeModel')->new($options{columns}, preserve => 0, id => $options{id}, parentNode => $options{parentNode});
+
+    $model = ('CODE' eq ref $handler)
+      ? $handler->(\%params, $model)
       : undef;
     IWL::RPC::eventResponse($event, {data => $model->toJSON});
 }

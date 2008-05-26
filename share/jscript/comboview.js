@@ -198,7 +198,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             childContainer.signalConnect('dom:mouseleave', function(event) {
                 childContainer.popDownDelay = popDown.bind(this, childContainer).delay(this.options.popDownDelay);
             }.bind(this));
-        } else if (node.childCount == null) {
+        } else if (null == node.childCount) {
             var callback = function(event) {
                 element.signalDisconnect('dom:mouseenter', callback);
                 var arrow = element.down('.comboview_partial_parental_arrow');
@@ -302,7 +302,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 continue;
             }
             var childCount = node.childCount;
-            if (!flat && (childCount > 0 || childCount == null)) {
+            if (!flat && (childCount != 0)) {
                 var className = childCount ? 'comboview_parental_arrow' : 'comboview_partial_parental_arrow';
                 cellTemplate.parentalArrow = ['<div class="', className, '"></div>'].join('');
                 if (childCount)

@@ -195,7 +195,7 @@ sub toObject {
     my $object = {values => $self->{values}};
     $object->{childNodes} = [map {$_->toObject} @{$self->{childNodes}}]
         if @{$self->{childNodes}};
-    $object->{attributes} = $self->{attributes} if $self->{attributes};
+    $object->{attributes} = $self->{attributes} if %{$self->{attributes}};
     $object->{childCount} = $self->{childCount};
     return $object;
 }

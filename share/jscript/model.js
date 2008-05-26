@@ -98,7 +98,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     if (parentNode) parentNode.childCount = length;
     for (var i = 0; i < length; i++) {
       var n = nodes[i], node = this.insertNode(parentNode, options.index);
-      node.childCount = n.childCount;
+      if (n.childCount == 0)
+        node.childCount = 0;
       if (n.values && n.values.length)
         node.values = n.values.slice(0, this.columns.length);
       if (n.attributes)
@@ -129,6 +130,10 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     return node.childCount != 0;
   }
 
+  function flatLocalIterator(node) {
+    return node.childCount > 0;
+  }
+
   function RPCStartCallback(event, params, options) {
     if (event.endsWith('refresh')) {
       options.totalCount = this.options.totalCount;
@@ -144,8 +149,12 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
   }
 
   return {
-    initialize: function($super, columns) {
+    initialize: function($super, columns, data) {
       $super();
+      if (Object.isObject(columns) && columns.columns) {
+        columns = columns.columns;
+        data = columns;
+      }
 
       this.rootNodes = [];
       this.columns = new Array(columns.length);
@@ -154,7 +163,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         this.setColumn(i, columns[i]);
       }
       this.options = {};
-      this.loadData(arguments[2]);
+      this.loadData(data);
       this._emitter._refreshResponse = refreshResponse.bind(this);
       this._emitter._requestChildrenResponse = refreshResponse.bind(this);
     },
@@ -197,7 +206,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return node;
     },
     isFlat: function() {
-      return !this.rootNodes.any(flatIterator);
+      return this.hasEvent('IWL-TreeModel-requestChildren')
+        ? !this.rootNodes.any(flatIterator)
+        : !this.rootNodes.any(flatLocalIterator);
     },
 
     /* Sortable Interface */
@@ -444,6 +455,10 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
     insert: function(model, parent, index) {
       if (!model) return;
+
+      if (this.childCount == null
+          && !model.hasEvent('IWL-TreeModel-requestChildren'))
+        this.childCount = 0;
 
       this.remove();
       if (this.model != model) {
