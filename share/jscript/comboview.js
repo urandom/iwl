@@ -624,7 +624,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }, arguments[2]);
             if (Object.keys(model.options.columnTypes).length)
                 IWL.TreeModel.overrideDefaultDataTypes(model.options.columnTypes);
-            this.model = new IWL.TreeModel(model.columns, model);
+            this.model = new IWL.TreeModel(model);
             this.button = this.down('.comboview_button');
             this.content = this.down('.comboview_content');
             this.contentColumns = [];

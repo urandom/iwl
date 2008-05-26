@@ -296,9 +296,10 @@ sub _sortColumnEvent {
 }
 
 sub _init {
-    my ($self, $columns, %args) = @_;
-    my $index = 0;
+    my $self = shift;
+    my ($columns, %args) = (@_ % 2 ? (shift, @_) : (undef, @_));
 
+    $columns = $args{columns} if 'ARRAY' eq ref $args{columns};
     $self->{options}{id} = $args{id} || randomize('treemodel');
     $self->{options}{totalCount} = $args{totalCount} if $args{totalCount};
     $self->{options}{offset}     = $args{offset}     if $args{offset};
@@ -309,6 +310,8 @@ sub _init {
     $self->{columns} = [];
     $self->{rootNodes} = [];
     $columns = [] unless 'ARRAY' eq ref $columns;
+
+    my $index = 0;
     foreach (@$columns) {
         $_->{type} = $Types->{$_->{type}};
         $self->{columns}[$index++] = $_;

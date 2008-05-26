@@ -152,8 +152,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     initialize: function($super, columns, data) {
       $super();
       if (Object.isObject(columns) && columns.columns) {
-        columns = columns.columns;
         data = columns;
+        columns = columns.columns;
       }
 
       this.rootNodes = [];
