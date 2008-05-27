@@ -1612,6 +1612,9 @@ div.tooltip_content {
     height: 7px;
     background: url('/iwl/skin/default/images/comboview/arrow.png') no-repeat -12px 0px;
 }
+.comboview_node_highlight .comboview_partial_parental_arrow {
+    background-position: -18px 0px;
+}
 .comboview_button_off {
     background-position: 0px 0px;
 }

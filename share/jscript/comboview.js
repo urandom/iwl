@@ -177,6 +177,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }.bind(this));
         element.signalConnect('dom:mouseleave', function(event) {
             changeHighlight();
+            clearTimeout(container.popUpDelay);
         }.bind(this));
 
         if (node.attributes.insensitive)
@@ -186,25 +187,17 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             childContainer.parentRow = element;
             element.signalConnect('dom:mouseenter', function(event) {
                 /* Race condition by incorrect event sequence in IE */
-                popUp.bind(this, childContainer).delay(0.001);
-            }.bind(this));
-            element.signalConnect('dom:mouseleave', function(event) {
-                childContainer.popDownDelay = popDown.bind(this, childContainer).delay(this.options.popDownDelay);
-            }.bind(this));
-            childContainer.signalConnect('dom:mouseenter', function(event) {
-                clearTimeout(childContainer.popDownDelay);
-                clearTimeout(childContainer.parentContainer.popDownDelay);
-            }.bind(this));
-            childContainer.signalConnect('dom:mouseleave', function(event) {
-                childContainer.popDownDelay = popDown.bind(this, childContainer).delay(this.options.popDownDelay);
+                container.popUpDelay = popUp.bind(this, childContainer).delay(this.options.popUpDelay);
             }.bind(this));
         } else if (null == node.childCount) {
             var callback = function(event) {
-                element.signalDisconnect('dom:mouseenter', callback);
-                var arrow = element.down('.comboview_partial_parental_arrow');
-                if (node.requestChildren())
-                    arrow.removeClassName('comboview_partial_parental_arrow').addClassName('comboview_partial_loading');
-                else arrow.remove();
+                container.popUpDelay = (function() {
+                    element.signalDisconnect('dom:mouseenter', callback);
+                    var arrow = element.down('.comboview_partial_parental_arrow');
+                    if (node.requestChildren())
+                        arrow.removeClassName('comboview_partial_parental_arrow').addClassName('comboview_partial_loading');
+                    else arrow.remove();
+                }).delay(this.options.popUpDelay);
             }.bind(this);
             element.signalConnect('dom:mouseenter', callback);
         }
@@ -620,7 +613,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 columnClass: [],
                 cellAttributes: [],
                 initialPath: [0],
-                maxHeight: 400
+                maxHeight: 400,
+                popUpDelay: 0.2
             }, arguments[2]);
             if (Object.keys(model.options.columnTypes).length)
                 IWL.TreeModel.overrideDefaultDataTypes(model.options.columnTypes);
@@ -629,8 +623,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.content = this.down('.comboview_content');
             this.contentColumns = [];
             this.containers = {};
-            if (!this.options.popDownDelay)
-                this.options.popDownDelay = 0.3;
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
                 this.pageControl.signalConnect('iwl:current_page_is_changing', onPageChanging.bind(this));
