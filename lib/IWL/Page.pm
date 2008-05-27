@@ -238,6 +238,10 @@ sub requiredJs {
     return shift->{environment}->requiredJs(@_);
 }
 
+sub requiredCSS {
+    return shift->{environment}->requiredCSS(@_);
+}
+
 # Protected
 #
 sub _init {
@@ -253,7 +257,6 @@ sub _init {
     do { $self->{__simple} = delete $args{simple}; return 1 } if $args{simple};
 
     $self->_constructorArguments(%args);
-    $self->requiredCSS('main.css');
     my $ie   = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie.css');
     my $ie6  = IWL::Page::Link->newLinkToCSS($IWLConfig{SKIN_DIR} . '/ie6.css');
 
@@ -269,7 +272,7 @@ sub _init {
     $conditional = IWL::Comment->new;
     $head->appendChild($conditional);
     $self->{environment} = IWL::Environment->new unless $self->{environment};
-    $self->requiredJs('base.js');
+    $self->requiredJs('base.js')->requiredCSS('main.css');
     return $conditional->setConditionalData('lt IE 7', $ie6);
 }
 
