@@ -103,8 +103,6 @@ Unless otherwise noted, the perl callback called by the event handler, will only
 
 See L<IWL::RPC::handleEvent> for more information
 
-=back
-
 =cut
 
 sub new {
