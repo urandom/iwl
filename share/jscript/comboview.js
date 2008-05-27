@@ -96,8 +96,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var template = generateNodeTemplate.call(this, flat)
         if (parentNode) {
             var highlight = parentNode.view.element.highlight;
-            if (parentNode.childCount > 0)
-                createNodes.call(this, parentNode.childNodes, template, flat);
             recreateNode.call(this, parentNode, template, flat);
             if (highlight) {
                 changeHighlight(parentNode);
@@ -214,34 +212,38 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function createContainer(parentNode) {
         var container;
-        if (parentNode) {
-            var path = parentNode.getPath().toString();
-            container = this.containers[path];
-            if (!container)
-                container = new Element('div', {className: 'comboview_node_container'});
-            this.containers[path] = container;
+        if (parentNode && parentNode.view.childContainer)
+            container = parentNode.view.childContainer
+        else {
+            if (parentNode) {
+                var path = parentNode.getPath().toString();
+                container = this.containers[path];
+                if (!container)
+                    container = new Element('div', {className: 'comboview_node_container'});
+                this.containers[path] = container;
 
-            parentNode.view.childContainer = container;
-            container.parentContainer = parentNode.parentNode
-                                     && parentNode.parentNode.view.childContainer
-                ? parentNode.parentNode.view.childContainer
-                : this.container;
-            container.parentContainer.childContainers.push(container);
-        } else {
-            container = this.container;
-            if (!container) {
-                container = new Element('div', {className: 'comboview_node_container'});
-                container.registerFocus();
-                container.keyLogger(keyEventsCB.bindAsEventListener(this));
+                parentNode.view.childContainer = container;
+                container.parentContainer = parentNode.parentNode
+                                         && parentNode.parentNode.view.childContainer
+                    ? parentNode.parentNode.view.childContainer
+                    : this.container;
+                container.parentContainer.childContainers.push(container);
+            } else {
+                container = this.container;
+                if (!container) {
+                    container = new Element('div', {className: 'comboview_node_container'});
+                    container.registerFocus();
+                    container.keyLogger(keyEventsCB.bindAsEventListener(this));
+                }
+                if (this.pageControl && !container.pageContainer) {
+                    var pageContainer = new Element('div', {className: 'comboview_page_container'});
+                    pageContainer.appendChild(container);
+                    pageContainer.appendChild(this.pageControl);
+                    this.pageControl.setStyle({position: '', left: ''});
+                    container.pageContainer = pageContainer;
+                }
+                this.container = container;
             }
-            if (this.pageControl && !container.pageContainer) {
-                var pageContainer = new Element('div', {className: 'comboview_page_container'});
-                pageContainer.appendChild(container);
-                pageContainer.appendChild(this.pageControl);
-                this.pageControl.setStyle({position: '', left: ''});
-                container.pageContainer = pageContainer;
-            }
-            this.container = container;
         }
         container.childContainers = [];
         return container;
@@ -533,6 +535,17 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function onNodeChange(event, node) {
+        var flat = this.model.isFlat();
+        var template = generateNodeTemplate.call(this, flat)
+        var highlight = node.view.element.highlight;
+        recreateNode.call(this, node, template, flat);
+        if (highlight) {
+            changeHighlight(node);
+            popUp.call(this, node.view.childContainer);
+        }
+    }
+
     return {
         /**
          * Pops up (shows) the dropdown list
@@ -651,6 +664,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.model.signalConnect('iwl:load_data', callback);
             this.model.signalConnect('iwl:sort_column_change', callback);
             this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
+            this.model.signalConnect('iwl:node_change', onNodeChange.bind(this));
 
             document.observe('click', function(event) {
                 if (!Event.isLeftClick(event)) return;
