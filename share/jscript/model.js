@@ -66,7 +66,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       node.nextSibling = undefined;
 
       previous = node;
-      if (node.childNodes.length)
+      if (node.childCount)
         sortDepth.call(this, node.childNodes, wrapper);
     });
   }
@@ -104,7 +104,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
         node.values = n.values.slice(0, this.columns.length);
       if (n.attributes)
         node.attributes = Object.extend({}, n.attributes);
-      if (n.childNodes && n.childNodes.length)
+      if (n.childNodes && n.childCount)
         loadNodes.call(this, n.childNodes, node, {});
     }
   }
@@ -118,8 +118,8 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       node.values = n.values;
       node.attributes = n.attributes;
       node.childCount = n.childCount;
-      if (n.childNodes && n.childNodes.length)
-        node.childNodes = getNodes(n);
+      if (n.childNodes && n.childCount)
+        node.childNodes = getNodes.call(this, n);
       ret.push(node);
     }.bind(this));
 
@@ -357,9 +357,9 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       }
       var parentNode = this.getNodeByPath(data.options.parentNode);
 
-      if (!Object.isArray(data.nodes)) return this;
       this.freeze();
-      loadNodes.call(this, data.nodes, parentNode, this.options);
+      if (Object.isArray(data.nodes))
+        loadNodes.call(this, data.nodes, parentNode, this.options);
 
       return this.thaw().emitSignal('iwl:load_data', parentNode);
     },
@@ -496,36 +496,44 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
       this.columns = model.columns.clone();
 
-      this.model.emitSignal('iwl:node_insert', this);
-      if ((parent && parent.childNodes.length == 1) || this.model.rootNodes.length == 1)
+      this.model.emitSignal('iwl:node_insert', this, parent);
+      if ((parent && parent.childCount == 1) || this.model.rootNodes.length == 1)
         this.model.emitSignal('iwl:node_has_child_toggle', parent);
 
       return this;
     },
 
     remove: function() {
-      if (!this.model) return;
+      var model = this.model;
+      if (!model) return;
       var parent = this.parentNode;
-      if (parent)
+      if (parent) {
         parent.childNodes = parent.childNodes.without(this);
-      else
-        this.model.rootNodes = this.model.rootNodes.without(this);
+        if (--parent.childCount < 0) parent.childCount = 0;
+      } else
+        model.rootNodes = model.rootNodes.without(this);
 
       var next = this.nextSibling, previous = this.previousSibling;
       if (next) next.previousSibling = previous;
       if (previous) previous.nextSibling = previous;
 
       this.parentNode = this.nextSibling = this.previousSibling = undefined;
-      if (!this.model.frozen) {
+      if (!model.frozen) {
         removeModel(this);
         this.each(removeModel);
       }
 
-      this.model.emitSignal('iwl:node_remove', this);
-      if ((parent && !parent.childNodes.length) || !this.model.rootNodes.length)
-        this.model.emitSignal('iwl:node_has_child_toggle', parent);
+      model.emitSignal('iwl:node_remove', this, parent);
+      if ((parent && !parent.childCount) || !model.rootNodes.length)
+        model.emitSignal('iwl:node_has_child_toggle', parent);
 
       return this;
+    },
+
+    clear: function() {
+      this.model.freeze();
+      this.childNodes.invoke('remove');
+      return this.model.thaw().emitSignal('iwl:load_data', this);
     },
 
     next: function(index) {
@@ -574,7 +582,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
     },
     hasChildren: function() {
       if (!this.model) return -1;
-      return this.childNodes.length;
+      return this.childCount;
     },
     requestChildren: function() {
       if (this.childCount != null
