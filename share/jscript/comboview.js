@@ -230,6 +230,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     : this.container;
                 container.parentContainer.childContainers.push(container);
                 container.childContainers = [];
+                container.node = parentNode;
             } else {
                 container = this.container;
                 if (!container) {
@@ -529,12 +530,12 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function onPageChanging() {
+    function pageChanging() {
         this.pageChanging = true;
         IWL.View.disable({element: this.container.pageContainer});
     }
 
-    function onPageChange() {
+    function pageChange() {
         IWL.View.enable();
         this.pageChanging = undefined;
         if (this.popDownRequest) {
@@ -554,16 +555,16 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function nodeInsert(event, node, parent) {
+    function nodeInsert(event, node, parentNode) {
         var flat = this.model.isFlat();
         var template = generateNodeTemplate.call(this, flat)
         node.view = {};
-        var container = parent ? createContainer.call(this, parent) : this.container;
-        recreateNode.call(this, parent || node, template, flat, container);
-        generatePathAttributes.call(this, parent);
+        var container = parentNode ? createContainer.call(this, parentNode) : this.container;
+        recreateNode.call(this, parentNode || node, template, flat, container);
+        generatePathAttributes.call(this, parentNode);
     }
 
-    function nodeRemove(event, node, parent) {
+    function nodeRemove(event, node, parentNode) {
         var element = node.view.element;
         var container = node.view.container;
         var childContainer = node.view.childContainer;
@@ -577,23 +578,35 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (childContainer)
             removeContainers.call(this, childContainer);
         element.remove();
-        generatePathAttributes.call(this, parent);
-    }
 
+        var count = parentNode ? parentNode.childCount : this.model.rootNodes.length;
+        if (count)
+            generatePathAttributes.call(this, parentNode);
+        else {
+            removeContainers.call(this, container);
+            var flat = this.model.isFlat();
+            var template = generateNodeTemplate.call(this, flat)
+            var container = parentNode ? createContainer.call(this, parentNode) : this.container;
+            recreateNode.call(this, parentNode || node, template, flat, container);
+        }
+    }
+    
     function removeContainers(container) {
         if (container.parentNode)
             container.remove();
         delete this.containers[container.path];
+        if (container.node && container.node.view.childContainer)
+            delete container.node.view.childContainer;
         for (var i = 0, l = container.childContainers.length; i < l; i++)
             removeContainers.call(this, container.childContainers[i]);
         container.childContainers = [];
     }
 
-    function generatePathAttributes(parent) {
+    function generatePathAttributes(parentNode) {
         var childNodes, parentPath;
-        if (parent) {
-            childNodes = parent.childNodes;
-            parentPath = parent.getPath();
+        if (parentNode) {
+            childNodes = parentNode.childNodes;
+            parentPath = parentNode.getPath();
         } else {
             childNodes = this.model.rootNodes;
             parentPath = [];
@@ -700,8 +713,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.containers = {};
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
-                this.pageControl.signalConnect('iwl:current_page_is_changing', onPageChanging.bind(this));
-                this.pageControl.signalConnect('iwl:current_page_change', onPageChange.bind(this));
+                this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
+                this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
             if (this.pageControl && this.options.pageControlEventName)
                 this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);

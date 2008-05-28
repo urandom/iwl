@@ -95,7 +95,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       parentNode ? parentNode.childNodes = [] : this.rootNodes.invoke('remove');
 
     var length = nodes.length;
-    if (parentNode) parentNode.childCount = length;
+    if (parentNode && length == 0) parentNode.childCount = 0;
     for (var i = 0; i < length; i++) {
       var n = nodes[i], node = this.insertNode(parentNode, options.index);
       if (n.childCount == 0)
@@ -269,24 +269,24 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return node.remove();
     },
 
-    insertNode: function(parent, index) {
-      return new IWL.TreeModel.Node(this, parent, index);
+    insertNode: function(parentNode, index) {
+      return new IWL.TreeModel.Node(this, parentNode, index);
     },
 
-    insertNodeBefore: function(parent, sibling) {
-      return new IWL.TreeModel.Node(this, parent, sibling.getIndex());
+    insertNodeBefore: function(parentNode, sibling) {
+      return new IWL.TreeModel.Node(this, parentNode, sibling.getIndex());
     },
 
-    insertNodeAfter: function(parent, sibling) {
-      return new IWL.TreeModel.Node(this, parent, sibling.getIndex() + 1);
+    insertNodeAfter: function(parentNode, sibling) {
+      return new IWL.TreeModel.Node(this, parentNode, sibling.getIndex() + 1);
     },
 
-    prependNode: function(parent) {
-      return new IWL.TreeModel.Node(this, parent, 0);
+    prependNode: function(parentNode) {
+      return new IWL.TreeModel.Node(this, parentNode, 0);
     },
 
-    appendNode: function(parent) {
-      return new IWL.TreeModel.Node(this, parent, -1);
+    appendNode: function(parentNode) {
+      return new IWL.TreeModel.Node(this, parentNode, -1);
     },
 
     clear: function() {
@@ -295,22 +295,22 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return this.thaw().emitSignal('iwl:load_data');
     },
 
-    reorder: function(parent, order) {
-      if (Object.isArray(parent)) {
-        order = parent;
-        parent = undefined;
+    reorder: function(parentNode, order) {
+      if (Object.isArray(parentNode)) {
+        order = parentNode;
+        parentNode = undefined;
       } else if (!Object.isArray(order)) return;
       this.freeze();
 
-      var children = parent ? parent.childNodes : this.rootNodes,
+      var children = parentNode ? parentNode.childNodes : this.rootNodes,
           length = order.length;
       if (length != children.length) return;
       for (var i = 0; i < length; i++) {
         var child = children[order[i]];
-        child.insert(this, parent, i);
+        child.insert(this, parentNode, i);
       }
 
-      return this.thaw().emitSignal('iwl:nodes_reorder', parent);
+      return this.thaw().emitSignal('iwl:nodes_reorder', parentNode);
     },
 
     swap: function(node1, node2) {
@@ -325,12 +325,12 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return this.thaw().emitSignal('iwl:nodes_swap', node1, node2);
     },
 
-    move: function(node, parent, index) {
+    move: function(node, parentNode, index) {
       this.freeze();
 
       var previous = node.parentNode;
-      node.insert(this, parent, index);
-      return this.thaw().emitSignal('iwl:node_move', parent, previous);
+      node.insert(this, parentNode, index);
+      return this.thaw().emitSignal('iwl:node_move', parentNode, previous);
     },
 
     loadData: function(data) {
@@ -445,15 +445,15 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
 
   return {
-    initialize: function(model, parent, index) {
+    initialize: function(model, parentNode, index) {
       this.childNodes = [], this.values = [],
       this.attributes = {}, this.childCount = null;
 
       if (model)
-        this.insert(model, parent, index);
+        this.insert(model, parentNode, index);
     },
 
-    insert: function(model, parent, index) {
+    insert: function(model, parentNode, index) {
       if (!model) return;
 
       if (this.childCount == null
@@ -470,10 +470,10 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       if (isNaN(index) || index < 0)
         index = -1;
 
-      if (parent) {
-        this.parentNode = parent;
-        nodes = parent.childNodes;
-        parent.childCount++;
+      if (parentNode) {
+        this.parentNode = parentNode;
+        nodes = parentNode.childNodes;
+        parentNode.childCount++;
       } else nodes = model.rootNodes;
 
       index > -1
@@ -496,9 +496,9 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
       this.columns = model.columns.clone();
 
-      this.model.emitSignal('iwl:node_insert', this, parent);
-      if ((parent && parent.childCount == 1) || this.model.rootNodes.length == 1)
-        this.model.emitSignal('iwl:node_has_child_toggle', parent);
+      this.model.emitSignal('iwl:node_insert', this, parentNode);
+      if ((parentNode && parentNode.childCount == 1) || this.model.rootNodes.length == 1)
+        this.model.emitSignal('iwl:node_has_child_toggle', parentNode);
 
       return this;
     },
@@ -506,10 +506,10 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
     remove: function() {
       var model = this.model;
       if (!model) return;
-      var parent = this.parentNode;
-      if (parent) {
-        parent.childNodes = parent.childNodes.without(this);
-        if (--parent.childCount < 0) parent.childCount = 0;
+      var parentNode = this.parentNode;
+      if (parentNode) {
+        parentNode.childNodes = parentNode.childNodes.without(this);
+        if (--parentNode.childCount < 0) parentNode.childCount = 0;
       } else
         model.rootNodes = model.rootNodes.without(this);
 
@@ -523,9 +523,9 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         this.each(removeModel);
       }
 
-      model.emitSignal('iwl:node_remove', this, parent);
-      if ((parent && !parent.childCount) || !model.rootNodes.length)
-        model.emitSignal('iwl:node_has_child_toggle', parent);
+      model.emitSignal('iwl:node_remove', this, parentNode);
+      if ((parentNode && !parentNode.childCount) || !model.rootNodes.length)
+        model.emitSignal('iwl:node_has_child_toggle', parentNode);
 
       return this;
     },
