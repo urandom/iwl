@@ -292,7 +292,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     clear: function() {
       this.freeze();
       this.rootNodes.invoke('remove');
-      return this.thaw().emitSignal('iwl:nodes_reorder');
+      return this.thaw().emitSignal('iwl:load_data');
     },
 
     reorder: function(parent, order) {
