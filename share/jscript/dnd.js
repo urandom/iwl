@@ -56,6 +56,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
             left: point.x + 'px',
             top: point.y + 'px'
           });
+          this.dummy.originalElement = this.element;
           document.body.appendChild(this.view);
         }
       } else if (this.options.outline) {
@@ -68,6 +69,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
           this.outline.style.zIndex = this.options.zindex + 1;
         this.element.insert({after: this.outline});
         this.outline.setOpacity(this.options.outlineOpacity);
+        this.outline.originalElement = this.element;
       }
     },
 
@@ -142,7 +144,7 @@ IWL.Droppable = Class.create((function() {
 
   return {
     initialize: function(element) {
-      var options = Object.extend({}, arguments[0] || {});
+      var options = Object.extend({}, arguments[1] || {});
       options.onHover = onHover.bind(this);
       options.onDrop = onDrop.bind(this);
 
@@ -155,6 +157,26 @@ IWL.Droppable = Class.create((function() {
     }
   }
 })());
+
+(function() {
+  var show = Droppables.show;
+
+  Droppables.show = function(point, element) {
+    if (element.originalElement)
+      show.call(Droppables, point, element.originalElement);
+    else
+      show.call(Droppables, point, element);
+  };
+  Droppables.isContained = function(element, drop) {
+    var containmentNode;
+    if(drop.tree) {
+      containmentNode = element.treeNode; 
+    } else {
+      containmentNode = element.parentNode;
+    }
+    return drop._containers.detect(function(c) { return element == c || containmentNode == c });
+  };
+})();
 
 (function() {
   var ElementMethods = {
@@ -170,6 +192,8 @@ IWL.Droppable = Class.create((function() {
     },
     dragDestSet: function(element, options) {
       if (!element.iwl) element.iwl = {};
+      if (element.iwl.droppable)
+        element.iwl.droppable.destroy();
       element.iwl.droppable = new IWL.Droppable(element, options);
       return element;
     },
