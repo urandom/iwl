@@ -208,21 +208,6 @@ IWL.Droppable = Class.create((function() {
     dragDataGet: function(element) {
       if (!element.iwl || !element.iwl.draggable) return;
       return element.iwl.draggable.data;
-    },
-    prepareDND: function(element, events) {
-      if (element._preparedDND) return element;
-      if (!events) {
-        events = element.readAttribute('iwl:DNDEvents');
-        events = unescape(events).evalJSON();
-      }
-      if (events) {
-        if (events.source)
-          element.dragSourceSet(events.source);
-        if (events.dest)
-          element.dragDestSet(events.dest);
-        element._preparedDND = true;
-        return element;
-      }
     }
   };
   Element.addMethods(ElementMethods);
