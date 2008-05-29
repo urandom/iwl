@@ -178,6 +178,8 @@ IWL.Droppable = Class.create((function() {
   var ElementMethods = {
     dragSourceSet: function(element, options) {
       if (!element.iwl) element.iwl = {};
+      if (element.iwl.draggable)
+        element.iwl.draggable.destroy();
       element.iwl.draggable = new IWL.Draggable(element, options);
       return element;
     },
