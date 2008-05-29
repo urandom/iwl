@@ -130,12 +130,8 @@ IWL.Draggable.HTMLView = Class.create({
 });
 
 IWL.Droppable = Class.create((function() {
-  function onHover(draggable, element, overlap) {
-    var element = draggable.originalElement || draggable.element;
-    var pseudo = draggable.originalElement ? draggable.element : null;
-    if (pseudo) draggable.element = element;
-    this.element.emitSignal('iwl:drag_hover', element, draggable)
-    if (pseudo) draggable.element = pseudo;
+  function onHover(dragElement, dropElement, overlap) {
+    this.element.emitSignal('iwl:drag_hover', dragElement.originalElement || dragElement, dropElement, overlap)
   }
 
   function onDrop(dragElement, dropElement, dragEvent) {
@@ -210,6 +206,21 @@ IWL.Droppable = Class.create((function() {
     dragDataGet: function(element) {
       if (!element.iwl || !element.iwl.draggable) return;
       return element.iwl.draggable.data;
+    },
+    prepareDND: function(element, events) {
+      if (element._preparedDND) return element;
+      if (!events) {
+        events = element.readAttribute('iwl:DNDEvents');
+        events = unescape(events).evalJSON();
+      }
+      if (events) {
+        if (events.source)
+          element.dragSourceSet(events.source);
+        if (events.dest)
+          element.dragDestSet(events.dest);
+        element._preparedDND = true;
+        return element;
+      }
     }
   };
   Element.addMethods(ElementMethods);
