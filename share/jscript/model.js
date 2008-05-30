@@ -515,7 +515,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
       var next = this.nextSibling, previous = this.previousSibling;
       if (next) next.previousSibling = previous;
-      if (previous) previous.nextSibling = previous;
+      if (previous) previous.nextSibling = next;
 
       this.parentNode = this.nextSibling = this.previousSibling = undefined;
       if (!model.frozen) {

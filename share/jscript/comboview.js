@@ -280,7 +280,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             html = template.evaluate(cellTemplate);
         }
         var next = node.nextSibling;
-        if (node.view[id].element)
+        if (Object.isElement(node.view[id].element) && node.view[id].element.parentNode)
             node.view[id].element.replace(html);
         else {
             if (next)
@@ -549,6 +549,21 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function nodesSwap(event, node1, node2) {
+        var id = this.id;
+        var childContainer = node1.view[id].childContainer;
+        node1.view[id].element.remove();
+        if (childContainer)
+            removeContainers.call(this, childContainer);
+        nodeChange.call(this, event, node1);
+
+        childContainer = node2.view[id].childContainer;
+        node2.view[id].element.remove();
+        if (childContainer)
+            removeContainers.call(this, childContainer);
+        nodeChange.call(this, event, node2);
+    }
+
     function nodeChange(event, node) {
         var flat = this.model.isFlat(), id = this.id;
         var template = generateNodeTemplate.call(this, flat)
@@ -745,10 +760,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             normalizeCellAttributes.call(this);
             loadData.call(this, null);
             var callback = loadData.bind(this);
+            this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
             this.model.signalConnect('iwl:load_data', callback);
             this.model.signalConnect('iwl:sort_column_change', callback);
             this.model.signalConnect('iwl:nodes_reorder', callback);
-            this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
+            this.model.signalConnect('iwl:nodes_swap',  nodesSwap.bind(this));
             this.model.signalConnect('iwl:node_change', nodeChange.bind(this));
             this.model.signalConnect('iwl:node_insert', nodeInsert.bind(this));
             this.model.signalConnect('iwl:node_remove', nodeRemove.bind(this));
