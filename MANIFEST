@@ -31,6 +31,7 @@ lib/IWL/Comment.pm
 lib/IWL/Config.pm
 lib/IWL/Container.pm
 lib/IWL/Contentbox.pm
+lib/IWL/DND.pm
 lib/IWL/Druid.pm
 lib/IWL/Druid/Page.pm
 lib/IWL/Entry.pm
@@ -236,6 +237,7 @@ share/jscript/dist/scriptaculous.js
 share/jscript/dist/slider.js
 share/jscript/dist/sound.js
 share/jscript/dist/unittest.js
+share/jscript/dnd.js
 share/jscript/druid.js
 share/jscript/entry.js
 share/jscript/google/map.js

@@ -1558,3 +1558,9 @@ div.tooltip_content {
     width: 500px;
     height: 400px;
 }
+
+/* DND */
+.draggable_outline {
+    background: #eeeeee;
+    border: 1px solid  #6a81a3;
+}

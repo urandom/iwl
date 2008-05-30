@@ -380,6 +380,7 @@ sub build_misc {
     my $file   = IWL::Tree::Row->new(id => 'file_row');
     my $gmap   = IWL::Tree::Row->new(id => 'gmap_row');
     my $canvas = IWL::Tree::Row->new(id => 'canvas_row');
+    my $dnd    = IWL::Tree::Row->new(id => 'dnd_row');
 
     $file->appendTextCell('File Upload');
     $row->appendRow($file);
@@ -387,8 +388,10 @@ sub build_misc {
     $row->appendRow($gmap);
     $canvas->appendTextCell('Canvas');
     $row->appendRow($canvas);
+    $dnd->appendTextCell('Drag & Drop');
+    $row->appendRow($dnd);
 
-    register_row_event($file, $gmap, $canvas);
+    register_row_event($file, $gmap, $canvas, $dnd);
 }
 
 sub build_tests {
@@ -973,6 +976,29 @@ sub generate_canvas {
     $container->appendChild($moon, $canvas);
 
     return $container;
+}
+
+sub generate_dnd {
+    my $container = IWL::Container->new(id => 'dnd_container');
+    my $source1 = IWL::Container->new(id => 'source1');
+    my $source2 = IWL::Container->new(id => 'source2');
+    my $view = IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
+    my $dest1 = IWL::Container->new(id => 'dest1');
+
+    $source1->setDragSource(outline => 1);
+    $source2->setDragSource(view => $view, revert => 1);
+    $dest1->setDragDest(containment => $container, hoverclass => 'hover');
+    $source1->appendChild(IWL::Label->new->setText('Drag me!'));
+    $dest1->setDragSource(ghosting => 1);
+    $dest1->appendChild(IWL::Label->new->setText('Drop something here'));
+    $dest1->signalConnect('drag_drop', 'dest1_drop(arguments[1], arguments[2])');
+    $dest1->signalConnect('drag_begin', 'this.setOpacity(0.6)');
+    $dest1->signalConnect('drag_end', 'this.setOpacity(1)');
+
+    return $container->appendChild(
+        IWL::Label->new(expand => 1)->appendTextType("The green containers are draggable, while the blue one is both draggable, and accepts the green ones as targets", 'em'),
+        $source1, $dest1, $source2
+    );
 }
 
 sub generate_rpc_events {

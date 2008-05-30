@@ -9,6 +9,7 @@ Release: 0.60 -
       . New IWL::Canvas widget
       . New IWL::ProgressBar widget
       . New selection API for IWL::Objects
+      . New Drag & Drop API for IWL::Widgets, via IWL::DND
       . Rewrite of the shared resource management
         * No more global hash for storing shared resources
         * Addition of a 'requiredCSS' method

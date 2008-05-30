@@ -5,7 +5,7 @@ package IWL::Widget;
 
 use strict;
 
-use base qw(IWL::Object IWL::RPC::Request);
+use base qw(IWL::Object IWL::RPC::Request IWL::DND);
 use IWL::Config qw(%IWLConfig);
 
 =head1 NAME
@@ -152,8 +152,11 @@ Returns: returns false if the signal is invalid
 sub signalConnect {
     my ($self, $signal, $callback) = @_;
 
-    if ($self->{_customSignals}{$signal} ||
-	  $signal eq 'mouseenter' || $signal eq 'mouseleave' || $signal eq 'mousewheel'
+    if ($self->{_customSignals}{$signal}
+        || grep {$_ eq $signal} qw(
+            mouseenter mouseleave mousewheel
+            drag_begin drag_motion drag_end drag_hover drag_drop
+           )
     ) {
 	push @{$self->{_customSignals}{$signal}}, $callback;
 	return $self;
@@ -506,6 +509,7 @@ from B<IWL::Widget>.
 sub _realize {
     my $self = shift;
 
+    $self->IWL::DND::_realize;
     $self->IWL::Object::_realize;
 
     unless ($self->{__selectable}) {
@@ -578,7 +582,8 @@ sub _registerEvent {
 sub _namespacedSignalName {
     my ($self, $signal) = @_;
     return 'iwl:' . $signal
-      if exists $self->{_customSignals}{$signal};
+      if exists $self->{_customSignals}{$signal}
+      || grep {$_ eq $signal} qw(drag_begin drag_motion drag_end drag_hover drag_drop);
     return 'dom:' . $signal
       if $signal =~ /mouse(?:enter|leave|wheel)/;
     return $signal;
