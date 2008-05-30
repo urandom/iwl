@@ -313,7 +313,7 @@ sub _init {
 
     delete @args{qw(columnWidth columnClass columnMap cellAttributes nodeHeight maxHeight model)};
 
-    $self->requiredJs('comboview.js');
+    $self->requiredJs('base.js', 'model.js', 'comboview.js');
     $self->_constructorArguments(%args);
 
     return $self;

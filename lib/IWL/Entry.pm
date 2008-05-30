@@ -501,7 +501,7 @@ sub _init {
     $self->{_options} = {};
 
     $self->{_customSignals} = {text_state_change => [], load => []};
-    $self->requiredJs('base.js', 'entry.js');
+    $self->requiredJs('base.js', 'dist/controls.js', 'entry.js');
 
     return $self;
 }
