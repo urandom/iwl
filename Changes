@@ -25,6 +25,7 @@ Release: 0.60 -
 	    created event, by instantiating a new 'Event.Options' object, with the options
 	    hash as the parameter of the constructor, and passing it as the last argument
 	    of the emitSignal method.
+      . IWL::Contentbox supports both resize and drag outline mode
       . Various internal changes
 
 Release: 0.52 - 22/11/07

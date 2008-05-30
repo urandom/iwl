@@ -848,7 +848,7 @@ sub generate_contentbox {
     $chooser->appendOption('window');
     $chooser->appendOption('noresize');
     $chooser->signalConnect(change => "contentbox_chooser_change(this)");
-    $outline->setLabel('Outline resizing');
+    $outline->setLabel('Outline dragging/resizing');
     return $container;
 }
 

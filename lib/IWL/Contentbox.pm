@@ -283,7 +283,7 @@ Window without resizing
 
 =item B<outline>
 
-If true, an outline of the contentbox will apear when it is resized.
+If true, an outline of the contentbox will apear when it is dragged/resized.
 
 =back
 
@@ -523,7 +523,7 @@ sub _init {
     $self->{__footerColorIndex} = 0;
 
     $self->_constructorArguments(%args);
-    $self->requiredJs('base.js', 'dist/dragdrop.js', 'resizer.js', 'contentbox.js');
+    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'resizer.js', 'contentbox.js');
     $self->{_customSignals} = {close => [], hide => [], show => []};
 
     # Callbacks
