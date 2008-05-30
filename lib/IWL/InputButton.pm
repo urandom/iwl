@@ -59,11 +59,7 @@ Parameter: B<TEXT> - the text.
 
 =cut
 
-sub setLabel {
-    my ($self, $text) = @_;
-
-    return $self->setValue($text);
-}
+*setLabel = *IWL::Input::setValue;
 
 =item B<getLabel>
 
@@ -71,9 +67,7 @@ Returns the label of the button
 
 =cut
 
-sub getLabel {
-    return shift->getValue;
-}
+*getLabel = *IWL::Input::getValue;
 
 # Protected
 #

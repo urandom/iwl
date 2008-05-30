@@ -216,12 +216,15 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             container = parentNode.view.childContainer
         else {
             if (parentNode) {
-                var path = parentNode.getPath().toString();
-                container = this.containers[path];
+                var path = parentNode.getPath();
+                var pathString = path.toString();
+                container = this.containers[pathString];
                 if (!container)
-                    container = new Element('div', {className: 'comboview_node_container'});
-                this.containers[path] = container;
-                container.path = path;
+                    container = new Element('div', {
+                        className: 'comboview_node_container comboview_node_container_depth' + path.length
+                    });
+                this.containers[pathString] = container;
+                container.path = pathString;
 
                 parentNode.view.childContainer = container;
                 container.parentContainer = parentNode.parentNode

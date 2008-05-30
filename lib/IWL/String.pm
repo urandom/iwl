@@ -9,7 +9,7 @@ use strict;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK);
-@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape unescape escapeHTML unescapeHTML randomize templateSymbol);
+@EXPORT_OK = qw(encodeURI decodeURI encodeURIComponent escape unescape escapeHTML unescapeHTML randomize templateSymbol tS);
 
 =head1 NAME
 
@@ -199,6 +199,9 @@ Parameters: B<NAME> - the template symbol name (Alphanumeric)
 sub templateSymbol {
     return '#{' . (shift) . '}';
 }
+
+# Aliases
+*tS = *templateSymbol;
 
 1;
 

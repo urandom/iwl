@@ -166,6 +166,6 @@ sub _setBad {
 }
 
 # Aliases
-sub errorSuck { IWL::Error::errorShift(@_) }
+*errorSuck = *errorShift;
 
 1;

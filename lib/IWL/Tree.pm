@@ -166,10 +166,7 @@ Parameters: B<ROW> - a row of L<IWL::Tree::Row>
 
 =cut
 
-sub appendRow {
-    my ($self, $row) = @_;
-    return $self->appendBody($row);
-}
+*appendRow = *appendBody;
 
 =item B<prependRow> (B<ROW>)
 
@@ -179,10 +176,7 @@ Parameters: B<ROW> - a row of L<IWL::Tree::Row>
 
 =cut
 
-sub prependRow {
-    my ($self, $row) = @_;
-    return $self->prependBody($row);
-}
+*prependRow = *prependBody;
 
 
 # Overrides

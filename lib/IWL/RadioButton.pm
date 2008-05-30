@@ -70,11 +70,7 @@ Parameter: B<NAME> - the name of the group
 
 =cut
 
-sub setGroup {
-    my ($self, $name) = @_;
-
-    return $self->setName($name);
-}
+*setGroup = *IWL::Input::setName;
 
 # Overrides
 #
