@@ -1559,6 +1559,12 @@ div.tooltip_content {
     height: 400px;
 }
 
+/* DND */
+.draggable_outline {
+    background: #eeeeee;
+    border: 1px solid  #6a81a3;
+}
+
 /* ComboView */
 .comboview {
     border: 1px solid #7F9DB9;

@@ -70,9 +70,9 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setupDrag() {
         this.contentboxTitle.style.cursor = 'move';
         this.contentboxTitle.parentNode.style.cursor = 'move';
-        this._draggable = new Draggable(this, {
+        this._draggable = new IWL.Draggable(this, {
             handle:      $(this.id + '_title'),
-            starteffect: null,
+            outline:     this.options.typeOptions.outline,
             endeffect:   endDragCallback.bind(this)});
         setFocus.call(this);
         return this.observe('click', setFocus.bind(this));
