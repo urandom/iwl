@@ -32,7 +32,7 @@ Bar</td>
 <tfoot (?:(?:class="\1_footer"|id="\2_footer")\s*){2}><tr (?:(?:iwl:treeRowData=".*?"|id="footer1"|class="\1_row \1_footer_row")\s*){3}></tr>
 <tr (?:(?:iwl:treeRowData=".*?"|id="footer2"|class="\1_row \1_footer_row")\s*){3}></tr>
 </tfoot>
-.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*tree.js.*?
+.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*scriptaculous_extensions.js.*base.js.*tree.js.*?
 <script.*?IWL.Tree.create.'\2', {.*?</script>
 </table>
 )s);

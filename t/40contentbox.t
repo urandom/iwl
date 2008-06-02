@@ -43,7 +43,7 @@ like($cb->getContent, qr(<div (?:(?:class="contentbox shadowbox"|id="cb")\s*){2}
 </div>
 <div (?:(?:class="contentbox_bottom"|id="cb_bottom")\s*){2}><div (?:(?:class="contentbox_bottomr"|id="cb_bottomr")\s*){2}></div>
 </div>
-.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*dist/dragdrop.js.*resizer.js.*contentbox.js.*?
+.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*scriptaculous_extensions.js.*base.js.*dist/dragdrop.js.*resizer.js.*contentbox.js.*?
 <script (?:(?:type="text/javascript"|iwl:initScript)\s*){2}>IWL.Contentbox.create.'cb', {.*}.;*</script>
 </div>
 )s);
