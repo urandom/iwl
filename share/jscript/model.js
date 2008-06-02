@@ -330,7 +330,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
       var previous = node.parentNode;
       node.insert(this, parentNode, index);
-      return this.thaw().emitSignal('iwl:node_move', parentNode, previous);
+      return this.thaw().emitSignal('iwl:node_move', node, parentNode, previousParent);
     },
 
     loadData: function(data) {

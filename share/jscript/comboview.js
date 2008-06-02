@@ -92,14 +92,15 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function loadData(event, parentNode) {
-        var flat = this.model.isFlat(), id = this.id;
+        var flat = this.model.isFlat();
         var template = generateNodeTemplate.call(this, flat)
         if (parentNode) {
-            var highlight = parentNode.view[id].element.highlight;
-            recreateNode.call(this, parentNode, template, flat, parentNode.view[id].container);
+            var view = parentNode.view[this.id];
+            var highlight = view.element.highlight;
+            recreateNode.call(this, parentNode, template, flat, view.container);
             if (highlight) {
                 changeHighlight.call(this, parentNode);
-                popUp.call(this, parentNode.view[id].childContainer);
+                popUp.call(this, view.childContainer);
             }
         } else {
             createNodes.call(this, this.model.rootNodes, template, flat);
@@ -567,14 +568,22 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         nodeChange.call(this, event, node2);
     }
 
+    function nodeMove(event, node, parentNode, previousParent) {
+        var view = node.view[this.id];
+        if (view.element && view.element.parentNode == previousParent)
+            view.element.remove();
+
+        nodeInsert.call(this, event, node, parentNode);
+    }
+
     function nodeChange(event, node) {
-        var flat = this.model.isFlat(), id = this.id;
+        var flat = this.model.isFlat(), view = node.view[this.id];
         var template = generateNodeTemplate.call(this, flat)
-        var highlight = node.view[id].element.highlight;
-        recreateNode.call(this, node, template, flat, node.view[id].container);
+        var highlight = view.element.highlight;
+        recreateNode.call(this, node, template, flat, view.container);
         if (highlight) {
             changeHighlight.call(this, node);
-            popUp.call(this, node.view[id].childContainer);
+            popUp.call(this, view.childContainer);
         }
     }
 
@@ -590,10 +599,10 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeRemove(event, node, parentNode) {
-        var id = this.id;
-        var element = node.view[id].element;
-        var container = node.view[id].container;
-        var childContainer = node.view[id].childContainer;
+        var view = node.view[this.id];
+        var element = view.element;
+        var container = view.container;
+        var childContainer = view.childContainer;
         var styleHeight = parseFloat(container.style.height);
         var height = container.getHeight();
 
@@ -768,6 +777,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.model.signalConnect('iwl:sort_column_change', callback);
             this.model.signalConnect('iwl:nodes_reorder', callback);
             this.model.signalConnect('iwl:nodes_swap',  nodesSwap.bind(this));
+            this.model.signalConnect('iwl:node_move',   nodeMove.bind(this));
             this.model.signalConnect('iwl:node_change', nodeChange.bind(this));
             this.model.signalConnect('iwl:node_insert', nodeInsert.bind(this));
             this.model.signalConnect('iwl:node_remove', nodeRemove.bind(this));
