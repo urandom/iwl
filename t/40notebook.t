@@ -17,7 +17,7 @@ like($nb->getContent, qr(<div (?:(?:class="(notebook)"|id="(\1_\d+)")\s*){2}><di
 </div>
 <div (?:(?:class="\1_page"|id="\1_page_\d+")\s*){2}></div>
 </div>
-.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*notebook.js.*?
+.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*scriptaculous_extensions.js.*base.js.*notebook.js.*?
 <script.*IWL.Notebook.create.'\2'.;*</script>
 </div>
 $)s);

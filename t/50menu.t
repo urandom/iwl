@@ -18,7 +18,7 @@ like($m->getContent, qr(^<ul (?:(?:class="(menu)"|id="(\1_\d+)")\s*){2}><li (?:(
 <li (?:(?:class="\1_item"|id="\1_item_\d+")\s*){2}><span (?:(?:class="\1_item_label"|id="\1_item_\d+_label")\s*){2}>Some text</span>
 </li>
 <li (?:(?:class="\1_separator"|id="\1_item_\d+")\s*){2}>&nbsp;</li>
-<script.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*dist/controls.js.*scriptaculous_extensions.js.*base.js.*menu.js.*?</script>
+<script.*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*scriptaculous_extensions.js.*base.js.*menu.js.*?</script>
 <script.*?IWL.Menu.create.'\2'.*?</script>
 </ul>
 $)s);

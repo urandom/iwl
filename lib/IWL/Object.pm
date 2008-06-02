@@ -988,7 +988,6 @@ sub requiredJs {
 		'dist/prototype.js',
 		'prototype_extensions.js',
 		'dist/effects.js',
-		'dist/controls.js',
 		'scriptaculous_extensions.js');
 	}
 

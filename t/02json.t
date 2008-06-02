@@ -30,7 +30,7 @@ use IWL::JSON ':all';
     is(toJSON('-16.23e-16'), '-16.23e-16');
 
     is(toJSON([]), '[]');
-    is(toJSON([1,2,2.3e+55,"foo",{}]), '[1, 2, 2.3e+55, "foo", {}]');
+    is(toJSON([1,2,"foo",{}]), '[1, 2, "foo", {}]');
 
     is(toJSON({}), '{}');
     is(toJSON({foo => {bar => [1,2,3]}}), '{"foo": {"bar": [1, 2, 3]}}');
