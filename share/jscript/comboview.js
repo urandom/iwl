@@ -551,6 +551,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function nodesSwap(event, node1, node2) {
         var id = this.id;
+        var c1 = node1.view[id].container, c2 = node2.view[id].container;
+        node1.view[id].container = c2, node2.view[id].container = c1;
+
         var childContainer = node1.view[id].childContainer;
         node1.view[id].element.remove();
         if (childContainer)
