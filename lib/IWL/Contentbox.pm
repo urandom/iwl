@@ -277,7 +277,7 @@ Window without resizing
 
 =back
 
-=item B<OPTIONS> - a hashref of options for use with the different types:
+=item B<OPTIONS> - a hash(ref) of options for use with the different types:
 
 =over 12
 
@@ -292,11 +292,15 @@ If true, an outline of the contentbox will apear when it is dragged/resized.
 =cut 
 
 sub setType {
-    my ($self, $type, $options) = @_;
+    my ($self, $type) = (shift, shift);
+    my $options = {};
 
     return if !exists TYPE->{$type};
-    my $ref = ref $options;
-    $options = {} unless $ref && $ref == 'HASH';
+    if (1 == @_ && ref $_[0] eq 'HASH') {
+        $options = $_[0];
+    } elsif (!(@_ % 2)) {
+        $options = {@_};
+    }
 
     $self->{_options}{type} = $type;
     $self->{_options}{typeOptions} = $options;

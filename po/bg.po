@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IWL 0.45\n"
 "Report-Msgid-Bugs-To: Viktor Kojouharov <viktork@cpan.org>\n"
-"POT-Creation-Date: 2007-12-01 12:28+0200\n"
-"PO-Revision-Date: 2007-12-01 12:31+0200\n"
+"POT-Creation-Date: 2008-06-02 18:06+0300\n"
+"PO-Revision-Date: 2008-06-02 18:10+0300\n"
 "Last-Translator: mmm\n"
 "Language-Team: Bulgarian <guido@imperia.net,stoian.iovchev@imperia.net,"
 "viktor@imperia.net>\n"
@@ -17,31 +17,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lib/IWL/GoogleMap.pm:158
-msgid "Container has no id"
-msgstr "Контейнерът няма ИД"
+#: ../lib/IWL/Google/Map.pm:398
+#, perl-brace-format
+msgid "No API key provided. One can be obtained from {URL}"
+msgstr "Не е предоставен API ключ. Такъв може да се добави от {URL}"
 
-#: ../lib/IWL/GoogleMap.pm:270
-msgid ""
-"No key provided.  Please follow this link in order to obtain a key from "
-"Google."
-msgstr ""
-"Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ от "
-"Google."
-
-#: ../lib/IWL/Tooltip.pm:79 ../lib/IWL/Tooltip.pm:100 ../lib/IWL/Menu.pm:140
+#: ../lib/IWL/Tooltip.pm:79 ../lib/IWL/Tooltip.pm:100 ../lib/IWL/Menu.pm:138
 msgid "Invalid id"
 msgstr "Невалидно ИД"
 
-#: ../lib/IWL/Druid.pm:171
+#: ../lib/IWL/Druid.pm:169
 msgid "Finish"
 msgstr "Край"
 
 #. TRANSLATORS: {PAGEENTRY} and {PAGECOUNT} are placeholders
-#: ../lib/IWL/PageControl.pm:166
+#: ../lib/IWL/PageControl.pm:164
 #, perl-brace-format
 msgid "{PAGEENTRY} of {PAGECOUNT}"
 msgstr "{PAGEENTRY} от {PAGECOUNT}"
+
+#: ../lib/IWL/Static.pm:294
+#, perl-brace-format
+msgid "Cannot open directory {URI}: {ERR}"
+msgstr "Директорията {URI} не може да бъде отворена: {ERR}"
+
+#: ../lib/IWL/Static.pm:330
+#, perl-brace-format
+msgid "The URI '{URI}' does not belong in the predefined list of static URIs."
+msgstr "Адресът '{URI}' не е включен в списъкът на статични адреси."
 
 #: ../lib/IWL/Stock.pm:28
 msgid "Add"
@@ -172,7 +175,7 @@ msgid "Generic Text"
 msgstr "Общ текст"
 
 #. TRANSLATORS: {TITLE} is a placeholder
-#: ../lib/IWL/Iconbox.pm:141
+#: ../lib/IWL/Iconbox.pm:200
 #, perl-brace-format
 msgid "The icon '{TITLE}' was removed."
 msgstr "Иконата „{TITLE}“ е премахната."
@@ -181,9 +184,28 @@ msgstr "Иконата „{TITLE}“ е премахната."
 msgid "Uploading ..."
 msgstr "Качване ..."
 
-#: ../lib/IWL/Upload.pm:223
+#: ../lib/IWL/Upload.pm:221
 msgid "Browse ..."
 msgstr "Избор ..."
+
+#: ../lib/IWL/Canvas.pm:34
+msgid "No context has been given."
+msgstr "Не е зададен контекст."
+
+#: ../lib/IWL/Canvas.pm:155 ../lib/IWL/Canvas.pm:395 ../lib/IWL/Canvas.pm:471
+#: ../lib/IWL/Canvas.pm:830
+#, perl-brace-format
+msgid "Invalid color: '{COLOR}'"
+msgstr "Невалиден цвят: '{COLOR}'"
+
+#: ../lib/IWL/Canvas.pm:832
+msgid "No gradient name has been given."
+msgstr "Не е зададено име на градиент."
+
+#: ../lib/IWL/Canvas.pm:833
+#, perl-brace-format
+msgid "The gradient object '{GRADIENT}' does not exist."
+msgstr "Градиентът '{GRADIENT}' не съществува."
 
 #. TRANSLATORS: week day abbreviations, {ABBR} is a placeholder
 #: ../lib/IWL/Calendar.pm:20
@@ -358,21 +380,12 @@ msgstr "Ноември"
 msgid "December"
 msgstr "Декември"
 
-#: ../lib/IWL/Canvas.pm:35
-msgid "No context has been given."
-msgstr "Не е зададен контекст."
+#~ msgid "Container has no id"
+#~ msgstr "Контейнерът няма ИД"
 
-#: ../lib/IWL/Canvas.pm:156 ../lib/IWL/Canvas.pm:396 ../lib/IWL/Canvas.pm:472
-#: ../lib/IWL/Canvas.pm:831
-#, perl-brace-format
-msgid "Invalid color: '{COLOR}'"
-msgstr "Невалиден цвят: '{COLOR}'"
-
-#: ../lib/IWL/Canvas.pm:833
-msgid "No gradient name has been given."
-msgstr "Не е зададено име на градиент."
-
-#: ../lib/IWL/Canvas.pm:834
-#, perl-brace-format
-msgid "The gradient object '{GRADIENT}' does not exist."
-msgstr "Градиентът '{GRADIENT}' не съществува."
+#~ msgid ""
+#~ "No key provided.  Please follow this link in order to obtain a key from "
+#~ "Google."
+#~ msgstr ""
+#~ "Не е предоставен ключ. Последвайте връзката, за да се сдобиете с нов ключ "
+#~ "от Google."
