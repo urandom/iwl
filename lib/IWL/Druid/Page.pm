@@ -88,7 +88,7 @@ Emitted when the previous druid page has been requested. A custom event handler 
 
 =item B<IWL-Druid-Page-final>
 
-Emitted when the previous druid page has been requested. The default event handler is used. See L<IWL::RPC::handleEvent> for more details.
+Emitted when the previous druid page has been requested. The default event handler is used. See L<IWL::RPC::handleEvent|IWL::RPC/handleEvent> for more details.
 
 =back
 

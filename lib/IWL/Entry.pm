@@ -182,7 +182,7 @@ sub setValue {
 
 Sets the text of the entry
 
-Note: for setting both the text and blur value, see L<IWL::Entry::setValue()>
+Note: for setting both the text and blur value, see L<IWL::Entry::setValue|/setValue>
 
 Parameter: B<TEXT> - the text.
 

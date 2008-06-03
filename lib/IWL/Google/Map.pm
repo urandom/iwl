@@ -40,19 +40,19 @@ L<http://www.google.com/apis/maps/signup.html>
 
 =item B<latitude>
 
-See L<IWL::Google::Map::setLatitude()>
+See L<IWL::Google::Map::setLatitude|/setLatitude>
 
 =item B<longitude>
 
-See L<IWL::Google::Map::setLongitude()>
+See L<IWL::Google::Map::setLongitude|/setLongitude>
 
 =item B<zoom>
 
-See L<IWL::Google::Map::setZoom()>
+See L<IWL::Google::Map::setZoom|/setZoom>
 
 =item B<mapType>
 
-See L<IWL::Google::Map::setMapType()>
+See L<IWL::Google::Map::setMapType|/setMapType>
 
 =item B<dragging>
 

@@ -48,7 +48,7 @@ If the I<STATIC_LABEL> option is set to a true value, the static content files w
 
 IWL::Static->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values. See L<IWL::RPC> for supported parameters
+Where B<%ARGS> is an optional hash parameter with with key-values. See L<IWL::RPC::new|IWL::RPC/CONSTRUCTOR> for supported parameters
 
 =cut
 

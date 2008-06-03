@@ -101,7 +101,7 @@ Every widget signal will also be emitted as an event, if it was registered. The 
 
 Unless otherwise noted, the perl callback called by the event handler, will only receive the serialized signal event, under the I<eventData> key of the parameter hashref.
 
-See L<IWL::RPC::handleEvent> for more information
+See L<IWL::RPC::handleEvent|IWL::RPC/handleEvent> for more information
 
 =cut
 
@@ -228,7 +228,7 @@ Disconnects all of the expressions from the signal handler
 
 Parameters: B<SIGNAL> - the signal
 
-B<DEPRECATED> - use L<IWL::Widget::signalDisconnect> without an expression parameter instead.
+B<DEPRECATED> - use L<IWL::Widget::signalDisconnect|/signalConnect> without an expression parameter instead.
 
 =cut
 
