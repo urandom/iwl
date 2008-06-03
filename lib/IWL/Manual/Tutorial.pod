@@ -1,0 +1,39 @@
+=head1 NAME
+
+IWL::Manual::Tutorial - IWL Introductory Tutorial
+
+=head1 OVERVIEW
+
+	use <Module::Name>;
+	# Brief but working code example(s) here showing the most common usage(s)
+
+	# This section will be as far as many users bother reading
+	# so make it as educational and exemplary as possible.
+
+
+=head1 DESCRIPTION
+
+A full description of the module and its features.
+May include numerous subsections (i.e. =head2, =head3, etc.)
+
+=head1 AUTHOR
+
+  Viktor Kojouharov
+
+=head1 WEBSITE
+
+L<http://code.google.com/p/iwl>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perldoc perlartistic.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
