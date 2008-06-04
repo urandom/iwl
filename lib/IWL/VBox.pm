@@ -56,11 +56,15 @@ Returns: the packing container
 sub packStart {
     my ($self, $widget, $margin) = @_;
     my $pack = IWL::Container->new;
+    my $last = $self->{_start}[-1];
 
     $pack->setStyle(margin => $margin) if $margin;
     $pack->appendChild($widget);
     $pack->{_defaultClass} = 'vbox_start';
     push @{$self->{_start}}, $pack;
+    $last
+        ? $self->insertAfter($last, $pack)
+        : $self->prependChild($pack);
 
     return $pack;
 }
@@ -78,22 +82,17 @@ Returns: the packing container
 sub packEnd {
     my ($self, $widget, $margin) = @_;
     my $pack = IWL::Container->new;
+    my $first = $self->{_end}[0];
 
     $pack->setStyle(margin => $margin) if $margin;
     $pack->appendChild($widget);
     $pack->{_defaultClass} = 'vbox_end';
     unshift @{$self->{_end}}, $pack;
+    $first
+        ? $self->insertBefore($first, $pack)
+        : $self->appendChild($pack);
 
     return $pack;
-}
-
-# Protected
-#
-sub _realize {
-    my $self = shift;
-
-    $self->SUPER::_realize;
-    $self->appendChild($_) foreach (@{$self->{_start}}, @{$self->{_end}});
 }
 
 1;
