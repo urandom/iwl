@@ -128,70 +128,83 @@ The widgets themselves can be used either as standalone object in an already exi
 
 The following widgets have so far been written. They have extensive documentation for their methods
 
- IWL::Accordion - An accordion container widget
- IWL::Accordion::Page - A page widget for an accordion
- IWL::Anchor - An anchor widget ("<a>")
- IWL::Break - A break widget ("<br>")
- IWL::Button - A graphic button widget
- IWL::Calendar - a calendar widget
- IWL::Canvas - The html5 canvas element ("<canvas>")
- IWL::Checkbox - A checkbox widget (checkbox + text)
- IWL::Combo - A combobox widget ("<select>")
- IWL::Combo::Option - The content of a combobox ("<option>")
- IWL::Comment - A widget for placing comments (and conditional comments)
- IWL::Container - A basic container widget ("<div>")
- IWL::Contentbox - A generic window-like contentbox
- IWL::Druid - A step-based druid widget
- IWL::Druid::Page - A page widget for a druid
- IWL::Entry - An entry widget with support for icons
- IWL::File - A file upload widget ("<input type="file">")
- IWL::Form - A form widget ("<form>")
- IWL::Frame - A frame widget ("<fieldset>")
- IWL::Hidden - A hidden input object ("<input type="hidden">")
- IWL::Hbox - A container widget for positioning widgets horizontally
- IWL::Iconbox - An iconbox widget (holds icons and has keyboard navigation)
- IWL::Iconbox::Icon - An icon widget for the iconbox
- IWL::IFrame - An iframe container
- IWL::Image - An image widget ("<img>")
- IWL::Input - A generic input widget ("<input>")
- IWL::InputButton - A generic button widget ("<input type="button">")
- IWL::Label - A label widget 
- IWL::List - A widget for creating bulleted or numbered lists
- IWL::List::Definition - A definition list item
- IWL::Menu - A menu widget
- IWL::Menu::Item - A menu item widget for menus and menubars
- IWL::Menubar - A menubar widget
- IWL::NavBar - A navigation bar widget
- IWL::Notebook - A tab notebook widget
- IWL::Notebook::Tab - A tab widget for the notebook
- IWL::Page - A page widget, for creating new pages
- IWL::Page::Link - A link object for the page widget ("<link>")
- IWL::Page::Meta - A meta object for the page widget ("<meta>")
- IWL::PageControl - A page control widget for paginating other widgets
- IWL::RadioButton - A radiobutton widget (radiobutton + text)
- IWL::RPC - A helper class for ajax connections and cgi parameters
- IWL::Script - A script object ("<script>")
- IWL::Slider - A slider widget
- IWL::Spinner-  A spinner widget
- IWL::Stash - A stash class for form information encapsulation
- IWL::Stock - A stock object, for buttons and images
- IWL::Style - A style object ("<style>")
- IWL::SubmitImage - An input image widget ("<input type="image">")
- IWL::Table - A table widget ("<table>")
- IWL::Table::Cell - A cell widget for the table row ("<td>", "<th>")
- IWL::Table::Row - A row widget for the table ("<tr">)
- IWL::Text - A simple text container
- IWL::Textarea - A textarea widget ("<textarea>")
- IWL::Tooltip - A tooltip widget
- IWL::Tree - A tree widget (has keyboard navigation)
- IWL::Tree::Cell - A tree cell widget
- IWL::Tree::Row - A tree row widget
- IWL::Upload - A theme-able upload widget
- IWL::VBox - A vertical box container
+L<IWL::Accordion>        - An accordion container widget
+L<IWL::Accordion::Page>  - A page widget for an accordion
+L<IWL::Anchor>           - An anchor widget ("<a>")
+L<IWL::Break>            - A break widget ("<br>")
+L<IWL::Button>           - A graphic button widget
+L<IWL::Calendar>         - a calendar widget
+L<IWL::Canvas>           - The html5 canvas element ("<canvas>")
+L<IWL::Checkbox>         - A checkbox widget (checkbox + text)
+L<IWL::Combo>            - A combobox widget ("<select>")
+L<IWL::Combo::Option>    - The content of a combobox ("<option>")
+L<IWL::Comment>          - A widget for placing comments (and conditional comments)
+L<IWL::Config>           - The IWL Config module
+L<IWL::Container>        - A basic container widget ("<div>")
+L<IWL::Contentbox>       - A generic window-like contentbox
+L<IWL::DND>              - A Drag & Drop interface, implemented by L<IWL::Widget>
+L<IWL::Druid>            - A step-based druid widget
+L<IWL::Druid::Page>      - A page widget for a druid
+L<IWL::Entry>            - An entry widget with support for icons
+L<IWL::Environment>      - An environment, used to manage shared resources, used in L<IWL::Page>
+L<IWL::Error>            - A base class for handling errors, implemented by L<IWL::Object>
+L<IWL::Expander>         - An expander widget, which can show and hide its children
+L<IWL::File>             - A file upload widget ("<input type="file">")
+L<IWL::Form>             - A form widget ("<form>")
+L<IWL::Frame>            - A frame widget ("<fieldset>")
+L<IWL::Google::Map>      - A widget for adding Google Maps
+L<IWL::Hidden>           - A hidden input object ("<input type="hidden">")
+L<IWL::HBox>             - A container widget for positioning widgets horizontally
+L<IWL::Iconbox>          - An iconbox widget (holds icons and has keyboard navigation)
+L<IWL::Iconbox::Icon>    - An icon widget for the iconbox
+L<IWL::IFrame>           - An iframe container
+L<IWL::Image>            - An image widget ("<img>")
+L<IWL::Input>            - A generic input widget ("<input>")
+L<IWL::InputButton>      - A generic button widget ("<input type="button">")
+L<IWL::JSON>             - A module, providing helper functions for encoding and decoding data as JSON
+L<IWL::Label>            - A label widget
+L<IWL::List>             - A widget for creating bulleted or numbered lists
+L<IWL::List::Definition> - A definition list item
+L<IWL::Menu>             - A menu widget
+L<IWL::Menu::Item>       - A menu item widget for menus and menubars
+L<IWL::Menubar>          - A menubar widget
+L<IWL::NavBar>           - A navigation bar widget
+L<IWL::Notebook>         - A tab notebook widget
+L<IWL::Notebook::Tab>    - A tab widget for the notebook
+L<IWL::Object>           - The base class for all content objects
+L<IWL::Page>             - A page widget, for creating new pages
+L<IWL::Page::Link>       - A link object for the page widget ("<link>")
+L<IWL::Page::Meta>       - A meta object for the page widget ("<meta>")
+L<IWL::PageControl>      - A page control widget for paginating other widgets
+L<IWL::ProgressBar>      - A visual progress indicator widget
+L<IWL::RadioButton>      - A radiobutton widget (radiobutton + text)
+L<IWL::Response>         - An abstract response output class
+L<IWL::RPC>              - A helper class for ajax connections and cgi parameters
+L<IWL::Script>           - A script object ("<script>")
+L<IWL::Slider>           - A slider widget
+L<IWL::Spinner>          - A spinner widget
+L<IWL::Stash>            - A stash class for form information encapsulation
+L<IWL::Static>           - A static file handler module
+L<IWL::Stock>            - A stock object, for buttons and images
+L<IWL::String>           - A module, providing helper function for strings
+L<IWL::Style>            - A style object ("<style>")
+L<IWL::SubmitImage>      - An input image widget ("<input type="image">")
+L<IWL::Table>            - A table widget ("<table>")
+L<IWL::Table::Cell>      - A cell widget for the table row ("<td>", "<th>")
+L<IWL::Table::Row>       - A row widget for the table ("<tr">)
+L<IWL::Text>             - A simple text container
+L<IWL::Textarea>         - A textarea widget ("<textarea>")
+L<IWL::Tooltip>          - A tooltip widget
+L<IWL::Tree>             - A tree widget (has keyboard navigation)
+L<IWL::Tree::Cell>       - A tree cell widget
+L<IWL::Tree::Row>        - A tree row widget
+L<IWL::Upload>           - A theme-able upload widget
+L<IWL::VBox>             - A vertical box container
+L<IWL::Widget>           - The base class for all widgets
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-Configuration is done by editing the I<iwl.conf> file. It can be placed in the directory of the scripts that use IWL, or it's full path and name can be fiven in the I<IWL_CONFIG_FILE> environment variable. A default configuration is provided inside IWL::Config(3pm). See IWL::Config(3pm) for more details
+Configuration is done by editing the I<iwl.conf> file. It can be placed in the directory of the scripts that use IWL, or it's full path and name can be fiven in the I<IWL_CONFIG_FILE> environment variable. A default configuration is provided inside L<IWL::Config>. See L<IWL::Config> for more details
 
 In order to actually use the library, the javascript and css files will also have to be installed in the server's document root. To do that, the I<iwl-install> script is provided. It is usually located in '/usr/bin'. The script also creates a I<iwl.conf> file from the user input.
 
@@ -220,13 +233,13 @@ In order to actually use the library, the javascript and css files will also hav
 
   Viktor Kojouharov
 
-=head1 Website
+=head1 WEBSITE
 
 L<http://code.google.com/p/iwl>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.

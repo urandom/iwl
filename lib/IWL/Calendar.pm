@@ -68,19 +68,19 @@ Specifies the upper month boundary of the calendar. Months range from 0 to 11
 
 =item B<startDate>
 
-Sets the starting date of the calendar. Defaults to the current date. See IWL::Calendar::setDate(3pm)
+Sets the starting date of the calendar. Defaults to the current date. See L<IWL::Calendar::setDate|/setDate>
 
 =item B<showWeekNumbers>
 
-True, if the week numbers should be shown. Defaults to I<true>. See IWL::Calendar::showWeekNumbers(3pm)
+True, if the week numbers should be shown. Defaults to I<true>. See L<IWL::Calendar::showWeekNumbers|/showWeekNumbers>
 
 =item B<showHeading>
 
-True, if the heading should be shown. Defaults to I<true>. See IWL::Calendar::showHeading(3pm)
+True, if the heading should be shown. Defaults to I<true>. See L<IWL::Calendar::showHeading|/showHeading>
 
 =item B<showTime>
 
-True, if the time should be shown. Defaults to I<true>. See IWL::Calendar::showTime(3pm)
+True, if the time should be shown. Defaults to I<true>. See L<IWL::Calendar::showTime|/showTime>
 
 =item B<showAdjacentMonths>
 
@@ -104,7 +104,7 @@ True, if the displayed time should use astronomical notation (e.g. 15:00 instead
 
 =item B<markedDates>
 
-An array of dates that should be marked as special. See IWL::Calendar::markDate(3pm)
+An array of dates that should be marked as special. See L<IWL::Calendar::markDate|/markDate>
 
 =back
 
@@ -282,7 +282,7 @@ sub markDate {
 
 Removes the given date from the list of marked dates.
 
-Parameters: B<DATE> - a date to unmark. See IWL::Calendar::markDate(3pm) for more information.
+Parameters: B<DATE> - a date to unmark. See L<IWL::Calendar::markDate|/markDate> for more information.
 
 =cut
 
@@ -475,7 +475,7 @@ sub _init {
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.

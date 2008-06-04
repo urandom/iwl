@@ -48,7 +48,7 @@ If the I<STATIC_LABEL> option is set to a true value, the static content files w
 
 IWL::Static->new ([B<%ARGS>])
 
-Where B<%ARGS> is an optional hash parameter with with key-values. See L<IWL::RPC> for supported parameters
+Where B<%ARGS> is an optional hash parameter with with key-values. See L<IWL::RPC::new|IWL::RPC/CONSTRUCTOR> for supported parameters
 
 =cut
 
@@ -375,7 +375,7 @@ sub timeToString (;$) {
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.

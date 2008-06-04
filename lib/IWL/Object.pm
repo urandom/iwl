@@ -1185,7 +1185,7 @@ Searches upward along the object stack for objects, matching the criteria set by
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+See L<IWL::Object::match|/match> for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
 
 Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
 
@@ -1235,7 +1235,7 @@ Searches downward along the object stack for objects, matching the criteria set 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+See L<IWL::Object::match|/match> for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
 
 Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
 
@@ -1292,7 +1292,7 @@ Searches the next siblings of the object for objects, matching the criteria set 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+See L<IWL::Object::match|/match> for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
 
 Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
 
@@ -1343,7 +1343,7 @@ Searches the previous siblings of the object for objects, matching the criteria 
 In scalar context, returns the first found object. In list context, returns all matching objects.
 Returns the parent object in scalar context, and parent objects in list context, if no criteria are given.
 
-See IWL::Object::match(3pm) for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
+See L<IWL::Object::match|/match> for B<CRITERIA> documentation. If the method is invoked with the second syntax, B<CRITERIA> must be an array reference, instead of a list.
 
 Parameters: B<OPTIONS> - a hash reference, with the following key-value pairs:
 
@@ -1712,7 +1712,7 @@ $splitCriteria = sub {
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.

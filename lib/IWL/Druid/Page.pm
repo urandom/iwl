@@ -88,7 +88,7 @@ Emitted when the previous druid page has been requested. A custom event handler 
 
 =item B<IWL-Druid-Page-final>
 
-Emitted when the previous druid page has been requested. The default event handler is used. See L<IWL::RPC::handleEvent> for more details.
+Emitted when the previous druid page has been requested. The default event handler is used. See L<IWL::RPC::handleEvent|IWL::RPC/handleEvent> for more details.
 
 =back
 
@@ -246,7 +246,7 @@ sub __buttonEvent {
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.

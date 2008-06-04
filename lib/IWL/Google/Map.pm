@@ -14,7 +14,7 @@ use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 
-IWL::Google::Map - a button with a background
+IWL::Google::Map - a widget interface to Google Maps (c)
 
 =head1 INHERITANCE
 
@@ -40,19 +40,19 @@ L<http://www.google.com/apis/maps/signup.html>
 
 =item B<latitude>
 
-See L<IWL::Google::Map::setLatitude()>
+See L<IWL::Google::Map::setLatitude|/setLatitude>
 
 =item B<longitude>
 
-See L<IWL::Google::Map::setLongitude()>
+See L<IWL::Google::Map::setLongitude|/setLongitude>
 
 =item B<zoom>
 
-See L<IWL::Google::Map::setZoom()>
+See L<IWL::Google::Map::setZoom|/setZoom>
 
 =item B<mapType>
 
-See L<IWL::Google::Map::setMapType()>
+See L<IWL::Google::Map::setMapType|/setMapType>
 
 =item B<dragging>
 
@@ -421,7 +421,7 @@ sub _init {
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.
