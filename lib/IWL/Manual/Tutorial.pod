@@ -10,7 +10,7 @@ This tutorial should provide all the knowledge to build your first application, 
 
 =head2 Installation
 
-Installation should be pretty straightforward. IWL is available through L<CPAN|http://search.cpan.org/dist/IWL/>, and only relies on L<HTTP::Parser> as a C module. The rest of the requirements are all in pure Perl. See IWL for the complete list of module requirements.
+Installation should be pretty straightforward. IWL is available through B<CPAN>: L<http://search.cpan.org/dist/IWL/> , and only relies on L<HTTP::Parser> as a C module. The rest of the requirements are all in pure Perl. See IWL for the complete list of module requirements.
 
 Once installed, in order for IWL to actually be useful, the client static content (such as JavaScript and CSS files) need to be installed on the server. To do that, the B<iwl-install> script is provided, and will be installed in the server's I<PATH>.
 
