@@ -98,6 +98,67 @@ While form processing has mostly been replaced by AJAX, it is still useful. So l
 
   $page->send(type => 'html');
 
+There are a few things in this example worth mentioning. First, all arguments passed to the constructor, are either options or attributes. If the passed key-value pairs are not options for the widget, they will be added as attributes. This is an alternative syntax to the getters and setters for the same attributes, which are available by the class.
+
+The L<IWL::RPC> object, as can be guessed from the example, is not a widget. It has multiple tasks, some of which will be discussed later. Its main task however, is to provide a method for obtaining the CGI parameters. Here, we use the parameters, passed by the form widgets, to change some aspects of the page.
+
+=head3 Playing with signals and events
+
+Modern web application require need to react to various user events, in order to be dynamic and easy to use. In IWL, there are two ways to achieve this.
+
+=over 4
+
+=item B<Signals>
+
+Signals are events, which emitted and processed in the client-side portion of an application. They include various user and widget generated events, such as mouse clicks or state changes. They key distinction of signals is that they are processed entirely using JavaScript. Lets look at one example of a button, which is listening for a mouse click:
+
+  $button->signalConnect(click => "some expression here; call_my_function(this)");
+
+There are two methods in L<IWL::Widget>, which manage signals for a given widget. They are I<signalConnect> - for connecting an expression to a signal, and I<signalDisconnect> - for disconnecting an expression, or all expressions from a signal, or all signals of a widget. The expressions are just JavaScript code, which is passed as a string, similarly to the way people write expressions in the corresponding attributes (such as 'onclick') in HTML.
+
+=item B<Events>
+
+Events are similar to signals, in a way that they correspond to user or widget events. In an essence, every signal also has a corresponding event, but not all events have a signal. The difference, however, is that event for the most part are processed in Perl, and only one event handler can be registered per event per widget. Event registration is handled by L<IWL::RPC::Request>, from which L<IWL::Widget> inherits. Lets modify the above signal example:
+
+  $button->registerEvent('IWL-Button-click', 'my_script.pl', {someParam => 'foo'})
+
+B<registerEvent> registers the script URL with the event name. When the button is clicked, besides emitting a I<click> signal, the corresponding event will also be emitted. Using an XMLHTTPRequest object, the given script will be called with special parameters, which the L<IWL::RPC::handleEvent|IWL::RPC/handleEvent> will understand. Here is an example of how to handle the above event in I<my_script.pl>:
+  
+  IWL::RPC->new->handleEvent(
+    'IWL-Button-click',
+    sub { },
+    ...
+  );
+
+The subref for the given event will receive all the parameters which are passed by the event in its course to the script, as well as various other options, which depend on the given signal. For most, but not all signals, the subref arguments will be: parameters hashref, the id string of the widget, which emitted the event, and the collected data, if such was requested. The collected data is a hash of parameters, collected from all control widgets, which are descendants of the widget. Control widgets include entries, spinners, sliders and so on. In an essence, if the event was registered with the I<collectData> option, it makes the emitting widget behave similarly to a form.
+
+The subroutine is expected to return two values. The first one is some data, which is dependant on both the type of handled event, and the specified options for the event upon registration. The second one is an extra hashref of options, which some events need for further process on the client-side.
+
+Most events, based on signals, can handle multiple type of data values. For these events, the subroutine can return an L<IWL::Object>, a hash or array reference, or a string. There are three ways this data is then handled. First, if the I<update> option was specified when registering the event, an existing widget in the page will be updated with that data. Second, if the widget has some specific handler on the client-side, that handler process this data. Finally, if the user specifies a JavaScript expression in an I<onComplete> option during registration, that expression will be evaluated with three variables in its context: I<json> - a JavaScript object, which holds the returned data and extra options, I<params> - the params, as seen in the handler subroutine, and the event I<options>. Here is a complete example of both a registration and handling of an event:
+
+  $button->setId('button');
+  $button->registerEvent('IWL-Button-click', 'my_script.pl', {someParam => 'foo'}, {onComplete => 'completeResponse(json, params)'});
+
+  # my_script.pl
+  IWL::RPC->new->handleEvent(
+    'IWL-Button-click',
+    sub {
+        my ($params, $id) = @_;
+        return IWL::Label->new->setText("The button was pressed with: " . $params->{someParam})
+            if ($id eq 'button');
+    }
+  );
+ 
+  # some javascript file
+  function completeResponse(json, params) {
+      if (!json) return;
+      IWL.createHtmlElement(json.data, document.body);
+  }
+
+From the code, if the button with id I<button> is clicked, it will emit an event to the I<my_script.pl> with parameters, containing I<someParam>. In the script, the subroutine handler will catch that event, create a new label with some text, and return it. Finally, when the response arrives on the client-side, the function I<completeResponse> will be called, and it will add that label to the document.
+
+=back
+
 =head1 AUTHOR
 
   Viktor Kojouharov
