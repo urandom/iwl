@@ -2,19 +2,56 @@
 
 IWL::Manual::Tutorial - IWL Introductory Tutorial
 
-=head1 OVERVIEW
-
-	use <Module::Name>;
-	# Brief but working code example(s) here showing the most common usage(s)
-
-	# This section will be as far as many users bother reading
-	# so make it as educational and exemplary as possible.
-
-
 =head1 DESCRIPTION
 
-A full description of the module and its features.
-May include numerous subsections (i.e. =head2, =head3, etc.)
+This tutorial should provide all the knowledge to build your first application, using L<IWL>
+
+=head1 OVERVIEW
+
+=head2 Installation
+
+Installation should be pretty straightforward. IWL is available through L<CPAN|http://search.cpan.org/dist/IWL/>, and only relies on L<HTTP::Parser> as a C module. The rest of the requirements are all in pure Perl. See IWL for the complete list of module requirements.
+
+Once installed, in order for IWL to actually be useful, the client static content (such as JavaScript and CSS files) need to be installed on the server. To do that, the B<iwl-install> script is provided, and will be installed in the server's I<PATH>.
+
+For complete command-line help of the B<iwl-install> script, invoke it with:
+
+  iwl-install --help
+
+The only mandatory argument for the script is for specifying the document root of the application. Optional arguments provide a fine-grained control for placing the various static content, that is needed by IWL, or for setup of a static uri script handler (See L<IWL::Static>)
+
+Example invocation:
+
+  iwl-install -d . -j js -skin skin -static /cgi-bin/static.pl
+
+The above command will install the skin files in /skin, and JavaScript files in /js, all relative to the document root, which is specified as the current directory. Furthermore, the command will setup I</cgi-bin/static.pl> as the static content handler.
+
+=head2 Starting the new application
+
+While IWL was inspired by L<Gtk2>, and tries to mimic it as closely as possible, there is one main difference, which is worth noting. Whereas Gtk2 is aimed at building desktop applications, IWL is geared towards building web applications. With Gtk2, a program's life starts with creating the main window at the beginning of the loop. With IWL, the main window is the page which holds all representable data. In order to create the page, one has to use the L<IWL::Page> class.
+
+=head3 Creating a simple B<Hello World> page
+
+Lets begin by creating a B<Hello World> page. The following code does just that:
+
+  # Using the whole IWL (overkill)
+  use IWL;
+
+  # Our page, with an appropriate title, which the user agent will most likely display as the title of its window
+  my $page = IWL::Page->new->setTitle("Hello World");
+
+  # The label, with a strong typed "Hello World" in it
+  my $label = IWL::Label->new->appendTextType("Hello World", "strong");
+
+  # Adding the label to the body of the page
+  $page->appendChild($label);
+
+  # Sending the page as HTML
+  #page->sent(type => 'html');
+
+As can be seen (in a browser), we just created our first page. It contains the text B<Hello World> in bold letters, which we did by creating a label with a strong text string, and adding it as a child of the page.
+
+The above example illustrates the main concept of IWL. In order to display something, it needs to be created in the form of an L<IWL::Widget>, and added in a hierarchy. Once the hierarchy is fully built, its full contents are obtained. The methods for parent-child management, and obtaining/sending content is available through the base L<IWL::Object> class.
 
 =head1 AUTHOR
 
@@ -34,6 +71,4 @@ modify it under the same terms as Perl itself. See perldoc perlartistic.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-=cut
 
