@@ -14,7 +14,7 @@ use Locale::TextDomain qw(org.bloka.iwl);
 
 =head1 NAME
 
-IWL::Google::Map - a button with a background
+IWL::Google::Map - a widget interface to Google Maps (c)
 
 =head1 INHERITANCE
 

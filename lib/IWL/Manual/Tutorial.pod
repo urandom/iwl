@@ -34,6 +34,7 @@ While IWL was inspired by L<Gtk2>, and tries to mimic it as closely as possible,
 
 Lets begin by creating a B<Hello World> page. The following code does just that:
 
+  #!/usr/bin/perl
   # Using the whole IWL (overkill)
   use IWL;
 
@@ -47,11 +48,55 @@ Lets begin by creating a B<Hello World> page. The following code does just that:
   $page->appendChild($label);
 
   # Sending the page as HTML
-  #page->sent(type => 'html');
+  $page->send(type => 'html');
 
 As can be seen (in a browser), we just created our first page. It contains the text B<Hello World> in bold letters, which we did by creating a label with a strong text string, and adding it as a child of the page.
 
 The above example illustrates the main concept of IWL. In order to display something, it needs to be created in the form of an L<IWL::Widget>, and added in a hierarchy. Once the hierarchy is fully built, its full contents are obtained. The methods for parent-child management, and obtaining/sending content is available through the base L<IWL::Object> class.
+
+Internally, the I<send> method of IWL::Object uses the L<IWL::Response> class to build a proper response. The response class is designed to build a response for a standard web server by default, but leaves the possibility of creating custom responses for atypical servers.
+
+=head3 Creating forms and processing values
+
+While form processing has mostly been replaced by AJAX, it is still useful. So let us create a simple form example.
+
+  #!/usr/bin/perl
+  use IWL;
+
+  # Getting the form parameters
+  my $rpc = IWL::RPC->new;
+  my %params = $rpc->getParams;
+
+  my $page = IWL::Page->new->setTitle('My form');
+
+  # Widget attributes can be set as arguments for the constructor, and as methods
+  my $form = IWL::Form->new(action => "form.pl")->setMethod("post");
+
+  # Adding a user input and a checkbox
+  my $entry = IWL::Entry->new(name => 'entry');
+  my $check = IWL::Checkbox->new(name => 'check');
+
+  # Addding the entry default text, which will be displayed if it holds no value.
+  # The default text will be passed by the form on submit.
+  $entry->setDefaultText("Type here");
+  $entry->setValue($params{entry}) if $params{entry} && $params{entry} ne 'Type here';
+
+  # Adding the checkbox label and value
+  $check->setValue("checkbox")->setLabel($params{check} ? "Untick here" : "Tick here");
+  $check->setChecked($params{check});
+
+  # Creating a submit button
+  my $submit = IWL::Button->new->setLabel("Submit me")->setSubmit;
+
+  # Creating the vertical box container
+  my $vbox = IWL::VBox->new;
+  $vbox->packStart($entry);
+  $vbox->packStart($check);
+  $vbox->packEnd($submit);
+  $form->appendChild($vbox);
+  $page->appendChild($form);
+
+  $page->send(type => 'html');
 
 =head1 AUTHOR
 
