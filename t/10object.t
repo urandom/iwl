@@ -1,4 +1,4 @@
-use Test::More tests => 122;
+use Test::More tests => 124;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -143,6 +143,13 @@ my $output;
     is($data->{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
     is($data->{children}[1]{attributes}{src}, '/jscript/dist/prototype.js');
     is($data->{children}[6]{attributes}{src}, '/jscript/foo.js');
+
+    $o = IWL::Object->new;
+    $o->require(css => 'foo.css', js => [qw(base.js foo.js)]);
+    $o->unrequire(js => 'base.js');
+    $data = $o->getObject;
+    is($data->{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
+    is($data->{children}[1]{attributes}{src}, '/jscript/foo.js');
 }
 
 {
