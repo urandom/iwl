@@ -101,6 +101,7 @@ sub getContent {
     }
 
     $self->{childNodes} = [];
+    $self->{_realized} = 0;
 
     return $content;
 }
@@ -119,6 +120,7 @@ sub getObject {
     $object->{environment} = 1;
 
     $self->{childNodes} = [];
+    $self->{_realized} = 0;
 
     return $object;
 }
