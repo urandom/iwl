@@ -6,6 +6,8 @@ package IWL::Widget;
 use strict;
 
 use base qw(IWL::Object IWL::RPC::Request IWL::DND);
+
+use IWL::JSON qw(toJSON);
 use IWL::Config qw(%IWLConfig);
 
 =head1 NAME
@@ -497,6 +499,17 @@ sub isSelectable {
     return shift->{__selectable};
 }
 
+# Overrides
+#
+sub registerEvent {
+    my $self = shift;
+
+    $self->SUPER::registerEvent(@_);
+    $self->require(js => 'base.js');
+
+    return $self;
+}
+
 # Protected
 #
 =head1 PROTECTED METHODS
@@ -533,7 +546,7 @@ sub _realize {
 	}
     }
 
-    $self->_realizeEvents if $self->can('_realizeEvents');
+    $self->_realizeEvents;
     if ($self->can('_setupDefaultClass')) {
 	$self->_setupDefaultClass;
     } else {
@@ -546,9 +559,8 @@ sub _realizeEvents {
     my $id = $self->getId;
     return unless $self->{_handlers} && $id;
 
-    $self->SUPER::_realizeEvents;
-
-    $self->_appendInitScript("\$('$id').prepareEvents();");
+    my $handlers = toJSON($self->{_handlers});
+    $self->_appendInitScript("\$('$id').prepareEvents($handlers);");
 }
 
 sub _constructorArguments {

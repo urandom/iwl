@@ -1,4 +1,4 @@
-use Test::More tests => 37;
+use Test::More tests => 39;
 
 use IWL::Widget;
 use IWL::Config '%IWLConfig';
@@ -74,6 +74,14 @@ $IWLConfig{STRICT_LEVEL} = 2;
             unselectable => 'on'
         }
     });
+}
+
+{
+    my $w = IWL::Widget->new(id => 'foo');
+    $w->registerEvent('IWL-Widget-foo', 'bar');
+    my $data = $w->getObject;
+    is($data->{children}[0]{attributes}{src}, '/jscript/dist/prototype.js');
+    is($data->{children}[4]{attributes}{src}, '/jscript/base.js');
 }
 
 {

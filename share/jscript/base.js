@@ -100,14 +100,17 @@ Object.extend(IWL, {RPC: (function() {
           };
           return element;
       },
-      prepareEvents: function(element) {
+      prepareEvents: function(element, handlers) {
           if (!(element = $(element))) return;
           if (element.preparedEvents) return element;
-          var events = element.readAttribute('iwl:RPCEvents');
-          if (events) {
-              events = unescape(events).evalJSON();
-              for (var name in events)
-                  IWL.RPC.registerEvent(element, name, events[name][0], events[name][1], events[name][2]);
+          if (!handlers) {
+              handlers = element.readAttribute('iwl:RPCEvents');
+              if (handlers)
+                  handlers = unescape(handlers).evalJSON();
+          }
+          if (handlers) {
+              for (var name in handlers)
+                  IWL.RPC.registerEvent(element, name, handlers[name][0], handlers[name][1], handlers[name][2]);
               element.preparedEvents = true;
               return element;
           }

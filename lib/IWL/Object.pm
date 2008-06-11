@@ -971,7 +971,7 @@ sub appendAfter {
     return $self;
 }
 
-=item B<requiredJs> [B<URLS>]
+=item B<requiredJs> (B<URLS>)
 
 Adds the list of urls (relative to JS_DIR, or absolute) as required by the object
 
@@ -991,19 +991,20 @@ sub requiredJs {
 		'scriptaculous_extensions.js');
 	}
 
-	my $src    = $url ;
-	$src       = $IWLConfig{JS_DIR} . '/' . $src
-	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+        $url = $IWLConfig{JS_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+
+        next if grep {$_ eq $url} @{$self->{_required}{js}};
 
         $self->{_required}{js} = []
             unless $self->{_required}{js};
-        push @{$self->{_required}{js}} , $src;
+        push @{$self->{_required}{js}}, $url;
     }
 
     return $self;
 }
 
-=item B<requiredCSS> [B<URLS>]
+=item B<requiredCSS> (B<URLS>)
 
 Adds the list of urls (relative to CSS_DIR, or absolute) as required by the object
 
@@ -1015,15 +1016,84 @@ sub requiredCSS {
     my ($self, @urls) = @_;
 
     foreach my $url (@urls) {
-	my $src    = $url ;
-	$src       = $IWLConfig{SKIN_DIR} . '/' . $src
-	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+        $url = $IWLConfig{SKIN_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+
+        next if grep {$_ eq $url} @{$self->{_required}{css}};
 
         $self->{_required}{css} = []
             unless $self->{_required}{css};
-        push @{$self->{_required}{css}} , $src;
+        push @{$self->{_required}{css}}, $url;
     }
 
+    return $self;
+}
+
+=item B<require> (B<RESOURCES>)
+
+This method is a front-end to the L<IWL::Object::requiredJs|IWL::Object/requiredJs> and L<IWL::Object::requiredCSS|IWL::Object/requiredCSS> methods.
+It allows for setting of both I<CSS> and I<JavaScript> resources as required
+
+Parameters: B<RESOURCES> - a hash with the following recognised key-values:
+
+=over 8
+
+=item B<js>
+
+Expects a I<URL> or an array reference of I<URL>s for JavaScript files as a value
+
+=item B<css>
+
+Expects a I<URL> or an array reference of I<URL>s for CSS files as a value
+
+=back
+
+=cut
+
+sub require {
+    my ($self, %resources) = @_;
+    if (my $js = $resources{js}) {
+        $self->requiredJs('ARRAY' eq ref $js ? @$js : $js);
+    }
+    if (my $css = $resources{css}) {
+        $self->requiredCSS('ARRAY' eq ref $css ? @$css : $css);
+    }
+    return $self;
+}
+
+=item B<unrequire> (B<RESOURCES>)
+
+Un-requires the given resources for sharing
+
+Parameters: B<RESOURCES> - See L<IWL::Object::require|IWL::Object/require> for parameter definition
+
+=cut
+
+sub unrequire {
+    my ($self, %resources) = @_;
+    if (my $js = $resources{js}) {
+        my @js = 'ARRAY' eq ref $js ? @$js : ($js);
+        if (grep {$_ eq 'base.js'} @js) {
+            push @js, (
+		'dist/prototype.js',
+		'prototype_extensions.js',
+		'dist/effects.js',
+		'scriptaculous_extensions.js'
+            );
+        }
+        foreach my $url (@js) {
+            $url = $IWLConfig{JS_DIR} . '/' . $url
+                unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+            $self->{_required}{js} = [grep { $_ ne $url } @{$self->{_required}{js}}];
+        }
+    }
+    if (my $css = $resources{css}) {
+        foreach my $url ('ARRAY' eq ref $css ? @$css : ($css)) {
+            $url = $IWLConfig{SKIN_DIR} . '/' . $url
+                unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+            $self->{_required}{css} = [grep { $_ ne $url } @{$self->{_required}{css}}];
+        }
+    }
     return $self;
 }
 
@@ -1521,11 +1591,30 @@ Realizes the object. It is right before the object is serialized into HTML or JS
 
 sub _realize {
     my $self = shift;
+    my ($script, $head, $body, %required);
 
-    return if $self->{parentNode};
+    if ($self->{parentNode}) {
+        return $self unless %{$self->{_required}};
+        my $top = $self->up(options => {last => 1}) || $self;
+        my $env = $top->{environment} || {};
+        $self->{___top} = $top;
+
+        foreach my $resource (keys %{$self->{_required}}) {
+            foreach (@{$self->{_required}{$resource}}) {
+                next if $self->{_shared}{$resource}{$_} || $env->{_shared}{$resource}{$_};
+                $self->{_shared}{$resource}{$_} = $env->{_shared}{$resource}{$_} = 1;
+                push @{$required{$resource}}, $_;
+            }
+        }
+        $self->{_required} = {};
+
+        $top->__addRequired(%required);
+
+        return $self;
+    }
+
     my @descendants = ($self, $self->getDescendants);
     my $env = $self->{environment} || {};
-    my ($script, $head, $body, @scripts, %required);
 
     push @{$self->{_required}{$_}}, @{$env->{_required}{$_}}
         foreach keys %{$env->{_required}};
@@ -1545,11 +1634,9 @@ sub _realize {
                 push @{$required{$resource}}, $_;
             }
         }
-        delete $object->{_required};
+        $object->{_required} = {};
     }
     
-    require IWL::Script;
-
     my $pivot = $script
         ? $script->{parentNode}
             ? undef
@@ -1557,56 +1644,14 @@ sub _realize {
         : $body
             ? undef
             : $self->lastChild;
-    if (ref $required{js} eq 'ARRAY') {
-        if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
-            my @required = @{$required{js}};
-            push @scripts,
-                IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc(\@required) while @required;
-        } else {
-            @scripts = map {
-                IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc($_)
-            } @{$required{js}};
-        }
+    $self->{___pivot}  = $pivot  and weaken $self->{___pivot};
+    $self->{___script} = $script and weaken $self->{___script};
+    $self->{___head}   = $head   and weaken $self->{___head};
+    $self->{___body}   = $body   and weaken $self->{___body};
 
-    }
+    $self->__addRequired(%required);
 
-    $self->{_lastShared} = $scripts[-1];
-
-    $script && $script->{parentNode}
-        ? $script->{parentNode}->insertBefore($script, @scripts)
-        : $pivot
-            ? $self->insertAfter($pivot, @scripts)
-            : ($body || $self)->appendChild(@scripts);
-
-    if (ref $required{css} eq 'ARRAY') {
-        if ($head) {
-            require IWL::Page::Link;
-            my @required = @{$required{css}};
-            my @css;
-
-            if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
-                push @css,
-                    IWL::Page::Link->newLinkToCSS(\@required)->setAttribute('iwl:requiredCSS') while @required;
-            } else {
-                @css = map {IWL::Page::Link->newLinkToCSS($_)->setAttribute('iwl:requiredCSS')} @{$required{css}};
-            }
-            $head->appendChild(@css);
-        } else {
-            require IWL::Style;
-
-            my $style = IWL::Style->new->setAttribute('iwl:requiredCSS');
-            if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
-                my @required = @{$required{css}};
-                $style->appendStyleImport(\@required) while @required;
-            } else {
-                $style->appendStyleImport($_) foreach @{$required{css}};
-            }
-
-            $self->isa('IWL::Page')
-                ? ($self->down({package => 'IWL::Page::Body'}) || $self)->prependChild($style)
-                : $self->prependChild($style);
-        }
-    }
+    return $self;
 }
 
 # Internal
@@ -1648,7 +1693,8 @@ sub __addInitScripts {
         my $expr = join '; ', @{$self->{_initScripts}};
         return unless $expr;
 
-        my $top = $self->up(options => {last => 1}) || $self;
+        my $top = $self->{___top} || $self->up(options => {last => 1}) || $self;
+        $self->{___top} = $top;
 
         unless ($top->{_initScript} && !$top->{_initScript}{_realized}) {
             require IWL::Script;
@@ -1656,18 +1702,19 @@ sub __addInitScripts {
             my $init = $top->{_initScript} = IWL::Script->new->setAttribute('iwl:initScript');
             weaken $top->{_initScript};
 
-            unless (($top->{_lastShared} && !$top->{_lastShared}{_realized}) || $top->{_firstScript}) {
+            unless (($top->{___lastShared} && !$top->{___lastShared}{_realized}) || $top->{___firstScript}) {
                 my $first = $top->down({package => 'IWL::Script'}, 'not', {attribute => ['iwl:requiredScript']});
-                $top->{_firstScript} = $first and weaken $top->{_firstScript};
+                $top->{___firstScript} = $first and weaken $top->{___firstScript};
             }
-            my $script = $top->{_firstScript};
+            my $script = $top->{___firstScript};
             undef $script if $script && $script->{_realized};
 
-            unless ($script || $top->{_pivot}) {
+            unless ($script || $top->{___pivot}) {
                 my $pivot = $top->lastChild;
-                $top->{_pivot} = $pivot and weaken $top->{_pivot};
+                $top->{___pivot} = $pivot and weaken $top->{___pivot};
             }
-            my $pivot = $top->{_lastShared} && !$top->{_lastShared}{_realized} ? $top->{_lastShared} : $top->{_pivot};
+            my $pivot = $top->{___lastShared} && !$top->{___lastShared}{_realized}
+                ? $top->{___lastShared} : $top->{___pivot};
             undef $pivot if $pivot && $pivot->{_realized};
 
             $script && $script->{parentNode}
@@ -1678,6 +1725,64 @@ sub __addInitScripts {
         }
 
         $top->{_initScript}->appendScript($expr . ';');
+    }
+}
+
+sub __addRequired {
+    my ($self, %required) = @_;
+    my @scripts;
+
+    my ($script, $pivot, $head, $body) = ($self->{___script}, $self->{___pivot}, $self->{___head}, $self->{___body});
+    if (ref $required{js} eq 'ARRAY') {
+        require IWL::Script;
+        if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
+            my @required = @{$required{js}};
+            push @scripts,
+                IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc(\@required) while @required;
+        } else {
+            @scripts = map {
+                IWL::Script->new->setAttribute('iwl:requiredScript')->setSrc($_)
+            } @{$required{js}};
+        }
+
+    }
+
+    $self->{___lastShared} = $scripts[-1];
+
+    $script && $script->{parentNode}
+        ? $script->{parentNode}->insertBefore($script, @scripts)
+        : $pivot && $pivot->{parentNode}
+            ? $pivot->{parentNode}->insertAfter($pivot, @scripts)
+            : ($body || $self)->appendChild(@scripts);
+
+    if (ref $required{css} eq 'ARRAY') {
+        if ($head) {
+            require IWL::Page::Link;
+            my @required = @{$required{css}};
+            my @css;
+
+            if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
+                push @css,
+                    IWL::Page::Link->newLinkToCSS(\@required)->setAttribute('iwl:requiredCSS') while @required;
+            } else {
+                @css = map {IWL::Page::Link->newLinkToCSS($_)->setAttribute('iwl:requiredCSS')} @{$required{css}};
+            }
+            $head->appendChild(@css);
+        } else {
+            require IWL::Style;
+
+            my $style = IWL::Style->new->setAttribute('iwl:requiredCSS');
+            if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
+                my @required = @{$required{css}};
+                $style->appendStyleImport(\@required) while @required;
+            } else {
+                $style->appendStyleImport($_) foreach @{$required{css}};
+            }
+
+            $self->isa('IWL::Page')
+                ? ($self->down({package => 'IWL::Page::Body'}) || $self)->prependChild($style)
+                : $self->prependChild($style);
+        }
     }
 }
 
