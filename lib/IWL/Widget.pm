@@ -6,6 +6,8 @@ package IWL::Widget;
 use strict;
 
 use base qw(IWL::Object IWL::RPC::Request IWL::DND);
+
+use IWL::JSON qw(toJSON);
 use IWL::Config qw(%IWLConfig);
 
 =head1 NAME
@@ -544,7 +546,7 @@ sub _realize {
 	}
     }
 
-    $self->_realizeEvents if $self->can('_realizeEvents');
+    $self->_realizeEvents;
     if ($self->can('_setupDefaultClass')) {
 	$self->_setupDefaultClass;
     } else {
@@ -557,9 +559,8 @@ sub _realizeEvents {
     my $id = $self->getId;
     return unless $self->{_handlers} && $id;
 
-    $self->SUPER::_realizeEvents;
-
-    $self->_appendInitScript("\$('$id').prepareEvents();");
+    my $handlers = toJSON($self->{_handlers});
+    $self->_appendInitScript("\$('$id').prepareEvents($handlers);");
 }
 
 sub _constructorArguments {
