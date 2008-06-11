@@ -1,4 +1,4 @@
-use Test::More tests => 119;
+use Test::More tests => 122;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -134,6 +134,15 @@ my $output;
 
     is(IWL::JSON::toJSON({a => IWL::Object->new->setAttribute(foo => 1)}), '{"a": {"attributes": {"foo": 1}}}');
     is(IWL::JSON::toJSON([IWL::Object->newMultiple(3)]), '[{}, {}, {}]');
+}
+
+{
+    my $o = IWL::Object->new;
+    $o->require(css => 'foo.css', js => [qw(base.js foo.js)]);
+    my $data = $o->getObject;
+    is($data->{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
+    is($data->{children}[1]{attributes}{src}, '/jscript/dist/prototype.js');
+    is($data->{children}[6]{attributes}{src}, '/jscript/foo.js');
 }
 
 {

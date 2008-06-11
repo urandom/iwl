@@ -971,7 +971,7 @@ sub appendAfter {
     return $self;
 }
 
-=item B<requiredJs> [B<URLS>]
+=item B<requiredJs> (B<URLS>)
 
 Adds the list of urls (relative to JS_DIR, or absolute) as required by the object
 
@@ -991,19 +991,18 @@ sub requiredJs {
 		'scriptaculous_extensions.js');
 	}
 
-	my $src    = $url ;
-	$src       = $IWLConfig{JS_DIR} . '/' . $src
-	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+        $url = $IWLConfig{JS_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
         $self->{_required}{js} = []
             unless $self->{_required}{js};
-        push @{$self->{_required}{js}} , $src;
+        push @{$self->{_required}{js}}, $url;
     }
 
     return $self;
 }
 
-=item B<requiredCSS> [B<URLS>]
+=item B<requiredCSS> (B<URLS>)
 
 Adds the list of urls (relative to CSS_DIR, or absolute) as required by the object
 
@@ -1015,15 +1014,82 @@ sub requiredCSS {
     my ($self, @urls) = @_;
 
     foreach my $url (@urls) {
-	my $src    = $url ;
-	$src       = $IWLConfig{SKIN_DIR} . '/' . $src
-	    unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+        $url = $IWLConfig{SKIN_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
         $self->{_required}{css} = []
             unless $self->{_required}{css};
-        push @{$self->{_required}{css}} , $src;
+        push @{$self->{_required}{css}}, $url;
     }
 
+    return $self;
+}
+
+=item B<require> (B<RESOURCES>)
+
+This method is a front-end to the L<IWL::Object::requiredJs|IWL::Object/requiredJs> and L<IWL::Object::requiredCSS|IWL::Object/requiredCSS> methods.
+It allows for setting of both I<CSS> and I<JavaScript> resources as required
+
+Parameters: B<RESOURCES> - a hash with the following recognised key-values:
+
+=over 8
+
+=item B<js>
+
+Expects a I<URL> or an array reference of I<URL>s for JavaScript files as a value
+
+=item B<css>
+
+Expects a I<URL> or an array reference of I<URL>s for CSS files as a value
+
+=back
+
+=cut
+
+sub require {
+    my ($self, %resources) = @_;
+    if (my $js = $resources{js}) {
+        $self->requiredJs('ARRAY' eq ref $js ? @$js : $js);
+    }
+    if (my $css = $resources{css}) {
+        $self->requiredCSS('ARRAY' eq ref $css ? @$css : $css);
+    }
+    return $self;
+}
+
+=item B<unrequire> (B<RESOURCES>)
+
+Un-requires the given resources for sharing
+
+Parameters: B<RESOURCES> - See L<IWL::Object::require|IWL::Object/require> for parameter definition
+
+=cut
+
+sub unrequire {
+    my ($self, %resources) = @_;
+    if (my $js = $resources{js}) {
+        my @js = 'ARRAY' eq ref $js ? @$js : ($js);
+        if (grep {$_ eq 'base.js'} @js) {
+            push @js, (
+		'dist/prototype.js',
+		'prototype_extensions.js',
+		'dist/effects.js',
+		'scriptaculous_extensions.js'
+            );
+        }
+        foreach my $url (@js) {
+            $url = $IWLConfig{JS_DIR} . '/' . $url
+                unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+            $self->{_required}{js} = [grep { $_ ne $url } @{$self->{_required}{js}}];
+        }
+    }
+    if (my $css = $resources{css}) {
+        foreach my $url ('ARRAY' eq ref $css ? @$css : ($css)) {
+            $url = $IWLConfig{SKIN_DIR} . '/' . $url
+                unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+            $self->{_required}{css} = [grep { $_ ne $url } @{$self->{_required}{css}}];
+        }
+    }
     return $self;
 }
 
