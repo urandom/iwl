@@ -222,6 +222,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var container, id = this.id;
         if (parentNode) {
             var nId = parentNode.attributes.id;
+            if (!nodeMap[id][nId])
+                nodeMap[id][nId] = {};
             if (nodeMap[id][nId].childContainer)
                 return nodeMap[id][nId].childContainer
         }
@@ -348,7 +350,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setState(state) {
-        if (this.pageChanging) return;
+        if (this.pageChanging || !this.model) return;
         this.state = state;
         var classNames = ['comboview_button'];
         if (state == (IWL.ComboView.State.SHOW | IWL.ComboView.State.HOVER)) {
@@ -390,7 +392,10 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function popUp(container) {
         var container = Object.isElement(container)
-            ? container : this.container.pageContainer || this.container;
+            ? container : this.container
+                ? this.container.pageContainer || this.container
+                : null;
+        if (!container) return;
         var inner = this.container.pageContainer ? this.container : container;
         clearTimeout(container.popDownDelay);
         if (!container) return;
@@ -452,8 +457,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function popDown(container) {
         var container = Object.isElement(container)
-            ? container
-            : this.container.pageContainer || this.container;
+            ? container : this.container
+                ? this.container.pageContainer || this.container
+                : null;
         if (!container || !container.popped) return;
         (container == this.container.pageContainer ? this.container : container).childContainers.each(
             function(c) { popDown.call(this, c) }.bind(this)
@@ -633,6 +639,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function removeModel() {
+        this.popDown();
+        removeContainers.call(this, this.container);
+        nodeMap[this.id] = {};
+        this.model = this.container = undefined;
+    }
+
     return {
         /**
          * Pops up (shows) the dropdown list
@@ -705,6 +718,28 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element.sensitive = !!sensitive;
 
             return this.emitSignal('iwl:sensitivity_change', node);
+        },
+        /**
+         * Sets the model for the view
+         * @param {IWL.ObservableModel} model The model, this view will associate with. If none is given, the current model will be removed
+         * @returns The object
+         * */
+        setModel: function(model) {
+            if (this.model)
+                removeModel.call(this);
+            if (model instanceof IWL.ObservableModel) {
+                this.model = model;
+                loadData.call(this, null);
+                setContent.call(this);
+            }
+
+            return this;
+        },
+        /**
+         * @returns The ComboView's model
+         * */
+        getModel: function () {
+            return this.model;
         },
 
         _init: function(id, model) {
