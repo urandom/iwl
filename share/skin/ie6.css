@@ -44,6 +44,10 @@ div.shadowbox div.contentbox_topr {
     height: 8px;
 }
 
+div.contentbox_middle {
+    zoom: 1;
+}
+
 ul.menu {
     width: 1%;
 }
