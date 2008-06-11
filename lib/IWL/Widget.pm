@@ -497,6 +497,17 @@ sub isSelectable {
     return shift->{__selectable};
 }
 
+# Overrides
+#
+sub registerEvent {
+    my $self = shift;
+
+    $self->SUPER::registerEvent(@_);
+    $self->require(js => 'base.js');
+
+    return $self;
+}
+
 # Protected
 #
 =head1 PROTECTED METHODS
