@@ -1,5 +1,7 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
+    var nodeMap = {};
+
     function connectSignals() {
         var mouseover = function() {
             setState.call(this, this.state | IWL.ComboView.State.HOVER);
@@ -95,7 +97,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var flat = this.model.isFlat();
         var template = generateNodeTemplate.call(this, flat)
         if (parentNode) {
-            var view = parentNode.view[this.id];
+            var view = nodeMap[this.id][parentNode.attributes.id];
             var highlight = view.element.highlight;
             recreateNode.call(this, parentNode, template, flat, view.container);
             if (highlight) {
@@ -111,7 +113,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function eventAbort(event, eventName, params, options) {
         if (eventName == 'IWL-TreeModel-requestChildren') {
             var node = this.model.getNodeByPath(options.parentNode);
-            var element = node.view[this.id].element;
+            var element = nodeMap[this.id][node.attributes.id].element;
             var arrow = element.down('.comboview_partial_loading');
             arrow.removeClassName('comboview_partial_loading').addClassName('comboview_partial_parental_arrow');
             var callback = function(event) {
@@ -160,12 +162,15 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setNodeAttributes(container, element, node) {
-        var id = this.id;
-        if (!node.view) node.view = {};
-        if (!node.view[id]) node.view[id] = {};
-        node.view[id].element = element;
-        node.view[id].container = container;
-        var childContainer = node.view[id].childContainer;
+        var id = this.id, nId = node.attributes.id;
+        if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
+        var nView = nodeMap[id][nId];
+        Object.extend(nView, {
+            node: node,
+            element: element,
+            container: container
+        });
+        var childContainer = nView.childContainer;
         var hasChildren = node.hasChildren();
         if (element.hasClassName('comboview_node_separator'))
             return;
@@ -215,45 +220,44 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function createContainer(parentNode) {
         var container, id = this.id;
-        if (parentNode && parentNode.view[id].childContainer)
-            container = parentNode.view[id].childContainer
-        else {
-            if (parentNode) {
-                var path = parentNode.getPath();
-                var pathString = path.toString();
-                container = this.containers[pathString];
-                if (!container)
-                    container = new Element('div', {
-                        className: 'comboview_node_container comboview_node_container_depth' + path.length
-                    });
-                this.containers[pathString] = container;
-                container.path = pathString;
+        if (parentNode) {
+            var nId = parentNode.attributes.id;
+            if (nodeMap[id][nId].childContainer)
+                return nodeMap[id][nId].childContainer
+        }
+        if (parentNode) {
+            var path = parentNode.getPath();
+            var pathString = path.toString();
+            container = this.containers[pathString];
+            if (!container)
+                container = new Element('div', {
+                    className: 'comboview_node_container comboview_node_container_depth' + path.length
+                });
+            this.containers[pathString] = container;
+            container.path = pathString;
 
-                parentNode.view[id].childContainer = container;
-                container.parentContainer = parentNode.parentNode
-                                         && parentNode.parentNode.view[id].childContainer
-                    ? parentNode.parentNode.view[id].childContainer
-                    : this.container;
-                container.parentContainer.childContainers.push(container);
+            nodeMap[id][nId].childContainer = container;
+            container.parentContainer = parentNode.parentNode
+                                     && nodeMap[id][parentNode.parentNode.attributes.id].childContainer
+                ? nodeMap[id][parentNode.parentNode.attributes.id].childContainer
+                : this.container;
+            container.parentContainer.childContainers.push(container);
+            container.childContainers = [];
+            container.node = parentNode;
+        } else {
+            container = this.container;
+            if (!container) {
+                container = new Element('div', {className: 'comboview_node_container'});
                 container.childContainers = [];
-                container.node = parentNode;
-            } else {
-                container = this.container;
-                if (!container) {
-                    container = new Element('div', {className: 'comboview_node_container'});
-                    container.registerFocus();
-                    container.keyLogger(keyEventsCB.bindAsEventListener(this));
-                    container.childContainers = [];
-                }
-                if (this.pageControl && !container.pageContainer) {
-                    var pageContainer = new Element('div', {className: 'comboview_page_container'});
-                    pageContainer.appendChild(container);
-                    pageContainer.appendChild(this.pageControl);
-                    this.pageControl.setStyle({position: '', left: ''});
-                    container.pageContainer = pageContainer;
-                }
-                this.container = container;
             }
+            if (this.pageControl && !container.pageContainer) {
+                var pageContainer = new Element('div', {className: 'comboview_page_container'});
+                pageContainer.appendChild(container);
+                pageContainer.appendChild(this.pageControl);
+                this.pageControl.setStyle({position: '', left: ''});
+                container.pageContainer = pageContainer;
+            }
+            this.container = container;
         }
         return container;
     }
@@ -280,18 +284,19 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             cellTemplate.nodePath = nodePath;
             html = template.evaluate(cellTemplate);
         }
-        var next = node.nextSibling;
-        if (Object.isElement(node.view[id].element) && node.view[id].element.parentNode)
-            node.view[id].element.replace(html);
+        var next = node.nextSibling, previous = node.previousSibling,
+            map = nodeMap[id], element = nodeMap[id][node.attributes.id].element;
+        if (Object.isElement(element) && element.parentNode)
+            element.replace(html);
         else {
             if (next)
-                next.view[id].element.insert({before: html});
-            else if (node.previousSibling)
-                node.previousSibling.view[id].element.insert({after: html});
+                map[next.attributes.id].element.insert({before: html});
+            else if (previous)
+                map[previous.attributes.id].element.insert({after: html});
             else
                 container.innerHTML = html;
         }
-        var element = next ? next.view[id].element.previousSibling : container.lastChild;
+        var element = next ? map[next.attributes.id].element.previousSibling : container.lastChild;
         var values = [], types = [], cMap = this.options.columnMap;
         for (var j = 0, l = cMap.length; j < l; j++) {
             var index = cMap[j];
@@ -459,52 +464,19 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function changeHighlight(node) {
-        var current = this.currentNodeHighlight, id = this.id;
+        var current = this.currentNodeHighlight;
         if (current) {
-            current.view[id].element.removeClassName('comboview_node_highlight');
-            current.view[id].element.highlight = false;
+            var element = nodeMap[this.id][current.attributes.id].element;
+            element.removeClassName('comboview_node_highlight');
+            element.highlight = false;
         }
         if (node) {
-            if (node.view[id].element.sensitive || node.childCount != 0)
-                node.view[id].element.addClassName('comboview_node_highlight');
-            node.view[id].element.highlight = true;
+            var element = nodeMap[this.id][node.attributes.id].element;
+            if (element.sensitive || node.childCount != 0)
+                element.addClassName('comboview_node_highlight');
+            element.highlight = true;
         }
         this.currentNodeHighlight = node;
-    }
-
-    function keyEventsCB(event) {
-        var current = this.currentNodeHighlight, id = this.id;
-        var row = current ? current.view[id].element : null;
-        if (!row || !row.highlight)
-            return;
-        var keyCode = Event.getKeyCode(event);
-        var row;
-        if (![Event.KEY_UP, Event.KEY_DOWN, Event.KEY_RETURN].include(keyCode)) return;
-        var nodes = this.model.toArray(), node;
-
-        if (keyCode == Event.KEY_UP)  {
-            var index = nodes[nodes.indexOf(current)];
-            while (node = nodes[--index]) {
-                if (!node || node.view[id].element.hasClassName('comboview_node_separator'))
-                    continue;
-                else break;
-            }
-            changeHighlight.call(this, node);
-            Event.stop(event);
-        } else if (keyCode == Event.KEY_DOWN) {
-            var index = nodes[nodes.indexOf(current)];
-            while (node = nodes[++index]) {
-                if (!node || node.view[id].element.hasClassName('comboview_node_separator'))
-                    continue;
-                else break;
-            }
-            changeHighlight.call(this, node);
-            Event.stop(event);
-        } else if (keyCode == Event.KEY_RETURN) {
-            if (current.view[id].element.hasClassName('comboview_node_separator')) return;
-            this.setActive(current);
-            this.popDown();
-        }
     }
 
     function normalizeCellAttributes() {
@@ -551,25 +523,26 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodesSwap(event, node1, node2) {
-        var id = this.id;
-        var c1 = node1.view[id].container, c2 = node2.view[id].container;
-        node1.view[id].container = c2, node2.view[id].container = c1;
+        var n1View = nodeMap[this.id][node1.attributes.id],
+            n2View = nodeMap[this.id][node2.attributes.id];
+        var c1 = n1View.container, c2 = n2View.container;
+        n1View.container = c2, n2View.container = c1;
 
-        var childContainer = node1.view[id].childContainer;
-        node1.view[id].element.remove();
+        var childContainer = n1View.childContainer;
+        n1View.element.remove();
         if (childContainer)
             removeContainers.call(this, childContainer);
         nodeChange.call(this, event, node1);
 
-        childContainer = node2.view[id].childContainer;
-        node2.view[id].element.remove();
+        childContainer = n2View.childContainer;
+        n2View.element.remove();
         if (childContainer)
             removeContainers.call(this, childContainer);
         nodeChange.call(this, event, node2);
     }
 
     function nodeMove(event, node, parentNode, previousParent) {
-        var view = node.view[this.id];
+        var view = nodeMap[this.id][node.attributes.id];
         if (view.element && view.element.parentNode == previousParent)
             view.element.remove();
 
@@ -577,7 +550,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeChange(event, node) {
-        var flat = this.model.isFlat(), view = node.view[this.id];
+        var flat = this.model.isFlat(), view = nodeMap[this.id][node.attributes.id];
         var template = generateNodeTemplate.call(this, flat)
         var highlight = view.element.highlight;
         recreateNode.call(this, node, template, flat, view.container);
@@ -590,16 +563,17 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function nodeInsert(event, node, parentNode) {
         var flat = this.model.isFlat();
         var template = generateNodeTemplate.call(this, flat)
-        var id = this.id;
-        if (!node.view) node.view = {};
-        if (!node.view[id]) node.view[id] = {};
+        var id = this.id, nId = node.attributes.id;
         var container = parentNode ? createContainer.call(this, parentNode) : this.container;
+        if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
+        if (!node.nextSibling && node.previousSibling)
+            nodeMap[id][node.previousSibling.attributes.id].element.removeClassName('comboview_node_last');
         recreateNode.call(this, parentNode || node, template, flat, container);
         generatePathAttributes.call(this, parentNode);
     }
 
     function nodeRemove(event, node, parentNode) {
-        var view = node.view[this.id];
+        var view = nodeMap[this.id][node.attributes.id];
         var element = view.element;
         var container = view.container;
         var childContainer = view.childContainer;
@@ -627,12 +601,14 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
     
     function removeContainers(container) {
-        var id = this.id;
         if (container.parentNode)
             container.remove();
         delete this.containers[container.path];
-        if (container.node && container.node.view[id].childContainer)
-            delete container.node.view[id].childContainer;
+        if (container.node) {
+            var view = nodeMap[this.id][container.node.attributes.id];
+            if (view.childContainer)
+                delete view.childContainer;
+        }
         for (var i = 0, l = container.childContainers.length; i < l; i++)
             removeContainers.call(this, container.childContainers[i]);
         container.childContainers = [];
@@ -650,7 +626,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = childNodes.length; i < l; i++) {
             var child = childNodes[i];
             var path = parentPath.concat(i);
-            var element = child.view[this.id].element;
+            var element = nodeMap[this.id][child.attributes.id].element;
             element.writeAttribute('iwl:nodePath', Object.toJSON(path));
             if (child.childNodes.length)
                 generatePathAttributes.call(this, child);
@@ -693,7 +669,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!Object.isArray(path)) path = [path];
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
-            if (!node || !node.view[this.id].element.sensitive) return;
+            if (!node || !nodeMap[this.id][node.attributes.id].element.sensitive) return;
             this.content.removeClassName('comboview_content_empty');
             this.values = node.getValues();
             var cellTemplate = cellTemplateRenderer.call(this, node);
@@ -722,7 +698,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node) return;
-            var element = node.view[this.id].element;
+            var element = nodeMap[this.id][node.attributes.id].element;
             if (!element) return;
             var hasChildren = node.childCount != 0;
             element[sensitive ? 'removeClassName' : 'addClassName'](hasChildren ? 'comboview_partial_node_insensitive' : 'comboview_node_insensitive');
@@ -754,6 +730,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             if (this.pageControl && this.options.pageControlEventName)
                 this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
+
+            nodeMap[id] = {};
 
             connectSignals.call(this);
             setContent.call(this);

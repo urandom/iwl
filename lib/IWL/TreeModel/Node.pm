@@ -212,7 +212,7 @@ sub _init {
 
     $self->{childNodes} = [];
     $self->{values} = [];
-    $self->{attributes} =  {};
+    $self->{attributes} =  {id => "$self" =~ /.*0x([0-9a-fA-F]+)/};
     $self->{childCount} = undef;
     $self->{previousSibling} = $self->{nextSibling} = undef;
     $self->insert(@_) if $_[0];

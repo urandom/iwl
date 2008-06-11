@@ -411,6 +411,8 @@ Object.extend(IWL.TreeModel, (function() {
 })());
 
 IWL.TreeModel.Node = Class.create(Enumerable, (function() {
+  var counter = 0;
+
   function addModel(model, node) {
     node.model = model;
     if (node.columns) {
@@ -447,7 +449,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
   return {
     initialize: function(model, parentNode, index) {
       this.childNodes = [], this.values = [],
-      this.attributes = {}, this.childCount = null;
+      this.attributes = {id: ++counter}, this.childCount = null;
 
       if (model)
         this.insert(model, parentNode, index);
