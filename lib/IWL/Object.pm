@@ -994,6 +994,8 @@ sub requiredJs {
         $url = $IWLConfig{JS_DIR} . '/' . $url
             unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
 
+        next if grep {$_ eq $url} @{$self->{_required}{js}};
+
         $self->{_required}{js} = []
             unless $self->{_required}{js};
         push @{$self->{_required}{js}}, $url;
@@ -1016,6 +1018,8 @@ sub requiredCSS {
     foreach my $url (@urls) {
         $url = $IWLConfig{SKIN_DIR} . '/' . $url
             unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+
+        next if grep {$_ eq $url} @{$self->{_required}{css}};
 
         $self->{_required}{css} = []
             unless $self->{_required}{css};
