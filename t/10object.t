@@ -1,4 +1,4 @@
-use Test::More tests => 124;
+use Test::More tests => 126;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -144,11 +144,18 @@ my $output;
     is($data->{children}[1]{attributes}{src}, '/jscript/dist/prototype.js');
     is($data->{children}[6]{attributes}{src}, '/jscript/foo.js');
 
-    $o = IWL::Object->new;
+    $o = $o->new;
     $o->require(css => 'foo.css', js => [qw(base.js foo.js)]);
     $o->unrequire(js => 'base.js');
     $data = $o->getObject;
     is($data->{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
+    is($data->{children}[1]{attributes}{src}, '/jscript/foo.js');
+
+    $o = $o->new;
+    $o2 = IWL::Test::Object2->new;
+    $o->appendChild($o2);
+    $data = $o->getObject;
+    is($data->{children}[0]{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
     is($data->{children}[1]{attributes}{src}, '/jscript/foo.js');
 }
 
@@ -256,3 +263,13 @@ sub PRINT {
 package IWL::Test::Object;
 
 use base 'IWL::Object';
+
+package IWL::Test::Object2;
+
+use base 'IWL::Object';
+
+sub _realize {
+    my $self = shift;
+    $self->require(js => 'foo.js', css => 'foo.css');
+    $self->SUPER::_realize;
+}
