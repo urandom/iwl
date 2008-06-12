@@ -1,12 +1,13 @@
 #! /bin/false
 # vim: set autoindent shiftwidth=4 tabstop=8:
 
-package IWL::ComboView;
+package IWL::IconView;
 
 use strict;
 
 use base 'IWL::Widget';
 
+use IWL::TreeModel;
 use IWL::Container;
 use IWL::Table::Container;
 use IWL::Table::Row;
@@ -15,21 +16,23 @@ use IWL::JSON qw(toJSON);
 
 use Locale::TextDomain qw(org.bloka.iwl);
 
+use constant DEFAULT_COLUMNS => 3;
+
 =head1 NAME
 
-IWL::ComboView - a combo widget
+IWL::IconView - an iconbox widget
 
 =head1 INHERITANCE
 
-L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::ComboView>
+L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::IconView>
 
 =head1 DESCRIPTION
 
-The ComboView widget is similar to the L<IWL::Combo> widget, but uses a L<IWL::TreeModel> to represent its data
+The IconView widget is similar to the L<IWL::Iconbox> widget, but uses a L<IWL::TreeModel> to represent its data
 
 =head1 CONSTRUCTOR
 
-IWL::ComboView->new ([B<%ARGS>])
+IWL::IconView->new ([B<%ARGS>])
 
 Where B<%ARGS> is an optional hash parameter with with key-values.
 
@@ -37,31 +40,23 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 =item B<model>
 
-The L<IWL::TreeModel> for the ComboView
+The L<IWL::TreeModel> for the IconView
 
-=item B<columnWidth>
+=item B<columns>
 
-An array reference of width per column, in pixels
-
-=item B<columnClass>
-
-An array reference of I<CSS> class names per column
-
-=item B<columnMap>
-
-An array reference of column names/indices which will be used to build the combo view
+The number of columns of icons. Defaults to I<3>
 
 =item B<cellAttributes>
 
-An array reference of cell attributes per column. See L<IWL::ComboView::setCellAttributes|IWL::ComboView/setCellAttributes>
+An array reference of cell attributes per column. See L<IWL::IconView::setCellAttributes|IWL::IconView/setCellAttributes>
 
-=item B<contentHeight>
+=item B<textColumn>
 
-The height, in pixels, of the comboview content area
+The name/index of the column in the model, which will be used to display the text for an icon. The model column must be of type B<STRING>. A value of I<-1> will disable the text display
 
-=item B<maxHeight>
+=item B<imageColumn>
 
-The maximum height, in pixels, of the combo popups
+The name/index of the column in the model, which will be used to display the image of the icon. The model column must be of type B<IMAGE>. A value of I<-1> will disable the image display
 
 =back
 
@@ -173,7 +168,7 @@ sub getCellAttributes {
 
 =item B<setActive> (B<PATH>)
 
-Sets the active item of the L<IWL::ComboView>
+Sets the active item of the L<IWL::IconView>
 
 Parameters: B<PATH> - the model path (or an index for flat models) for the item
 
@@ -241,8 +236,6 @@ sub _setupDefaultClass {
     $self->prependClass($self->{_defaultClass} . '_editable')
         if $self->{_options}{editable};
     $self->prependClass($self->{_defaultClass});
-    $self->{__button}->prependClass($self->{_defaultClass} . '_button');
-    $self->{__content}->prependClass($self->{_defaultClass} . '_content ' . $self->{_defaultClass} . '_content_empty');
 }
 
 sub _realize {
@@ -276,25 +269,6 @@ sub _realize {
         }
         $self->{_options}{pageControl} = $self->{__pager}->getId;
     }
-    if ($self->{_options}{columnMap}) {
-        foreach my $column (@{$self->{_options}{columnMap}}) {
-            unless ($column =~ /^[0-9]+$/) {
-                my $index = -1;
-                foreach (@{$model->{columns}}) {
-                    ++$index;
-                    if ($_->{name} eq $column) {
-                        $column = $index;
-                        last;
-                    }
-                }
-            }
-        }
-    } else {
-        $self->{_options}{columnMap} = [0 .. @{$model->{columns}} - 1];
-    }
-
-    $self->{__content}->setStyle(height => $self->{_options}{contentHeight} . 'px')
-        if $self->{_options}{contentHeight};
 
     foreach my $attrs (@{$self->{_options}{cellAttributes}}) {
         next unless 'HASH' eq ref $attrs;
@@ -303,36 +277,24 @@ sub _realize {
     }
     my $options = toJSON($self->{_options});
 
-    $self->_appendInitScript("IWL.ComboView.create('$id', @{[$model->toJSON]}, $options);");
+    $self->_appendInitScript("IWL.IconView.create('$id', @{[$model->toJSON]}, $options);");
 }
 
 sub _init {
     my ($self, %args) = @_;
     my $body          = IWL::Table::Container->new;
-    my $row           = IWL::Table::Row->new;
-    my $button        = IWL::Container->new;
-    my $content       = IWL::Container->new;
 
     $self->setAttributes(cellpadding => 0, cellspacing => 0);
     $self->appendChild($body);
-    $body->appendChild($row);
-    $row->appendCell($content);
-    $row->appendCell($button)->appendClass('comboview_button_cell');
+    $self->{__body} = $body;
 
-    $self->{_defaultClass} = 'comboview';
-    $args{id} ||= randomize('comboview');
+    $self->{_defaultClass} = 'iconview';
+    $args{id} ||= randomize('iconview');
 
     $self->{_tag} = 'table';
-    $self->{_options}  = {columnWidth => [], cellAttributes => []};
-    $self->{__button}  = $button;
-    $self->{__content} = $content;
     $self->{__pageControlEvent} = [];
 
-    $self->{_options}{columnWidth}   = $args{columnWidth}   if 'ARRAY' eq ref $args{columnWidth};
-    $self->{_options}{columnClass}   = $args{columnClass}   if 'ARRAY' eq ref $args{columnClass};
-    $self->{_options}{columnMap}     = $args{columnMap}     if 'ARRAY' eq ref $args{columnMap};
-    $self->{_options}{contentHeight} = $args{contentHeight} if $args{contentHeight};
-    $self->{_options}{maxHeight}     = $args{maxHeight}     if defined $args{maxHeight};
+    $self->{_options}{columns} = defined $args{columns} ? $args{columns} || DEFAULT_COLUMNS;
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -342,13 +304,15 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
+    delete @args{qw(columns cellAttributes model)};
 
-    $self->requiredJs('base.js', 'model.js', 'treemodel.js', 'comboview.js');
+    $self->requiredJs('base.js', 'model.js', 'treemodel.js', 'iconview.js');
     $self->_constructorArguments(%args);
 
     return $self;
 }
+
+addColumnType('IMAGE');
 
 1;
 

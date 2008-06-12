@@ -48,6 +48,7 @@ lib/IWL/HBox.pm
 lib/IWL/Hidden.pm
 lib/IWL/Iconbox.pm
 lib/IWL/Iconbox/Icon.pm
+lib/IWL/IconView.pm
 lib/IWL/IFrame.pm
 lib/IWL/Image.pm
 lib/IWL/Input.pm
