@@ -180,13 +180,18 @@ Sets the L<IWL::PageControl> bind settings, if the used model requires page cont
 
 For parameter documentation, see L<IWL::PageControl::bindToWidget>
 
+Returns a newly created IWL::PageControl with the given options. Users can place it manually, if the default location is not desired.
+
 =cut
 
 sub setPageControlOptions {
     my $self = shift;
+    require IWL::PageControl;
 
     $self->{__pageControlEvent} = \@_;
-    return $self;
+
+    my $pager = IWL::PageControl->new();
+    return $self->{__pager} = $pager;
 }
 
 =item B<setNodeSeparatorCallback> (B<CALLBACK>)
@@ -233,17 +238,20 @@ sub _realize {
         $self->{_options}{pageControlEventName} = $event;
         $self->{_model}->registerEvent($event, @{$self->{__pageControlEvent}});
 
-        require IWL::PageControl;
         my $limit = $model->{options}{limit};
-        my $pager = IWL::PageControl->new(
+        $self->{__pager}->setPageOptions(
             pageCount => int(($model->{options}{totalCount} -1 ) / $limit) + 1,
             pageSize => $limit,
             page => int($model->{options}{offset} / $limit) + 1,
-            id => $id . '_pagecontrol',
-            style => {position => 'absolute', left => '-1000px'},
         );
-        $self->appendAfter($pager);
-        $self->{_options}{pageControl} = $id . '_pagecontrol';
+        my $placed = !(!$self->{__pager}{parentNode});
+        if ($placed) {
+            $self->{_options}{placedPageControl} = 1;
+        } else {
+            $self->appendAfter($self->{__pager});
+            $self->{__pager}->setStyle(position => 'absolute', left => '-1000px');
+        }
+        $self->{_options}{pageControl} = $self->{__pager}->getId;
     }
     if ($self->{_options}{columnMap}) {
         foreach my $column (@{$self->{_options}{columnMap}}) {
@@ -323,7 +331,7 @@ sub _init {
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006-2007  Viktor Kojouharov. All rights reserved.
+Copyright (c) 2006-2008  Viktor Kojouharov. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See perldoc perlartistic.

@@ -252,7 +252,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 container = new Element('div', {className: 'comboview_node_container'});
                 container.childContainers = [];
             }
-            if (this.pageControl && !container.pageContainer) {
+            if (this.pageControl && !container.pageContainer && !this.options.placedPageControl) {
                 var pageContainer = new Element('div', {className: 'comboview_page_container'});
                 pageContainer.appendChild(container);
                 pageContainer.appendChild(this.pageControl);
@@ -764,7 +764,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
             if (this.pageControl && this.options.pageControlEventName)
-                this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
+                this.pageControl.loaded
+                    ? this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
+                    : this.pageControl.signalConnect('iwl:load', function() {
+                            this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
+                      }.bind(this));
 
             nodeMap[id] = {};
 

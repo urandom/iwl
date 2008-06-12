@@ -104,6 +104,51 @@ sub isBound {
     return !(!shift->{__options}{bound});
 }
 
+=item B<setPageOptions> (B<OPTIONS>)
+
+Sets the various paging options
+
+Parameters: B<OPTIONS> - a hash of options:
+
+=over 8
+
+=item B<page>
+
+The initial page of the page control
+
+=item B<pageSize>
+
+The number of items per page
+
+=item B<pageCount>
+
+The total number of pages
+
+=back
+
+=cut
+
+sub setPageOptions {
+    my ($self, %options) = @_;
+
+    $self->{__options}{pageCount} = $options{pageCount} if defined $options{pageCount};
+    $self->{__options}{pageSize}  = $options{pageSize}  if defined $options{pageSize};
+    $self->{__options}{page}      = $options{page}      if defined $options{page};
+
+    return $self;
+}
+
+=item B<getPageOptions>
+
+Returns a hash of the options, related to paging
+
+=cut
+
+sub getPageOptions {
+    my $self = shift;
+    return map { defined $self->{__options}{$_} ? ($_ => $self->{__options}{$_}) : () } qw(page pageCount pageSize);
+}
+
 # Overrides
 #
 sub setId {
