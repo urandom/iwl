@@ -88,7 +88,7 @@ sub bindToWidget {
     $event_name =~ s/::/-/g;
     $self->{__bind}{eventName} = $event_name;
     $self->{__bind}{widgetId} = $id;
-    $self->{__options}{bound} = 1;
+    $self->{_options}{bound} = 1;
 
     $widget->registerEvent($event_name, $url, $params, $options);
     return $self;
@@ -101,7 +101,7 @@ Returns whether the page control is bound to a widget
 =cut
 
 sub isBound {
-    return !(!shift->{__options}{bound});
+    return !(!shift->{_options}{bound});
 }
 
 =item B<setPageOptions> (B<OPTIONS>)
@@ -131,9 +131,9 @@ The total number of pages
 sub setPageOptions {
     my ($self, %options) = @_;
 
-    $self->{__options}{pageCount} = $options{pageCount} if defined $options{pageCount};
-    $self->{__options}{pageSize}  = $options{pageSize}  if defined $options{pageSize};
-    $self->{__options}{page}      = $options{page}      if defined $options{page};
+    $self->{_options}{pageCount} = $options{pageCount} if defined $options{pageCount};
+    $self->{_options}{pageSize}  = $options{pageSize}  if defined $options{pageSize};
+    $self->{_options}{page}      = $options{page}      if defined $options{page};
 
     return $self;
 }
@@ -146,7 +146,7 @@ Returns a hash of the options, related to paging
 
 sub getPageOptions {
     my $self = shift;
-    return map { defined $self->{__options}{$_} ? ($_ => $self->{__options}{$_}) : () } qw(page pageCount pageSize);
+    return map { defined $self->{_options}{$_} ? ($_ => $self->{_options}{$_}) : () } qw(page pageCount pageSize);
 }
 
 # Overrides
@@ -170,14 +170,15 @@ sub setId {
 sub _realize {
     my $self    = shift;
     my $id      = $self->getId;
-    my $options = toJSON($self->{__options});
+    my $options = toJSON($self->{_options});
     my $script;
 
     $self->setStyle(display => 'none');
     $self->SUPER::_realize;
+    $self->{__pageCount}->setText($self->{_options}{pageCount});
     $script = "IWL.PageControl.create('$id', $options);";
     $script .= "\$('$id').bindToWidget('$self->{__bind}{widgetId}', '$self->{__bind}{eventName}');"
-	if $self->{__options}{bound};
+	if $self->{_options}{bound};
     return $self->_appendInitScript($script);
 }
 
@@ -197,7 +198,7 @@ sub _setupDefaultClass {
 sub _init {
     my ($self, %args) = @_;
     my $label = IWL::Container->new;
-    my $page_count = IWL::Label->new->appendText($args{pageCount});
+    my $page_count = IWL::Label->new;
     my $page_entry = IWL::Entry->new->setSize(2);
     my ($first, $prev, $next, $last) = IWL::Button->newMultiple(
 	{size => 'medium'}, {size => 'medium'}, {size => 'medium'}, {size => 'medium'});
@@ -230,10 +231,10 @@ sub _init {
 
     $self->appendChild($first, $prev, $label, $next, $last);
 
-    $self->{__options} = {};
-    $self->{__options}{pageCount} = $args{pageCount};
-    $self->{__options}{pageSize} = $args{pageSize};
-    $self->{__options}{page} = $args{page} || 1;
+    $self->{_options} = {};
+    $self->{_options}{pageCount} = $args{pageCount};
+    $self->{_options}{pageSize} = $args{pageSize};
+    $self->{_options}{page} = $args{page} || 1;
 
     $self->{__bind}{bound} = 0;
     delete @args{qw(pageCount pageSize)};

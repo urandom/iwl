@@ -516,7 +516,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function pageChanging() {
         this.pageChanging = true;
-        IWL.View.disable({element: this.container.pageContainer});
+        var container = this.container.pageContainer || this.container;
+        IWL.View.disable({element: container && container.visible() ? container: null});
     }
 
     function pageChange() {
