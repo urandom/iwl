@@ -72,7 +72,7 @@ The parent for the current object. Null if it has no parent.
 
 sub new {
     my ($class, %args) = @_;
-    my $self  = bless {}, $class;
+    my $self  = bless {}, (ref $class || $class);
 
     $self->{childNodes} = [];
     $self->{parentNode} = undef;
@@ -576,9 +576,9 @@ sub getContent {
 
     return '' if $self->bad;
     if (!$self->{_realized}) {
-        $self->{_realized} = 1;
         $self->_realize;
         $self->__addInitScripts;
+        $self->{_realized} = 1;
     }
 
     return '' if $self->bad;
@@ -672,9 +672,9 @@ sub getObject {
 
     return {} if $self->bad;
     if (!$self->{_realized}) {
-        $self->{_realized} = 1;
         $self->_realize;
         $self->__addInitScripts;
+        $self->{_realized} = 1;
     }
 
     return {} if $self->bad;
@@ -1608,7 +1608,7 @@ sub _realize {
         }
         $self->{_required} = {};
 
-        $top->__addRequired(%required);
+        $self->__addRequired(%required) if %required;
 
         return $self;
     }
@@ -1649,7 +1649,7 @@ sub _realize {
     $self->{___head}   = $head   and weaken $self->{___head};
     $self->{___body}   = $body   and weaken $self->{___body};
 
-    $self->__addRequired(%required);
+    $self->__addRequired(%required) if %required;
 
     return $self;
 }
@@ -1730,9 +1730,10 @@ sub __addInitScripts {
 
 sub __addRequired {
     my ($self, %required) = @_;
-    my @scripts;
+    my $top = $self->{___top} || $self;
+    my ($script, $pivot, $head, $body, @scripts) =
+        ($top->{___script}, $top->{___pivot}, $top->{___head}, $top->{___body});
 
-    my ($script, $pivot, $head, $body) = ($self->{___script}, $self->{___pivot}, $self->{___head}, $self->{___body});
     if (ref $required{js} eq 'ARRAY') {
         require IWL::Script;
         if ($IWLConfig{STATIC_URI_SCRIPT} && $IWLConfig{STATIC_UNION}) {
@@ -1747,7 +1748,7 @@ sub __addRequired {
 
     }
 
-    $self->{___lastShared} = $scripts[-1];
+    $top->{___lastShared} = $scripts[-1];
 
     $script && $script->{parentNode}
         ? $script->{parentNode}->insertBefore($script, @scripts)
@@ -1794,7 +1795,6 @@ sub __addChildren {
     return unless @objects;
 
     my @children;
-    my $top = $self->up(options => {last => 1}) || $self;
     foreach my $object (grep {UNIVERSAL::isa($_, 'IWL::Object')} @objects) {
         $object->remove;
         $object->{parentNode} = $self and weaken $object->{parentNode};
