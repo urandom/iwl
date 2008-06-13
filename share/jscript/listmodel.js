@@ -1,47 +1,35 @@
 // vim: set autoindent shiftwidth=2 tabstop=8:
-IWL.TreeModel = Class.create(IWL.ListModel, (function() {
-  function loadNodes(nodes, parentNode, options) {
+IWL.ListModel = Class.create(IWL.ObservableModel, (function() {
+  function sortResponse(response, params, options) {
+    this.freeze().loadData(response.data);
+    this.thaw().emitSignal('iwl:sort_column_change');
+  }
+
+  function loadNodes(nodes, options) {
     if ('preserve' in options && !options.preserve)
-      parentNode ? parentNode.childNodes.invoke('remove') : this.rootNodes.invoke('remove');
+      this.rootNodes = [];
 
     var length = nodes.length;
-    if (parentNode && length == 0) parentNode.childCount = 0;
     for (var i = 0; i < length; i++) {
-      var n = nodes[i], node = this.insertNode(options.index, parentNode);
-      if (n.childCount == 0)
-        node.childCount = 0;
+      var n = nodes[i], node = this.insertNode(options.index);
       if (n.values && n.values.length)
         node.values = n.values.slice(0, this.columns.length);
       if (n.attributes)
         node.attributes = Object.extend({}, n.attributes);
-      if (n.childNodes && n.childCount)
-        loadNodes.call(this, n.childNodes, node, {});
     }
   }
 
-  function getNodes(parentNode) {
-    var childNodes = parentNode ? parentNode.childNodes : this.rootNodes;
+  function getNodes() {
     var ret = [];
 
-    childNodes.each(function(n) {
-      var node = {};
+    for (var i = 0, l = this.rootNodes.length; i < l; i++) {
+      var n = this.rootNodes[i], node = {};
       node.values = n.values;
       node.attributes = n.attributes;
-      node.childCount = n.childCount;
-      if (n.childNodes && n.childCount)
-        node.childNodes = getNodes.call(this, n);
       ret.push(node);
-    }.bind(this));
-
+    }
+    
     return ret;
-  }
-
-  function flatIterator(node) {
-    return node.childCount != 0;
-  }
-
-  function flatLocalIterator(node) {
-    return node.childCount > 0;
   }
 
   function RPCStartCallback(event, params, options) {
@@ -54,87 +42,178 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
     }
   }
 
-  function requestChildrenResponse(json, params, options) {
+  function refreshResponse(json, params, options) {
     this.loadData(json.data);
   }
 
   return {
     initialize: function($super, columns, data) {
-      $super(columns, data);
+      $super();
+      if (Object.isObject(columns) && columns.columns) {
+        data = columns;
+        columns = columns.columns;
+      }
 
-      this._emitter._requestChildrenResponse = requestChildrenResponse.bind(this);
+      this.rootNodes = [];
+      this.columns = new Array(columns.length);
+      this.sortMethods = [];
+      for (var i = 0, l = columns.length; i < l; i++) {
+        this.setColumn(i, columns[i]);
+      }
+      this.options = {};
+      this.loadData(data);
+      this._emitter._refreshResponse = refreshResponse.bind(this);
     },
 
+    addColumnType: function() {
+      IWL.ListModel.addColumnType.apply(this, arguments);
+      return this;
+    },
+    getColumnType: function(index) {
+      return this.columns[index] ? this.columns[index].type : undefined;
+    },
+    getColumnName: function(index) {
+      return this.columns[index] ? this.columns[index].name : undefined;
+    },
+    getColumnCount: function() {
+      return this.columns.length;
+    },
+    setColumn: function(index, type, name) {
+      if (Object.isObject(type))
+        this.columns[index] = type;
+      else
+        this.columns[index] = {
+          type: type,
+          name: name
+        };
+    },
+
+    getFirstNode: function() {
+      return this.rootNodes[0];
+    },
+    getRootNodes: function() {
+      return this.rootNodes;
+    },
     getNodeByPath: function(path) {
-      if (!Object.isArray(path)) return;
-      var node = this.rootNodes[path.shift()];
-      for (var i = 0, l = path.length; node && i < l; i++)
-        node = node.childNodes[path[i]];
-
-      return node;
-    },
-    isFlat: function() {
-      return this.hasEvent('IWL-TreeModel-requestChildren')
-        ? !this.rootNodes.any(flatIterator)
-        : !this.rootNodes.any(flatLocalIterator);
+      if (Object.isArray(path)) path = path[0];
+      return this.rootNodes[path];
     },
 
-    insertNode: function(index, parentNode) {
-      return new IWL.TreeModel.Node(this, index, parentNode);
+    /* Sortable Interface */
+    setSortMethod: function(index, options) {
+      this.sortMethods[index] = options;
+      if (Object.isString(options.url) && !options.url.blank()) {
+        this.registerEvent('IWL-ListModel-sortColumn', options.url, {}, {
+          responseCallback: sortResponse.bind(this),
+          id: this.options.id
+        });
+      }
+      return this;
+    },
+    setDefaultOrderMethod: function(options) {
+      this.defaultOrderMethod = options;
+      if (Object.isString(options.url) && !options.url.blank()) {
+        this.registerEvent('IWL-ListModel-sortColumn', options.url, {}, {
+          responseCallback: sortResponse.bind(this),
+          id: this.options.id
+        });
+      }
+      return this;
+    },
+    getSortColumn: function() {
+      return this.sortColumn || {index: -1};
+    },
+    setSortColumn: function(index, sortType) {
+      var options;
+      if (index == -1)
+        options = this.defaultOrderMethod;
+      else
+        options = this.sortMethods[index];
+
+      if (!options) return;
+      this.sortColumn = {index: index, sortType: sortType || IWL.ListModel.SortTypes.DESCENDING};
+      var asc = this.sortColumn.sortType == IWL.ListModel.SortTypes.ASCENDING;
+
+      if (Object.isString(options.url) && !options.url.blank()) {
+        var emitOptions = {};
+        if (index == -1)
+          emitOptions.defaultOrder = 1;
+
+        emitOptions.ascending = asc ? 1 : 0;
+        return this.emitEvent('IWL-ListModel-sortColumn', {}, emitOptions);
+      } else if (!Object.isFunction(options.sortable)) return;
+
+      var wrapper = function(a, b) {
+        var ret = options.sortable(a.values[index], b.values[index]);
+        return asc ? ret * -1 : ret;
+      };
+      sortDepth.call(this, this.rootNodes, wrapper);
+
+      return this.emitSignal('iwl:sort_column_change');
+    },
+    /* !Sortable Interface */
+
+    removeNode: function(node) {
+      return node.remove();
     },
 
-    insertNodeBefore: function(sibling, parentNode) {
-      return new IWL.TreeModel.Node(this, sibling.getIndex(), parentNode);
+    insertNode: function(index) {
+      return new IWL.ListModel.Node(this, index);
     },
 
-    insertNodeAfter: function(sibling, parentNode) {
-      return new IWL.TreeModel.Node(this, sibling.getIndex() + 1, parentNode);
+    insertNodeBefore: function(sibling) {
+      return new IWL.ListModel.Node(this, sibling.getIndex());
     },
 
-    prependNode: function(parentNode) {
-      return new IWL.TreeModel.Node(this, 0, parentNode);
+    insertNodeAfter: function(sibling) {
+      return new IWL.ListModel.Node(this, sibling.getIndex() + 1);
     },
 
-    appendNode: function(parentNode) {
-      return new IWL.TreeModel.Node(this, -1, parentNode);
+    prependNode: function() {
+      return new IWL.ListModel.Node(this, 0);
     },
 
-    reorder: function(order, parentNode) {
-      if (Object.isArray(parentNode)) {
-        order = parentNode;
-        parentNode = undefined;
-      } else if (!Object.isArray(order)) return;
+    appendNode: function() {
+      return new IWL.ListModel.Node(this, -1);
+    },
+
+    clear: function() {
+      this.freeze();
+      this.rootNodes.invoke('remove');
+      return this.thaw().emitSignal('iwl:load_data');
+    },
+
+    reorder: function(order) {
+      if (!Object.isArray(order)) return;
       this.freeze();
 
-      var children = parentNode ? parentNode.childNodes : this.rootNodes,
+      var children = this.rootNodes,
           length = order.length;
       if (length != children.length) return;
       for (var i = 0; i < length; i++) {
         var child = children[order[i]];
-        child.insert(this, i, parentNode);
+        child.insert(this, i);
       }
 
-      return this.thaw().emitSignal('iwl:nodes_reorder', parentNode);
+      return this.thaw().emitSignal('iwl:nodes_reorder');
     },
 
     swap: function(node1, node2) {
-      if (node2.isDescendant(node1) || node1.isDescendant(node2)) return;
       this.freeze();
 
-      var index1 = node1.getIndex(), parent1 = node1.parentNode,
-          index2 = node2.getIndex(), parent2 = node2.parentNode;
-      node1.insert(this, index2, parent2);
-      node2.insert(this, index1, parent1);
+      var index1 = node1.getIndex(),
+          index2 = node2.getIndex();
+      node1.insert(this, index2);
+      node2.insert(this, index1);
 
       return this.thaw().emitSignal('iwl:nodes_swap', node1, node2);
     },
 
-    move: function(node, index, parentNode) {
+    move: function(node, index) {
       this.freeze();
 
-      var previous = node.parentNode;
-      node.insert(this, index, parentNode);
-      return this.thaw().emitSignal('iwl:node_move', node, parentNode, previous);
+      node.insert(this, index);
+      return this.thaw().emitSignal('iwl:node_move', node);
     },
 
     loadData: function(data) {
@@ -159,21 +238,18 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
           IWL.RPC.registerEvent(this._emitter, name, events[name][0], events[name][1], options);
         }
       }
-      var parentNode = this.getNodeByPath(data.options.parentNode);
 
       this.freeze();
       if (Object.isArray(data.nodes))
-        loadNodes.call(this, data.nodes, parentNode, this.options);
+        loadNodes.call(this, data.nodes, this.options);
 
-      return this.thaw().emitSignal('iwl:load_data', parentNode);
+      return this.thaw().emitSignal('iwl:load_data');
     },
 
     getData: function() {
       var data = Object.extend({}, arguments[0]);
-      if (Object.isArray(data.parentNode))
-        data.parentNode = this.getNodeByPath(data.parentNode);
 
-      data.nodes = getNodes.call(this, data.parentNode);
+      data.nodes = getNodes.call(this);
 
       return data;
     },
@@ -181,14 +257,14 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
     _each: function(iterator) {
       for (var i = 0, l = this.rootNodes.length; i < l; i++) {
         iterator(this.rootNodes[i]);
-        this.rootNodes[i]._each(iterator);
       }
     },
     _localSort: function(nodes, wrapper) {
       var previous;
 
       nodes.sort(wrapper);
-      nodes.each(function(node) {
+      for (var i = 0, l = nodes.length; i < l; i++) {
+        var node = nodes[i];
         if (previous) {
           previous.nextSibling = node;
           node.previousSibling = previous;
@@ -196,14 +272,41 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
         node.nextSibling = undefined;
 
         previous = node;
-        if (node.childCount)
-          this._localSort(node.childNodes, wrapper);
-      });
+      }
     }
   };
 })());
 
-IWL.TreeModel.Node = Class.create(Enumerable, (function() {
+Object.extend(IWL.ListModel, (function() {
+  var index = -1;
+  return {
+    SortTypes: {
+      DESCENDING: 1,
+      ASCENDING:  2
+    },
+    DataTypes: {
+      NONE:     ++index,
+      STRING:   ++index,
+      INT:      ++index,
+      FLOAT:    ++index,
+      BOOLEAN:  ++index,
+      COUNT:    ++index
+    },
+    addColumnType: function() {
+      var types = $A(arguments);
+      while (types)
+        IWL.ListModel.Types[types.shift()] = ++index;
+    },
+    overrideDefaultDataTypes: function(types) {
+      IWL.ListModel.DataTypes = types;
+      index = Math.max.apply(Math, Object.values(types));
+    }
+  }
+})());
+
+IWL.ListModel.Node = Class.create(Enumerable, (function() {
+  var counter = 0;
+
   function RPCStartCallback(event, params, options) {
     if (event.endsWith('refresh')) {
       options.totalCount = this.model.options.totalCount;
@@ -216,22 +319,23 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
 
   return {
-    initialize: function($super, model, index, parentNode) {
-      $super(model, index);
-      this.childCount = null;
+    initialize: function(model, index) {
+      this.childNodes = [], this.values = [],
+      this.attributes = {id: ++counter};
+
+      if (model)
+        this.insert.apply(this, $A(arguments));
     },
 
     insert: function(model, index, parentNode) {
       if (!model) return;
 
-      if (this.childCount == null
-          && !model.hasEvent('IWL-TreeModel-requestChildren'))
+      if (this.childCount == null)
         this.childCount = 0;
 
       this.remove();
       if (this.model != model) {
-        this._addModel(model, this);
-        this.each(this._addModel.bind(this, model));
+        this._addModel(model);
       }
 
       var previous, next, nodes;
@@ -287,8 +391,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
       this.parentNode = this.nextSibling = this.previousSibling = undefined;
       if (!model.frozen) {
-        removeModel(this);
-        this.each(removeModel);
+        this.removeModel();
       }
 
       model.emitSignal('iwl:node_remove', this, parentNode);
@@ -351,21 +454,6 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
     hasChildren: function() {
       if (!this.model) return -1;
       return this.childCount;
-    },
-    requestChildren: function() {
-      if (this.childCount != null
-       || !this.model
-       || !this.model.hasEvent('IWL-TreeModel-requestChildren'))
-         return;
-      this.model.emitSignal('iwl:request_children', this);
-      var emitOptions = {
-        columns: this.model.columns,
-        id: this.model.options.id,
-        parentNode: this.getPath(),
-        values: this.values
-      };
-
-      return this.model.emitEvent('IWL-TreeModel-requestChildren', {}, emitOptions);
     },
 
     getValues: function() {
@@ -465,11 +553,24 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       return path;
     },
 
-    _each: function(iterator) {
-      for (var i = 0, l = this.childNodes.length; i < l; i++) {
-        iterator(this.childNodes[i]);
-        this.childNodes[i]._each(iterator);
+    _addModel: function(model) {
+      this.model = model;
+      if (this.columns) {
+        if (!this._compareColumns(this.columns, model.columns))
+          this.values = [];
       }
+    },
+    _removeModel: function() {
+      this.model = undefined;
+    },
+    _compareColumns: function(column1, column2) {
+      if (columns1.length != columns2.length) return false;
+      for (var i = 0, l = columns1.length; i < l; i++) {
+        if (columns1[i].type != columns2[i].type)
+          return false;
+      }
+
+      return true;
     }
   };
 })());

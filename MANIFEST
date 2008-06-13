@@ -57,6 +57,8 @@ lib/IWL/JSON.pm
 lib/IWL/Label.pm
 lib/IWL/List.pm
 lib/IWL/List/Definition.pm
+lib/IWL/ListModel.pm
+lib/IWL/ListModel/Node.pm
 lib/IWL/Menu.pm
 lib/IWL/Menu/Item.pm
 lib/IWL/Menubar.pm
@@ -282,11 +284,13 @@ t/03stock.t
 t/10object.t
 t/10response.t
 t/10stash.t
+t/10listmodel.t
 t/20comment.t
 t/20page_link.t
 t/20page_meta.t
 t/20rpc.t
 t/20text.t
+t/20treemodel.t
 t/21page_head.t
 t/21page_title.t
 t/21script.t
@@ -350,3 +354,4 @@ t/50radiobutton.t
 t/50spinner.t
 t/iwl.conf
 t/test.html
+t/data.json
