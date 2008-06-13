@@ -255,7 +255,7 @@ sub _realize {
     $self->SUPER::_realize;
 
     my $model = $self->{_model};
-    if ($model->{options}{limit} && $model->isFlat && @{$self->{__pageControlEvent}}) {
+    if ($model->{options}{limit} && ($model->can('isFlat') ? $model->isFlat : 1) && @{$self->{__pageControlEvent}}) {
         my $event = ref($self->{_model}) . "::refresh";
         $event =~ s/::/-/g;
         $self->{_options}{pageControlEventName} = $event;
@@ -344,7 +344,7 @@ sub _init {
 
     delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
 
-    $self->requiredJs('base.js', 'model.js', 'treemodel.js', 'comboview.js');
+    $self->requiredJs('base.js', 'model.js', 'listmodel.js', 'treemodel.js', 'comboview.js');
     $self->_constructorArguments(%args);
 
     return $self;

@@ -203,7 +203,7 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
   };
 })());
 
-IWL.TreeModel.Node = Class.create(Enumerable, (function() {
+IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
   function RPCStartCallback(event, params, options) {
     if (event.endsWith('refresh')) {
       options.totalCount = this.model.options.totalCount;
@@ -217,24 +217,25 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
   return {
     initialize: function($super, model, index, parentNode) {
-      $super(model, index);
+      this.childNodes = [];
       this.childCount = null;
+      $super(model, index, parentNode);
     },
 
     insert: function(model, index, parentNode) {
       if (!model) return;
 
-      if (this.childCount == null
+      if (this.childCount === null
           && !model.hasEvent('IWL-TreeModel-requestChildren'))
         this.childCount = 0;
 
       this.remove();
       if (this.model != model) {
-        this._addModel(model, this);
+        this._addModel(model);
         this.each(this._addModel.bind(this, model));
       }
 
-      var previous, next, nodes;
+      var nodes;
       if (isNaN(index) || index < 0)
         index = -1;
 
@@ -244,23 +245,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
         parentNode.childCount++;
       } else nodes = model.rootNodes;
 
-      index > -1
-        ? nodes.splice(index, 0, this)
-        : nodes.push(this);
-      if (index > -1) {
-        previous = nodes[index - 1];
-        next = nodes[index + 1];
-      } else previous = nodes[nodes.length - 2];
-
-      if (previous) {
-        previous.nextSibling = this;
-        this.previousSibling = previous;
-      }
-
-      if (next) {
-        next.previousSibling = this;
-        this.nextSibling = next;
-      }
+      this._addNodeRelationship(index, nodes);
 
       this.columns = model.columns.clone();
 
@@ -281,14 +266,12 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       } else
         model.rootNodes = model.rootNodes.without(this);
 
-      var next = this.nextSibling, previous = this.previousSibling;
-      if (next) next.previousSibling = previous;
-      if (previous) previous.nextSibling = next;
+        this._removeNodeRelationship();
 
-      this.parentNode = this.nextSibling = this.previousSibling = undefined;
+      this.parentNode = undefined;
       if (!model.frozen) {
-        removeModel(this);
-        this.each(removeModel);
+        this.removeModel();
+        this.each(this.removeModel.bind(this));
       }
 
       model.emitSignal('iwl:node_remove', this, parentNode);
@@ -304,26 +287,6 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       return this.model.thaw().emitSignal('iwl:load_data', this);
     },
 
-    next: function(index) {
-      if (!this.model) return;
-      var ret = this.nextSibling;
-      if (index > 0)
-        while (index--) {
-          if (!ret) break;
-          ret = ret.nextSibling;
-        }
-      return ret;
-    },
-    previous: function(index) {
-      if (!this.model) return;
-      var ret = this.previousSibling;
-      if (index > 0)
-        while (index--) {
-          if (!ret) break;
-          ret = ret.previousSibling;
-        }
-      return ret;
-    },
     down: function(index) {
       if (!this.model) return;
       var ret = this.childNodes[0];
@@ -353,7 +316,7 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       return this.childCount;
     },
     requestChildren: function() {
-      if (this.childCount != null
+      if (this.childCount !== null
        || !this.model
        || !this.model.hasEvent('IWL-TreeModel-requestChildren'))
          return;
@@ -366,58 +329,6 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
       };
 
       return this.model.emitEvent('IWL-TreeModel-requestChildren', {}, emitOptions);
-    },
-
-    getValues: function() {
-      if (!this.model) return;
-      var args = $A(arguments);
-      if (!args.length)
-        return this.values;
-      var ret = [];
-      while (args.length)
-        ret.push(this.values[args.shift()]);
-      return ret;
-    },
-    setValues: function() {
-      if (!this.model) return;
-      var args = $A(arguments);
-      var v = this.values;
-      while (args.length) {
-        var tuple = args.splice(0, 2);
-        if (!this.columns[tuple[0]])
-          continue;
-        v[tuple[0]] = tuple[1];
-      }
-
-      this.model.emitSignal('iwl:node_change', this);
-
-      return this;
-    },
-
-    getAttributes: function() {
-      var args = $A(arguments);
-      if (!args.length)
-        return this.attributes;
-      var ret = [];
-      while(args.length) {
-        var key = args.shift();
-        ret.push(this.attributes[key]);
-      }
-
-      return ret;
-    },
-
-    setAttributes: function() {
-      var args = $A(arguments);
-      var attrs = {};
-      if (args.length == 1 && Object.isObject(args[0]))
-        attrs = args[0];
-      else while (args.length) {
-        var pair = args.splice(0, 2);
-        attrs[pair[0]] = pair[1];
-      }
-      Object.extend(this.attributes, attrs);
-      return this;
     },
 
     isAncestor: function(descendant) {

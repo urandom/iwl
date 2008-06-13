@@ -49,6 +49,11 @@ sub remove {
     return $self;
 }
 
+sub clear {
+    my $self = shift;
+    return $self->each(sub { shift->remove });
+}
+
 sub getIndex {
     my $self = shift;
     return -1 unless $self->{model};
@@ -116,6 +121,7 @@ sub each {
         next if $ret && 'next' eq $ret;
         $_->each($iterator);
     }
+    return $self;
 }
 
 sub toObject {

@@ -94,7 +94,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function loadData(event, parentNode) {
-        var flat = this.model.isFlat();
+        var flat = this.model.isFlat ? this.model.isFlat() : true;
         var template = generateNodeTemplate.call(this, flat)
         if (parentNode) {
             var view = nodeMap[this.id][parentNode.attributes.id];
@@ -144,16 +144,16 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 cellTemplate['column' + i] = render.evaluate(options);
             } else {
                 var index = cMap[i];
-                var type = this.model.columns[index] ? this.model.columns[index].type : IWL.TreeModel.DataTypes.NONE;
-                if (type == IWL.TreeModel.DataTypes.STRING)
+                var type = this.model.columns[index] ? this.model.columns[index].type : IWL.ListModel.DataTypes.NONE;
+                if (type == IWL.ListModel.DataTypes.STRING)
                     cellTemplate['column' + i] = values[i].toString();
-                else if (type == IWL.TreeModel.DataTypes.INT)
+                else if (type == IWL.ListModel.DataTypes.INT)
                     cellTemplate['column' + i] = parseInt(values[i])
-                else if (type == IWL.TreeModel.DataTypes.FLOAT)
+                else if (type == IWL.ListModel.DataTypes.FLOAT)
                     cellTemplate['column' + i] = parseFloat(values[i])
-                else if (type == IWL.TreeModel.DataTypes.BOOLEAN)
+                else if (type == IWL.ListModel.DataTypes.BOOLEAN)
                     cellTemplate['column' + i] = values[i].toString();
-                else if (type == IWL.TreeModel.DataTypes.COUNT) {
+                else if (type == IWL.ListModel.DataTypes.COUNT) {
                     cellTemplate['column' + i] = node.getIndex() + 1 + (this.model.options.offset || 0);
                 }
             }
@@ -170,10 +170,15 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element: element,
             container: container
         });
-        var childContainer = nView.childContainer;
-        var hasChildren = node.hasChildren();
         if (element.hasClassName('comboview_node_separator'))
             return;
+        if (this.model.constructor == IWL.ListModel) {
+            var childContainer = null;
+            var hasChildren = false;
+        } else {
+            var childContainer = nView.childContainer;
+            var hasChildren = node.hasChildren();
+        }
 
         element.sensitive = true;
         element.signalConnect('dom:mouseenter', function(event) {
@@ -195,7 +200,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 /* Race condition by incorrect event sequence in IE */
                 container.popUpDelay = popUp.bind(this, childContainer).delay(this.options.popUpDelay);
             }.bind(this));
-        } else if (null == node.childCount) {
+        } else if (null === node.childCount) {
             var callback = function(event) {
                 container.popUpDelay = (function() {
                     element.signalDisconnect('dom:mouseenter', callback);
@@ -557,7 +562,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeChange(event, node) {
-        var flat = this.model.isFlat(), view = nodeMap[this.id][node.attributes.id];
+        var flat = this.model.isFlat ? this.model.isFlat() : true,
+            view = nodeMap[this.id][node.attributes.id];
         var template = generateNodeTemplate.call(this, flat)
         var highlight = view.element.highlight;
         recreateNode.call(this, node, template, flat, view.container);
@@ -568,7 +574,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeInsert(event, node, parentNode) {
-        var flat = this.model.isFlat();
+        var flat = this.model.isFlat ? this.model.isFlat() : true;
         var template = generateNodeTemplate.call(this, flat)
         var id = this.id, nId = node.attributes.id;
         var container = parentNode ? createContainer.call(this, parentNode) : this.container;
@@ -600,7 +606,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             generatePathAttributes.call(this, parentNode);
         else {
             removeContainers.call(this, container);
-            var flat = this.model.isFlat();
+            var flat = this.model.isFlat ? this.model.isFlat() : true;
             var template = generateNodeTemplate.call(this, flat)
             var container = parentNode ? createContainer.call(this, parentNode) : this.container;
             recreateNode.call(this, parentNode || node, template, flat, container);
@@ -647,6 +653,11 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.model = this.container = undefined;
     }
 
+    function setPager() {
+        this.pageControl.unbind();
+        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
+    }
+
     return {
         /**
          * Pops up (shows) the dropdown list
@@ -675,7 +686,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         setActive: function(path) {
             var node;
-            if (path instanceof IWL.TreeModel.Node) {
+            if (path instanceof IWL.ListModel.Node) {
                 node = path;
                 this.selectedPath = node.getPath();
             } else {
@@ -705,7 +716,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         setSensitivity: function(path, sensitive) {
             var node;
-            if (path instanceof IWL.TreeModel.Node) {
+            if (path instanceof IWL.ListModel.Node) {
                 node = path;
             } else {
                 if (!Object.isArray(path)) path = [path];
@@ -730,8 +741,27 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 removeModel.call(this);
             if (model instanceof IWL.ObservableModel) {
                 this.model = model;
-                loadData.call(this, null);
+                if (this.pageControl && this.options.pageControlEventName) {
+                    if (this.pageControl.loaded) {
+                        setPager.call(this);
+                    } else {
+                        this.pageControl.signalConnect('iwl:load', setPager.bind(this));
+                    }
+                }
+
                 setContent.call(this);
+                loadData.call(this, null);
+
+                var callback = loadData.bind(this);
+                this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
+                this.model.signalConnect('iwl:load_data', callback);
+                this.model.signalConnect('iwl:sort_column_change', callback);
+                this.model.signalConnect('iwl:nodes_reorder', callback);
+                this.model.signalConnect('iwl:nodes_swap',  nodesSwap.bind(this));
+                this.model.signalConnect('iwl:node_move',   nodeMove.bind(this));
+                this.model.signalConnect('iwl:node_change', nodeChange.bind(this));
+                this.model.signalConnect('iwl:node_insert', nodeInsert.bind(this));
+                this.model.signalConnect('iwl:node_remove', nodeRemove.bind(this));
             }
 
             return this;
@@ -753,8 +783,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 popUpDelay: 0.2
             }, arguments[2]);
             if (Object.keys(model.options.columnTypes).length)
-                IWL.TreeModel.overrideDefaultDataTypes(model.options.columnTypes);
-            this.model = new IWL.TreeModel(model);
+                IWL.ListModel.overrideDefaultDataTypes(model.options.columnTypes);
             this.button = this.down('.comboview_button');
             this.content = this.down('.comboview_content');
             this.containers = {};
@@ -763,17 +792,17 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
-            if (this.pageControl && this.options.pageControlEventName)
-                this.pageControl.loaded
-                    ? this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
-                    : this.pageControl.signalConnect('iwl:load', function() {
-                            this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
-                      }.bind(this));
 
             nodeMap[id] = {};
 
             connectSignals.call(this);
-            setContent.call(this);
+            normalizeCellAttributes.call(this);
+
+            if (model) {
+                if (!(model instanceof IWL.ListModel))
+                    model = new (model.classType.objectize())(model);
+                this.setModel(model);
+            }
 
             this.state = 0;
 
@@ -787,19 +816,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 ? this.options.nodeSeparatorCallback.objectize()
                 : Object.isFunction(this.options.nodeSeparatorCallback)
                     ? this.options.nodeSeparatorCallback : null;
-
-            normalizeCellAttributes.call(this);
-            loadData.call(this, null);
-            var callback = loadData.bind(this);
-            this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
-            this.model.signalConnect('iwl:load_data', callback);
-            this.model.signalConnect('iwl:sort_column_change', callback);
-            this.model.signalConnect('iwl:nodes_reorder', callback);
-            this.model.signalConnect('iwl:nodes_swap',  nodesSwap.bind(this));
-            this.model.signalConnect('iwl:node_move',   nodeMove.bind(this));
-            this.model.signalConnect('iwl:node_change', nodeChange.bind(this));
-            this.model.signalConnect('iwl:node_insert', nodeInsert.bind(this));
-            this.model.signalConnect('iwl:node_remove', nodeRemove.bind(this));
 
             document.observe('click', function(event) {
                 if (!Event.isLeftClick(event)) return;

@@ -255,6 +255,7 @@ share/jscript/entry.js
 share/jscript/google/map.js
 share/jscript/iconbox.js
 share/jscript/iconview.js
+share/jscript/listmodel.js
 share/jscript/menu.js
 share/jscript/model.js
 share/jscript/navbar.js

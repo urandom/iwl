@@ -67,6 +67,14 @@ sub each {
     }
 }
 
+sub dataReader {
+    my ($self, %options) = @_;
+    $options{optionsList} = [qw(totalCount limit offset parentNode)]
+        unless exists $options{optionsList};
+
+    $self->SUPER::dataReader(%options);
+}
+
 sub getScript {
     my $self = shift;
 
@@ -116,6 +124,7 @@ sub _init {
     delete $args{parentNode};
 
     $self->SUPER::_init($columns, %args);
+    $self->{_classType} = 'IWL.TreeModel';
 }
 
 sub _requestChildrenEvent {
@@ -140,6 +149,14 @@ sub _registerEvent {
     }
 
     return $options;
+}
+
+sub _refreshEvent {
+    IWL::ListModel::_refreshEvent(@_);
+}
+
+sub _sortColumnEvent {
+    IWL::ListModel::_sortColumnEvent(@_);
 }
 
 =head1

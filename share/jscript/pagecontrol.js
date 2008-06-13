@@ -118,6 +118,19 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
         /**
+         * Unbinds the page control from the current bound element
+         * @returns The object
+         * */
+        unbind: function() {
+            if (!this.element) return;
+
+            this.options.bound = false;
+            this.element = null;
+            this.eventName = '';
+            refresh.call(this);
+            return this;
+        },
+        /**
          * Sets the page count for the page control widget
          * @param {int} count The number of pages
          * @returns The object

@@ -168,6 +168,7 @@ sub dataReader {
             $self->_pushFatalError($@);
 
         $data = Storable::thaw($content);
+        return $self->_pushFatalError(__"No data available") unless $data;
         if ($options{subtype} eq 'array') {
             $self->_readArray($data, %options);
         } else {
@@ -175,15 +176,19 @@ sub dataReader {
         }
     } elsif ($options{type} eq 'json') {
         $data = evalJSON($content, 1);
+        return $self->_pushFatalError(__"No data available") unless $data;
         if ($options{subtype} eq 'array') {
             $self->_readArray($data, %options);
         } else {
             $modifiers = $self->_readHashList($data, %options);
         }
-    } elsif ($options{type} eq 'array') {
-        $self->_readArray($data, %options);
     } else {
-        $modifiers = $self->_readHashList($data, %options);
+        return $self->_pushFatalError(__"No data available") unless $data;
+        if ($options{type} eq 'array') {
+            $self->_readArray($data, %options);
+        } else {
+            $modifiers = $self->_readHashList($data, %options);
+        }
     }
     foreach (keys %$modifiers) {
         delete $modifiers->{$_} unless defined $modifiers->{$_};
@@ -194,8 +199,10 @@ sub dataReader {
     };
     $self->{options}{preserve} = $options{preserve} if defined $options{preserve};
 
+    $options{optionsList} = [qw(totalCount limit offset)]
+        unless exists $options{optionsList};
     $self->{options}{$_} = $options{$_} foreach
-        grep {defined $options{$_}} qw(totalCount limit offset parentNode);
+        grep {defined $options{$_}} @{$options{optionsList}};
 
     return $self;
 }
@@ -237,6 +244,7 @@ sub toObject {
     my $object = {options => {%{$self->{options}}, columnTypes => $Types}};
     $object->{columns} = $self->{columns};
     $object->{nodes} = [map {$_->toObject} @{$self->{rootNodes}}];
+    $object->{classType} = $self->{_classType};
 
     return $object;
 }
@@ -276,17 +284,19 @@ sub _init {
 
     $self->{columns} = [];
     $self->{rootNodes} = [];
+    $self->{_classType} = 'IWL.ListModel';
     $columns = [] unless 'ARRAY' eq ref $columns;
 
     return $self->_pushFatalError(__"No columns have been given.")
         unless @$columns;
     my $index = 0;
-    foreach (@$columns) {
+    my @typeValues = values %$Types;
+    foreach my $column (@$columns) {
         # TRANSLATORS: {COLUMN} is a placeholder
-        return $self->_pushFatalError(__x("Unknown column type: {COLUMN}", COLUMN => $_->{type}))
-            unless exists $Types->{$_->{type}};
-        $_->{type} = $Types->{$_->{type}};
-        $self->{columns}[$index++] = $_;
+        return $self->_pushFatalError(__x("Unknown column type: {COLUMN}", COLUMN => $column->{type}))
+            unless exists $Types->{$column->{type}} || grep {$_ eq $column->{type}} @typeValues;
+        $column->{type} = $Types->{$column->{type}};
+        $self->{columns}[$index++] = $column;
     }
 }
 
@@ -307,7 +317,8 @@ sub _refreshEvent {
         last => $params{pageCount}
     }->{$params{type}};
     $options{offset} = ($page - 1) * $options{limit};
-    my $model = ($options{class} || __PACKAGE__)->new($options{columns}, preserve => 0, map {$_ => $options{$_}} qw(id totalCount limit offset));
+    my $package = __eventNameToPackage($event);
+    my $model = ($options{class} || $package)->new($options{columns}, preserve => 0, map {$_ => $options{$_}} qw(id totalCount limit offset));
 
     $model = ('CODE' eq ref $handler)
       ? $handler->(\%params, $model)
@@ -326,7 +337,8 @@ sub _sortColumnEvent {
     my ($event, $handler) = @_;
     my %options = %{$event->{options}};
     my %params = %{$event->{params}};
-    my $model = ($options{class} || __PACKAGE__)->new($options{columns}, preserve => 0, id => $options{id}, parentNode => $options{parentNode});
+    my $package = __eventNameToPackage($event);
+    my $model = ($options{class} || $package)->new($options{columns}, preserve => 0, id => $options{id}, parentNode => $options{parentNode});
 
     $model = ('CODE' eq ref $handler)
       ? $handler->(\%params, $model)
@@ -416,7 +428,7 @@ sub _readHashList {
 
     foreach my $item (@$list) {
         next unless 'HASH' eq ref $item;
-        my $node = $self->appendNode();
+        my $node = $self->appendNode;
         if (ref $item->{$values} eq 'ARRAY') {
             if ($indices) {
                 my $i = 0;
@@ -435,6 +447,15 @@ sub _readHashList {
     }
 
     return $modifiers;
+}
+
+# Internal
+#
+sub __eventNameToPackage {
+    my $name = shift->{eventName};
+    $name =~ s/-/::/g;
+    my ($package, undef) = $name =~ /(.*)::([^:]*)$/;
+    return $package;
 }
 
 addColumnType(qw(NONE STRING INT FLOAT BOOLEAN COUNT));

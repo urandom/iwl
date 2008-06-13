@@ -313,7 +313,7 @@ sub _init {
 
     delete @args{qw(columns orientation cellAttributes model)};
 
-    $self->requiredJs('base.js', 'model.js', 'treemodel.js', 'iconview.js');
+    $self->requiredJs('base.js', 'model.js', 'listmodel.js', 'iconview.js');
     $self->_constructorArguments(%args);
 
     return $self;

@@ -320,57 +320,27 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
 
   return {
     initialize: function(model, index) {
-      this.childNodes = [], this.values = [],
-      this.attributes = {id: ++counter};
+      this.values = [], this.attributes = {id: ++counter};
 
       if (model)
         this.insert.apply(this, $A(arguments));
     },
 
-    insert: function(model, index, parentNode) {
+    insert: function(model, index) {
       if (!model) return;
 
-      if (this.childCount == null)
-        this.childCount = 0;
-
       this.remove();
-      if (this.model != model) {
+      if (this.model != model)
         this._addModel(model);
-      }
 
-      var previous, next, nodes;
       if (isNaN(index) || index < 0)
         index = -1;
 
-      if (parentNode) {
-        this.parentNode = parentNode;
-        nodes = parentNode.childNodes;
-        parentNode.childCount++;
-      } else nodes = model.rootNodes;
-
-      index > -1
-        ? nodes.splice(index, 0, this)
-        : nodes.push(this);
-      if (index > -1) {
-        previous = nodes[index - 1];
-        next = nodes[index + 1];
-      } else previous = nodes[nodes.length - 2];
-
-      if (previous) {
-        previous.nextSibling = this;
-        this.previousSibling = previous;
-      }
-
-      if (next) {
-        next.previousSibling = this;
-        this.nextSibling = next;
-      }
+      this._addNodeRelationship(index, model.rootNodes);
 
       this.columns = model.columns.clone();
 
-      this.model.emitSignal('iwl:node_insert', this, parentNode);
-      if ((parentNode && parentNode.childCount == 1) || this.model.rootNodes.length == 1)
-        this.model.emitSignal('iwl:node_has_child_toggle', parentNode);
+      this.model.emitSignal('iwl:node_insert', this);
 
       return this;
     },
@@ -378,33 +348,15 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
     remove: function() {
       var model = this.model;
       if (!model) return;
-      var parentNode = this.parentNode;
-      if (parentNode) {
-        parentNode.childNodes = parentNode.childNodes.without(this);
-        if (--parentNode.childCount < 0) parentNode.childCount = 0;
-      } else
-        model.rootNodes = model.rootNodes.without(this);
+      this._removeNodeRelationship();
+      model.rootNodes = model.rootNodes.without(this);
 
-      var next = this.nextSibling, previous = this.previousSibling;
-      if (next) next.previousSibling = previous;
-      if (previous) previous.nextSibling = next;
-
-      this.parentNode = this.nextSibling = this.previousSibling = undefined;
-      if (!model.frozen) {
+      if (!model.frozen)
         this.removeModel();
-      }
 
-      model.emitSignal('iwl:node_remove', this, parentNode);
-      if ((parentNode && !parentNode.childCount) || !model.rootNodes.length)
-        model.emitSignal('iwl:node_has_child_toggle', parentNode);
+      model.emitSignal('iwl:node_remove', this);
 
       return this;
-    },
-
-    clear: function() {
-      this.model.freeze();
-      this.childNodes.invoke('remove');
-      return this.model.thaw().emitSignal('iwl:load_data', this);
     },
 
     next: function(index) {
@@ -426,34 +378,6 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
           ret = ret.previousSibling;
         }
       return ret;
-    },
-    down: function(index) {
-      if (!this.model) return;
-      var ret = this.childNodes[0];
-      if (index > 0)
-        while (index--) {
-          if (!ret) break;
-          ret = ret.childNodes[0];
-        }
-      return ret;
-    },
-    up: function(index) {
-      if (!this.model) return;
-      var ret = this.parentNode;
-      if (index > 0)
-        while (index--) {
-          if (!ret) break;
-          ret = ret.childNodes[0];
-        }
-      return ret;
-    },
-    children: function() {
-      if (!this.model) return;
-      return this.childNodes;
-    },
-    hasChildren: function() {
-      if (!this.model) return -1;
-      return this.childCount;
     },
 
     getValues: function() {
@@ -508,50 +432,16 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
       return this;
     },
 
-    isAncestor: function(descendant) {
-      var ret = false;
-      this.each(function(node) {
-        if (node == descendant) {
-          ret = true;
-          throw $break;
-        }
-      });
-
-      return ret;
-    },
-    isDescendant: function(ancestor) {
-      var node = this.parentNode;
-      if (!node) return;
-      do {
-        if (node == ancestor) return true;
-      } while (node = node.parentNode)
-      return false;
-    },
-
     getIndex: function() {
       if (!this.model) return -1;
-      return this.parentNode
-        ? this.parentNode.childNodes.indexOf(this)
-        : this.model.rootNodes.indexOf(this);
-    },
-    getDepth: function() {
-      if (!this.model) return -1;
-      var depth = 0, node = this;
-      while (node = node.parentNode)
-        depth++;
-
-      return depth;
+      return this.model.rootNodes.indexOf(this);
     },
     getPath: function() {
       if (!this.model) return [];
-      var path = [this.getIndex()], node = this.parentNode;
-      if (node)
-        do {
-          path.unshift(node.getIndex());
-        } while (node = node.parentNode);
-
-      return path;
+      return [this.getIndex()];
     },
+
+    _each: Prototype.emptyFunction,
 
     _addModel: function(model) {
       this.model = model;
@@ -571,6 +461,35 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
       }
 
       return true;
+    },
+    _addNodeRelationship: function(index, nodes) {
+      var previous, next;
+
+      index > -1
+        ? nodes.splice(index, 0, this)
+        : nodes.push(this);
+      if (index > -1) {
+        previous = nodes[index - 1];
+        next = nodes[index + 1];
+      } else previous = nodes[nodes.length - 2];
+
+      if (previous) {
+        previous.nextSibling = this;
+        this.previousSibling = previous;
+      }
+
+      if (next) {
+        next.previousSibling = this;
+        this.nextSibling = next;
+      }
+
+    },
+    _removeNodeRelationship: function() {
+      var next = this.nextSibling, previous = this.previousSibling;
+      if (next) next.previousSibling = previous;
+      if (previous) previous.nextSibling = next;
+
+      this.parentNode = this.nextSibling = this.previousSibling = undefined;
     }
   };
 })());

@@ -23,10 +23,7 @@ sub insert {
     return unless $model;
 
     $self->remove;
-    if (!$self->{model} || $self->{model} != $model) {
-        $self->_addModel($model);
-        $self->each(sub { shift->_addModel($model) });
-    }
+    $self->_addModel($model) if !$self->{model} || $self->{model} != $model;
 
     $index = -1 if !defined $index || $index < 0;
     $self->_addNodeRelationship($index, $model->{rootNodes});
@@ -179,8 +176,6 @@ sub _removeNodeRelationship {
 
     $self->{nextSibling} = $self->{previousSibling} = undef;
     $self->_removeModel;
-    $self->each(sub {shift->_removeModel});
-
 }
 
 1;
