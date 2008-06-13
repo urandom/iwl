@@ -16,7 +16,12 @@ use IWL::JSON qw(toJSON);
 
 use Locale::TextDomain qw(org.bloka.iwl);
 
-use constant DEFAULT_COLUMNS => 3;
+use constant Orientation => {
+    HORIZONTAL => 0,
+    VERTICAL => 1,
+};
+
+my $default_columns = 3;
 
 =head1 NAME
 
@@ -57,6 +62,10 @@ The name/index of the column in the model, which will be used to display the tex
 =item B<imageColumn>
 
 The name/index of the column in the model, which will be used to display the image of the icon. The model column must be of type B<IMAGE>. A value of I<-1> will disable the image display
+
+=item B<orientation>
+
+Sets the orientation of the icons. With B<IWL::IconView::Orientation-E<gt>{VERTICAL}> (I<default>), the label will appear below the image. With B<IWL::IconView::Orientation-E<gt>{HORIZONTAL}>, the label will appear beside the image.
 
 =back
 
@@ -212,22 +221,6 @@ sub setPageControlOptions {
     return $self->{__pager} = $pager;
 }
 
-=item B<setNodeSeparatorCallback> (B<CALLBACK>)
-
-Sets the JavaScript callback which will determine whether a node is rendered as a separator
-
-Parameters: B<CALLBACK> - the JavaScript function. It will receive the B<MODEL> and current B<NODE> as its two parameters. If it returns a true value, the node will be rendered as a separator.
-
-=cut
-
-sub setNodeSeparatorCallback {
-    my ($self, $callback) = @_;
-
-    $self->{_options}{nodeSeparatorCallback} = $callback;
-
-    return $self;
-}
-
 # Protected
 #
 sub _setupDefaultClass {
@@ -270,6 +263,19 @@ sub _realize {
         $self->{_options}{pageControl} = $self->{__pager}->getId;
     }
 
+    foreach my $column ($self->{_options}{textColumn}, $self->{_options}{imageColumn}) {
+        unless ($column =~ /^[0-9]+$/) {
+            my $index = -1;
+            foreach (@{$model->{columns}}) {
+                ++$index;
+                if ($_->{name} eq $column) {
+                    $column = $index;
+                    last;
+                }
+            }
+        }
+    }
+
     foreach my $attrs (@{$self->{_options}{cellAttributes}}) {
         next unless 'HASH' eq ref $attrs;
         $attrs->{renderTemplate} = $attrs->{renderTemplate}->getContent
@@ -294,7 +300,8 @@ sub _init {
     $self->{_tag} = 'table';
     $self->{__pageControlEvent} = [];
 
-    $self->{_options}{columns} = defined $args{columns} ? $args{columns} || DEFAULT_COLUMNS;
+    $self->{_options}{columns}     = defined $args{columns}     ? $args{columns}     : $default_columns;
+    $self->{_options}{orientation} = defined $args{orientation} ? $args{orientation} : Orientation->{VERTICAL};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -304,7 +311,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columns cellAttributes model)};
+    delete @args{qw(columns orientation cellAttributes model)};
 
     $self->requiredJs('base.js', 'model.js', 'treemodel.js', 'iconview.js');
     $self->_constructorArguments(%args);
@@ -312,7 +319,7 @@ sub _init {
     return $self;
 }
 
-addColumnType('IMAGE');
+IWL::TreeModel::addColumnType('IMAGE');
 
 1;
 
