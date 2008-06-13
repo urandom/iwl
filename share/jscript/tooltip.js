@@ -4,6 +4,9 @@
  * @extends IWL.Widget
  * */
 IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
+    var scrollbar_size = document.viewport.getScrollbarSize();
+    var max_dimensions, viewport_dims, scroll_offset, viewport_scroll;
+
     function build(id) {
         var container;
         if ((container = $(id)) && !container.hasClassName('tooltip')) {
@@ -14,25 +17,28 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (!container)
             container = new Element('div', {className: 'tooltip', id: id});
         var content = new Element('div', {className: 'tooltip_content'});
-        var bubble1 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_1'});
-        var bubble2 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_2'});
-        var bubble3 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_3'});
+        if (!this.options.simple) {
+            var bubble1 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_1'});
+            var bubble2 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_2'});
+            var bubble3 = new Element('div', {className: 'tooltip_bubble tooltip_bubble_3'});
 
-        container.appendChild(bubble3);
-        container.appendChild(bubble2);
-        container.appendChild(bubble1);
+            container.appendChild(bubble3);
+            container.appendChild(bubble2);
+            container.appendChild(bubble1);
+
+            this.bubbles = new Array(bubble1, bubble2, bubble3);
+        }
         container.appendChild(content);
         container.style.display = 'none';
         container.style.visibility = this.options.visibility || '';
 
         if (this.options.followMouse) {
-            container.setStyle({marginTop: '5px'});
+            container.setStyle({marginTop: (this.options.simple ? 15 : 5) + 'px'});
             Event.observe(document, 'mousemove', move.bindAsEventListener(container), false);
         }
 
         this.current = container;
         this.content = content;
-        this.bubbles = new Array(bubble1, bubble2, bubble3);
 
         return true;
     }
@@ -50,85 +56,100 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }
 
     function draw(x, y) {
-        var bubbles = [{width: 14, height: 14, left: 10, top: -10}, {width: 10, height: 10, left: 6, top: -4}, {width: 7, height: 7, left: 14, top: 0}];
-        var content_top = -18;
+        var simple = this.options.simple;
+        if (!simple) {
+            var content_top = -18;
+            var bubbles = [
+                {width: 14, height: 14, left: 10, top: -10},
+                {width: 10, height: 10, left: 6, top: -4},
+                {width: 7, height: 7, left: 14, top: 0}
+            ];
+        }
+
         if (typeof x == 'undefined') {
-            this.bubbles[0].setStyle({width: bubbles[0].width + 'px',
-                    height: bubbles[0].height + 'px',
-                    top: bubbles[0].top + 'px', left: bubbles[0].left + 'px', 'z-index': 17});
-            this.bubbles[1].setStyle({width: bubbles[1].width + 'px',
-                    height: bubbles[1].height + 'px',
-                    top: bubbles[1].top + 'px', left: bubbles[1].left + 'px', 'z-index': 16});
-            this.bubbles[2].setStyle({width: bubbles[2].width + 'px',
-                    height: bubbles[2].height + 'px',
-                    left: bubbles[2].left + 'px'});
-            this.content.setStyle({top: content_top + 'px', width: this.options.width});
+            if (simple) {
+                this.content.style.width = this.options.width;
+            } else {
+                this.bubbles[0].setStyle({width: bubbles[0].width + 'px',
+                        height: bubbles[0].height + 'px',
+                        top: bubbles[0].top + 'px', left: bubbles[0].left + 'px', 'z-index': 17});
+                this.bubbles[1].setStyle({width: bubbles[1].width + 'px',
+                        height: bubbles[1].height + 'px',
+                        top: bubbles[1].top + 'px', left: bubbles[1].left + 'px', 'z-index': 16});
+                this.bubbles[2].setStyle({width: bubbles[2].width + 'px',
+                        height: bubbles[2].height + 'px',
+                        left: bubbles[2].left + 'px'});
+                this.content.setStyle({top: content_top + 'px', width: this.options.width});
+            }
             this.style.width = this.options.width;
 
             return this;
         }
 
-        var viewport_dims = document.viewport.getDimensions();
-        var scroll_offset = document.viewport.getScrollOffsets();
         var tooltip_dims = this.getDimensions();
-        var element_top = elementRealPosition.call(this)[1];
+        var element_top = this.__elementPos[1];
         var compensation = this.options.followMouse ? 2.5 : 0;
+        var view_dims = Object.clone(viewport_dims);
         var margins = 5;
         var left = x;
         var top = y;
         if (Prototype.Browser.Gecko) {
-            var max_dims = document.viewport.getMaxDimensions();
-            var scroll_size = document.viewport.getScrollbarSize();
-            viewport_dims.width -= max_dims.height > viewport_dims.height ? scroll_size : 0;
-            viewport_dims.height -= max_dims.width > viewport_dims.width ? scroll_size : 0;
+            view_dims.width -= max_dimensions.height > viewport_dims.height ? scrollbar_size : 0;
+            view_dims.height -= max_dimensions.width > viewport_dims.width ? scrollbar_size : 0;
         }
 
         if (x < margins + scroll_offset.left) left = margins + scroll_offset.left;
-        if (x + tooltip_dims.width > viewport_dims.width + scroll_offset.left - margins)
-            left = viewport_dims.width + scroll_offset.left - margins - tooltip_dims.width;
+        if (x + tooltip_dims.width > view_dims.width + scroll_offset.left - margins)
+            left = view_dims.width + scroll_offset.left - margins - tooltip_dims.width;
         if (y < margins + scroll_offset.top) top = margins + scroll_offset.top;
-        if (y + tooltip_dims.height > viewport_dims.height + scroll_offset.top - margins)
+        if (y + tooltip_dims.height > view_dims.height + scroll_offset.top - margins)
             top = element_top
                 ? element_top - tooltip_dims.height
-                : viewport_dims.height + scroll_offset.top - margins - tooltip_dims.height;
+                : view_dims.height + scroll_offset.top - margins - tooltip_dims.height;
 
         /* Vertical offset */
-        if (top < y) {
-            var old_visibility = this.style.visibility;
-            var old_display = this.style.display;
-            this.style.visibility = this.visible() ? '' : 'hidden';
-            this.style.display = '';
+        if (!simple) {
+            if (top < y) {
+                var old_visibility = this.style.visibility;
+                var old_display = this.style.display;
+                this.style.visibility = this.visible() ? '' : 'hidden';
+                this.style.display = '';
 
-            var cheight = this.content.getHeight();
-            var height  = cheight - 2 * content_top - bubbles[2].height;
-            this.bubbles[2].style.top = height + 'px';
-            height -= (bubbles[2].height + bubbles[1].height);
-            this.bubbles[1].style.top = height + 'px';
-            height -= (bubbles[1].height + bubbles[0].height);
-            this.bubbles[0].style.top = height + 'px';
+                var cheight = this.content.getHeight();
+                var height  = cheight - 2 * content_top - bubbles[2].height;
+                this.bubbles[2].style.top = height + 'px';
+                height -= (bubbles[2].height + bubbles[1].height);
+                this.bubbles[1].style.top = height + 'px';
+                height -= (bubbles[1].height + bubbles[0].height);
+                this.bubbles[0].style.top = height + 'px';
 
-            this.style.display = old_display;
-            this.style.visibility = old_visibility;
-        } else {
-            this.bubbles[2].style.top = bubbles[2].top + 'px';
-            this.bubbles[1].style.top = bubbles[1].top + 'px';
-            this.bubbles[0].style.top = bubbles[0].top + 'px';
+                this.style.display = old_display;
+                this.style.visibility = old_visibility;
+            } else {
+                this.bubbles[2].style.top = bubbles[2].top + 'px';
+                this.bubbles[1].style.top = bubbles[1].top + 'px';
+                this.bubbles[0].style.top = bubbles[0].top + 'px';
+            }
         }
 
         /* Horizontal offset */
-        var const_offset = bubbles[2].left + bubbles[2].width + compensation;
-        var offset_x = x - left - const_offset;
-        if (offset_x > tooltip_dims.width) offset_x = tooltip_dims.width;
-        var offset_ratio = offset_x / tooltip_dims.width;
-        if (offset_ratio < 0) offset_ratio = 0;
+        if (simple) {
+            var offset_x = x - left;
+        } else {
+            var const_offset = bubbles[2].left + bubbles[2].width + compensation;
+            var offset_x = x - left - const_offset;
+            if (offset_x > tooltip_dims.width) offset_x = tooltip_dims.width;
+            var offset_ratio = offset_x / tooltip_dims.width;
+            if (offset_ratio < 0) offset_ratio = 0;
 
-        var bubble0_x = (tooltip_dims.width - 2 * bubbles[0].left - bubbles[0].width + const_offset) * offset_ratio + bubbles[0].left;
-        var bubble1_x = (tooltip_dims.width - 2 * bubbles[1].left - bubbles[1].width + const_offset) * offset_ratio + bubbles[1].left;
-        var bubble2_x = (tooltip_dims.width - 2 * bubbles[2].left - bubbles[2].width + const_offset) * offset_ratio + bubbles[2].left;
+            var bubble0_x = (tooltip_dims.width - 2 * bubbles[0].left - bubbles[0].width + const_offset) * offset_ratio + bubbles[0].left;
+            var bubble1_x = (tooltip_dims.width - 2 * bubbles[1].left - bubbles[1].width + const_offset) * offset_ratio + bubbles[1].left;
+            var bubble2_x = (tooltip_dims.width - 2 * bubbles[2].left - bubbles[2].width + const_offset) * offset_ratio + bubbles[2].left;
 
-        this.bubbles[0].style.left = bubble0_x + 'px';
-        this.bubbles[1].style.left = bubble1_x + 'px';
-        this.bubbles[2].style.left = bubble2_x + 'px';
+            this.bubbles[0].style.left = bubble0_x + 'px';
+            this.bubbles[1].style.left = bubble1_x + 'px';
+            this.bubbles[2].style.left = bubble2_x + 'px';
+        }
 
         if (offset_x < 0)
             this.setStyle({left: left + offset_x + 'px', top: top + 'px'});
@@ -149,9 +170,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         this.__positioned = false;
         if (!this.element) return false;
 
-        var viewport_scroll = document.viewport.getScrollOffsets();
-        var viewport_dims = document.viewport.getDimensions();
-        pos = elementRealPosition.call(this);
+        pos = Object.clone(this.__elementPos);
         pos[1] += this.element.getHeight();
 
         if (this.options.centerOnElement)
@@ -170,7 +189,6 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         if (!this.element) return [0, 0];
         var pos = this.element.cumulativeOffset();
         var scroll = this.element.cumulativeScrollOffset();
-        var viewport_scroll = document.viewport.getScrollOffsets();
         if (scroll[0] || (Prototype.Browser.Opera && scroll[0] != pos[0]))
             scroll[0] -= viewport_scroll.left;
         if (scroll[1] || (Prototype.Browser.Opera && scroll[1] != pos[1]))
@@ -199,19 +217,28 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
         }
     }
 
+    function fillDimensions() {
+        max_dimensions = document.viewport.getMaxDimensions();
+        viewport_dims = document.viewport.getDimensions();
+        scroll_offset = document.viewport.getScrollOffsets();
+        viewport_scroll = document.viewport.getScrollOffsets();
+        this.__elementPos = elementRealPosition.call(this);
+    }
+
     return {
         /**
          * Shows the tooltip
          * @returns The object
          * */
         showTooltip: function() {
+            fillDimensions.call(this);
             if (!placeAtElement.call(this)) return;
             if (this.__fade) {
                 this.__fade.cancel();
                 this.__fade = undefined;
             }
             this.__appear = new Effect.Appear(this, {
-                    duration: 0.25,
+                    duration: 0.1,
                     afterFinish: function() { this.__appear = undefined; this.emitSignal('iwl:show') }.bind(this)
             });
             return this;
@@ -315,6 +342,7 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
             else
                 document.observe('dom:loaded', append.bind(this));
 
+            fillDimensions.call(this);
             draw.call(this);
         }
     }
