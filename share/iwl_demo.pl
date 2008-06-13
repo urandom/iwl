@@ -900,21 +900,26 @@ sub generate_notebook {
 sub generate_tooltips {
     my $container = IWL::Container->new(id => 'tooltips_container');
     my $button = IWL::Button->new(size => 'medium', style => {float => 'none', margin => '0 auto'});
-    my $label = IWL::Label->new(expand => 1, style => {'text-align' => 'center', border => '1px solid gray'});
+    my $label1 = IWL::Label->new(expand => 1, style => {'text-align' => 'center', border => '1px solid gray'});
     my $tip1 = IWL::Tooltip->new;
     my $tip2 = IWL::Tooltip->new(followMouse => 1);
+    my $tip3 = IWL::Tooltip->new(simple => 1);
     my $calendar = IWL::Calendar->new(id => 'calendar', showTime => 0, showWeekNumbers => 0, noMonthChange => 1);
+    my $label2 = $label1->clone->setId('simple_tooltip_label');
 
     $tip1->bindToWidget($button, 'click', 1);
     $tip1->setContent($calendar);
-    $tip2->bindToWidget($label, 'mouseover');
-    $tip2->bindHideToWidget($label, 'mouseout');
+    $tip2->bindToWidget($label1, 'mouseover');
+    $tip2->bindHideToWidget($label1, 'mouseout');
     $tip2->setContent('Some text here. Кирилица.');
+    $tip3->bindToWidget($label2, 'click', 1);
+    $tip3->setContent('More text.');
     $button->setLabel('Click for date');
-    $label->signalConnect(click => $tip1->showingCallback);
+    $label1->signalConnect(click => $tip1->showingCallback);
     $calendar->signalConnect(activate_date => $tip1->hidingCallback);
-    $label->setText('Hover over me');
-    $container->appendChild($button, $label, $tip1, $tip2);
+    $label1->setText('Hover over me');
+    $label2->setText('Click for a simpler tooltip');
+    $container->appendChild($button, $label1, $label2, $tip1, $tip2, $tip3);
 
     return $container;
 }

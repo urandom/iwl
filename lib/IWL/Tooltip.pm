@@ -44,6 +44,10 @@ True, if the tooltip should follow the mouse
 
 The parent element of the tooltip
 
+=item B<simple>
+
+The created tooltip will be represented by a single element, without bubbles
+
 =back
 
 =cut
@@ -185,13 +189,14 @@ sub _init {
     $self->{_options} = {style => {}};
     $self->{_options}{centerOnElement} = $args{centerOnElement} ? 1 : 0 if defined $args{centerOnElement};
     $self->{_options}{followMouse}     = $args{followMouse}     ? 1 : 0 if defined $args{followMouse};
+    $self->{_options}{simple}          = $args{simple}          ? 1 : 0 if defined $args{simple};
     $self->{_options}{parent}          = $args{parent}                  if defined $args{parent};
 
     $self->{_defaultClass} = 'tooltip';
     $args{id} ||= randomize($self->{_defaultClass});
     $self->{_tag} = "div";
 
-    delete @args{qw(centerOnElement followMouse parent)};
+    delete @args{qw(centerOnElement followMouse simple parent)};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'tooltip.js');
 
