@@ -281,6 +281,7 @@ t/03stock.t
 t/10object.t
 t/10response.t
 t/10stash.t
+t/10treemodel.t
 t/20comment.t
 t/20page_link.t
 t/20page_meta.t
@@ -349,3 +350,4 @@ t/50radiobutton.t
 t/50spinner.t
 t/iwl.conf
 t/test.html
+t/data.json

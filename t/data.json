@@ -1,0 +1,82 @@
+[
+{
+    "name": "Foo",
+    "results": ["Sample", 15, true],
+    "children": [{
+        "name": "Omega",
+        "results": ["Foo child 1", 15.1, true]
+    },{
+        "name": "Foxtrot",
+        "results": ["Foo child 2", 15.7, false]
+    }],
+    "user": ""
+},{
+    "name": "Bar",
+    "results": ["Something else", 7, false],
+    "children": [{
+        "name": "Tango",
+        "results": ["Bar child 1", 7.13, false]
+    },{
+        "name": "Waltz",
+        "results": ["Bar child 2", 7.9, false],
+        "children": [{
+            "name": "Casper",
+            "results": ["Ghost", 7.91, true]
+        }]
+    }],
+    user: ""
+},{
+    "name": "Bar",
+    "results": ["Something else", 7, false],
+    user: ""
+},{
+    "name": "Bar",
+    "results": ["Something else", 7, false],
+    "children": [{
+        "name": "Tango",
+        "results": ["Bar child 1", 7.13, false]
+    },{
+        "name": "Waltz",
+        "results": ["Bar child 2", 7.9, false],
+        "children": [{
+            "name": "Casper",
+            "results": ["Ghost", 7.91, true]
+        }]
+    }],
+    user: ""
+},{
+    "name": "Bar",
+    "results": ["Something else", 7, false],
+    user: ""
+},{
+    "name": "Bar",
+    "results": ["Something else", 7, false],
+    "children": [{
+        "name": "Tango",
+        "results": ["Bar child 1", 7.13, false]
+    },{
+        "name": "Waltz",
+        "results": ["Bar child 2", 7.9, false],
+        "children": [{
+            "name": "Casper",
+            "results": ["Ghost", 7.91, true]
+        }]
+    }],
+    user: ""
+},{
+    "name": "Bar",
+    "results": ["Something else", 7, false],
+    "children": [{
+        "name": "Tango",
+        "results": ["Bar child 1", 7.13, false]
+    },{
+        "name": "Waltz",
+        "results": ["Bar child 2", 7.9, false],
+        "children": [{
+            "name": "Casper",
+            "results": ["Ghost", 7.91, true]
+        }]
+    }],
+    user: ""
+}
+]

@@ -86,7 +86,7 @@ sub remove {
 sub getValues {
     my $self = shift;
     return unless $self->{model};
-    return $self->{values} unless @_;
+    return @{$self->{values}} unless @_;
     my @ret;
     push @ret, $self->{values}[$_] foreach @_;
     return @ret;
@@ -106,7 +106,7 @@ sub setValues {
 
 sub getAttributes {
     my $self = shift;
-    return $self->{attributes} unless @_;
+    return %{$self->{attributes}} unless @_;
     my @ret;
     push @ret, $self->{attributes}{$_} foreach @_;
     return @ret;
@@ -147,7 +147,7 @@ sub getDepth {
 sub getPath {
     my $self = shift;
     return unless $self->{model};
-    my ($path, $node) = ($self->getIndex, $self->{parentNode});
+    my ($path, $node) = ([$self->getIndex], $self->{parentNode});
     if ($node) {
         do {
             unshift @$path, $node->getIndex;

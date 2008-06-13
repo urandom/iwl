@@ -11,10 +11,11 @@ use IWL::TreeModel::Node;
 use IWL::String qw(randomize);
 use IWL::JSON qw(evalJSON);
 
+use Locale::TextDomain qw(org.bloka.iwl);
+
 sub new {
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $self = bless {}, $class;
+    my $class = shift;
+    my $self = bless {}, (ref($class) || $class);
     
     $self->_init(@_);
 
@@ -106,7 +107,12 @@ sub dataReader {
     if ($options{file}) {
         local *FILE;
         local $/ = undef;
-        open FILE, $options{file};
+        open FILE, $options{file}
+            or return $self->_pushFatalError(__x(
+                "Cannot open {FILE}: {ERROR}",
+                FILE => $options{file},
+                ERROR => $!,
+            ));
         $content = <FILE>;
         close FILE;
     } elsif ($options{host}) {
@@ -272,29 +278,6 @@ sub registerEvent {
 
 # Protected
 #
-sub _sortColumnEvent {
-    my ($event, $handler) = @_;
-    my $response = IWL::Response->new;
-
-    my ($data, $extras) = ('CODE' eq ref $handler)
-      ? $handler->($event->{params}, {
-              ascending => $event->{options}{ascending},
-              columnValues => 
-                  $event->{options}{columnValues} ? evalJSON($event->{options}{columnValues}, 1) : undef,
-              defaultOrder => $event->{options}{defaultOrder},
-              id => $event->{options}{id}
-          })
-      : (undef, undef);
-    $data = UNIVERSAL::isa($data, 'IWL::TreeModel') ? $data->toJSON : IWL::JSON::toJSON($data);
-
-    require IWL::Object;
-
-    $response->send(
-        content => '{data: ' . $data . ', extras: ' . (IWL::JSON::toJSON($extras) || 'null') . '}',
-        header => IWL::Object::getJSONHeader()
-    );
-}
-
 sub _init {
     my $self = shift;
     my ($columns, %args) = (@_ % 2 ? (shift, @_) : (undef, @_));
@@ -311,8 +294,13 @@ sub _init {
     $self->{rootNodes} = [];
     $columns = [] unless 'ARRAY' eq ref $columns;
 
+    return $self->_pushFatalError(__"No columns have been given.")
+        unless @$columns;
     my $index = 0;
     foreach (@$columns) {
+        # TRANSLATORS: {COLUMN} is a placeholder
+        return $self->_pushFatalError(__x("Unknown column type: {COLUMN}", COLUMN => $_->{type}))
+            unless exists $Types->{$_->{type}};
         $_->{type} = $Types->{$_->{type}};
         $self->{columns}[$index++] = $_;
     }
