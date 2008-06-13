@@ -21,7 +21,7 @@ sub new {
 my ($addModel, $removeModel, $compareColumns);
 
 sub insert {
-    my ($self, $model, $parent, $index) = @_;
+    my ($self, $model, $index, $parent) = @_;
     return unless $model;
 
     $self->remove;

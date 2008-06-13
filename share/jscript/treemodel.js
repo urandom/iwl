@@ -43,7 +43,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
     var length = nodes.length;
     if (parentNode && length == 0) parentNode.childCount = 0;
     for (var i = 0; i < length; i++) {
-      var n = nodes[i], node = this.insertNode(parentNode, options.index);
+      var n = nodes[i], node = this.insertNode(options.index, parentNode);
       if (n.childCount == 0)
         node.childCount = 0;
       if (n.values && n.values.length)
@@ -215,24 +215,24 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return node.remove();
     },
 
-    insertNode: function(parentNode, index) {
-      return new IWL.TreeModel.Node(this, parentNode, index);
+    insertNode: function(index, parentNode) {
+      return new IWL.TreeModel.Node(this, index, parentNode);
     },
 
-    insertNodeBefore: function(parentNode, sibling) {
-      return new IWL.TreeModel.Node(this, parentNode, sibling.getIndex());
+    insertNodeBefore: function(sibling, parentNode) {
+      return new IWL.TreeModel.Node(this, sibling.getIndex(), parentNode);
     },
 
-    insertNodeAfter: function(parentNode, sibling) {
-      return new IWL.TreeModel.Node(this, parentNode, sibling.getIndex() + 1);
+    insertNodeAfter: function(sibling, parentNode) {
+      return new IWL.TreeModel.Node(this, sibling.getIndex() + 1, parentNode);
     },
 
     prependNode: function(parentNode) {
-      return new IWL.TreeModel.Node(this, parentNode, 0);
+      return new IWL.TreeModel.Node(this, 0, parentNode);
     },
 
     appendNode: function(parentNode) {
-      return new IWL.TreeModel.Node(this, parentNode, -1);
+      return new IWL.TreeModel.Node(this, -1, parentNode);
     },
 
     clear: function() {
@@ -241,7 +241,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       return this.thaw().emitSignal('iwl:load_data');
     },
 
-    reorder: function(parentNode, order) {
+    reorder: function(order, parentNode) {
       if (Object.isArray(parentNode)) {
         order = parentNode;
         parentNode = undefined;
@@ -253,7 +253,7 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
       if (length != children.length) return;
       for (var i = 0; i < length; i++) {
         var child = children[order[i]];
-        child.insert(this, parentNode, i);
+        child.insert(this, i, parentNode);
       }
 
       return this.thaw().emitSignal('iwl:nodes_reorder', parentNode);
@@ -265,18 +265,18 @@ IWL.TreeModel = Class.create(IWL.ObservableModel, (function() {
 
       var index1 = node1.getIndex(), parent1 = node1.parentNode,
           index2 = node2.getIndex(), parent2 = node2.parentNode;
-      node1.insert(this, parent2, index2);
-      node2.insert(this, parent1, index1);
+      node1.insert(this, index2, parent2);
+      node2.insert(this, index1, parent1);
 
       return this.thaw().emitSignal('iwl:nodes_swap', node1, node2);
     },
 
-    move: function(node, parentNode, index) {
+    move: function(node, index, parentNode) {
       this.freeze();
 
       var previous = node.parentNode;
-      node.insert(this, parentNode, index);
-      return this.thaw().emitSignal('iwl:node_move', node, parentNode, previousParent);
+      node.insert(this, index, parentNode);
+      return this.thaw().emitSignal('iwl:node_move', node, parentNode, previous);
     },
 
     loadData: function(data) {
@@ -393,15 +393,15 @@ IWL.TreeModel.Node = Class.create(Enumerable, (function() {
 
 
   return {
-    initialize: function(model, parentNode, index) {
+    initialize: function(model, index, parentNode) {
       this.childNodes = [], this.values = [],
       this.attributes = {id: ++counter}, this.childCount = null;
 
       if (model)
-        this.insert(model, parentNode, index);
+        this.insert(model, index, parentNode);
     },
 
-    insert: function(model, parentNode, index) {
+    insert: function(model, index, parentNode) {
       if (!model) return;
 
       if (this.childCount == null

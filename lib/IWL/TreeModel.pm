@@ -47,28 +47,28 @@ sub isFlat {
 }
 
 sub insertNode {
-    my ($self, $parent, $index) = @_;
-    return IWL::TreeModel::Node->new($self, $parent, $index);
+    my ($self, $index, $parent) = @_;
+    return IWL::TreeModel::Node->new($self, $index, $parent);
 }
 
 sub insertNodeBefore {
-    my ($self, $parent, $sibling) = @_;
-    return IWL::TreeModel::Node->new($self, $parent, $sibling->getIndex);
+    my ($self, $sibling, $parent) = @_;
+    return IWL::TreeModel::Node->new($self, $sibling->getIndex, $parent);
 }
 
 sub insertNodeAfter {
-    my ($self, $parent, $sibling) = @_;
-    return IWL::TreeModel::Node->new($self, $parent, $sibling->getIndex + 1);
+    my ($self, $sibling, $parent) = @_;
+    return IWL::TreeModel::Node->new($self, $sibling->getIndex + 1, $parent);
 }
 
 sub prependNode {
     my ($self, $parent) = @_;
-    return IWL::TreeModel::Node->new($self, $parent, 0);
+    return IWL::TreeModel::Node->new($self, 0, $parent);
 }
 
 sub appendNode {
     my ($self, $parent) = @_;
-    return IWL::TreeModel::Node->new($self, $parent, -1);
+    return IWL::TreeModel::Node->new($self, -1, $parent);
 }
 
 sub clear {
@@ -281,14 +281,22 @@ sub registerEvent {
 sub _init {
     my $self = shift;
     my ($columns, %args) = (@_ % 2 ? (shift, @_) : (undef, @_));
+    my %options;
 
-    $columns = $args{columns} if 'ARRAY' eq ref $args{columns};
-    $self->{options}{id} = $args{id} || randomize('treemodel');
-    $self->{options}{totalCount} = $args{totalCount} if $args{totalCount};
-    $self->{options}{offset}     = $args{offset}     if $args{offset};
-    $self->{options}{limit}      = $args{limit}      if $args{limit};
-    $self->{options}{preserve}   = $args{preserve}   if defined $args{preserve};
-    $self->{options}{parentNode} = $args{parentNode} if 'ARRAY' eq ref $args{parentNode};
+    if ($args{data}) {
+        %options = %{$args{data}{options}};
+        $columns = $args{data}{columns} if 'ARRAY' eq ref $args{data}{columns};
+    } else {
+        %options = %args;
+        $columns = $args{columns} if 'ARRAY' eq ref $args{columns};
+    }
+
+    $self->{options}{totalCount} = $options{totalCount} if $options{totalCount};
+    $self->{options}{offset}     = $options{offset}     if $options{offset};
+    $self->{options}{limit}      = $options{limit}      if $options{limit};
+    $self->{options}{preserve}   = $options{preserve}   if defined $options{preserve};
+    $self->{options}{parentNode} = $options{parentNode} if 'ARRAY' eq ref $options{parentNode};
+    $self->{options}{id} = $options{id} || randomize('treemodel');
 
     $self->{columns} = [];
     $self->{rootNodes} = [];

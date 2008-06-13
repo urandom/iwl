@@ -34,7 +34,7 @@ is($t->{rootNodes}[-2], $last);
 $first = $t->{rootNodes}[1]{childNodes}[0];
 is_deeply($first->getPath, [1, 0]);
 is($first->getDepth, 1);
-isa_ok($t->insertNode($t->{rootNodes}[1], 0), 'IWL::TreeModel::Node');
+isa_ok($t->insertNode(0, $t->{rootNodes}[1]), 'IWL::TreeModel::Node');
 is(@{$t->{rootNodes}[1]{childNodes}}, 3);
 is($t->{rootNodes}[1]{childNodes}[1], $first);
 is_deeply($first->getPath, [1, 1]);
@@ -50,3 +50,9 @@ ok($first->isDescendant($t->{rootNodes}[1]));
 ok(!$first->isDescendant($t->{rootNodes}[0]));
 ok($t->{rootNodes}[1]->isAncestor($first));
 ok(!$t->{rootNodes}[0]->isAncestor($first));
+
+my $t2 = $t->new(data => $t->toObject);
+isa_ok($t, 'IWL::TreeModel');
+ok(!$t->bad);
+is(@{$t->{rootNodes}}, 8);
+is(@{$t->{rootNodes}[1]{childNodes}}, 3);
