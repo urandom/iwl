@@ -4,21 +4,7 @@ package IWL::TreeModel::Node;
 
 use strict;
 
-use IWL::JSON;
-
-use base 'IWL::Error';
-
-sub new {
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $self = bless {}, $class;
-    
-    $self->_init(@_);
-
-    return $self;
-}
-
-my ($addModel, $removeModel, $compareColumns);
+use base 'IWL::ListModel::Node';
 
 sub insert {
     my ($self, $model, $index, $parent) = @_;
@@ -26,11 +12,11 @@ sub insert {
 
     $self->remove;
     if (!$self->{model} || $self->{model} != $model) {
-        $addModel->($model, $self);
-        $self->each(sub { $addModel->($model, shift) });
+        $self->_addModel($model);
+        $self->each(sub { shift->_addModel($model) });
     }
 
-    my ($previous, $next, $nodes);
+    my $nodes;
     $index = -1 if !defined $index || $index < 0;
 
     if ($parent) {
@@ -41,23 +27,7 @@ sub insert {
         $nodes = $model->{rootNodes};
     }
 
-    if ($index > -1) {
-        splice @$nodes, $index, 0, $self;
-        $previous = $nodes->[$index - 1];
-        $next = $nodes->[$index + 1];
-    } else {
-        push @$nodes, $self;
-        $previous = $nodes->[-2];
-    }
-
-    if ($previous) {
-        $previous->{nextSibling} = $self;
-        $self->{previousSibling} = $previous;
-    }
-    if ($next) {
-        $next->{previousSibling} = $self;
-        $self->{nextSibling} = $next;
-    }
+    $self->_addNodeRelationship($index, $nodes);
 
     $self->{columns} = [@{$model->{columns}}];
     
@@ -72,51 +42,9 @@ sub remove {
         ? $parent->{childNodes} = [grep {$_ != $self} @{$parent->{childNodes}}]
         : $self->{model}{rootNodes} = [grep {$_ != $self} @{$self->{model}{rootNodes}}];
 
-    my ($next, $previous) = ($self->{nextSibling}, $self->{previousSibling});
-    $next->{previousSibling} = $previous if $next;
-    $previous->{nextSibling} = $next if $previous;
+    $self->{parentNode} = undef;
 
-    $self->{parentNode} = $self->{nextSibling} = $self->{previousSibling} = undef;
-    $removeModel->($self);
-    $self->each($removeModel);
-
-    return $self;
-}
-
-sub getValues {
-    my $self = shift;
-    return unless $self->{model};
-    return @{$self->{values}} unless @_;
-    my @ret;
-    push @ret, $self->{values}[$_] foreach @_;
-    return @ret;
-}
-
-sub setValues {
-    my $self = shift;
-    return unless $self->{model};
-    while (@_) {
-        my @tuple = splice @_, 0, 2;
-        next unless $self->{columns}[$tuple[0]];
-        $self->{values}[$tuple[0]] = $tuple[1];
-    }
-
-    return $self;
-}
-
-sub getAttributes {
-    my $self = shift;
-    return %{$self->{attributes}} unless @_;
-    my @ret;
-    push @ret, $self->{attributes}{$_} foreach @_;
-    return @ret;
-}
-
-sub setAttributes {
-    my ($self, %attributes) = @_;
-    while (my ($key, $value) = each %attributes) {
-        $self->{attributes}{$key} = $value;
-    }
+    $self->_removeNodeRelationship;
 
     return $self;
 }
@@ -192,18 +120,12 @@ sub each {
 
 sub toObject {
     my $self = shift;
-    my $object = {values => $self->{values}};
+    my $object = $self->SUPER::toObject;
     $object->{childNodes} = [map {$_->toObject} @{$self->{childNodes}}]
         if @{$self->{childNodes}};
-    $object->{attributes} = $self->{attributes} if %{$self->{attributes}};
     $object->{childCount} = $self->{childCount};
     return $object;
 }
-
-sub toJSON {
-    return IWL::JSON::toJSON(shift->toObject);
-}
-
 
 # Protected
 #
@@ -211,34 +133,8 @@ sub _init {
     my $self = shift;
 
     $self->{childNodes} = [];
-    $self->{values} = [];
-    $self->{attributes} =  {id => "$self" =~ /.*0x([0-9a-fA-F]+)/};
     $self->{childCount} = undef;
-    $self->{previousSibling} = $self->{nextSibling} = undef;
-    $self->insert(@_) if $_[0];
+    $self->SUPER::_init(@_);
 }
 
-# Private
-#
-$addModel = sub {
-    my ($model, $node) = @_;
-    $node->{model} = $model;
-    if ($node->{columns}) {
-        $node->{values} = []
-            unless $compareColumns->($node->{columns}, $model->{columns});
-    }
-};
-
-$removeModel = sub {
-    shift->{model} = undef;
-};
-
-$compareColumns = sub {
-    my ($c1, $c2) = @_;
-    return unless @$c1 == @$c2;
-    for (my $i = 0; $i < @$c1; $i++) {
-        return unless $c1->[$i]{type} eq $c2->[$i]{type};
-    }
-
-    return 1;
-};
+1;

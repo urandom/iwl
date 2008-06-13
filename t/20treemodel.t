@@ -3,11 +3,6 @@ use Test::More qw(no_plan);
 BEGIN { use_ok('IWL::TreeModel') }
 
 my $t = IWL::TreeModel->new;
-isa_ok($t, 'IWL::TreeModel');
-ok($t->bad);
-$t = IWL::TreeModel->new([{type => 'FOO'}]);
-isa_ok($t, 'IWL::TreeModel');
-ok($t->bad);
 $t = IWL::TreeModel->new([{type => 'STRING', name => 'Name'}, {type => 'FLOAT', name => 'Count'}]);
 isa_ok($t, 'IWL::TreeModel');
 ok(!$t->bad);
@@ -38,14 +33,6 @@ isa_ok($t->insertNode(0, $t->{rootNodes}[1]), 'IWL::TreeModel::Node');
 is(@{$t->{rootNodes}[1]{childNodes}}, 3);
 is($t->{rootNodes}[1]{childNodes}[1], $first);
 is_deeply($first->getPath, [1, 1]);
-is_deeply([$first->getValues], ["Foo child 1", 15.1]);
-is($first->setValues(1, 42, 0, "Hello"), $first);
-is_deeply([$first->getValues], ["Hello", 42]);
-is_deeply([$first->getValues(1)], [42]);
-ok($first->getAttributes('id'));
-is($first->setAttributes(foo => 1, bar => 'aaa'), $first);
-is(keys %{{$first->getAttributes}}, 3);
-is_deeply([$first->getAttributes('bar', 'foo')], ['aaa', 1]);
 ok($first->isDescendant($t->{rootNodes}[1]));
 ok(!$first->isDescendant($t->{rootNodes}[0]));
 ok($t->{rootNodes}[1]->isAncestor($first));
