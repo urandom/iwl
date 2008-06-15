@@ -5,12 +5,10 @@ package IWL::IconView;
 
 use strict;
 
-use base 'IWL::Widget';
+use base 'IWL::Container';
 
-use IWL::TreeModel;
+use IWL::ListModel;
 use IWL::Container;
-use IWL::Table::Container;
-use IWL::Table::Row;
 use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
 
@@ -21,7 +19,12 @@ use constant Orientation => {
     VERTICAL => 1,
 };
 
-my $default_columns = 3;
+use constant CellType => {
+    TEXT => 0,
+    IMAGE => 1,
+};
+
+my $default_columns = 5;
 
 =head1 NAME
 
@@ -33,7 +36,7 @@ L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::IconView>
 
 =head1 DESCRIPTION
 
-The IconView widget is similar to the L<IWL::Iconbox> widget, but uses a L<IWL::TreeModel> to represent its data
+The IconView widget is similar to the L<IWL::Iconbox> widget, but uses a L<IWL::ListModel> to represent its data
 
 =head1 CONSTRUCTOR
 
@@ -45,11 +48,15 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 =item B<model>
 
-The L<IWL::TreeModel> for the IconView
+The L<IWL::ListModel> for the IconView
 
 =item B<columns>
 
-The number of columns of icons. Defaults to I<3>
+The number of columns of icons
+
+=item B<columnWidth>
+
+The width of the columns, in pixels. If neither B<columns> nor B<columnWidth> is specified, B<columns> assumes a default value of I<5>
 
 =item B<cellAttributes>
 
@@ -89,7 +96,7 @@ sub new {
 
 Sets the model for the view
 
-Parameter: B<MODEL> - an L<IWL::TreeModel>
+Parameter: B<MODEL> - an L<IWL::ListModel>
 
 =cut
 
@@ -112,11 +119,25 @@ sub getModel {
     return shift->{_model};
 }
 
-=item B<setCellAttributes> (B<INDEX>, B<ATTRIBUTES>)
+=item B<setCellAttributes> (B<TYPE>, B<ATTRIBUTES>)
 
 Sets the cell attributes for a particular cell index
 
-Parameter: B<INDEX> - a cell index, B<ATTRIBUTES> - a hash reference of attributes, with the following possible keys:
+Parameter: B<TYPE> - the cell type, can be one of:
+
+=over 8
+
+=item B<IWL::IconView::CellType-E<gt>{TEXT}>
+
+The text cell
+
+=item B<IWL::IconView::CellType-E<gt>{IMAGE}>
+
+The image cell
+
+=back
+
+B<ATTRIBUTES> - a hash reference of attributes, with the following possible keys:
 
 =over 8
 
@@ -155,19 +176,19 @@ I<renderFunction> and I<renderClass> are mutually exclusive. If a I<renderClass>
 =cut
 
 sub setCellAttributes {
-    my ($self, $index, $attr) = @_;
+    my ($self, $type, $attr) = @_;
     return unless %$attr;
 
-    $self->{_options}{cellAttributes}[$index] = $attr;
+    $self->{_options}{cellAttributes}[$type] = $attr;
 
     return $self;
 }
 
-=item B<getCellAttributes> (B<INDEX>)
+=item B<getCellAttributes> (B<TYPE>)
 
-Sets the get attributes for a particular cell index
+Sets the get attributes for a particular cell type
 
-Parameter: B<INDEX> - a cell index
+Parameter: B<TYPE> - the cell type. See L<IWL::IconView::setCellAttributes|IWL::IconView/setCellAttributes> for more details
 
 =cut
 
@@ -223,54 +244,45 @@ sub setPageControlOptions {
 
 # Protected
 #
-sub _setupDefaultClass {
-    my $self = shift;
-
-    $self->prependClass($self->{_defaultClass} . '_editable')
-        if $self->{_options}{editable};
-    $self->prependClass($self->{_defaultClass});
-}
-
 sub _realize {
     my $self    = shift;
     my $id      = $self->getId;
 
-    return $self->_pushFatalError(__"No model was given!")
-        unless $self->{_model};
-
     $self->SUPER::_realize;
 
     my $model = $self->{_model};
-    if ($model->{options}{limit} && $model->isFlat && @{$self->{__pageControlEvent}}) {
-        my $event = ref($self->{_model}) . "::refresh";
-        $event =~ s/::/-/g;
-        $self->{_options}{pageControlEventName} = $event;
-        $self->{_model}->registerEvent($event, @{$self->{__pageControlEvent}});
+    if ($model) {
+        if ($model->{options}{limit} && @{$self->{__pageControlEvent}}) {
+            my $event = ref($self->{_model}) . "::refresh";
+            $event =~ s/::/-/g;
+            $self->{_options}{pageControlEventName} = $event;
+            $self->{_model}->registerEvent($event, @{$self->{__pageControlEvent}});
 
-        my $limit = $model->{options}{limit};
-        $self->{__pager}->setPageOptions(
-            pageCount => int(($model->{options}{totalCount} -1 ) / $limit) + 1,
-            pageSize => $limit,
-            page => int($model->{options}{offset} / $limit) + 1,
-        );
-        my $placed = !(!$self->{__pager}{parentNode});
-        if ($placed) {
-            $self->{_options}{placedPageControl} = 1;
-        } else {
-            $self->appendAfter($self->{__pager});
-            $self->{__pager}->setStyle(position => 'absolute', left => '-1000px');
+            my $limit = $model->{options}{limit};
+            $self->{__pager}->setPageOptions(
+                pageCount => int(($model->{options}{totalCount} -1 ) / $limit) + 1,
+                pageSize => $limit,
+                page => int($model->{options}{offset} / $limit) + 1,
+            );
+            my $placed = !(!$self->{__pager}{parentNode});
+            if ($placed) {
+                $self->{_options}{placedPageControl} = 1;
+            } else {
+                $self->appendAfter($self->{__pager});
+                $self->{__pager}->setStyle(position => 'absolute', left => '-1000px');
+            }
+            $self->{_options}{pageControl} = $self->{__pager}->getId;
         }
-        $self->{_options}{pageControl} = $self->{__pager}->getId;
-    }
 
-    foreach my $column ($self->{_options}{textColumn}, $self->{_options}{imageColumn}) {
-        unless ($column =~ /^[0-9]+$/) {
-            my $index = -1;
-            foreach (@{$model->{columns}}) {
-                ++$index;
-                if ($_->{name} eq $column) {
-                    $column = $index;
-                    last;
+        foreach my $column ($self->{_options}{textColumn}, $self->{_options}{imageColumn}) {
+            unless ($column =~ /^[0-9]+$/) {
+                my $index = -1;
+                foreach (@{$model->{columns}}) {
+                    ++$index;
+                    if ($_->{name} eq $column) {
+                        $column = $index;
+                        last;
+                    }
                 }
             }
         }
@@ -281,27 +293,27 @@ sub _realize {
         $attrs->{renderTemplate} = $attrs->{renderTemplate}->getContent
             if $attrs->{renderTemplate};
     }
+    $self->{_options}{columns} = $default_columns
+        unless $self->{_options}{columns} || $self->{_options}{columnWidth};
+
     my $options = toJSON($self->{_options});
 
-    $self->_appendInitScript("IWL.IconView.create('$id', @{[$model->toJSON]}, $options);");
+    $self->_appendInitScript("IWL.IconView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);");
 }
 
 sub _init {
     my ($self, %args) = @_;
-    my $body          = IWL::Table::Container->new;
-
-    $self->setAttributes(cellpadding => 0, cellspacing => 0);
-    $self->appendChild($body);
-    $self->{__body} = $body;
 
     $self->{_defaultClass} = 'iconview';
     $args{id} ||= randomize('iconview');
 
-    $self->{_tag} = 'table';
     $self->{__pageControlEvent} = [];
 
-    $self->{_options}{columns}     = defined $args{columns}     ? $args{columns}     : $default_columns;
     $self->{_options}{orientation} = defined $args{orientation} ? $args{orientation} : Orientation->{VERTICAL};
+    $self->{_options}{columns}     = $args{columns}     if defined $args{columns};
+    $self->{_options}{columnWidth} = $args{columnWidth} if defined $args{columnWidth};
+    $self->{_options}{textColumn}  = $args{textColumn}  if defined $args{textColumn};
+    $self->{_options}{imageColumn} = $args{imageColumn} if defined $args{imageColumn};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -311,7 +323,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columns orientation cellAttributes model)};
+    delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model)};
 
     $self->requiredJs('base.js', 'model.js', 'listmodel.js', 'iconview.js');
     $self->_constructorArguments(%args);
@@ -319,7 +331,7 @@ sub _init {
     return $self;
 }
 
-IWL::TreeModel::addColumnType('IMAGE');
+IWL::ListModel::addColumnType('IMAGE');
 
 1;
 

@@ -1699,3 +1699,27 @@ div.tooltip_content {
     border-bottom: 2px solid #444;
     margin-bottom: 1px;
 }
+
+/* IconView */
+.iconview {
+    border: 1px solid #7F9DB9;
+    background-color: white;
+    color: #111;
+    margin: 1px 0;
+}
+.iconview_page_container {
+    background: #eee;
+    border: 1px solid #7F9DB9;
+}
+.iconview_page_container .iconview {
+    border: 1px solid #444;
+}
+.iconview_page_container .pagecontrol {
+    margin: 0 auto;
+}
+.iconview_node {
+    margin: 2px;
+    float: left;
+    text-align: center;
+    color: #111;
+}

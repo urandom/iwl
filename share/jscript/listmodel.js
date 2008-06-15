@@ -180,7 +180,7 @@ IWL.ListModel = Class.create(IWL.ObservableModel, (function() {
     clear: function() {
       this.freeze();
       this.rootNodes.invoke('remove');
-      return this.thaw().emitSignal('iwl:load_data');
+      return this.thaw().emitSignal('iwl:clear');
     },
 
     reorder: function(order) {
@@ -317,6 +317,15 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
     }
   }
 
+  function compareColumns(column1, column2) {
+    if (columns1.length != columns2.length) return false;
+    for (var i = 0, l = columns1.length; i < l; i++) {
+      if (columns1[i].type != columns2[i].type)
+        return false;
+    }
+
+    return true;
+  }
 
   return {
     initialize: function(model, index) {
@@ -352,7 +361,7 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
       model.rootNodes = model.rootNodes.without(this);
 
       if (!model.frozen)
-        this.removeModel();
+        this._removeModel();
 
       model.emitSignal('iwl:node_remove', this);
 
@@ -446,21 +455,12 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
     _addModel: function(model) {
       this.model = model;
       if (this.columns) {
-        if (!this._compareColumns(this.columns, model.columns))
+        if (!compareColumns.call(this, this.columns, model.columns))
           this.values = [];
       }
     },
     _removeModel: function() {
       this.model = undefined;
-    },
-    _compareColumns: function(column1, column2) {
-      if (columns1.length != columns2.length) return false;
-      for (var i = 0, l = columns1.length; i < l; i++) {
-        if (columns1[i].type != columns2[i].type)
-          return false;
-      }
-
-      return true;
     },
     _addNodeRelationship: function(index, nodes) {
       var previous, next;

@@ -249,48 +249,47 @@ sub _realize {
     my $self    = shift;
     my $id      = $self->getId;
 
-    return $self->_pushFatalError(__"No model was given!")
-        unless $self->{_model};
-
     $self->SUPER::_realize;
 
     my $model = $self->{_model};
-    if ($model->{options}{limit} && ($model->can('isFlat') ? $model->isFlat : 1) && @{$self->{__pageControlEvent}}) {
-        my $event = ref($self->{_model}) . "::refresh";
-        $event =~ s/::/-/g;
-        $self->{_options}{pageControlEventName} = $event;
-        $self->{_model}->registerEvent($event, @{$self->{__pageControlEvent}});
+    if ($model) {
+        if ($model->{options}{limit} && ($model->can('isFlat') ? $model->isFlat : 1) && @{$self->{__pageControlEvent}}) {
+            my $event = ref($self->{_model}) . "::refresh";
+            $event =~ s/::/-/g;
+            $self->{_options}{pageControlEventName} = $event;
+            $self->{_model}->registerEvent($event, @{$self->{__pageControlEvent}});
 
-        my $limit = $model->{options}{limit};
-        $self->{__pager}->setPageOptions(
-            pageCount => int(($model->{options}{totalCount} -1 ) / $limit) + 1,
-            pageSize => $limit,
-            page => int($model->{options}{offset} / $limit) + 1,
-        );
-        my $placed = !(!$self->{__pager}{parentNode});
-        if ($placed) {
-            $self->{_options}{placedPageControl} = 1;
-        } else {
-            $self->appendAfter($self->{__pager});
-            $self->{__pager}->setStyle(position => 'absolute', left => '-1000px');
+            my $limit = $model->{options}{limit};
+            $self->{__pager}->setPageOptions(
+                pageCount => int(($model->{options}{totalCount} -1 ) / $limit) + 1,
+                pageSize => $limit,
+                page => int($model->{options}{offset} / $limit) + 1,
+            );
+            my $placed = !(!$self->{__pager}{parentNode});
+            if ($placed) {
+                $self->{_options}{placedPageControl} = 1;
+            } else {
+                $self->appendAfter($self->{__pager});
+                $self->{__pager}->setStyle(position => 'absolute', left => '-1000px');
+            }
+            $self->{_options}{pageControl} = $self->{__pager}->getId;
         }
-        $self->{_options}{pageControl} = $self->{__pager}->getId;
-    }
-    if ($self->{_options}{columnMap}) {
-        foreach my $column (@{$self->{_options}{columnMap}}) {
-            unless ($column =~ /^[0-9]+$/) {
-                my $index = -1;
-                foreach (@{$model->{columns}}) {
-                    ++$index;
-                    if ($_->{name} eq $column) {
-                        $column = $index;
-                        last;
+        if ($self->{_options}{columnMap}) {
+            foreach my $column (@{$self->{_options}{columnMap}}) {
+                unless ($column =~ /^[0-9]+$/) {
+                    my $index = -1;
+                    foreach (@{$model->{columns}}) {
+                        ++$index;
+                        if ($_->{name} eq $column) {
+                            $column = $index;
+                            last;
+                        }
                     }
                 }
             }
+        } else {
+            $self->{_options}{columnMap} = [0 .. @{$model->{columns}} - 1];
         }
-    } else {
-        $self->{_options}{columnMap} = [0 .. @{$model->{columns}} - 1];
     }
 
     $self->{__content}->setStyle(height => $self->{_options}{contentHeight} . 'px')
@@ -303,7 +302,7 @@ sub _realize {
     }
     my $options = toJSON($self->{_options});
 
-    $self->_appendInitScript("IWL.ComboView.create('$id', @{[$model->toJSON]}, $options);");
+    $self->_appendInitScript("IWL.ComboView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);");
 }
 
 sub _init {

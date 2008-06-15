@@ -138,9 +138,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var render = this.options.cellAttributes[i].renderTemplate;
             if (render) {
                 render = new Template(render);
-                var options = Object.isObject(values[i])
-                    ? render.evaluate(values[i])
-                    : Object.extend(Object.clone(mappedValues), {cellValue: values[i]});
+                var options = Object.extend(Object.clone(mappedValues), {cellValue: values[i]});
                 cellTemplate['column' + i] = render.evaluate(options);
             } else {
                 var index = cMap[i];
@@ -754,6 +752,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
                 var callback = loadData.bind(this);
                 this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
+                this.model.signalConnect('iwl:clear', callback);
                 this.model.signalConnect('iwl:load_data', callback);
                 this.model.signalConnect('iwl:sort_column_change', callback);
                 this.model.signalConnect('iwl:nodes_reorder', callback);
@@ -782,8 +781,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 maxHeight: 400,
                 popUpDelay: 0.2
             }, arguments[2]);
-            if (Object.keys(model.options.columnTypes).length)
-                IWL.ListModel.overrideDefaultDataTypes(model.options.columnTypes);
             this.button = this.down('.comboview_button');
             this.content = this.down('.comboview_content');
             this.containers = {};
@@ -799,6 +796,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             normalizeCellAttributes.call(this);
 
             if (model) {
+                if (Object.keys(model.options.columnTypes).length)
+                    IWL.ListModel.overrideDefaultDataTypes(model.options.columnTypes);
                 if (!(model instanceof IWL.ListModel))
                     model = new (model.classType.objectize())(model);
                 this.setModel(model);

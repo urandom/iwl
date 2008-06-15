@@ -270,8 +270,8 @@ IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
 
       this.parentNode = undefined;
       if (!model.frozen) {
-        this.removeModel();
-        this.each(this.removeModel.bind(this));
+        this._removeModel();
+        this.each(this._removeModel.bind(this));
       }
 
       model.emitSignal('iwl:node_remove', this, parentNode);
@@ -284,7 +284,7 @@ IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
     clear: function() {
       this.model.freeze();
       this.childNodes.invoke('remove');
-      return this.model.thaw().emitSignal('iwl:load_data', this);
+      return this.model.thaw().emitSignal('iwl:clear', this);
     },
 
     down: function(index) {
