@@ -897,8 +897,8 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.emitSignal('iwl:load');
         },
         _expandResponse: function(json, params, options) {
-            if (json && json.length != 0) {
-                this.append(json);
+            if (json && json.data && json.data.length != 0) {
+                this.append(json.data);
                 this.expand(options.all);
             }
             this._expanding = false;
