@@ -11,6 +11,6 @@ like($hbox->getContent, qr(^<div (?:(?:class="hbox"|id="foo")\s*){2}><div (?:(?:
 <div class="hbox_start"></div>
 <div (?:(?:class="hbox_end"|style="margin: 3px 1px")\s*){2}></div>
 <div class="hbox_end"></div>
+<div class="iwl-clear"></div>
 </div>
-<span style="clear: both"></span>
 $));

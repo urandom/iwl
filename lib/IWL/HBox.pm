@@ -90,8 +90,8 @@ sub packEnd {
 sub _realize {
     my $self = shift;
 
+    $self->appendChild(IWL::Container->new(class => 'iwl-clear'));
     $self->SUPER::_realize;
-    $self->appendAfter(IWL::Container->new(inline => 1, style => {clear => 'both'}));
 }
 
 1;

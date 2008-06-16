@@ -183,7 +183,7 @@ sub _init {
     $self->{__pageCount} = $page_count;
     $self->{__pageEntry} = $page_entry;
 
-    $self->appendChild($first, $prev, $label, $next, $last);
+    $self->appendChild($first, $prev, $label, $next, $last, IWL::Container->new(class => 'iwl-clear'));
 
     $self->{__options} = {};
     $self->{__options}{pageCount} = $args{pageCount};
