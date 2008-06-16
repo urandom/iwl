@@ -52,6 +52,14 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         if (node.attributes.insensitive)
             this.setSensitivity(node, false);
+
+        element.signalConnect('dom:mouseenter', function(event) {
+            changeHighlight.call(this, node);
+        }.bind(this));
+        element.signalConnect('dom:mouseleave', function(event) {
+            changeHighlight.call(this);
+        }.bind(this));
+        element.signalConnect('click', toggleSelectNode.bindAsEventListener(this, node));
     }
 
     function cellFunctionRenderer(cells, values, node) {
@@ -131,6 +139,22 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             setNodeAttributes.call(this, children[i], node);
             cellFunctionRenderer.call(this, children[i], values, node);
         }
+    }
+
+    function changeHighlight(node) {
+        var current = this.currentNodeHighlight;
+        if (current) {
+            var element = nodeMap[this.id][current.attributes.id].element;
+            element.removeClassName('iconview_node_highlight');
+            element.highlight = false;
+        }
+        if (node) {
+            var element = nodeMap[this.id][node.attributes.id].element;
+            if (element.sensitive || node.childCount != 0)
+                element.addClassName('iconview_node_highlight');
+            element.highlight = true;
+        }
+        this.currentNodeHighlight = node;
     }
 
     function normalizeCellAttributes() {
@@ -270,6 +294,47 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function toggleSelectNode(event, node) {
+        var first = this.selectedNodes[0];
+        if (!event.ctrlKey) {
+            for (var i = 0, l = this.selectedNodes.length; i < l; i++)
+                unselectNode.call(this, this.selectedNodes[i], true);
+            this.selectedNodes = [];
+        }
+        if (event.shiftKey && first) {
+            var map = nodeMap[this.id];
+            var fIndex = first.getIndex();
+            var cIndex = node.getIndex();
+            if (cIndex == fIndex)
+                return selectNode.call(this, node);
+
+            var property = fIndex < cIndex ? 'nextSibling' : 'previousSibling';
+            var sibling = first;
+            for (var i = 0, l = Math.abs(fIndex - cIndex) + 1; i < l; i++) {
+                selectNode.call(this, sibling);
+                sibling = sibling[property];
+            }
+        } else if (event.ctrlKey && this.selectedNodes.length) {
+            if (this.selectedNodes.indexOf(node) > -1)
+                unselectNode.call(this, node);
+            else
+                selectNode.call(this, node);
+        } else {
+            selectNode.call(this, node);
+        }
+    }
+
+    function selectNode(node) {
+        nodeMap[this.id][node.attributes.id].element.addClassName('iconview_node_selected');
+        this.selectedNodes.push(node);
+    }
+
+    function unselectNode(node, skipRemoval) {
+        if (!skipRemoval)
+            this.selectedNodes = this.selectedNodes.without(node);
+        nodeMap[this.id][node.attributes.id].element.removeClassName('iconview_node_selected');
+    }
+
     return {
         /**
          * Sets the active item of the IconView
@@ -377,6 +442,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
+            this.selectedNodes = [];
 
             getIconMargin.call(this);
             this.columns = this.options.columns

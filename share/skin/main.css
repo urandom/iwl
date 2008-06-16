@@ -1723,3 +1723,12 @@ div.tooltip_content {
     text-align: center;
     color: #111;
 }
+.iconview_node_highlight .iconview_node_text {
+    color: #333;
+    font-weight: bold;
+}
+.iconview_node_selected .iconview_node_text,
+.iconview_node_selected .iconview_node_image {
+    border: 1px solid #6a81a2;
+    background-color: #d2d4e3;
+}
