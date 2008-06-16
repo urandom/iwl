@@ -75,13 +75,6 @@ sub dataReader {
     $self->SUPER::dataReader(%options);
 }
 
-sub getScript {
-    my $self = shift;
-
-    my $data = $self->toJSON;
-    return 'window.' . $self->{options}{id} . " = new IWL.TreeModel($data);";
-}
-
 =head1
 
 Data:
@@ -125,6 +118,7 @@ sub _init {
 
     $self->SUPER::_init($columns, %args);
     $self->{_classType} = 'IWL.TreeModel';
+    push @{$self->{_requiredResources}{js}}, 'treemodel.js';
 }
 
 sub _requestChildrenEvent {

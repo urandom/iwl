@@ -85,15 +85,20 @@ sub new {
 
 Sets the model for the view
 
-Parameter: B<MODEL> - an L<IWL::TreeModel>
+Parameter: B<MODEL> - an L<IWL::ListModel> or L<IWL::TreeModel>
 
 =cut
 
 sub setModel {
     my ($self, $model) = @_;
 
-    $self->{_model}->remove if $self->{_model};
-    $self->{_model} = $model;
+    $self->unrequire($self->{_model}->getRequiredResources)
+        if $self->{_model};
+
+    if ($model) {
+        $self->{_model} = $model;
+        $self->require($model->getRequiredResources);
+    }
 
     return $self;
 }
@@ -343,7 +348,7 @@ sub _init {
 
     delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
 
-    $self->requiredJs('base.js', 'model.js', 'listmodel.js', 'treemodel.js', 'comboview.js');
+    $self->requiredJs('base.js', 'comboview.js');
     $self->_constructorArguments(%args);
 
     return $self;

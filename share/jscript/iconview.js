@@ -363,7 +363,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.model;
         },
 
-        _init: function(id, model) {
+        _init: function(model) {
             this.options = Object.extend({
                 columnWidth: [],
                 columnClass: [],
@@ -371,7 +371,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 initialPath: [0],
                 maxHeight: 400,
                 popUpDelay: 0.2
-            }, arguments[2]);
+            }, arguments[1]);
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
@@ -381,7 +381,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             getIconMargin.call(this);
             this.columns = this.options.columns
                         || parseInt(this.offsetWidth / this.options.columnWidth);
-            nodeMap[id] = {};
+            nodeMap[this.id] = {};
 
             normalizeCellAttributes.call(this);
 
@@ -399,8 +399,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 window.attachEvent("onunload", function() {
                     this.model = null;
                     this.pageContainer = null;
-                    nodeMap[id] = {};
-                });
+                    nodeMap[this.id] = {};
+                }.bind(this));
 
             this.emitSignal('iwl:load');
         }

@@ -772,7 +772,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.model;
         },
 
-        _init: function(id, model) {
+        _init: function(model) {
             this.options = Object.extend({
                 columnWidth: [],
                 columnClass: [],
@@ -780,7 +780,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 initialPath: [0],
                 maxHeight: 400,
                 popUpDelay: 0.2
-            }, arguments[2]);
+            }, arguments[1]);
             this.button = this.down('.comboview_button');
             this.content = this.down('.comboview_content');
             this.containers = {};
@@ -790,7 +790,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
 
-            nodeMap[id] = {};
+            nodeMap[this.id] = {};
 
             connectSignals.call(this);
             normalizeCellAttributes.call(this);
@@ -808,8 +808,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (window.attachEvent)
                 window.attachEvent("onunload", function() {
                     this.model = null;
-                    nodeMap[id] = {};
-                });
+                    nodeMap[this.id] = {};
+                }.bind(this));
 
             this.nodeSeparatorCallback = Object.isString(this.options.nodeSeparatorCallback)
                 ? this.options.nodeSeparatorCallback.objectize()

@@ -208,10 +208,17 @@ sub dataReader {
 }
 
 sub getScript {
-    my $self = shift;
+    my ($self, $environment) = @_;
+
+    $environment->require($self->getRequiredResources)
+        if $environment;
 
     my $data = $self->toJSON;
-    return 'window.' . $self->{options}{id} . " = new IWL.ListModel($data);";
+    return 'window.' . $self->{options}{id} . " = new " . $self->{_classType} . "($data);";
+}
+
+sub getRequiredResources {
+    return %{shift->{_requiredResources} || {}};
 }
 
 =head1
@@ -285,6 +292,7 @@ sub _init {
     $self->{columns} = [];
     $self->{rootNodes} = [];
     $self->{_classType} = 'IWL.ListModel';
+    $self->{_requiredResources} = {js => ['dist/prototype.js', 'model.js', 'listmodel.js']};
     $columns = [] unless 'ARRAY' eq ref $columns;
 
     return $self->_pushFatalError(__"No columns have been given.")
