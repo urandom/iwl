@@ -171,29 +171,36 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
 
     this.box = new Element('div', {className: 'draggable_box_selection'});
-    this.options.parent.appendChild(this.box);
+    this.element.appendChild(this.box);
     this.box.style.left = pointer[0] + 'px';
     this.box.style.top = pointer[1] + 'px';
     this.box.setOpacity(this.options.boxOpacity);
-    this.initialPosition = pointer;
+    this.initialPointer = pointer;
 
     Draggables.notify('onStart', this, event);
-    this.element.emitSignal('iwl:drag_begin', this, pointer);
+    this.element.emitSignal(
+      'iwl:box_selection_begin',
+      this,
+      relativeCoordinates.call(this, this.initialPointer),
+      relativeCoordinates.call(this, pointer)
+    );
   }
 
   function draw(pointer) {
-    var delta = [this.initialPosition[0] - pointer[0],
-                 this.initialPosition[1] - pointer[1]];
-    if (delta[0] > 0) {
+    var delta = [this.initialPointer[0] - pointer[0],
+                 this.initialPointer[1] - pointer[1]];
+    var tl = this.boundary.tl;
+    var br = this.boundary.br;
+    if (delta[0] > 0 && pointer[0] > tl[0]) {
       this.box.style.left = pointer[0] + 'px';
       this.box.style.width = delta[0] + 'px';
-    } else {
+    } else if (pointer[0] < br[0]) {
       this.box.style.width = -delta[0] + 'px';
     }
-    if (delta[1] > 0) {
+    if (delta[1] > 0 && pointer[1] > tl[1]) {
       this.box.style.top = pointer[1] + 'px';
       this.box.style.height = delta[1] + 'px';
-    } else {
+    } else if (pointer[1] < br[1]) {
       this.box.style.height = -delta[1] + 'px';
     }
   }
@@ -202,18 +209,29 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.dragging = false;
     this.box.remove();
 
+    var pointer = Event.pointer(event);
+    pointer = [pointer.x, pointer.y];
     Draggables.notify('onEnd', this, event);
-    this.element.emitSignal('iwl:drag_end', this);
+    this.element.emitSignal(
+      'iwl:box_selection_end',
+      this,
+      relativeCoordinates.call(this, this.initialPointer),
+      relativeCoordinates.call(this, pointer)
+    );
 
     Draggables.deactivate(this);
+  }
+
+  function relativeCoordinates(pointer) {
+    var pos = this.boundary.tl;
+    return [pointer[0] - pos[0], pointer[1] - pos[1]];
   }
 
   return {
     initialize: function(element) {
       this.element = $(element);
       this.options = Object.extend({
-        boxOpacity: 0.6,
-        parent: this.element
+        boxOpacity: 0.8
       }, arguments[1] || {});
       this.eventMouseDown = initDrag.bindAsEventListener(this);
       Event.observe(this.element, 'mousedown', this.eventMouseDown);
@@ -226,15 +244,15 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     updateDrag: function(event, pointer) {
       if (!this.dragging) startDrag.call(this, event, pointer);
 
-      if (   pointer[0] > this.boundary.tl[0]
-          && pointer[0] < this.boundary.br[0]
-          && pointer[1] > this.boundary.tl[1]
-          && pointer[1] < this.boundary.br[1]
-        )
-        draw.call(this, pointer);
+      draw.call(this, pointer);
 
       Draggables.notify('onDrag', this, event);
-      this.element.emitSignal('iwl:drag_motion', this, pointer);
+      this.element.emitSignal(
+        'iwl:box_selection_motion',
+        this,
+        relativeCoordinates.call(this, this.initialPointer),
+        relativeCoordinates.call(this, pointer)
+      );
 
       if(Prototype.Browser.WebKit) window.scrollBy(0,0);
       

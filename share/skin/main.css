@@ -1711,6 +1711,9 @@ div.tooltip_content {
     color: #111;
     margin: 1px 0;
     overflow: auto;
+
+    /* Required */
+    position: relative;
 }
 .iconview_page_container {
     background: #eee;
@@ -1735,7 +1738,7 @@ div.tooltip_content {
 
 .iconview_node_highlight .iconview_node_text {
     color: #333;
-    font-weight: bold;
+    font-style: italic;
 }
 .iconview_node_selected .iconview_node_text,
 .iconview_node_selected .iconview_node_image {
