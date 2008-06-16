@@ -154,6 +154,105 @@ IWL.Droppable = Class.create((function() {
   }
 })());
 
+IWL.BoxSelection = Class.create(Draggable, (function() {
+  function initDrag(event) {
+    var pointer = [Event.pointerX(event), Event.pointerY(event)];
+    var pos     = Position.cumulativeOffset(this.element);
+    this.offset = [0,1].map( function(i) { return (pointer[i] - pos[i]) });
+    Draggables.activate(this);
+    Event.stop(event);
+  }
+
+  function startDrag(event, pointer) {
+    this.dragging = true;
+
+    var pos = this.element.cumulativeOffset();
+    var dim = this.element.getDimensions();
+    this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
+
+    this.box = new Element('div', {className: 'draggable_box_selection'});
+    this.options.parent.appendChild(this.box);
+    this.box.style.left = pointer[0] + 'px';
+    this.box.style.top = pointer[1] + 'px';
+    this.box.setOpacity(this.options.boxOpacity);
+    this.initialPosition = pointer;
+
+    Draggables.notify('onStart', this, event);
+    this.element.emitSignal('iwl:drag_begin', this, pointer);
+  }
+
+  function draw(pointer) {
+    var delta = [this.initialPosition[0] - pointer[0],
+                 this.initialPosition[1] - pointer[1]];
+    if (delta[0] > 0) {
+      this.box.style.left = pointer[0] + 'px';
+      this.box.style.width = delta[0] + 'px';
+    } else {
+      this.box.style.width = -delta[0] + 'px';
+    }
+    if (delta[1] > 0) {
+      this.box.style.top = pointer[1] + 'px';
+      this.box.style.height = delta[1] + 'px';
+    } else {
+      this.box.style.height = -delta[1] + 'px';
+    }
+  }
+
+  function finishDrag(event, success) {
+    this.dragging = false;
+    this.box.remove();
+
+    Draggables.notify('onEnd', this, event);
+    this.element.emitSignal('iwl:drag_end', this);
+
+    Draggables.deactivate(this);
+  }
+
+  return {
+    initialize: function(element) {
+      this.element = $(element);
+      this.options = Object.extend({
+        boxOpacity: 0.6,
+        parent: this.element
+      }, arguments[1] || {});
+      this.eventMouseDown = initDrag.bindAsEventListener(this);
+      Event.observe(this.element, 'mousedown', this.eventMouseDown);
+      Draggables.register(this);
+    },
+    destroy: function() {
+      Event.stopObserving(this.element, 'mousedown', this.eventMouseDown);
+      Draggables.unregister(this);
+    },
+    updateDrag: function(event, pointer) {
+      if (!this.dragging) startDrag.call(this, event, pointer);
+
+      if (   pointer[0] > this.boundary.tl[0]
+          && pointer[0] < this.boundary.br[0]
+          && pointer[1] > this.boundary.tl[1]
+          && pointer[1] < this.boundary.br[1]
+        )
+        draw.call(this, pointer);
+
+      Draggables.notify('onDrag', this, event);
+      this.element.emitSignal('iwl:drag_motion', this, pointer);
+
+      if(Prototype.Browser.WebKit) window.scrollBy(0,0);
+      
+      Event.stop(event);
+    },
+    endDrag: function(event) {
+      if(!this.dragging) return;
+      finishDrag.call(this, event, true);
+      Event.stop(event);
+    },
+    keyPress: function(event) {
+      if(event.keyCode != Event.KEY_ESC) return;
+      finishDrag.call(this, event, false);
+      Event.stop(event);
+    },
+  };
+})());
+
 (function() {
   var show = Droppables.show;
 

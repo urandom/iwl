@@ -2,8 +2,8 @@
 IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataTypes.IMAGE, IWL.ListModel.DataTypes.STRING],
         imageTemplate = new Template('<img class="iconview_node_image" src="#{src}" alt="#{alt}" />'),
-        hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_vertical">#{text}</span>');
-        vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_horizontal">#{text}</p>');
+        hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal">#{text}</span>');
+        vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical">#{text}</p>');
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iconview_node #{nodePosition}" iwl:nodePath="#{nodePath}">#{imageColumn}#{textColumn}</div>');
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>';
 
@@ -59,7 +59,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         element.signalConnect('dom:mouseleave', function(event) {
             changeHighlight.call(this);
         }.bind(this));
-        element.signalConnect('click', toggleSelectNode.bindAsEventListener(this, node));
+        element.signalConnect('mousedown', toggleSelectNode.bindAsEventListener(this, node));
     }
 
     function cellFunctionRenderer(cells, values, node) {
@@ -74,9 +74,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function recreateNode(node) {
         var cellTemplate = cellTemplateRenderer.call(this, node), nodePath = node.getPath().toJSON(), id = this.id;
         var bugs = Prototype.Browser.IE ? 3 * this.options.colums : Prototype.Browser.Gecko ? this.options.columns : 0;
-        var width = this.options.columns > 0
-            ? 'width: ' + (this.offsetWidth / this.columns - this.iconMargin - bugs) + 'px;'
-            : 'width: ' + this.options.columnWidth + 'px;';
+        this.columnWidth = this.options.columns > 0
+            ? this.offsetWidth / this.columns - this.iconMargin - bugs
+            : this.options.columnWidth;
+        var width = 'width: ' + this.columnWidth + 'px;';
 
         cellTemplate.nodeStyle = width;
         if (!node.previousSibling && !node.nextSibling)
@@ -109,9 +110,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function createNodes(nodes) {
         var html = [], nodeLength = nodes.length, column = 0;
         var bugs = Prototype.Browser.IE ? 3 * this.options.colums : Prototype.Browser.Gecko ? this.options.columns : 0;
-        var width = this.options.columns > 0
-            ? 'width: ' + (this.offsetWidth / this.columns - this.iconMargin - bugs) + 'px;'
-            : 'width: ' + this.options.columnWidth + 'px;';
+        this.columnWidth = this.options.columns > 0
+            ? this.offsetWidth / this.columns - this.iconMargin - bugs
+            : this.options.columnWidth;
+        var width = 'width: ' + this.columnWidth + 'px;';
         for (var i = 0, node = nodes[0]; i < nodeLength; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
 
@@ -296,11 +298,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function toggleSelectNode(event, node) {
         var first = this.selectedNodes[0];
-        if (!event.ctrlKey) {
-            for (var i = 0, l = this.selectedNodes.length; i < l; i++)
-                unselectNode.call(this, this.selectedNodes[i], true);
-            this.selectedNodes = [];
-        }
+        Event.stop(event);
+        if (!event.ctrlKey)
+            unselectAll.call(this)
         if (event.shiftKey && first) {
             var map = nodeMap[this.id];
             var fIndex = first.getIndex();
@@ -333,6 +333,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!skipRemoval)
             this.selectedNodes = this.selectedNodes.without(node);
         nodeMap[this.id][node.attributes.id].element.removeClassName('iconview_node_selected');
+    }
+
+    function unselectAll() {
+        for (var i = 0, l = this.selectedNodes.length; i < l; i++)
+            unselectNode.call(this, this.selectedNodes[i], true);
+        this.selectedNodes = [];
     }
 
     return {
@@ -469,6 +475,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 }.bind(this));
 
             this.emitSignal('iwl:load');
+            this.signalConnect('mousedown', unselectAll.bind(this));
         }
     }
 })());

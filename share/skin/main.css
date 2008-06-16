@@ -1560,9 +1560,13 @@ div.tooltip_content {
 }
 
 /* DND */
-.draggable_outline {
+.draggable_outline, .draggable_box_selection {
     background: #eeeeee;
     border: 1px solid  #6a81a3;
+}
+
+.draggable_box_selection {
+    position: absolute;
 }
 
 /* ComboView */
@@ -1706,6 +1710,7 @@ div.tooltip_content {
     background-color: white;
     color: #111;
     margin: 1px 0;
+    overflow: auto;
 }
 .iconview_page_container {
     background: #eee;
@@ -1718,11 +1723,16 @@ div.tooltip_content {
     margin: 0 auto;
 }
 .iconview_node {
-    margin: 2px;
+    margin: 10px;
     float: left;
     text-align: center;
     color: #111;
 }
+.iconview_node_text_vertical {
+    margin: 0px;
+    margin-top: 2px;
+}
+
 .iconview_node_highlight .iconview_node_text {
     color: #333;
     font-weight: bold;
