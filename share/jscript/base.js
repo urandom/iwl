@@ -15,9 +15,12 @@ Object.extend(IWL, {RPC: (function() {
       };
   }
 
-  function eventCompletion(str) {
+  function eventCompletion(str, err) {
       return function(json, params, options) {
-          eval(str);
+          if (json.extras && json.extras.error)
+              eval(err);
+          else
+              eval(str);
       };
   }
 
@@ -68,8 +71,8 @@ Object.extend(IWL, {RPC: (function() {
                               element[options.method].call(element, json, params, options);
                           if (Object.isFunction(options.responseCallback))
                               options.responseCallback.call(element, json, params, options);
-                          if (options.onComplete) {
-                              var callback = eventCompletion(options.onComplete);
+                          if (options.onComplete || options.onError) {
+                              var callback = eventCompletion(options.onComplete, options.onError);
                               callback.call(element, json, params, options);
                           }
                           eventFinalize(element, eventName, options);
@@ -83,8 +86,8 @@ Object.extend(IWL, {RPC: (function() {
                       onComplete: function(or) {
                           if (options.responseCallback && typeof options.responseCallback === 'function')
                               options.responseCallback.call(element, {}, params, options);
-                          if (options.onComplete) {
-                              var callback = eventCompletion(options.onComplete);
+                          if (options.onComplete || options.onError) {
+                              var callback = eventCompletion(options.onComplete, options.onError);
                               callback.call(element, {}, params, options);
                           }
                           eventFinalize(element, eventName, options);
