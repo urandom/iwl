@@ -66,8 +66,8 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     return {
-        _init: function(id, form) {
-            var button = $(id + '_button');
+        _init: function(form) {
+            var button = $(this.id + '_button');
             if (!button) {
                 var args = arguments;
                 setTimeout(function () {this._init.apply(this, args)}.bind(this), 500);
@@ -75,14 +75,17 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             this.options = Object.extend({
                 showTooltip: true
-            }, arguments[2] || {});
-            this.messages = Object.extend({}, arguments[3]);
+            }, arguments[1] || {});
+            this.messages = Object.extend({}, arguments[2]);
             button.createHtmlElement(form);
-            this.file = $(id + '_file');
+            this.file = $(this.id + '_file');
             this.button = button;
-            this.frame = $(id + '_frame');
+            this.frame = $(this.id + '_frame');
             this.tooltip = null;
             adjust.call(this);
+
+            this.loaded = true;
+            this.emitSignal('iwl:load');
         }
     }
 })());

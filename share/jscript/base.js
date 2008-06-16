@@ -145,7 +145,7 @@ IWL.Widget = {
   	if (this.current.prepareEvents)
             this.current.prepareEvents();
 	if (this.current._init)
-	    this.current._init.apply(this.current, arguments);
+            this.current._init.apply(this.current, $A(arguments).slice(1));
 
         this.current.emitSignal('iwl:init');
         return this.current;

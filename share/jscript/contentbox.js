@@ -496,7 +496,7 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             return true;
         },
-        _init: function(id) {
+        _init: function() {
             this.options = Object.extend({
                 type: 'none',
                 typeOptions: {},
@@ -506,11 +506,11 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 closeModalOnClick: false,
                 positionAtCenter: false,
                 modalOpacity: 0.7
-            }, arguments[1] || {});
-            this.contentboxTitle = $(id + '_titler');
-            this.contentboxHeader = $(id + '_header');
-            this.contentboxContent = $(id + '_content');
-            this.contentboxFooter = $(id + '_footerr');
+            }, arguments[0] || {});
+            this.contentboxTitle = $(this.id + '_titler');
+            this.contentboxHeader = $(this.id + '_header');
+            this.contentboxContent = $(this.id + '_content');
+            this.contentboxFooter = $(this.id + '_footerr');
             this.modalElement = null;
             this.hiddenQuirks = [];
 
@@ -526,6 +526,8 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     this.autoWidth();
                     removeQuirks.call(this);
                     this.setStyle({visibility: original_visibility});
+                    this.loaded = true;
+                    this.emitSignal('iwl:load');
                 }.bind(this), 250);
             } else {
                 removeQuirks.call(this);
@@ -534,8 +536,11 @@ IWL.Contentbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             if (this.options.modal)
                 this.setModal(true);
-            if (!deter_visibility)
+            if (!deter_visibility) {
                 this.setStyle({visibility: original_visibility});
+                this.loaded = true;
+                this.emitSignal('iwl:load');
+            }
         }
     }
 })());

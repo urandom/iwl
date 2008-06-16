@@ -287,8 +287,8 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
 
-        _init: function(id) {
-            this.statusbar = $(id + '_status_label');
+        _init: function() {
+            this.statusbar = $(this.id + '_status_label');
             this.iconsContainer = this.down();
             this.icons = new Array;
             this.selectedIcons = new Array;
@@ -296,8 +296,8 @@ IWL.Iconbox = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.options = Object.extend({
                 multipleSelect: false,
                 clickToSelect: true
-            }, arguments[1] || {});
-            this.messages = Object.extend({}, arguments[2]);
+            }, arguments[0] || {});
+            this.messages = Object.extend({}, arguments[1]);
 
             var childElements = this.iconsContainer.childElements().select(function(e) {
                 return e.hasClassName('icon');
@@ -477,7 +477,7 @@ IWL.Iconbox.Icon = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
 
-        _init: function(id, iconbox) {
+        _init: function(iconbox) {
             this.iconbox = iconbox;
             this.label = this.select('.icon_label')[0];
             this.image = this.select('img')[0];

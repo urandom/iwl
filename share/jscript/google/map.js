@@ -54,6 +54,7 @@ IWL.Google.Map = Object.extend(Object.extend({}, IWL.Widget), (function() {
     }.bind(this));
 
     Event.observe(document.body, 'unload', google.maps.Unload);
+    this.loaded = true;
     this.emitSignal('iwl:load');
   }
 

@@ -26,13 +26,14 @@ IWL.NavBar = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.emitEvent('IWL-NavBar-activatePath', {path: paths, values: values});
             return this;
         },
-        _init: function(id) {
+        _init: function() {
             var className = $A(this.classNames()).first();
             this.crumbs = this.select('.' + className + '_crumb').map(
                 function(path) { return IWL.NavBar.Path.create(path, this) }.bind(this)
             );
             this.combo = IWL.NavBar.Path.create(this.id + '_combo', this);
 
+            this.loaded = true;
             this.emitSignal('iwl:load');
         }
     }
@@ -83,7 +84,7 @@ IWL.NavBar.Path = Object.extend(Object.extend({}, IWL.Widget), (function() {
         getText: function() {
             return Element.getText(this.isCombo ? this.options[this.selectedIndex] : this);
         },
-        _init: function(id, navbar) {
+        _init: function(navbar) {
             this.navbar = navbar;
             this.isCombo = this.hasClassName('combo');
 

@@ -344,6 +344,8 @@ IWL.Tooltip = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
             fillDimensions.call(this);
             draw.call(this);
+            this.loaded = true;
+            this.emitSignal('iwl:load');
         }
     }
 })());

@@ -98,13 +98,13 @@ IWL.ProgressBar = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return this.pulsating;
         },
 
-        _init: function(id) {
+        _init: function() {
             this.options = Object.extend({
                 opacity: 0.7,
                 value: 0.0,
                 text: '',
                 pulsate: false
-            }, arguments[1] || {});
+            }, arguments[0] || {});
 
             this.cleanWhitespace();
 
@@ -120,6 +120,7 @@ IWL.ProgressBar = Object.extend(Object.extend({}, IWL.Widget), (function() {
 
             this.block.setOpacity(this.options.opacity);
 
+            this.loaded = true;
             this.emitSignal('iwl:load');
         }
     }

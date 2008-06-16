@@ -185,7 +185,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return dims;
         },
 
-        _init: function(id) {
+        _init: function() {
             var buttonCount = 5;
             var visibility = this.getStyle('visibility');
             this.style.visibility = 'hidden';
@@ -211,7 +211,7 @@ IWL.PageControl = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.options = Object.extend({
                 bound: false,
                 page: 1
-            }, arguments[1] || {});
+            }, arguments[0] || {});
             this.input.value = this.currentPage = this.options.page;
             this.show();
 

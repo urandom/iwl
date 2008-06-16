@@ -77,7 +77,7 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return tab;
         },
 
-        _init: function (id) {
+        _init: function () {
             this.tabContainer = this.down(1);
             this.pageContainer = this.down().next(1);
 
@@ -93,6 +93,8 @@ IWL.Notebook = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if ($_.hasClassName('notebook_tab'))
                     this.tabs.push(IWL.Notebook.Tab.create($_, this, pages[$i]));
             }.bind(this));
+            this.loaded = true;
+            this.emitSignal('iwl:load');
         }
     }
 })());
@@ -198,7 +200,7 @@ IWL.Notebook.Tab = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (anchor) return anchor.getText();
         },
         
-        _init: function(id, notebook, page) {
+        _init: function(notebook, page) {
             this.notebook = notebook;
             this.page = page;
             initEvents.call(this);

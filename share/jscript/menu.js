@@ -293,7 +293,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
 
-        _init: function(id) {
+        _init: function() {
             this.menuItems = [];
             this.parentItem = null;
             this.parentMenu = null;
@@ -304,7 +304,7 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 mouseOverActivation: false,
                 maxHeight: 0,
                 popDownTimeout: 500
-            }, arguments[1] || {});
+            }, arguments[0] || {});
 
             this.childElements().each(function ($_) {
                 if ($_.tagName == 'LI'
@@ -344,6 +344,8 @@ IWL.Menu = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     this.popDown();
             }.bind(this));
             this.keyLogger(keyEventsCB.bindAsEventListener(this));
+            this.loaded = true;
+            this.emitSignal('iwl:load');
         }
     }
 })());
@@ -543,7 +545,7 @@ IWL.Menu.Item = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.emitSignal('iwl:activate');
         },
 
-        _init: function(id, menu) {
+        _init: function(menu) {
             this.submenu = null;
             this.menu = menu;
 

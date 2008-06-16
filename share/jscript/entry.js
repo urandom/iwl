@@ -259,13 +259,13 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             return this;
         },
 
-        _init: function(id) {
+        _init: function() {
             this.options = Object.extend({
                 clearButton: false,
                 autoComplete: [],
                 defaultText: '',
                 blurValue: null
-            }, arguments[1] || {});
+            }, arguments[0] || {});
 
             this.focused = false;
             this.cleanWhitespace();
@@ -290,6 +290,7 @@ IWL.Entry = Object.extend(Object.extend({}, IWL.Widget), (function() {
             setupAutoComplete.call(this);
 
             changeCallback.call(this);
+            this.loaded = true;
             this.emitSignal('iwl:load');
         }
     }

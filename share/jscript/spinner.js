@@ -226,7 +226,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 wrap: false,
                 precision: false,
                 mask: null
-            }, arguments[1] || {});
+            }, arguments[0] || {});
             this.input = this.control = this.select('.spinner_text')[0];
             this.leftSpinner = this.select('.spinner_left')[0];
             this.rightSpinner = this.select('.spinner_right')[0];
@@ -246,6 +246,7 @@ IWL.Spinner = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.keyLogger(keyEventsCB.bindAsEventListener(this));
             this.registerFocus();
 
+            this.loaded = true;
             this.emitSignal('iwl:load');
         }
     }

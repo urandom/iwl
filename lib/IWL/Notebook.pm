@@ -38,6 +38,10 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 Fires when the current tab of the notebook has changed
 
+=item B<load>
+
+Fires when the notebook has been loaded
+
 =back
 
 =cut
@@ -159,7 +163,7 @@ sub _init {
 
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'notebook.js');
-    $self->{_customSignals} = {current_tab_change => []};
+    $self->{_customSignals} = {current_tab_change => [], load => []};
 
     return $self;
 }

@@ -40,6 +40,10 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 Fires when the current page of the druid has changed
 
+=item B<load>
+
+Fires when the druid has been loaded
+
 =back
 
 =cut
@@ -178,7 +182,7 @@ sub _init {
     delete @args{qw(id)};
     $self->setId($id);
 
-    $self->{_customSignals} = {current_page_change => []};
+    $self->{_customSignals} = {current_page_change => [], load => []};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'druid.js');
 

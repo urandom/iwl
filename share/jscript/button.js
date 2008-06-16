@@ -371,7 +371,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this._disabled;
         },
 
-        _init: function(id) {
+        _init: function() {
             this.buttonParts = new Array;
             this.buttonImage = null;
             this.buttonLabel = null;
@@ -381,7 +381,7 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 disabled: false,
                 submit: false,
                 label: ''
-            }, arguments[1] || {});
+            }, arguments[0] || {});
             this.loaded = false;
             this.cleanWhitespace();
             createElements.call(this);
