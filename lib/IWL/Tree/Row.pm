@@ -476,7 +476,10 @@ sub _expandEvent {
     $list = [] unless ref $list eq 'ARRAY';
 
     $response->send(
-        content => '[' . join(',', map {$_->{__ignoreChildren} = 1; $_->getJSON} @$list) . ']',
+        content => '{data: ['
+            . join(',', map {$_->{__ignoreChildren} = 1; $_->getJSON} @$list)
+            . '], extras: ' . (toJSON($extras) || 'null')
+            . '}',
         header => IWL::Object::getJSONHeader,
     );
 }
