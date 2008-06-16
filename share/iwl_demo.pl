@@ -58,7 +58,11 @@ $rpc->handleEvent(
     sub {
         my ($params, $id, $elementData) = @_;
 
-        return {text => 'The combo was changed to ' . $elementData->{$id}}, $params;
+        if (int(rand(3))) {
+            return {text => 'The combo was changed to ' . $elementData->{$id}}, $params;
+        } else {
+            return {}, {error => 'rand returned 0'};
+        }
     },
 );
 
@@ -1024,11 +1028,12 @@ sub generate_rpc_events {
 	    insertion => 'bottom',
     });
     $button->registerEvent('IWL-Button-click', 'iwl_demo.pl', {}, {
-            onComplete => "IWL.Status.display(arguments[0].data.text)",
+            onComplete => "IWL.Status.display(json.data.text)",
             emitOnce => 1
     });
     $combo->registerEvent('IWL-Combo-change', 'iwl_demo.pl', {}, {
-            onComplete => "IWL.Status.display(arguments[0].data.text)",
+            onComplete => "IWL.Status.display(json.data.text)",
+            onError => "IWL.Status.display('A random error occurred: ' + json.extras.error)",
             collectData => 1
     });
 

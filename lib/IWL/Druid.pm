@@ -9,7 +9,6 @@ use base 'IWL::Container';
 
 use IWL::String qw(randomize escape);
 use IWL::Button;
-use IWL::Break;
 use IWL::Druid::Page;
 
 use Locale::TextDomain qw(org.bloka.iwl);
@@ -39,6 +38,10 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 =item B<current_page_change>
 
 Fires when the current page of the druid has changed
+
+=item B<load>
+
+Fires when the druid has been loaded
 
 =back
 
@@ -158,7 +161,6 @@ sub _init {
     my $ok_button =
       IWL::Button->newFromStock('IWL_STOCK_OK', size => 'medium', style => {visibility => 'hidden'});
     my $button_container = IWL::Container->new;
-    my $span             = IWL::Break->new(style => {clear => 'both'});
 
     $self->{_defaultClass}     = 'druid';
     $self->{__content}         = $content;
@@ -168,17 +170,15 @@ sub _init {
     $self->{__buttonContainer} = $button_container;
     $self->{__finishText}      = $__->{'Finish'};
     $self->appendChild($content);
-    $button_container->appendChild($ok_button);
-    $button_container->appendChild($back_button);
-    $button_container->appendChild($next_button);
+    $button_container->appendChild($ok_button, $back_button, $next_button);
+    $button_container->appendChild(IWL::Container->new(class => 'iwl-clear'));
     $self->appendChild($button_container);
-    $self->appendChild($span);
 
     my $id = $args{id} || randomize($self->{_defaultClass});
     delete @args{qw(id)};
     $self->setId($id);
 
-    $self->{_customSignals} = {current_page_change => []};
+    $self->{_customSignals} = {current_page_change => [], load => []};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'druid.js');
 

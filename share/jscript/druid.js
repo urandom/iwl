@@ -175,7 +175,7 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
 
-        _init: function (id, text) {
+        _init: function (text) {
             this.okButton = $(this.id + '_ok_button');
             this.backButton = $(this.id + '_back_button');
             this.nextButton = $(this.id + '_next_button');
@@ -200,6 +200,8 @@ IWL.Druid = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (--count > 0) return;
                 this.nextText = this.nextButton.getLabel();
                 this._refreshButtons();
+                this.loaded = true;
+                this.emitSignal('iwl:load');
             }
 
             this.okButton.signalConnect('iwl:init', buttonLoad.bind(this));
@@ -424,7 +426,7 @@ IWL.Druid.Page = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
 
-        _init: function(id, druid) {
+        _init: function(druid) {
             this.druid = druid;
             this.check = {
                 callback: this.readAttribute('iwl:druidCheckCallback'),

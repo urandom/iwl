@@ -80,6 +80,10 @@ Fires when the contentbox has been hidden
 
 Fires when the contentbox has closed
 
+=item B<load>
+
+Fires when the contentbox has been loaded
+
 =back
 
 =cut
@@ -528,7 +532,7 @@ sub _init {
 
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'resizer.js', 'contentbox.js');
-    $self->{_customSignals} = {close => [], hide => [], show => []};
+    $self->{_customSignals} = {close => [], hide => [], show => [], load => []};
 
     # Callbacks
     return $self;

@@ -33,6 +33,10 @@ A javascript expression to be evaluated before the request takes place. It recei
 
 A javascript expression to be evaluated after the request takes place
 
+=item B<onError>
+
+A javascript expression to be evaluated, if the response contains an I<error> key in the extra hashref
+
 =item B<emitOnce>
 
 A boolean flag, causes the event to be emitted only once

@@ -736,7 +736,7 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
                 markWeekends: true,
                 astronomicalTime: true,
                 markedDates: []
-            }, arguments[1] || {});
+            }, arguments[0] || {});
             if (this.options.startDate instanceof Date)
                 this.startDate = this.date = this.options.startDate;
             else if (typeof this.options.startDate == 'number')
@@ -766,7 +766,7 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
             if (isNaN(this.date.getFullYear()))
                 this.startDate = this.date = new Date;
 
-            Object.extend(IWL.Calendar, arguments[2]);
+            Object.extend(IWL.Calendar, arguments[1]);
 
             if (!this.options.showWeekNumbers)
                 this.showWeekNumbers(false);
@@ -788,6 +788,7 @@ IWL.Calendar = Object.extend(Object.extend({}, IWL.Widget), (function() {
             this.keyLogger(keyEventsCB.bindAsEventListener(this));
             this.registerFocus();
 
+            this.loaded = true;
             this.emitSignal('iwl:load');
         }
     }
@@ -864,7 +865,7 @@ IWL.Calendar.Date = Object.extend(Object.extend({}, IWL.Widget), (function() {
             }
         },
 
-        _init: function(id, calendar) {
+        _init: function(calendar) {
             this.calendar = calendar;
 
             this.signalConnect('click', dateClickEvent.bindAsEventListener(this));

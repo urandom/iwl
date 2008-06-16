@@ -53,6 +53,10 @@ True, if an information tooltip should be shown
 
 Fires when a file has been uploaded
 
+=item B<load>
+
+Fires when the upload widget has been loaded
+
 =back
 
 =cut
@@ -221,7 +225,7 @@ sub _init {
     $button->setLabel(__('Browse ...'));
     $file->_constructorArguments(%args);
     $self->requiredJs('base.js', 'upload.js', 'tooltip.js');
-    $self->{_customSignals} = { upload => [] };
+    $self->{_customSignals} = { upload => [], load => [] };
 
     return $self;
 }

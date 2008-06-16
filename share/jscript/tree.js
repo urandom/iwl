@@ -519,7 +519,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
 
-        _init: function(id, images) {
+        _init: function(images) {
             this.body = $(this.tBodies[0]);
             this.currentRow = null;
             this.sortables = {};
@@ -534,7 +534,7 @@ IWL.Tree = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 clickToExpand: false,
                 scrollToSelection: false,
                 animate: false
-            }, arguments[2] || {});
+            }, arguments[1] || {});
 
             if (!this.body) return;
             this.body.isParent = true;
@@ -801,7 +801,7 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.path.length - 1;
         },
 
-        _init: function(id, tree) {
+        _init: function(tree) {
             this.tree = tree;
             this.childList = [];
 
@@ -893,6 +893,8 @@ IWL.Tree.Row = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         Event.stop(event);
                         this.collapse();}.bind(this));
             }
+            this.loaded = true;
+            this.emitSignal('iwl:load');
         },
         _expandResponse: function(json, params, options) {
             if (json && json.length != 0) {

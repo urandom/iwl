@@ -2,6 +2,7 @@ Release: 0.61
       . Fixes to the pod and a new IWL::Manual::Tutorial pod
       . Objects can unrequire resources (IWL::Object::unrequire)
       . Registering an event will automatically require the needed js files
+      . IWL::RPC improvements
 
 Release: 0.60 - 03.06.08
       . A logo and a move to github

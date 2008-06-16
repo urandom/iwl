@@ -50,6 +50,16 @@ The created tooltip will be represented by a single element, without bubbles
 
 =back
 
+=head1 SIGNALS
+
+=over 4
+
+=item B<load>
+
+Fires when the tooltip has been loaded
+
+=back
+
 =cut
 
 sub new {
@@ -199,6 +209,7 @@ sub _init {
     delete @args{qw(centerOnElement followMouse simple parent)};
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'tooltip.js');
+    $self->{_customSignals} = {load => []};
 
     return $self;
 }

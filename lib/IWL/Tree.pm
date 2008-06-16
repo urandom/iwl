@@ -78,6 +78,10 @@ Fires when a row has collapsed
 
 Fires when a row has expanded
 
+=item B<load>
+
+Fires when the tree has been loaded
+
 =back
 
 =head1 EVENTS
@@ -339,7 +343,8 @@ sub _init {
         unselect_all => [],
         row_activate => [],
         row_collapse => [],
-        row_expand   => []
+        row_expand   => [],
+        load         => [],
     };
     $self->setSelectable(0);
 }

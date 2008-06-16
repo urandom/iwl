@@ -36,6 +36,10 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 Fires when a menu item has been activated, via double clicking. Receives the activated item as a parameter
 
+=item B<load>
+
+Fires when the menubar has been loaded
+
 =back
 
 =cut
@@ -164,7 +168,7 @@ sub _init {
 
     $self->_constructorArguments(%args);
     $self->requiredJs('base.js', 'menu.js');
-    $self->{_customSignals} = {menu_item_activate => []};
+    $self->{_customSignals} = {menu_item_activate => [], load => []};
 }
 
 # Internal

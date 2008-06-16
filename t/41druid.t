@@ -16,9 +16,9 @@ like($druid->getContent, qr(<div (?:(?:class="(druid)"|id="\1_\d+")\s*){2}><div 
 <div (?:(?:iwl:druidCheckCallback="alert"|class="\1_page \1_page_selected"|iwl:druidCheckParam="\[%22this%22, 0\]"|iwl:druidFinalPage="1"|id="\1_page_\d+")\s*){5}><span id="label_\d+">Last page</span>
 </div>
 </div>
-<div (?:(?:class="\1_button_container"|id="\1_\d+_button_container")\s*){2}>.+</div>
-<br style="clear: both" />
+<div (?:(?:class="\1_button_container"|id="\1_\d+_button_container")\s*){2}>.+<div class="iwl-clear"></div>
+</div>
 .*dist/prototype.js.*prototype_extensions.js.*dist/effects.js.*scriptaculous_extensions.js.*base.js.*druid.js.*button.js.*?
 <script.*?IWL.Druid.create.*?(IWL.Button.create.*?){3}</script>
 </div>
-$)s);
+)s);
