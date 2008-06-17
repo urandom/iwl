@@ -5,7 +5,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal">#{text}</span>');
         vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical">#{text}</p>');
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iconview_node #{nodePosition}" iwl:nodePath="#{nodePath}">#{imageColumn}#{textColumn}</div>');
-        rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>';
+        rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
+        scrollbarSize = document.viewport.getScrollbarSize();
 
     function loadData(event) {
         createNodes.call(this, this.model.rootNodes);
@@ -266,7 +267,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.pageControl.unbind();
         this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
         if (!this.pageContainer && !this.options.placedPageControl) {
-            var pageContainer = new Element('div', {className: 'iconview_page_container'});
+            var pageContainer = new Element('div', {className: 'iconview_page_container', style: "width: " + this.offsetWidth + "px"});
             this.insert({after: pageContainer});
             pageContainer.appendChild(this);
             pageContainer.appendChild(this.pageControl);
@@ -527,7 +528,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             getIconMargin.call(this);
             this.columns = this.options.columns
-                        || parseInt(this.offsetWidth / this.options.columnWidth);
+                        || parseInt((this.offsetWidth - scrollbarSize) / this.options.columnWidth);
             nodeMap[this.id] = {};
 
             normalizeCellAttributes.call(this);
