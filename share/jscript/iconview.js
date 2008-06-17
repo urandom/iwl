@@ -52,16 +52,19 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         if (node.attributes.insensitive)
             this.setSensitivity(node, false);
-
-        element.signalConnect('dom:mouseenter', function(event) {
-            if (this.boxSelection && this.boxSelection.dragging) return;
-            changeHighlight.call(this, node);
-        }.bind(this));
-        element.signalConnect('dom:mouseleave', function(event) {
-            if (this.boxSelection && this.boxSelection.dragging) return;
-            changeHighlight.call(this);
-        }.bind(this));
-        element.signalConnect('mousedown', toggleSelectNode.bindAsEventListener(this, node));
+        var children = element.childElements();
+        for (var i = 0, l = children.length; i < l; i++) {
+            var child = children[i];
+            child.signalConnect('mouseover', function(event) {
+                if (this.boxSelection && this.boxSelection.dragging) return;
+                changeHighlight.call(this, node);
+            }.bind(this));
+            child.signalConnect('mouseout', function(event) {
+                if (this.boxSelection && this.boxSelection.dragging) return;
+                changeHighlight.call(this);
+            }.bind(this));
+            child.signalConnect('mousedown', toggleSelectNode.bindAsEventListener(this, node));
+        }
     }
 
     function cellFunctionRenderer(cells, values, node) {
@@ -276,8 +279,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var div = new Element('div');
         div.innerHTML = nodeTemplate.evaluate({});
         var icon = div.firstChild;
-        this.iconMarginX = parseFloat(icon.getStyle('margin-left') || 0) + parseFloat(icon.getStyle('margin-right') || 0);
-        this.iconMarginY = parseFloat(icon.getStyle('margin-top') || 0) + parseFloat(icon.getStyle('margin-bottom') || 0);
+        this.iconMarginLeft = parseFloat(icon.getStyle('margin-left') || 0);
+        this.iconMarginRight = parseFloat(icon.getStyle('margin-right') || 0);
+        this.iconMarginTop = parseFloat(icon.getStyle('margin-top') || 0);
+        this.iconMarginBottom = parseFloat(icon.getStyle('margin-bottom') || 0);
+        this.iconMarginX = this.iconMarginLeft + this.iconMarginRight;
+        this.iconMarginY = this.iconMarginTop + this.iconMarginBottom;
     }
 
     function replaceRowSeparators() {
@@ -297,6 +304,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 nodes[i].insert({after: rowSeparator});
             }
         }
+    }
+
+    function eventMouseDown(event) {
+        if (event.ctrlKey || event.shiftKey)
+            return;
+        unselectAll.call(this);
     }
 
     function toggleSelectNode(event, node) {
@@ -344,22 +357,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.selectedNodes = [];
     }
 
-    function getNodeAtPos(x, y) {
-        var columnIndex = Math.ceil(x / (this.columnWidth + this.iconMarginX)) - 1;
-        var map = nodeMap[this.id];
-        if (columnIndex < 0) columnIndex = 0;
-        else if (columnIndex > this.columns - 1) columnIndex = this.columns - 1;
-        for (var i = columnIndex, l = this.model.rootNodes.length; i < l; i += this.columns) {
-            var node = this.model.rootNodes[i];
-            var element = map[node.attributes.id].element;
-            var dims = [element.offsetWidth, element.offsetHeight];
-            var pos = [element.offsetLeft, element.offsetTop];
-            if (   x >= pos[0] - this.iconMarginX && x <= pos[0] + dims[0] + this.iconMarginX
-                && y >= pos[1] - this.iconMarginY && y <= pos[1] + dims[1] + this.iconMarginY)
-                return node;
-        }
-    }
-
     function boxSelectionEnd(event, draggable, startCoords, endCoords) {
         var tlCoords = [
             startCoords[0] < endCoords[0] ? startCoords[0] : endCoords[0],
@@ -371,27 +368,50 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         ];
         if (tlCoords[0] < 1) tlCoords[0] = 1;
         if (tlCoords[1] < 1) tlCoords[1] = 1;
-        var tlNode = getNodeAtPos.call(this, tlCoords[0], tlCoords[1]);
+        var columns = [];
+        for (var s = 0, i = 0; i < this.columns && s < tlCoords[0]; columns[0] = i++) {
+            s += this.iconMarginLeft + this.columnWidth;
+            if (tlCoords[0] < s) {
+                columns[0] = i;
+                break;
+            }
+            s += this.iconMarginRight;
+        }
+        for (var s = this.iconMarginLeft, i = 0; i < this.columns && s < brCoords[0]; columns[1] = i++) {
+            if (brCoords[0] > s && brCoords[0] < s + this.columnWidth) {
+                columns[1] = i;
+                break;
+            }
+            s += this.columnWidth + this.iconMarginX;
+        }
+        
+        var map = nodeMap[this.id], nodes = this.model.rootNodes, length = nodes.length, tlIndex = columns[0], tlNode;
+        for (x = tlCoords[0], y = tlCoords[1]; tlIndex < length; tlIndex += this.columns) {
+            var node = nodes[tlIndex];
+            var element = map[node.attributes.id].element;
+            var dims = [element.offsetWidth, element.offsetHeight];
+            var pos = [element.offsetLeft, element.offsetTop];
+            if (   x >= pos[0] - this.iconMarginX && x <= pos[0] + dims[0] + this.iconMarginX
+                && y >= pos[1] - this.iconMarginY && y <= pos[1] + dims[1] + this.iconMarginY) {
+                tlNode = node;
+                break;
+            }
+        }
+
         if (!tlNode)
             return;
 
-        var columns = [
-            Math.ceil(tlCoords[0] / (this.columnWidth + this.iconMarginX)) - 1,
-            Math.ceil(brCoords[0] / (this.columnWidth + this.iconMarginX)) - 1,
-        ].sort(function(a, b) {return a - b;});
-
-        var map = nodeMap[this.id];
-        selectNode.call(this, tlNode);
-        for (var i = tlNode.getIndex() + 1, l = this.model.rootNodes.length, y = brCoords[1]; i < l; i++) {
-            var column = i % this.columns;
+        for (y = brCoords[1]; tlIndex < length; tlIndex++) {
+            var column = tlIndex % this.columns;
             if (column < columns[0] || column > columns[1])
                 continue;
-            var node = this.model.rootNodes[i];
+            var node = this.model.rootNodes[tlIndex];
             var element = map[node.attributes.id].element;
             var pos = [element.offsetLeft, element.offsetTop];
 
             if (y >= pos[1] - this.iconMarginY)
                 selectNode.call(this, node);
+            else break;
         }
     }
 
@@ -496,7 +516,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 initialPath: [0],
                 maxHeight: 400,
                 popUpDelay: 0.2,
-                boxSelectionOpacity: 0.8
+                boxSelectionOpacity: 0.5
             }, arguments[1]);
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
@@ -532,7 +552,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 }.bind(this));
 
             this.emitSignal('iwl:load');
-            this.signalConnect('mousedown', unselectAll.bind(this));
+            this.signalConnect('mousedown', eventMouseDown.bind(this));
             this.signalConnect('iwl:box_selection_end', boxSelectionEnd.bind(this));
         }
     }

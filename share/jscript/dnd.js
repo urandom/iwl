@@ -192,15 +192,17 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     var tl = this.boundary.tl;
     var br = this.boundary.br;
     if (delta[0] > 0 && pointer[0] > tl[0]) {
-      this.box.style.left = pointer[0] + 'px';
+      this.box.style.left = pointer[0] - tl[0] + 'px';
       this.box.style.width = delta[0] + 'px';
     } else if (pointer[0] < br[0]) {
+      this.box.style.left = this.initialPointer[0] - tl[0] + 'px';
       this.box.style.width = -delta[0] + 'px';
     }
     if (delta[1] > 0 && pointer[1] > tl[1]) {
-      this.box.style.top = pointer[1] + 'px';
+      this.box.style.top = pointer[1] - tl[1] + 'px';
       this.box.style.height = delta[1] + 'px';
     } else if (pointer[1] < br[1]) {
+      this.box.style.top = this.initialPointer[1] - tl[1] + 'px';
       this.box.style.height = -delta[1] + 'px';
     }
   }
@@ -231,7 +233,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     initialize: function(element) {
       this.element = $(element);
       this.options = Object.extend({
-        boxOpacity: 0.8
+        boxOpacity: 0.5
       }, arguments[1] || {});
       this.eventMouseDown = initDrag.bindAsEventListener(this);
       Event.observe(this.element, 'mousedown', this.eventMouseDown);
