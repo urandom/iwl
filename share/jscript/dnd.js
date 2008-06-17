@@ -167,14 +167,17 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.dragging = true;
 
     var pos = this.element.cumulativeOffset();
-    var dim = this.element.getDimensions();
+    var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
     this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
 
     this.box = new Element('div', {className: 'draggable_box_selection'});
     this.element.appendChild(this.box);
+    pointer[0] += this.element.scrollLeft;
+    pointer[1] += this.element.scrollTop;
     this.box.style.left = pointer[0] + 'px';
     this.box.style.top = pointer[1] + 'px';
     this.box.setOpacity(this.options.boxOpacity);
+
     this.initialPointer = pointer;
 
     Draggables.notify('onStart', this, event);
@@ -187,6 +190,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
   }
 
   function draw(pointer) {
+    pointer[0] += this.element.scrollLeft;
+    pointer[1] += this.element.scrollTop;
     var delta = [this.initialPointer[0] - pointer[0],
                  this.initialPointer[1] - pointer[1]];
     var tl = this.boundary.tl;
@@ -213,6 +218,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
 
     var pointer = Event.pointer(event);
     pointer = [pointer.x, pointer.y];
+    pointer[0] += this.element.scrollLeft;
+    pointer[1] += this.element.scrollTop;
     Draggables.notify('onEnd', this, event);
     this.element.emitSignal(
       'iwl:box_selection_end',
@@ -244,7 +251,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       Draggables.unregister(this);
     },
     updateDrag: function(event, pointer) {
-      if (!this.dragging) startDrag.call(this, event, pointer);
+      if (!this.dragging) startDrag.call(this, event, pointer.clone());
 
       draw.call(this, pointer);
 

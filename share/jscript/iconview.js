@@ -528,7 +528,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             getIconMargin.call(this);
             this.columns = this.options.columns
-                        || parseInt((this.offsetWidth - scrollbarSize) / this.options.columnWidth);
+                || parseInt((this.offsetWidth - scrollbarSize) / (this.options.columnWidth + this.iconMarginX));
             nodeMap[this.id] = {};
 
             normalizeCellAttributes.call(this);
