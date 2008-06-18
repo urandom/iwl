@@ -315,7 +315,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function toggleSelectNode(event, node) {
         var first = this.selectedNodes[0];
-        Event.stop(event);
+        if (event instanceof Event)
+            Event.stop(event);
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {
@@ -342,11 +343,13 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function selectNode(node) {
+        if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
         nodeMap[this.id][node.attributes.id].element.addClassName('iconview_node_selected');
         this.selectedNodes.push(node);
     }
 
     function unselectNode(node, skipRemoval) {
+        if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
         if (!skipRemoval)
             this.selectedNodes = this.selectedNodes.without(node);
         nodeMap[this.id][node.attributes.id].element.removeClassName('iconview_node_selected');
@@ -418,32 +421,34 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     return {
         /**
-         * Sets the active item of the IconView
+         * Sets/unsets the given items as active
          * @param path The path (or index for flat models) of the item to be set as active
+         *        ...
          * @returns The object
          * */
-        setActive: function(path) {
-            var node;
-            if (path instanceof IWL.ListModel.Node) {
-                node = path;
-                this.selectedPath = node.getPath();
-            } else {
-                this.selectedPath = path;
-                if (!Object.isArray(path)) path = [path];
-                node = this.model.getNodeByPath(path) || this.model.getFirstNode();
+        toggleActive: function() {
+            var args = $A(arguments);
+            while (args.length) {
+                var path = args.shift(), node;
+                if (path instanceof IWL.ListModel.Node) {
+                    node = path;
+                    this.selectedPath = node.getPath();
+                } else {
+                    this.selectedPath = path;
+                    if (!Object.isArray(path)) path = [path];
+                    node = this.model.getNodeByPath(path) || this.model.getFirstNode();
+                }
+                if (node)
+                    toggleSelectNode.call(this, {ctrlKey: true}, node);
             }
-            if (!node || !nodeMap[this.id][node.attributes.id].element.sensitive) return;
-            this.content.removeClassName('iconview_content_empty');
-            this.values = node.getValues();
-            var cellTemplate = cellTemplateRenderer.call(this, node);
 
-            return this.emitSignal('iwl:change', this.values);
+            return this;
         },
         /**
-         * @returns The active item of the IconView
+         * @returns The active items of the IconView
          * */
         getActive: function() {
-            return this.selectedPath;
+            return this.selectedNodes;
         },
         /**
          * Sets the sentisitivy of the item
@@ -488,6 +493,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
                 loadData.call(this, null);
 
+                this.toggleActive.apply(this, this.options.initialActive);
+
                 var callback = loadData.bind(this);
                 this.model.signalConnect('iwl:clear', callback);
                 this.model.signalConnect('iwl:load_data', callback);
@@ -514,7 +521,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 columnWidth: [],
                 columnClass: [],
                 cellAttributes: [],
-                initialPath: [0],
+                initialActive: [],
                 maxHeight: 400,
                 popUpDelay: 0.2,
                 boxSelectionOpacity: 0.5

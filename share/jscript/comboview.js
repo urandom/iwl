@@ -107,7 +107,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         } else {
             createNodes.call(this, this.model.rootNodes, template, flat);
         }
-        this.setActive(this.options.initialPath);
     }
 
     function eventAbort(event, eventName, params, options) {
@@ -750,6 +749,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 setContent.call(this);
                 loadData.call(this, null);
 
+                this.setActive(this.options.initialPath);
+
                 var callback = loadData.bind(this);
                 this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
                 this.model.signalConnect('iwl:clear', callback);
@@ -777,7 +778,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 columnWidth: [],
                 columnClass: [],
                 cellAttributes: [],
-                initialPath: [0],
+                initialPath: [],
                 maxHeight: 400,
                 popUpDelay: 0.2
             }, arguments[1]);

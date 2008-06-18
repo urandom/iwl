@@ -201,7 +201,7 @@ sub getCellAttributes {
     return shift->{_options}{cellAttributes}[shift];
 }
 
-=item B<setActive> (B<PATH>)
+=item B<toggleActive> (B<PATH>)
 
 Sets the active item of the L<IWL::IconView>
 
@@ -209,10 +209,12 @@ Parameters: B<PATH> - the model path (or an index for flat models) for the item
 
 =cut
 
-sub setActive {
-    my ($self, $path) = @_;
-    $path = [$path] unless 'ARRAY' eq ref $path;
-    $self->{_options}{initialPath} = $path;
+sub toggleActive {
+    my ($self) = shift;
+    foreach my $path (@_) {
+        push @{$self->{_options}{initialActive}}, 'ARRAY' eq ref $path
+            ? $path : [$path];
+    }
 
     return $self;
 }
@@ -224,7 +226,7 @@ Returns the active item path
 =cut
 
 sub getActive {
-    return shift->{_options}{initialPath};
+    return @{shift->{_options}{initialActive}};
 }
 
 =item B<setPageControlOptions> (B<URL>, [B<PARAMS>, B<OPTIONS>])
@@ -314,6 +316,7 @@ sub _init {
 
     $self->{__pageControlEvent} = [];
 
+    $self->{_options} = {initialActive => []};
     $self->{_options}{orientation} = defined $args{orientation} ? $args{orientation} : Orientation->{VERTICAL};
     $self->{_options}{columns}     = $args{columns}     if defined $args{columns};
     $self->{_options}{columnWidth} = $args{columnWidth} if defined $args{columnWidth};
