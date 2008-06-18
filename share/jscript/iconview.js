@@ -432,9 +432,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 var path = args.shift(), node;
                 if (path instanceof IWL.ListModel.Node) {
                     node = path;
-                    this.selectedPath = node.getPath();
+                    this.selectedPaths.push(node.getPath());
                 } else {
-                    this.selectedPath = path;
+                    this.selectedPaths.push(path);
                     if (!Object.isArray(path)) path = [path];
                     node = this.model.getNodeByPath(path) || this.model.getFirstNode();
                 }
@@ -448,7 +448,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The active items of the IconView
          * */
         getActive: function() {
-            return this.selectedNodes;
+            return this.selectedPaths;
         },
         /**
          * Sets the sentisitivy of the item
@@ -532,6 +532,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
             this.selectedNodes = [];
+            this.selectedPaths = [];
 
             getIconMargin.call(this);
             this.columns = this.options.columns
