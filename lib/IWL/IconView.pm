@@ -333,13 +333,11 @@ sub _init {
 
     delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model)};
 
-    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'iconview.js');
+    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'cellrenderer.js', 'iconview.js');
     $self->_constructorArguments(%args);
 
     return $self;
 }
-
-IWL::ListModel::addColumnType('IMAGE');
 
 1;
 

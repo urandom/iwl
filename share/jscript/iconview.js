@@ -1,9 +1,6 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataTypes.IMAGE, IWL.ListModel.DataTypes.STRING],
-        imageTemplate = new Template('<img class="iconview_node_image" src="#{src}" alt="#{alt}" />'),
-        hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal">#{text}</span>');
-        vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical">#{text}</p>');
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iconview_node #{nodePosition}" iwl:nodePath="#{nodePath}">#{imageColumn}#{textColumn}</div>');
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
         scrollbarSize = document.viewport.getScrollbarSize();
@@ -26,16 +23,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             } else {
                 if (nValues[i] == null)
                     continue;
-                var type = this.model.columns[this.options[names[i]]];
-                if (type) type = type.type;
-                if (names[i] == 'imageColumn' && type == IWL.ListModel.DataTypes.IMAGE)
-                    cellTemplate.imageColumn = imageTemplate.evaluate(nValues[i]);
-                else if (names[i] == 'textColumn' && type == IWL.ListModel.DataTypes.STRING) {
-                    if (this.options.orientation == IWL.IconView.Orientation.HORIZONTAL)
-                        cellTemplate.textColumn = hTextTemplate.evaluate({text: nValues[i]});
-                    else
-                        cellTemplate.textColumn = vTextTemplate.evaluate({text: nValues[i]});
-                }
+                var template = this.options.cellAttributes[i].templateRenderer;
+                if (template)
+                    cellTemplate[names[i]] = template.render(nValues[i], node);
             }
         }
         return cellTemplate;
@@ -73,7 +63,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var attributes = this.options.cellAttributes[i];
             var render = attributes.renderFunction;
             if (!render) continue;
-            render.call(attributes.renderInstance || this, cells[i], values[i], types[i], node);
+            render.call(attributes.renderInstance || this, cells[i], values[i], node);
         }
     }
 
@@ -168,14 +158,14 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function normalizeCellAttributes() {
         for (var i = 0, l = types.length; i < l; i++) {
             var cAttrs = this.options.cellAttributes[i];
-            if (!cAttrs) {
-                this.options.cellAttributes[i] = {};
-                continue;
-            }
+            if (!cAttrs)
+                cAttrs = this.options.cellAttributes[i] = {};
             var renderClass = cAttrs.renderClass;
             var renderFunction = cAttrs.renderFunction;
             cAttrs.renderClass = cAttrs.renderFunction = undefined;
             if (renderClass) {
+                if (cAttrs.renderInstance)
+                    continue;
                 var klass = renderClass.name.objectize();
                 if (Object.isFunction(klass)) {
                     var instance = new klass(renderClass.options);
@@ -185,11 +175,24 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     }
                 }
             } else if (renderFunction) {
+                if (Object.isFunction(renderFunction))
+                    continue;
                 cAttrs.renderFunction = Object.isString(renderFunction)
                     ? renderFunction.objectize()
-                    : Object.isFunction(renderFunction)
-                        ? renderFunction
-                        : undefined;
+                    : undefined;
+            } else {
+                var type = this.model.columns[this.options[names[i]]].type;
+                switch(type) {
+                    case IWL.ListModel.DataTypes.STRING:
+                        if (this.options.orientation == IWL.IconView.Orientation.HORIZONTAL)
+                            cAttrs.templateRenderer = new IWL.IconView.horizontalTextRenderer();
+                        else
+                            cAttrs.templateRenderer = new IWL.IconView.verticalTextRenderer();
+                        break;
+                    case IWL.ListModel.DataTypes.IMAGE:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Image();
+                        break;
+                }
             }
         }
     }
@@ -491,6 +494,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     }
                 }
 
+                normalizeCellAttributes.call(this);
                 loadData.call(this, null);
 
                 this.toggleActive.apply(this, this.options.initialActive);
@@ -539,8 +543,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 || parseInt((this.offsetWidth - scrollbarSize) / (this.options.columnWidth + this.iconMarginX));
             nodeMap[this.id] = {};
 
-            normalizeCellAttributes.call(this);
-
             if (model) {
                 if (Object.keys(model.options.columnTypes).length)
                     IWL.ListModel.overrideDefaultDataTypes(model.options.columnTypes);
@@ -575,3 +577,19 @@ IWL.IconView.CellType = {
     TEXT: 0,
     IMAGE: 1
 };
+IWL.IconView.horizontalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
+    hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal">#{cellValue}</span>');
+    return {
+        render: function(value, node) {
+            return hTextTemplate.evaluate({cellValue: value});
+        }
+    };
+})());
+IWL.IconView.verticalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
+    vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical">#{cellValue}</p>');
+    return {
+        render: function(value, node) {
+            return vTextTemplate.evaluate({cellValue: value});
+        }
+    };
+})());

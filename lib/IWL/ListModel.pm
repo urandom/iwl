@@ -466,6 +466,6 @@ sub __eventNameToPackage {
     return $package;
 }
 
-addColumnType(qw(NONE STRING INT FLOAT BOOLEAN COUNT));
+addColumnType(qw(NONE STRING INT FLOAT BOOLEAN COUNT IMAGE));
 
 1;

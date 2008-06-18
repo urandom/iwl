@@ -290,7 +290,8 @@ Object.extend(IWL.ListModel, (function() {
       INT:      ++index,
       FLOAT:    ++index,
       BOOLEAN:  ++index,
-      COUNT:    ++index
+      COUNT:    ++index,
+      IMAGE:    ++index
     },
     addColumnType: function() {
       var types = $A(arguments);

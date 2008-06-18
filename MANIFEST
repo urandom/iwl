@@ -236,6 +236,7 @@ share/iwl_demo.pl
 share/jscript/base.js
 share/jscript/button.js
 share/jscript/calendar.js
+share/jscript/cellrenderer.js
 share/jscript/comboview.js
 share/jscript/contentbox.js
 share/jscript/demo.js

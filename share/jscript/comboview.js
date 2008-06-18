@@ -35,13 +35,12 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setContent(cellTemplate, node) {
         this.content.innerHTML = generateContentTemplate.call(this).evaluate(cellTemplate || {});
         if (node) {
-            var values = [], types = [], cMap = this.options.columnMap;
+            var values = [], cMap = this.options.columnMap;
             for (var j = 0, l = cMap.length; j < l; j++) {
                 var index = cMap[j];
                 values.push(node.values[index]);
-                types.push(node.columns[index].type);
             }
-            cellFunctionRenderer.call(this, this.content.firstChild.rows[0].cells, values, types, node);
+            cellFunctionRenderer.call(this, this.content.firstChild.rows[0].cells, values, node);
         }
 
         this.contentWidth = this.content.getWidth();
@@ -140,19 +139,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 var options = Object.extend(Object.clone(mappedValues), {cellValue: values[i]});
                 cellTemplate['column' + i] = render.evaluate(options);
             } else {
-                var index = cMap[i];
-                var type = this.model.columns[index] ? this.model.columns[index].type : IWL.ListModel.DataTypes.NONE;
-                if (type == IWL.ListModel.DataTypes.STRING)
-                    cellTemplate['column' + i] = values[i].toString();
-                else if (type == IWL.ListModel.DataTypes.INT)
-                    cellTemplate['column' + i] = parseInt(values[i])
-                else if (type == IWL.ListModel.DataTypes.FLOAT)
-                    cellTemplate['column' + i] = parseFloat(values[i])
-                else if (type == IWL.ListModel.DataTypes.BOOLEAN)
-                    cellTemplate['column' + i] = values[i].toString();
-                else if (type == IWL.ListModel.DataTypes.COUNT) {
-                    cellTemplate['column' + i] = node.getIndex() + 1 + (this.model.options.offset || 0);
-                }
+                var template = this.options.cellAttributes[i].templateRenderer;
+                if (template)
+                    cellTemplate['column' + i] = template.render(values[i], node);
             }
         }
         return cellTemplate;
@@ -211,12 +200,12 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function cellFunctionRenderer(cells, values, types, node) {
+    function cellFunctionRenderer(cells, values, node) {
         for (var i = 0, l = values.length; i < l; i++) {
             var attributes = this.options.cellAttributes[i];
             var render = attributes.renderFunction;
             if (!render) continue;
-            render.call(attributes.renderInstance || this, cells[i], values[i], types[i], node);
+            render.call(attributes.renderInstance || this, cells[i], values[i], node);
         }
     }
 
@@ -301,14 +290,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 container.innerHTML = html;
         }
         var element = next ? map[next.attributes.id].element.previousSibling : container.lastChild;
-        var values = [], types = [], cMap = this.options.columnMap;
+        var values = [], cMap = this.options.columnMap;
         for (var j = 0, l = cMap.length; j < l; j++) {
             var index = cMap[j];
             values.push(node.values[index]);
-            types.push(node.columns[index].type);
         }
         setNodeAttributes.call(this, container, element, node);
-        cellFunctionRenderer.call(this, element.rows[0].cells, values, types, node);
+        cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
     }
 
     function createNodes(nodes, template, flat) {
@@ -340,14 +328,13 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         container.innerHTML = html.join('');
         var children = container.childElements();
         for (var i = 0; i < nodeLength; i++) {
-            var values = [], types = [], cMap = this.options.columnMap, node = nodes[i];
+            var values = [], cMap = this.options.columnMap, node = nodes[i];
             for (var j = 0, l = cMap.length; j < l; j++) {
                 var index = cMap[j];
                 values.push(node.values[index]);
-                types.push(node.columns[index].type);
             }
             setNodeAttributes.call(this, container, children[i], node);
-            cellFunctionRenderer.call(this, children[i].rows[0].cells, values, types, node);
+            cellFunctionRenderer.call(this, children[i].rows[0].cells, values, node);
         }
     }
 
@@ -490,16 +477,16 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function normalizeCellAttributes() {
         for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
             var cAttrs = this.options.cellAttributes[i];
-            if (!cAttrs) {
-                this.options.cellAttributes[i] = {};
-                continue;
-            }
+            if (!cAttrs)
+                cAttrs = this.options.cellAttributes[i] = {};
             var renderClass = cAttrs.renderClass;
             var renderFunction = cAttrs.renderFunction;
             cAttrs.renderClass = cAttrs.renderFunction = undefined;
             if (renderClass) {
+                if (cAttrs.renderInstance)
+                    continue;
                 var klass = renderClass.name.objectize();
-                if (Object.isFunction(klass)) {
+                if (klass instanceof IWL.CellRenderer) {
                     var instance = new klass(renderClass.options);
                     if (Object.isFunction(instance.render)) {
                         cAttrs.renderFunction = instance.render;
@@ -507,11 +494,33 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     }
                 }
             } else if (renderFunction) {
+                if (Object.isFunction(renderFunction))
+                    continue;
                 cAttrs.renderFunction = Object.isString(renderFunction)
                     ? renderFunction.objectize()
-                    : Object.isFunction(renderFunction)
-                        ? renderFunction
-                        : undefined;
+                    : undefined;
+            } else {
+                var type = this.model.columns[this.options.columnMap[i]].type;
+                switch(type) {
+                    case IWL.ListModel.DataTypes.STRING:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.String();
+                        break;
+                    case IWL.ListModel.DataTypes.INT:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Int();
+                        break;
+                    case IWL.ListModel.DataTypes.FLOAT:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Float();
+                        break;
+                    case IWL.ListModel.DataTypes.BOOLEAN:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Boolean();
+                        break;
+                    case IWL.ListModel.DataTypes.COUNT:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Count();
+                        break;
+                    case IWL.ListModel.DataTypes.IMAGE:
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Image();
+                        break;
+                }
             }
         }
     }
@@ -746,6 +755,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     }
                 }
 
+                normalizeCellAttributes.call(this);
                 setContent.call(this);
                 loadData.call(this, null);
 
@@ -794,7 +804,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             nodeMap[this.id] = {};
 
             connectSignals.call(this);
-            normalizeCellAttributes.call(this);
 
             if (model) {
                 if (Object.keys(model.options.columnTypes).length)
