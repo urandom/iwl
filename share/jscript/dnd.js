@@ -184,8 +184,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.element.emitSignal(
       'iwl:box_selection_begin',
       this,
-      relativeCoordinates.call(this, this.initialPointer),
-      relativeCoordinates.call(this, pointer)
+      relativeCoordinates.call(this, this.initialPointer, pointer)
     );
   }
 
@@ -228,16 +227,28 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.element.emitSignal(
       'iwl:box_selection_end',
       this,
-      relativeCoordinates.call(this, this.initialPointer),
-      relativeCoordinates.call(this, pointer)
+      relativeCoordinates.call(this, this.initialPointer, pointer)
     );
 
     Draggables.deactivate(this);
   }
 
-  function relativeCoordinates(pointer) {
+  function relativeCoordinates() {
     var pos = this.boundary.tl;
-    return [pointer[0] - pos[0], pointer[1] - pos[1]];
+    var pointers = [];
+    for (var i = 0; i < 2; i++) {
+      pointers[i] = arguments[i].clone();
+      pointers[i] = [pointers[i][0] - pos[0], pointers[i][1] - pos[1]];
+    }
+    var tlCoords = [
+        pointers[0][0] < pointers[1][0] ? pointers[0][0] : pointers[1][0],
+        pointers[0][1] < pointers[1][1] ? pointers[0][1] : pointers[1][1]
+    ];
+    var brCoords = [
+        pointers[0][0] > pointers[1][0] ? pointers[0][0] : pointers[1][0],
+        pointers[0][1] > pointers[1][1] ? pointers[0][1] : pointers[1][1]
+    ];
+    return [tlCoords, brCoords];
   }
 
   return {
@@ -263,8 +274,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       this.element.emitSignal(
         'iwl:box_selection_motion',
         this,
-        relativeCoordinates.call(this, this.initialPointer),
-        relativeCoordinates.call(this, pointer)
+        relativeCoordinates.call(this, this.initialPointer, pointer)
       );
 
       if(Prototype.Browser.WebKit) window.scrollBy(0,0);

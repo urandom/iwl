@@ -364,15 +364,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.selectedNodes = [];
     }
 
-    function boxSelectionEnd(event, draggable, startCoords, endCoords) {
-        var tlCoords = [
-            startCoords[0] < endCoords[0] ? startCoords[0] : endCoords[0],
-            startCoords[1] < endCoords[1] ? startCoords[1] : endCoords[1]
-        ];
-        var brCoords = [
-            startCoords[0] > endCoords[0] ? startCoords[0] : endCoords[0],
-            startCoords[1] > endCoords[1] ? startCoords[1] : endCoords[1]
-        ];
+    function boxSelectionEnd(event, draggable, coords) {
+        var tlCoords = coords[0];
+        var brCoords = coords[1];
         if (tlCoords[0] < 1) tlCoords[0] = 1;
         if (tlCoords[1] < 1) tlCoords[1] = 1;
         var columns = [];
