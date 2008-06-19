@@ -1742,7 +1742,7 @@ div.tooltip_content {
     font-style: italic;
 }
 .iconview_node_text, .iconview_node_image {
-    border: 1px solid white;
+    border: 1px solid transparent;
 }
 
 .iconview_node_selected .iconview_node_text,

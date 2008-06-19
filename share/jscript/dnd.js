@@ -23,18 +23,23 @@ IWL.Draggable = Class.create(Draggable, (function() {
         reverteffect: false,
         starteffect: false,
         endeffect: false,
+        outlineOpacity: 0.6,
 
-        outlineOpacity: 0.6
+        actions: IWL.Draggable.Actions.DEFAULT
       }, arguments[2] || {});
       options.onStart = onStart;
       options.onDrag = onDrag;
       options.onEnd = onEnd;
       $super(element, options);
+
+      if (!element.iwl) element.iwl = {};
+      element.iwl.draggable = this;
     },
 
     destroy: function($super) {
       $super();
       this.data = undefined;
+      this.element.iwl.draggable = undefined;
     },
 
     startDrag: function($super, event, point) {
@@ -134,6 +139,15 @@ IWL.Draggable.HTMLView = Class.create({
   }
 });
 
+IWL.Draggable.Actions = {
+  DEFAULT: 1 << 0,
+  COPY:    1 << 1,
+  MOVE:    1 << 2,
+  LINK:    1 << 3,
+  PRIVATE: 1 << 4,
+  ASK:     1 << 5
+}
+
 IWL.Droppable = Class.create((function() {
   function onHover(dragElement, dropElement, overlap) {
     this.element.emitSignal('iwl:drag_hover', dragElement.originalElement || dragElement, dropElement, overlap)
@@ -145,16 +159,22 @@ IWL.Droppable = Class.create((function() {
 
   return {
     initialize: function(element) {
-      var options = Object.extend({}, arguments[1] || {});
+      var options = Object.extend({
+        actions: IWL.Draggable.Actions.DEFAULT
+      }, arguments[1] || {});
       options.onHover = onHover.bind(this);
       options.onDrop = onDrop.bind(this);
 
       this.element = $(element);
       this.options = options;
       Droppables.add(this.element, options);
+
+      if (!element.iwl) element.iwl = {};
+      element.iwl.droppable = this;
     },
     destroy: function() {
       Droppables.remove(this.element);
+      this.element.iwl.droppable = undefined;
     }
   }
 })());
@@ -306,13 +326,21 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
 })());
 
 (function() {
-  var show = Droppables.show;
+  var show       = Droppables.show,
+      isAffected = Droppables.isAffected;
 
   Droppables.show = function(point, element) {
     if (element.originalElement)
       show.call(Droppables, point, element.originalElement);
     else
       show.call(Droppables, point, element);
+  };
+  Droppables.isAffected = function(point, element, drop) {
+    if (element.iwl && element.iwl.draggable && drop.element.iwl && drop.element.iwl.droppable) {
+      if (!(element.iwl.draggable.options.actions & drop.element.iwl.droppable.options.actions))
+        return false;
+    }
+    return isAffected.call(Droppables, point, element, drop);
   };
   Droppables.isContained = function(element, drop) {
     var containmentNode;
@@ -330,26 +358,24 @@ Element.addMethods({
     if (!element.iwl) element.iwl = {};
     if (element.iwl.draggable)
       element.iwl.draggable.destroy();
-    element.iwl.draggable = new IWL.Draggable(element, options);
+    new IWL.Draggable(element, options);
     return element;
   },
   unsetDragSource: function(element) {
     if (!element.iwl || !element.iwl.draggable) return;
     element.iwl.draggable.destroy();
-    element.iwl.draggable = undefined;
     return element;
   },
   setDragDest: function(element, options) {
     if (!element.iwl) element.iwl = {};
     if (element.iwl.droppable)
       element.iwl.droppable.destroy();
-    element.iwl.droppable = new IWL.Droppable(element, options);
+    new IWL.Droppable(element, options);
     return element;
   },
   unsetDragDest: function(element) {
     if (!element.iwl || !element.iwl.droppable) return;
     element.iwl.droppable.destroy();
-    element.iwl.droppable = undefined;
     return element;
   },
   setDragData: function(element, data) {
