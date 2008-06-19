@@ -127,8 +127,39 @@ sub parse_conf {
     }
 }
 
-if (!exists $IWLConfig{JS_DIR}) {
-    # Default values
+=head1 METHODS
+
+=over 4
+
+=item B<getJSConfig>
+
+Returns a javascript expression, which creates the global IWL object, if such does not exist, and adds the Config attribute to it.
+
+B<NOTE>: This is a class method.
+
+=cut
+
+sub getJSConfig {
+    require IWL::JSON;
+
+    return "if (!window.IWL) var IWL = {};" .
+           "IWL.Config = " . IWL::JSON::toJSON(
+               {map {$_ => $IWLConfig{$_}} @{$IWLConfig{JS_WHITELIST}}}
+           ) . ";";
+}
+
+=item B<readConfig> ([B<PATH>])
+
+Reads the I<iwl.conf> file, fills out I<%IWLConfig> and returns it. Useful in a I<mod_perl> environment, or if you want to re-read the config file
+
+Parameters: B<PATH> - an optional path to a file, holding the L<IWL> config parameters. If the file exists, it will be used, instead of other methods for locating a config file.
+
+B<NOTE>: This is a class method.
+
+=cut
+
+sub readConfig {
+    my $path = shift;
     %IWLConfig = (
         SKIN         => 'default',
         SKIN_DIR     => '/iwl/skin',
@@ -141,7 +172,9 @@ if (!exists $IWLConfig{JS_DIR}) {
         JS_WHITELIST => 'SKIN,SKIN_DIR,IMAGE_DIR,ICON_DIR,ICON_EXT,JS_DIR,STRICT_LEVEL,DEBUG',
     );
 
-    if ($ENV{IWL_CONFIG_FILE} && -s $ENV{IWL_CONFIG_FILE}) {
+    if ($path && -s $path) {
+        parse_conf($path);
+    } elsif ($ENV{IWL_CONFIG_FILE} && -s $ENV{IWL_CONFIG_FILE}) {
         parse_conf($ENV{IWL_CONFIG_FILE});
     } elsif (-s 'iwl.conf') {
         parse_conf('iwl.conf');
@@ -161,32 +194,16 @@ if (!exists $IWLConfig{JS_DIR}) {
     $IWLConfig{IMAGE_DIR}    = $IWLConfig{SKIN_DIR} . $IWLConfig{IMAGE_DIR};
     $IWLConfig{ICON_DIR}     = $IWLConfig{SKIN_DIR} . $IWLConfig{ICON_DIR};
     $IWLConfig{JS_WHITELIST} = [split ',', $IWLConfig{JS_WHITELIST}];
+
+    return %IWLConfig;
 }
 
-@EXPORT_OK = qw(%IWLConfig);
-@EXPORT    = qw(%IWLConfig);
+BEGIN {
+    readConfig() unless exists $IWLConfig{JS_DIR};
 
-=head1 METHODS
-
-=over 4
-
-=item B<getJSConfig>
-
-Returns a javascript expression, which creates the global IWL object, if such does not exist, and adds the Config attribute to it.
-
-This is a class method.
-
-=cut
-
-sub getJSConfig {
-    require IWL::JSON;
-
-    return "if (!window.IWL) var IWL = {};" .
-           "IWL.Config = " . IWL::JSON::toJSON(
-               {map {$_ => $IWLConfig{$_}} @{$IWLConfig{JS_WHITELIST}}}
-           ) . ";";
+    @EXPORT_OK = qw(%IWLConfig);
+    @EXPORT    = qw(%IWLConfig);
 }
-
 1;
 
 =head1 LICENCE AND COPYRIGHT
