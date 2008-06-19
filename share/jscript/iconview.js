@@ -282,7 +282,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function getIconMargin() {
         var div = new Element('div');
         div.innerHTML = nodeTemplate.evaluate({});
-        var icon = div.firstChild;
+        var icon = Element.extend(div.firstChild);
         this.iconMarginLeft = parseFloat(icon.getStyle('margin-left') || 0);
         this.iconMarginRight = parseFloat(icon.getStyle('margin-right') || 0);
         this.iconMarginTop = parseFloat(icon.getStyle('margin-top') || 0);
@@ -311,6 +311,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventMouseDown(event) {
+        if (this.___selected) {
+            this.___selected = undefined;
+            return;
+        }
         if (event.ctrlKey || event.shiftKey)
             return;
         unselectAll.call(this);
@@ -318,8 +322,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function toggleSelectNode(event, node) {
         var first = this.selectedNodes[0];
-        if (event instanceof Event)
-            Event.stop(event);
+        this.___selected = true;
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {
@@ -414,6 +417,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 selectNode.call(this, node);
             else break;
         }
+    }
+
+    function setDraggableNode(node, view) {
+        var element = view.element;
+        element.setDragSource();
+        element.setDragDest({containment: this});
     }
 
     return {
@@ -512,6 +521,36 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         getModel: function () {
             return this.model;
+        },
+        /**
+         * Sets whether the user can reorder the model by dragging/dropping icons
+         * @param {Boolean} If true, the user can drag icons in order to reorder the model
+         * @returns The object
+         * */
+        setReorderable: function(bool) {
+            bool = !!bool;
+            if (this.options.reorderable == bool)
+                return;
+
+            this.options.reorderable = bool;
+            var map = nodeMap[this.id];
+            for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
+                var node = this.model.rootNodes[i];
+                var view = map[node.attributes.id];
+                if (!view.element.sensitive)
+                    continue;
+                bool
+                    ? setDraggableNode.call(this, node, view)
+                    : unsetDraggableNode.call(this, node, view);
+            }
+            
+            return this;
+        },
+        /**
+         * @returns True, if the icons can be reordered by dragging
+         * */
+        getReorderable: function() {
+            return this.options.reorderable;
         },
 
         _init: function(model) {

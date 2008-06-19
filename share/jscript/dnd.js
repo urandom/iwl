@@ -290,7 +290,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       if(event.keyCode != Event.KEY_ESC) return;
       finishDrag.call(this, event, false);
       Event.stop(event);
-    },
+    }
   };
 })());
 
