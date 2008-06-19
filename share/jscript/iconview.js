@@ -3,7 +3,15 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataTypes.IMAGE, IWL.ListModel.DataTypes.STRING],
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iconview_node #{nodePosition}" iwl:nodePath="#{nodePath}">#{imageColumn}#{textColumn}</div>');
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
-        scrollbarSize = document.viewport.getScrollbarSize();
+        scrollbarSize = document.viewport.getScrollbarSize(),
+        hoverOverlapState = {
+            NONE:   0,
+            TOP:    1,
+            RIGHT:  2,
+            BOTTOM: 3,
+            LEFT:   4,
+            CENTER: 5
+        };
 
     function loadData(event) {
         createNodes.call(this, this.model.rootNodes);
@@ -419,10 +427,106 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function setDraggableNode(node, view) {
-        var element = view.element;
-        element.setDragSource();
-        element.setDragDest({containment: this});
+    function setDraggableNode(node, view, map) {
+        var element = view.element, self = this;
+        setTimeout(function() {
+            element.setDragSource({
+                ghosting: true,
+                starteffect: function() {
+                    element._opacity = Element.getOpacity(element);
+                    Element.setOpacity(element, self.options.boxSelectionOpacity);
+                },
+                endeffect: function() {
+                    Element.setOpacity(element, element._opacity);
+                    element._opacity = undefined;
+                }
+            });
+            element.setDragDest({containment: self});
+            element.signalConnect('iwl:drag_hover', map.eventDragHover);
+            element.setDragData(node);
+        }, 5);
+    }
+
+    function eventDragHover(event, dragElement, dropElement) {
+        var hOverlap = Position.overlap('horizontal', dropElement);
+        var vOverlap = Position.overlap('vertical', dropElement);
+        var state = hoverOverlapState.NONE;
+        var hCenter = vCenter = center = left = right = top = bottom = false;
+        if (hOverlap < 0.3)
+            state = hoverOverlapState.RIGHT;
+        else if (hOverlap > 0.7)
+            state = hoverOverlapState.LEFT;
+        else
+            hCenter = true;
+
+        if (vOverlap < 0.3)
+            state = hoverOverlapState.BOTTOM;
+        else if (vOverlap > 0.7)
+            state = hoverOverlapState.TOP;
+        else
+            vCenter = true;
+
+        if (hCenter && vCenter)
+            state = hoverOverlapState.CENTER;
+
+        setElementHoverState.call(this, dropElement, state);
+    }
+
+    function setElementHoverState(element, state) {
+        if (this.__hoverElement && this.__hoverElement != element)
+            setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
+
+        if (element.__hoverState) {
+            var className;
+            switch(element.__hoverState) {
+                case hoverOverlapState.TOP:
+                    className = 'iconview_node_hover_top';
+                    break;
+                case hoverOverlapState.BOTTOM:
+                    className = 'iconview_node_hover_bottom';
+                    break;
+                case hoverOverlapState.LEFT:
+                    className = 'iconview_node_hover_left';
+                    break;
+                case hoverOverlapState.RIGHT:
+                    className = 'iconview_node_hover_right';
+                    break;
+                case hoverOverlapState.CENTER:
+                    className = 'iconview_node_hover_center';
+                    break;
+            }
+            Element.removeClassName(element, className);
+        }
+
+        element.__hoverState = state;
+        var className = '';
+        switch(state) {
+            case hoverOverlapState.TOP:
+                className = 'iconview_node_hover_top';
+                    break;
+            case hoverOverlapState.BOTTOM:
+                className = 'iconview_node_hover_bottom';
+                    break;
+            case hoverOverlapState.LEFT:
+                className = 'iconview_node_hover_left';
+                    break;
+            case hoverOverlapState.RIGHT:
+                className = 'iconview_node_hover_right';
+                    break;
+            case hoverOverlapState.CENTER:
+                className = 'iconview_node_hover_center';
+                    break;
+            default:
+                this.__hoverElement = undefined;
+                return;
+        }
+        this.__hoverElement = element;
+        Element.addClassName(element, className);
+    }
+
+    function eventIconViewHover(event) {
+        if (this.__hoverElement && Event.element(event) != this.__hoverElement)
+            setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
     }
 
     return {
@@ -534,14 +638,22 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.options.reorderable = bool;
             var map = nodeMap[this.id];
+            if (!map.eventDragHover)
+                map.eventDragHover = eventDragHover.bind(this);
+            if (!map.eventIconViewHover)
+                map.eventIconViewHover = eventIconViewHover.bind(this);
+
+            this.setDragDest({containment: this});
+            this[bool ? 'signalConnect' : 'signalDisconnect']('iwl:drag_hover', map.eventIconViewHover);
+
             for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
                 var node = this.model.rootNodes[i];
                 var view = map[node.attributes.id];
                 if (!view.element.sensitive)
                     continue;
                 bool
-                    ? setDraggableNode.call(this, node, view)
-                    : unsetDraggableNode.call(this, node, view);
+                    ? setDraggableNode.call(this, node, view, map)
+                    : unsetDraggableNode.call(this, node, view, map);
             }
             
             return this;

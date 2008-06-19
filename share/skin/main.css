@@ -1730,6 +1730,7 @@ div.tooltip_content {
     float: left;
     text-align: center;
     color: #111;
+    border: 1px solid transparent;
 }
 .iconview_node_text_vertical {
     margin: 0px;
@@ -1748,4 +1749,20 @@ div.tooltip_content {
 .iconview_node_selected .iconview_node_image {
     border: 1px solid #6a81a2;
     background-color: #d2d4e3;
+}
+
+.iconview_node_hover_top {
+    border-top: 1px dotted #273346;
+}
+.iconview_node_hover_right {
+    border-right: 1px dotted #273346;
+}
+.iconview_node_hover_bottom {
+    border-bottom: 1px dotted #273346;
+}
+.iconview_node_hover_left {
+    border-left: 1px dotted #273346;
+}
+.iconview_node_hover_center {
+    border: 1px dotted #273346;
 }

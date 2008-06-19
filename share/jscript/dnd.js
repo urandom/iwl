@@ -32,6 +32,11 @@ IWL.Draggable = Class.create(Draggable, (function() {
       $super(element, options);
     },
 
+    destroy: function($super) {
+      $super();
+      this.data = undefined;
+    },
+
     startDrag: function($super, event, point) {
       $super(event);
 
@@ -227,7 +232,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.element.emitSignal(
       'iwl:box_selection_end',
       this,
-      relativeCoordinates.call(this, this.initialPointer, pointer)
+      relativeCoordinates.call(this, this.initialPointer, pointer),
+      success
     );
 
     Draggables.deactivate(this);
@@ -286,6 +292,11 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       finishDrag.call(this, event, true);
       Event.stop(event);
     },
+    terminateDrag: function() {
+      if(!this.dragging) return;
+      finishDrag.call(this, {}, false);
+      Event.stop(event);
+    },
     keyPress: function(event) {
       if(event.keyCode != Event.KEY_ESC) return;
       finishDrag.call(this, event, false);
@@ -325,6 +336,7 @@ Element.addMethods({
   unsetDragSource: function(element) {
     if (!element.iwl || !element.iwl.draggable) return;
     element.iwl.draggable.destroy();
+    element.iwl.draggable = undefined;
     return element;
   },
   setDragDest: function(element, options) {
@@ -337,6 +349,7 @@ Element.addMethods({
   unsetDragDest: function(element) {
     if (!element.iwl || !element.iwl.droppable) return;
     element.iwl.droppable.destroy();
+    element.iwl.droppable = undefined;
     return element;
   },
   setDragData: function(element, data) {
