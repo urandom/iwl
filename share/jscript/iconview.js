@@ -56,11 +56,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = children.length; i < l; i++) {
             var child = children[i];
             child.signalConnect('mouseover', function(event) {
-                if (this.boxSelection && this.boxSelection.dragging) return;
+                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging)) return;
                 changeHighlight.call(this, node);
             }.bind(this));
             child.signalConnect('mouseout', function(event) {
-                if (this.boxSelection && this.boxSelection.dragging) return;
+                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging)) return;
                 changeHighlight.call(this);
             }.bind(this));
             child.signalConnect('mousedown', eventIconMouseDown.bindAsEventListener(this, node));
@@ -111,6 +111,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var values = node.getValues(this.options.imageColumn, this.options.textColumn);
         setNodeAttributes.call(this, element, node);
         cellFunctionRenderer.call(this, element, values, node);
+        if (this.options.dragDest)
+            setDroppableNode.call(this, node, map[node.attributes.id], map);
     }
 
     function createNodes(nodes) {
@@ -459,10 +461,18 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setDroppableNode(node, view, map) {
         var element = view.element, self = this;
         setTimeout(function() {
-            element.setDragData(node);
             element.setDragDest({containment: self});
             element.signalConnect('iwl:drag_hover', map.eventDragHover);
             element.signalConnect('iwl:drag_drop', map.eventDragDrop);
+        }, 5);
+    }
+
+    function unsetDroppableNode(node, view, map) {
+        var element = view.element;
+        setTimeout(function() {
+            element.unsetDragDest();
+            element.signalDisconnect('iwl:drag_hover', map.eventDragHover);
+            element.signalDisconnect('iwl:drag_drop', map.eventDragDrop);
         }, 5);
     }
 
@@ -495,6 +505,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragHover(event, dragElement, dropElement) {
+        var dropNode = this.model.getNodeByPath(dropElement.readAttribute('iwl:nodepath').evalJSON(true));
+        if (this.selectedNodes.indexOf(dropNode) > -1)
+            return;
+
         var hOverlap = Position.overlap('horizontal', dropElement);
         var vOverlap = Position.overlap('vertical', dropElement);
         var state = hoverOverlapState.NONE;
