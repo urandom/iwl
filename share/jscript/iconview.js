@@ -331,10 +331,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return;
 
         var pointer = [Event.pointerX(event), Event.pointerY(event)];
-        var pos     = Element.cumulativeOffset(this.element);
+        var pos     = Element.cumulativeOffset(this);
         pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
-        if (   this.element.offsetWidth - scrollbarSize < pointer[0]
-            || this.element.offsetHeight - scrollbarSize < pointer[1])
+        if (   this.offsetWidth - scrollbarSize < pointer[0]
+            || this.offsetHeight - scrollbarSize < pointer[1])
             return;
         unselectAll.call(this);
     }
