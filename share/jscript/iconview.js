@@ -694,8 +694,80 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.model;
         },
         /**
+         * Enables/Disables icon dragging for the Icon View
+         * @param {Boolean} bool If true, dragging will be enabled for the Icon View
+         * @returns The object
+         * */
+        setModelDragSource: function(bool) {
+            if (this.options.dragSource == (bool = !!bool))
+                return;
+
+            this.options.dragSource = bool;
+            var map = nodeMap[this.id];
+            if (!map.eventDragInit)
+                map.eventDragInit = eventDragInit.bind(this);
+
+            if (bool) {
+                this.setDragSource({revert: true});
+                this.signalConnect('iwl:drag_init', map.eventDragInit);
+            } else {
+                this.unsetDragSource();
+                this.signalDisconnect('iwl:drag_init', map.eventDragInit);
+            }
+
+            return this;
+        },
+        /**
+         * @returns True, if the Icon View is a drag source
+         * */
+        getModelDragSource: function() {
+            return this.options.dragSource;
+        },
+        /**
+         * Enables/Disables icon dropping for the Icon View
+         * @param {Boolean} bool If true, icon dropping will be enabled for the Icon View
+         * @returns The object
+         * */
+        setModelDragDest: function(bool) {
+            if (this.options.dragDest == (bool = !!bool))
+                return;
+
+            this.options.dragDest = bool;
+            var map = nodeMap[this.id];
+            if (!map.eventDragHover)
+                map.eventDragHover = eventDragHover.bind(this);
+            if (!map.eventDragDrop)
+                map.eventDragDrop = eventDragDrop.bind(this);
+            if (!map.eventIconViewHover)
+                map.eventIconViewHover = eventIconViewHover.bind(this);
+
+            if (bool) {
+                this.setDragDest({containment: this});
+                this.signalConnect('iwl:drag_hover', map.eventIconViewHover);
+            } else {
+                this.unsetDragDest();
+                this.signalDisconnect('iwl:drag_hover', map.eventIconViewHover);
+            }
+
+            for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
+                var node = this.model.rootNodes[i];
+                var view = map[node.attributes.id];
+                bool
+                    ? setDroppableNode.call(this, node, view, map)
+                    : unsetDroppableNode.call(this, node, view, map);
+            }
+            
+            return this;
+        },
+        /**
+         * @returns True, if the Icon View is a drag destination
+         * */
+        getModelDragDest: function() {
+            return this.options.dragDest;
+        },
+        /**
          * Sets whether the user can reorder the model by dragging/dropping icons
-         * @param {Boolean} If true, the user can drag icons in order to reorder the model
+         * @param {Boolean} bool If true, the user can drag icons in order to reorder the model
          * @returns The object
          * */
         setReorderable: function(bool) {
@@ -704,31 +776,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 return;
 
             this.options.reorderable = bool;
-            var map = nodeMap[this.id];
-            if (!map.eventDragHover)
-                map.eventDragHover = eventDragHover.bind(this);
-            if (!map.eventDragDrop)
-                map.eventDragDrop = eventDragDrop.bind(this);
-            if (!map.eventIconViewHover)
-                map.eventIconViewHover = eventIconViewHover.bind(this);
-            if (!map.eventDragInit)
-                map.eventDragInit = eventDragInit.bind(this);
-
-            this.setDragDest({containment: this});
-            this.setDragSource({revert: true});
-            this.signalConnect('iwl:drag_init', map.eventDragInit);
-            this[bool ? 'signalConnect' : 'signalDisconnect']('iwl:drag_hover', map.eventIconViewHover);
-
-            for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
-                var node = this.model.rootNodes[i];
-                var view = map[node.attributes.id];
-                if (!view.element.sensitive)
-                    continue;
-                bool
-                    ? setDroppableNode.call(this, node, view, map)
-                    : unsetDroppableNode.call(this, node, view, map);
-            }
-            
+            this.setModelDragSource(bool);
+            this.setModelDragDest(bool);
             return this;
         },
         /**
