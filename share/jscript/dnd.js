@@ -16,6 +16,15 @@ IWL.Draggable = Class.create(Draggable, (function() {
     draggable.element.emitSignal('iwl:drag_end', draggable);
   }
 
+  function eventOptions(event) {
+    var options = {};
+    var names = ['ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'which', 'detail'];
+    for (var i = 0, l = names.length; i < l; i++) {
+      options[names[i]] = event[names[i]];
+    }
+    return new Event.Options(options);
+  }
+
   return {
     initialize: function($super, element) {
       element = $(element);
