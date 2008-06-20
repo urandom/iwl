@@ -43,7 +43,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
     },
 
     initDrag: function($super, event) {
-      this.element.emitSignal('iwl:drag_init', this);
+      this.element.emitSignal('iwl:drag_init', this, eventOptions.call(this, event));
       if (this.terminated) {
         delete this.terminated;
         return;
@@ -198,20 +198,32 @@ IWL.Droppable = Class.create((function() {
 })());
 
 IWL.BoxSelection = Class.create(Draggable, (function() {
+  var scrollbarSize = document.viewport.getScrollbarSize();
+
   function initDrag(event) {
+    this.element.emitSignal('iwl:box_selection_init', this);
+    if (this.terminated) {
+      delete this.terminated;
+      return;
+    }
+
     var pointer = [Event.pointerX(event), Event.pointerY(event)];
-    var pos     = Position.cumulativeOffset(this.element);
+    var pos     = Element.cumulativeOffset(this.element);
     this.offset = [0,1].map( function(i) { return (pointer[i] - pos[i]) });
+
+    var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
+    this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
+    pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
+    if ( this.element.offsetWidth - scrollbarSize < pointer[0]
+      || this.element.offsetHeight - scrollbarSize < pointer[1])
+      return;
+
     Draggables.activate(this);
     Event.stop(event);
   }
 
   function startDrag(event, pointer) {
     this.dragging = true;
-
-    var pos = this.element.cumulativeOffset();
-    var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
-    this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
 
     this.box = new Element('div', {className: 'draggable_box_selection'});
     this.element.appendChild(this.box);
@@ -343,7 +355,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       Event.stop(event);
     },
     terminateDrag: function() {
-      if(!this.dragging) return;
+      if(!this.dragging) return this.terminated = true;
       finishDrag.call(this, {}, false);
       Event.stop(event);
     },

@@ -1569,6 +1569,10 @@ div.tooltip_content {
     position: absolute;
 }
 
+.draggable_html_view {
+    margin: 10px 0px 0px 10px;
+}
+
 /* ComboView */
 .comboview {
     border: 1px solid #7F9DB9;

@@ -329,6 +329,13 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return;
         if (event.ctrlKey || event.shiftKey)
             return;
+
+        var pointer = [Event.pointerX(event), Event.pointerY(event)];
+        var pos     = Element.cumulativeOffset(this.element);
+        pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
+        if (   this.element.offsetWidth - scrollbarSize < pointer[0]
+            || this.element.offsetHeight - scrollbarSize < pointer[1])
+            return;
         unselectAll.call(this);
     }
 
@@ -483,6 +490,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             for (var i = 0, l = this.selectedNodes.length; i < l; i++)
                 this.model.move(this.selectedNodes[i], ++index);
         }
+        unselectAll.call(this);
         setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
     }
 
