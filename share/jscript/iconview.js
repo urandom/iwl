@@ -2,6 +2,7 @@
 IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataTypes.IMAGE, IWL.ListModel.DataTypes.STRING],
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iconview_node #{nodePosition}" iwl:nodePath="#{nodePath}">#{imageColumn}#{textColumn}</div>');
+        dragMultipleIcons = new Template('<span class="iconview_dragged_nodes"><strong>#{number}</strong> #{text}</span>'),
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
         scrollbarSize = document.viewport.getScrollbarSize(),
         hoverOverlapState = {
@@ -451,6 +452,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setDroppableNode(node, view, map) {
         var element = view.element, self = this;
         setTimeout(function() {
+            element.setDragData(node);
             element.setDragDest({containment: self});
             element.signalConnect('iwl:drag_hover', map.eventDragHover);
             element.signalConnect('iwl:drag_drop', map.eventDragDrop);
@@ -458,6 +460,29 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement) {
+        var dropNode = this.model.getNodeByPath(dropElement.readAttribute('iwl:nodepath').evalJSON(true)), pivot;
+        switch(dropElement.__hoverState) {
+            case hoverOverlapState.TOP:
+                pivot = dropNode.previous(this.columns - 1);
+                break;
+            case hoverOverlapState.BOTTOM:
+                pivot = dropNode.next(this.columns - 2);
+                break;
+            case hoverOverlapState.LEFT:
+                pivot = dropNode.previousSibling;
+                break;
+            case hoverOverlapState.RIGHT:
+                pivot = dropNode;
+                break;
+            case hoverOverlapState.CENTER:
+                pivot = dropNode;
+                break;
+        }
+        if (pivot) {
+            var index = pivot.getIndex();
+            for (var i = 0, l = this.selectedNodes.length; i < l; i++)
+                this.model.move(this.selectedNodes[i], ++index);
+        }
         setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
     }
 
@@ -491,9 +516,18 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (this.selectedNodes.length == 0)
             return draggable.terminateDrag();
         if (this.selectedNodes.length == 1) {
-            draggable.options.viewOptions = '1 icon selected';
+            var cellTemplate = cellTemplateRenderer.call(this, this.selectedNodes[0]);
+            cellTemplate.nodeStyle = "width: " + this.columnWidth + "px;";
+            draggable.options.viewOptions = {string: nodeTemplate.evaluate(cellTemplate)};
         } else if (this.selectedNodes.length > 1) {
-            draggable.options.viewOptions = this.selectedNodes.length + ' icons selected';
+            draggable.options.viewOptions = {string: dragMultipleIcons.evaluate({number: this.selectedNodes.length, text: 'selected icons'})};
+        }
+
+        if (this.scrollLeft || this.scrollTop) {
+            Position.__includeScrollOffsets = Position.includeScrollOffsets;
+            Position.includeScrollOffsets = true;
+        } else if (Position.__includeScrollOffsets) {
+            Position.includeScrollOffsets = Position.__includeScrollOffsets;
         }
     }
 

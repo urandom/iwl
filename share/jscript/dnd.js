@@ -60,7 +60,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
           : Object.isElement(this.options.view)
             ? this.options.view
             : Object.isString(this.options.view)
-              ? new IWL.Draggable.HTMLView(this.options.view)
+              ? new IWL.Draggable.HTMLView({string: this.options.view})
               : undefined;
 
         if (this.view && Object.isElement(this.view.element))
@@ -146,10 +146,14 @@ IWL.Draggable = Class.create(Draggable, (function() {
 })());
 
 IWL.Draggable.HTMLView = Class.create({
-  initialize: function(string) {
+  initialize: function() {
+    this.options = Object.extend({
+      opacity: 0.5
+    }, arguments[0]);
     this.element = new Element('div', {className: 'draggable_view draggable_html_view', style: 'z-index: 1000'});
 
-    this.element.update(string);
+    this.element.update(this.options.string);
+    Element.setOpacity(this.element, this.options.opacity);
   }
 });
 
@@ -168,7 +172,7 @@ IWL.Droppable = Class.create((function() {
   }
 
   function onDrop(dragElement, dropElement, dragEvent) {
-    this.element.emitSignal('iwl:drag_drop', dragElement, dragEvent);
+    this.element.emitSignal('iwl:drag_drop', dragElement, dropElement, dragEvent);
   }
 
   return {
@@ -238,11 +242,6 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
   }
 
   function draw(pointer) {
-    if (this.element.scrollLeft || this.element.scrollTop)
-      Position.includeScrollOffsets = true;
-    else
-      Position.includeScrollOffsets = false;
-
     pointer[0] += this.element.scrollLeft;
     pointer[1] += this.element.scrollTop;
     var delta = [this.initialPointer[0] - pointer[0],

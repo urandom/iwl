@@ -1766,3 +1766,8 @@ div.tooltip_content {
 .iconview_node_hover_center {
     border: 1px dotted #273346;
 }
+.iconview_dragged_nodes {
+    border: 1px dashed #6a81a2;
+    background-color: #d2d4e3;
+    font-size: 2em;
+}
