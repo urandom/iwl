@@ -44,7 +44,10 @@ Object.extend(Prototype.Browser, {
 
 Event.Options = Class.create({
   initialize: function() {
-    Object.extend(this, arguments[0] || {});
+    this.options = Object.extend({}, arguments[0] || {});
+  },
+  getOptions: function() {
+    return this.options;
   }
 });
 Object.extend(Event, (function() {
@@ -290,7 +293,7 @@ Object.extend(Event, (function() {
       var name = args.shift();
       var options;
       if (args.last() instanceof Event.Options)
-	options = args.pop();
+	options = args.pop().options;
       return Event.fire(element, name, args, options);
     },
     fire: function(element, eventName, memo, options) {
@@ -310,6 +313,8 @@ Object.extend(Event, (function() {
 	  event = document.createEventObject();
 	  event.eventType = "ondataavailable";
 	}
+        if (options)
+          Object.extend(event, options)
       }
 
       event.eventName = eventName;

@@ -62,7 +62,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (this.boxSelection && this.boxSelection.dragging) return;
                 changeHighlight.call(this);
             }.bind(this));
-            child.signalConnect('mousedown', toggleSelectNode.bindAsEventListener(this, node));
+            child.signalConnect('mousedown', eventIconMouseDown.bindAsEventListener(this, node));
+            child.signalConnect('mouseup', eventIconMouseUp.bindAsEventListener(this, node));
         }
     }
 
@@ -319,18 +320,36 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventMouseDown(event) {
-        if (this.___selected) {
-            this.___selected = undefined;
+        if (nodeMap[this.id].iconSelected) {
+            delete nodeMap[this.id].iconSelected;
             return;
         }
+        if (nodeMap[this.id].skipIconSelect)
+            return;
         if (event.ctrlKey || event.shiftKey)
             return;
         unselectAll.call(this);
     }
 
+    function eventIconMouseDown(event, node) {
+        if (this.selectedNodes.indexOf(node) > -1) {
+            nodeMap[this.id].skipIconSelect = true;
+            return;
+        }
+        toggleSelectNode.call(this, event, node);
+    }
+
+    function eventIconMouseUp(event, node) {
+        if (nodeMap[this.id].skipIconSelect) {
+            toggleSelectNode.call(this, event, node);
+            delete nodeMap[this.id].skipIconSelect;
+        }
+    }
+
     function toggleSelectNode(event, node) {
         var first = this.selectedNodes[0];
-        this.___selected = true;
+        if (event.type == 'mousedown')
+            nodeMap[this.id].iconSelected = true;
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {
@@ -376,6 +395,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function boxSelectionEnd(event, draggable, coords) {
+        if (! event.shiftKey && !event.ctrlKey)
+            unselectAll.call(this);
         var tlCoords = coords[0];
         var brCoords = coords[1];
         if (tlCoords[0] < 1) tlCoords[0] = 1;
@@ -427,24 +448,17 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function setDraggableNode(node, view, map) {
+    function setDroppableNode(node, view, map) {
         var element = view.element, self = this;
         setTimeout(function() {
-            element.setDragSource({
-                ghosting: true,
-                starteffect: function() {
-                    element._opacity = Element.getOpacity(element);
-                    Element.setOpacity(element, self.options.boxSelectionOpacity);
-                },
-                endeffect: function() {
-                    Element.setOpacity(element, element._opacity);
-                    element._opacity = undefined;
-                }
-            });
             element.setDragDest({containment: self});
             element.signalConnect('iwl:drag_hover', map.eventDragHover);
-            element.setDragData(node);
+            element.signalConnect('iwl:drag_drop', map.eventDragDrop);
         }, 5);
+    }
+
+    function eventDragDrop(event, dragElement, dropElement) {
+        setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
     }
 
     function eventDragHover(event, dragElement, dropElement) {
@@ -470,6 +484,17 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             state = hoverOverlapState.CENTER;
 
         setElementHoverState.call(this, dropElement, state);
+    }
+
+    function eventDragInit(event, draggable) {
+        draggable.options.view = IWL.Draggable.HTMLView;
+        if (this.selectedNodes.length == 0)
+            return draggable.terminateDrag();
+        if (this.selectedNodes.length == 1) {
+            draggable.options.viewOptions = '1 icon selected';
+        } else if (this.selectedNodes.length > 1) {
+            draggable.options.viewOptions = this.selectedNodes.length + ' icons selected';
+        }
     }
 
     function setElementHoverState(element, state) {
@@ -640,10 +665,16 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var map = nodeMap[this.id];
             if (!map.eventDragHover)
                 map.eventDragHover = eventDragHover.bind(this);
+            if (!map.eventDragDrop)
+                map.eventDragDrop = eventDragDrop.bind(this);
             if (!map.eventIconViewHover)
                 map.eventIconViewHover = eventIconViewHover.bind(this);
+            if (!map.eventDragInit)
+                map.eventDragInit = eventDragInit.bind(this);
 
             this.setDragDest({containment: this});
+            this.setDragSource({revert: true});
+            this.signalConnect('iwl:drag_init', map.eventDragInit);
             this[bool ? 'signalConnect' : 'signalDisconnect']('iwl:drag_hover', map.eventIconViewHover);
 
             for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
@@ -652,8 +683,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!view.element.sensitive)
                     continue;
                 bool
-                    ? setDraggableNode.call(this, node, view, map)
-                    : unsetDraggableNode.call(this, node, view, map);
+                    ? setDroppableNode.call(this, node, view, map)
+                    : unsetDroppableNode.call(this, node, view, map);
             }
             
             return this;

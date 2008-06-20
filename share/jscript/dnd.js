@@ -42,6 +42,15 @@ IWL.Draggable = Class.create(Draggable, (function() {
       this.element.iwl.draggable = undefined;
     },
 
+    initDrag: function($super, event) {
+      this.element.emitSignal('iwl:drag_init', this);
+      if (this.terminated) {
+        delete this.terminated;
+        return;
+      }
+      $super(event);
+    },
+
     startDrag: function($super, event, point) {
       $super(event);
 
@@ -127,6 +136,11 @@ IWL.Draggable = Class.create(Draggable, (function() {
         delete this.outline;
       }
       $super(event, success);
+    },
+    terminateDrag: function() {
+      if(!this.dragging) return this.terminated = true;
+      this.dragging = false;
+      Draggables.deactivate(this);
     }
   };
 })());
@@ -209,11 +223,26 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.element.emitSignal(
       'iwl:box_selection_begin',
       this,
-      relativeCoordinates.call(this, this.initialPointer, pointer)
+      relativeCoordinates.call(this, this.initialPointer, pointer),
+      eventOptions.call(this, event)
     );
   }
 
+  function eventOptions(event) {
+    var options = {};
+    var names = ['ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'which', 'detail'];
+    for (var i = 0, l = names.length; i < l; i++) {
+      options[names[i]] = event[names[i]];
+    }
+    return new Event.Options(options);
+  }
+
   function draw(pointer) {
+    if (this.element.scrollLeft || this.element.scrollTop)
+      Position.includeScrollOffsets = true;
+    else
+      Position.includeScrollOffsets = false;
+
     pointer[0] += this.element.scrollLeft;
     pointer[1] += this.element.scrollTop;
     var delta = [this.initialPointer[0] - pointer[0],
@@ -253,7 +282,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       'iwl:box_selection_end',
       this,
       relativeCoordinates.call(this, this.initialPointer, pointer),
-      success
+      success,
+      eventOptions.call(this, event)
     );
 
     Draggables.deactivate(this);
@@ -300,7 +330,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       this.element.emitSignal(
         'iwl:box_selection_motion',
         this,
-        relativeCoordinates.call(this, this.initialPointer, pointer)
+        relativeCoordinates.call(this, this.initialPointer, pointer),
+        eventOptions.call(this, event)
       );
 
       if(Prototype.Browser.WebKit) window.scrollBy(0,0);
