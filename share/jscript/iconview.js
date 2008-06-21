@@ -56,11 +56,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = children.length; i < l; i++) {
             var child = children[i];
             child.signalConnect('mouseover', function(event) {
-                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging)) return;
+                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
                 changeHighlight.call(this, node);
             }.bind(this));
             child.signalConnect('mouseout', function(event) {
-                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging)) return;
+                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
                 changeHighlight.call(this);
             }.bind(this));
             child.signalConnect('mousedown', eventIconMouseDown.bindAsEventListener(this, node));
@@ -477,28 +477,33 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement) {
-        var dropNode = this.model.getNodeByPath(dropElement.readAttribute('iwl:nodepath').evalJSON(true)), pivot;
+        var dropNode = this.model.getNodeByPath(dropElement.readAttribute('iwl:nodepath').evalJSON(true)), index;
         switch(dropElement.__hoverState) {
             case hoverOverlapState.TOP:
-                pivot = dropNode.previous(this.columns - 1);
+                var pivot = dropNode.previous(this.columns - 1);
+                if (pivot) index = pivot.getIndex() + 1;
+                else index = 0;
                 break;
             case hoverOverlapState.BOTTOM:
-                pivot = dropNode.next(this.columns - 2);
+                var pivot = dropNode.next(this.columns - 2);
+                if (pivot) index = pivot.getIndex() + 1;
+                else index = -1;
                 break;
             case hoverOverlapState.LEFT:
-                pivot = dropNode.previousSibling;
+                var pivot = dropNode.previousSibling;
+                if (pivot) index = pivot.getIndex() + 1;
+                else index = 0;
                 break;
             case hoverOverlapState.RIGHT:
-                pivot = dropNode;
+                index = dropNode.getIndex() + 1;
                 break;
             case hoverOverlapState.CENTER:
-                pivot = dropNode;
+                index = dropNode.getIndex() + 1;
                 break;
         }
-        if (pivot) {
-            var index = pivot.getIndex();
-            for (var i = 0, l = this.selectedNodes.length; i < l; i++)
-                this.model.move(this.selectedNodes[i], ++index);
+        if (!isNaN(index)) {
+            for (var i = this.selectedNodes.length - 1; i > -1; --i)
+                this.model.move(this.selectedNodes[i], index);
         }
         unselectAll.call(this);
         setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
