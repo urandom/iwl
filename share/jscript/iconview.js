@@ -107,7 +107,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.innerHTML = html;
         }
         replaceRowSeparators.call(this);
-        element = next ? map[next.attributes.id].element.previous('.iconview_node') : this.lastChild;
+        element = next
+            ? map[next.attributes.id].element.previous('.iconview_node')
+            : this.childElements().grep(new Selector('.iwl-node')).last();
         var values = node.getValues(this.options.imageColumn, this.options.textColumn);
         setNodeAttributes.call(this, element, node);
         cellFunctionRenderer.call(this, element, values, node);
@@ -218,11 +220,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.pageChanging = undefined;
     }
 
-    function findViewByNodeId(id, wantMap) {
+    function findViewByNodeId(id) {
         for (var i in nodeMap) {
             var view;
             if (view = nodeMap[i][id])
-                return wantMap ? [view, nodeMap[i]] : view;
+                return view;
         }
     }
 
@@ -255,32 +257,19 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!node.nextSibling && node.previousSibling)
             nodeMap[id][node.previousSibling.attributes.id].element.removeClassName('iconview_node_last');
         recreateNode.call(this, node);
-        generatePathAttributes.call(this, nodeMap[id]);
     }
 
     function nodeRemove(event, node) {
-        var ret = findViewByNodeId(node.attributes.id, true);
-        var view = ret[0];
-        var map = ret[1];
+        var view = findViewByNodeId(node.attributes.id);
         var element = view.element;
 
         element.remove();
 
         if (this.model.rootNodes.length) {
-            generatePathAttributes.call(this, map);
             replaceRowSeparators.call(this);
         }
     }
     
-    function generatePathAttributes(map) {
-        var nodes = this.model.rootNodes;
-        for (var i = 0, l = nodes.length; i < l; i++) {
-            var node = nodes[i];
-            var element = map[node.attributes.id].element;
-            element._node = node;
-        }
-    }
-
     function removeModel() {
         nodeMap[this.id] = {};
         this.model = undefined;

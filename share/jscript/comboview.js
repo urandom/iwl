@@ -67,7 +67,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function generateNodeTemplate(flat) {
         /* Individual rows can't be dragged. Each node has to be a full table */
-        var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node #{nodePosition}" iwl:nodePath="#{nodePath}"><tbody><tr>'];
+        var node = ['<table cellpadding="0" cellspacing="0" class="comboview_node #{nodePosition}"><tbody><tr>'];
 
         for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
             var classNames = ['comboview_column', 'comboview_column' + i], width = '';
@@ -156,6 +156,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element: element,
             container: container
         });
+        element._node = node;
         if (element.hasClassName('comboview_node_separator'))
             return;
         if (this.model.constructor == IWL.ListModel) {
@@ -256,7 +257,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function recreateNode(node, template, flat, container) {
-        var cellTemplate = cellTemplateRenderer.call(this, node), html, nodePath = node.getPath().toJSON(), id = this.id;
+        var cellTemplate = cellTemplateRenderer.call(this, node), html, id = this.id;
         if (cellTemplate.separator) {
             html = generateSeparator.call(this);
         } else {
@@ -274,7 +275,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 cellTemplate.nodePosition = 'comboview_node_first'
             else if (!node.nextSibling)
                 cellTemplate.nodePosition = 'comboview_node_last'
-            cellTemplate.nodePath = nodePath;
             html = template.evaluate(cellTemplate);
         }
         var next = node.nextSibling, previous = node.previousSibling,
@@ -322,7 +322,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 cellTemplate.nodePosition = 'comboview_node_first'
             else if (i + 1 == nodeLength)
                 cellTemplate.nodePosition = 'comboview_node_last'
-            cellTemplate.nodePath = node.getPath().toJSON();
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
@@ -435,8 +434,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!Event.isLeftClick(event)) return;
                 var element = Event.element(event).up('.comboview_node');
                 if (!element || element.descendantOf(this)) return;
-                var path = element.readAttribute('iwl:nodePath').evalJSON();
-                if (this.setActive(path))
+                if (this.setActive(element._node))
                     return this.popDown();
                 else Event.stop(event);
             }.bind(this));
@@ -588,7 +586,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!node.nextSibling && node.previousSibling)
             nodeMap[id][node.previousSibling.attributes.id].element.removeClassName('comboview_node_last');
         recreateNode.call(this, parentNode || node, template, flat, container);
-        generatePathAttributes.call(this, parentNode);
     }
 
     function nodeRemove(event, node, parentNode) {
@@ -608,9 +605,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         element.remove();
 
         var count = parentNode ? parentNode.childCount : this.model.rootNodes.length;
-        if (count)
-            generatePathAttributes.call(this, parentNode);
-        else {
+        if (!count) {
             removeContainers.call(this, container);
             var flat = this.model.isFlat ? this.model.isFlat() : true;
             var template = generateNodeTemplate.call(this, flat)
@@ -631,25 +626,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = container.childContainers.length; i < l; i++)
             removeContainers.call(this, container.childContainers[i]);
         container.childContainers = [];
-    }
-
-    function generatePathAttributes(parentNode) {
-        var childNodes, parentPath;
-        if (parentNode) {
-            childNodes = parentNode.childNodes;
-            parentPath = parentNode.getPath();
-        } else {
-            childNodes = this.model.rootNodes;
-            parentPath = [];
-        }
-        for (var i = 0, l = childNodes.length; i < l; i++) {
-            var child = childNodes[i];
-            var path = parentPath.concat(i);
-            var element = nodeMap[this.id][child.attributes.id].element;
-            element.writeAttribute('iwl:nodePath', Object.toJSON(path));
-            if (child.childNodes.length)
-                generatePathAttributes.call(this, child);
-        }
     }
 
     function removeModel() {
