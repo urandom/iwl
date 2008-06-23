@@ -319,9 +319,9 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
   }
 
   function compareColumns(column1, column2) {
-    if (columns1.length != columns2.length) return false;
-    for (var i = 0, l = columns1.length; i < l; i++) {
-      if (columns1[i].type != columns2[i].type)
+    if (column1.length != column2.length) return false;
+    for (var i = 0, l = column1.length; i < l; i++) {
+      if (column1[i].type != column2[i].type)
         return false;
     }
 

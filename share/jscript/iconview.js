@@ -1,7 +1,7 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataTypes.IMAGE, IWL.ListModel.DataTypes.STRING],
-        nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iconview_node #{nodePosition}" iwl:nodePath="#{nodePath}">#{imageColumn}#{textColumn}</div>');
+        nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iwl-node iconview_node #{nodePosition}">#{imageColumn}#{textColumn}</div>');
         dragMultipleIcons = new Template('<span class="iconview_dragged_nodes"><strong>#{number}</strong> #{text}</span>'),
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
         scrollbarSize = document.viewport.getScrollbarSize(),
@@ -49,6 +49,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element: element
         });
         element.sensitive = true;
+        element._node = node;
 
         if (node.attributes.insensitive)
             this.setSensitivity(node, false);
@@ -78,7 +79,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function recreateNode(node) {
-        var cellTemplate = cellTemplateRenderer.call(this, node), nodePath = node.getPath().toJSON(), id = this.id;
+        var cellTemplate = cellTemplateRenderer.call(this, node), id = this.id;
         var bugs = Prototype.Browser.IE ? 3 * this.options.colums : Prototype.Browser.Gecko ? this.options.columns : 0;
         this.columnWidth = this.options.columns > 0
             ? this.offsetWidth / this.columns - this.iconMarginX - bugs
@@ -92,7 +93,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             cellTemplate.nodePosition = 'iconview_node_first'
         else if (!node.nextSibling)
             cellTemplate.nodePosition = 'iconview_node_last'
-        cellTemplate.nodePath = nodePath;
         var html = nodeTemplate.evaluate(cellTemplate);
         var next = node.nextSibling, previous = node.previousSibling,
             map = nodeMap[id], element = nodeMap[id][node.attributes.id].element;
@@ -132,7 +132,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 cellTemplate.nodePosition = 'iconview_node_first'
             else if (i + 1 == nodeLength)
                 cellTemplate.nodePosition = 'iconview_node_last'
-            cellTemplate.nodePath = node.getPath().toJSON();
             html.push(nodeTemplate.evaluate(cellTemplate));
             ++column;
             if (column == this.columns) {
@@ -219,9 +218,17 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.pageChanging = undefined;
     }
 
+    function findViewByNodeId(id, wantMap) {
+        for (var i in nodeMap) {
+            var view;
+            if (view = nodeMap[i][id])
+                return wantMap ? [view, nodeMap[i]] : view;
+        }
+    }
+
     function nodesSwap(event, node1, node2) {
-        var n1View = nodeMap[this.id][node1.attributes.id],
-            n2View = nodeMap[this.id][node2.attributes.id];
+        var n1View = findViewByNodeId(node1.attributes.id),
+            n2View = findViewByNodeId(node2.attributes.id);
 
         n1View.element.remove();
         nodeChange.call(this, event, node1);
@@ -231,7 +238,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeMove(event, node) {
-        var view = nodeMap[this.id][node.attributes.id];
+        var view = findViewByNodeId(node.attributes.id);
         if (view.element && view.element.parentNode)
             view.element.remove();
 
@@ -248,28 +255,29 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!node.nextSibling && node.previousSibling)
             nodeMap[id][node.previousSibling.attributes.id].element.removeClassName('iconview_node_last');
         recreateNode.call(this, node);
-        generatePathAttributes.call(this);
+        generatePathAttributes.call(this, nodeMap[id]);
     }
 
     function nodeRemove(event, node) {
-        var view = nodeMap[this.id][node.attributes.id];
+        var ret = findViewByNodeId(node.attributes.id, true);
+        var view = ret[0];
+        var map = ret[1];
         var element = view.element;
 
         element.remove();
 
         if (this.model.rootNodes.length) {
-            generatePathAttributes.call(this);
+            generatePathAttributes.call(this, map);
             replaceRowSeparators.call(this);
-        } else
-            recreateNode.call(this, node);
+        }
     }
     
-    function generatePathAttributes() {
+    function generatePathAttributes(map) {
         var nodes = this.model.rootNodes;
         for (var i = 0, l = nodes.length; i < l; i++) {
             var node = nodes[i];
-            var element = nodeMap[this.id][node.attributes.id].element;
-            element.writeAttribute('iwl:nodePath', '[' + i + ']');
+            var element = map[node.attributes.id].element;
+            element._node = node;
         }
     }
 
@@ -461,7 +469,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setDroppableNode(node, view, map) {
         var element = view.element, self = this;
         setTimeout(function() {
-            element.setDragDest({containment: self});
+            element.setDragDest({accept: ['iwl-node', 'iwl-node-container']});
             element.signalConnect('iwl:drag_hover', map.eventDragHover);
             element.signalConnect('iwl:drag_drop', map.eventDragDrop);
         }, 5);
@@ -477,7 +485,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement) {
-        var dropNode = this.model.getNodeByPath(dropElement.readAttribute('iwl:nodepath').evalJSON(true)), index;
+        var dropNode = dropElement._node, index;
         switch(dropElement.__hoverState) {
             case hoverOverlapState.TOP:
                 var pivot = dropNode.previous(this.columns - 1);
@@ -502,15 +510,15 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 break;
         }
         if (!isNaN(index)) {
-            for (var i = this.selectedNodes.length - 1; i > -1; --i)
-                this.model.move(this.selectedNodes[i], index);
+            for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
+                this.model.move(dragElement.selectedNodes[i], index);
         }
-        unselectAll.call(this);
+        unselectAll.call(dragElement);
         setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
     }
 
     function eventDragHover(event, dragElement, dropElement) {
-        var dropNode = this.model.getNodeByPath(dropElement.readAttribute('iwl:nodepath').evalJSON(true));
+        var dropNode = dropElement._node;
         if (this.selectedNodes.indexOf(dropNode) > -1)
             return;
 
@@ -613,6 +621,13 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function eventIconViewHover(event) {
         if (this.__hoverElement && Event.element(event) != this.__hoverElement)
             setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
+    }
+
+    function eventIconViewDrop(event, dragElement, dropElement) {
+        var dropNode = dropElement._node;
+        for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
+            this.model.move(dragElement.selectedNodes[i]);
+        unselectAll.call(dragElement);
     }
 
     return {
@@ -759,13 +774,17 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 map.eventDragDrop = eventDragDrop.bind(this);
             if (!map.eventIconViewHover)
                 map.eventIconViewHover = eventIconViewHover.bind(this);
+            if (!map.eventIconViewDrop)
+                map.eventIconViewDrop = eventIconViewDrop.bind(this);
 
             if (bool) {
-                this.setDragDest({containment: this});
+                this.setDragDest({accept: ['iwl-node', 'iwl-node-container']});
                 this.signalConnect('iwl:drag_hover', map.eventIconViewHover);
+                this.signalConnect('iwl:drag_drop', map.eventIconViewDrop);
             } else {
                 this.unsetDragDest();
                 this.signalDisconnect('iwl:drag_hover', map.eventIconViewHover);
+                this.signalDisconnect('iwl:drag_drop', map.eventIconViewDrop);
             }
 
             for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
@@ -821,6 +840,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
+            this.addClassName('iwl-node-container');
             this.selectedNodes = [];
             this.selectedPaths = [];
 

@@ -387,8 +387,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       show.call(Droppables, point, element);
   };
   Droppables.isAffected = function(point, element, drop) {
-    if (element.iwl && element.iwl.draggable && drop.element.iwl && drop.element.iwl.droppable) {
-      if (!(element.iwl.draggable.options.actions & drop.element.iwl.droppable.options.actions))
+    if (element.iwl && element.iwl.draggable) {
+      if (!(element.iwl.draggable.options.actions & drop.actions))
         return false;
     }
     return isAffected.call(Droppables, point, element, drop);
