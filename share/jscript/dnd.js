@@ -177,11 +177,11 @@ IWL.Draggable.Actions = {
 
 IWL.Droppable = Class.create((function() {
   function onHover(dragElement, dropElement, overlap) {
-    this.element.emitSignal('iwl:drag_hover', dragElement.originalElement || dragElement, dropElement, overlap)
+    this.element.emitSignal('iwl:drag_hover', dragElement.originalElement || dragElement, dropElement, overlap, this.options.actions)
   }
 
   function onDrop(dragElement, dropElement, dragEvent) {
-    this.element.emitSignal('iwl:drag_drop', dragElement, dropElement, dragEvent);
+    this.element.emitSignal('iwl:drag_drop', dragElement, dropElement, dragEvent, this.options.actions);
   }
 
   return {

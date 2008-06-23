@@ -451,6 +451,17 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
       return [this.getIndex()];
     },
 
+    clone: function() {
+      var clone = new IWL.ListModel.Node;
+
+      clone.values = this.values.clone();
+      clone.attributes = Object.clone(this.attributes);
+
+      clone.attributes.id = Math.random();
+
+      return clone;
+    },
+
     _each: Prototype.emptyFunction,
 
     _addModel: function(model) {
