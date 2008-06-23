@@ -361,7 +361,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventIconMouseUp(event, node) {
-        if (nodeMap[this.id].skipIconSelect) {
+        var dragging = this.iwl && this.iwl.draggable
+                ? this.iwl.draggable.dragging
+                : false;
+        if (nodeMap[this.id].skipIconSelect && !dragging) {
             toggleSelectNode.call(this, event, node);
             delete nodeMap[this.id].skipIconSelect;
         }
@@ -475,7 +478,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setDroppableNode(node, view, map) {
         var element = view.element, self = this;
         setTimeout(function() {
-            element.setDragDest({accept: ['iwl-node', 'iwl-node-container']});
+            element.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: self.dropActions});
             element.signalConnect('iwl:drag_hover', map.eventDragHover);
             element.signalConnect('iwl:drag_drop', map.eventDragDrop);
         }, 5);
@@ -736,9 +739,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         /**
          * Enables/Disables icon dragging for the Icon View
          * @param {Boolean} bool If true, dragging will be enabled for the Icon View
+         * @param {Bitmask} actions The drag source actions. See IWL.Draggable.Actions
          * @returns The object
          * */
-        setModelDragSource: function(bool) {
+        setModelDragSource: function(bool, actions) {
             if (this.options.dragSource == (bool = !!bool))
                 return;
 
@@ -746,9 +750,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var map = nodeMap[this.id];
             if (!map.eventDragInit)
                 map.eventDragInit = eventDragInit.bind(this);
+            this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
-                this.setDragSource({revert: true});
+                this.setDragSource({revert: true, actions: this.dragActions});
                 this.signalConnect('iwl:drag_init', map.eventDragInit);
             } else {
                 this.unsetDragSource();
@@ -766,9 +771,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         /**
          * Enables/Disables icon dropping for the Icon View
          * @param {Boolean} bool If true, icon dropping will be enabled for the Icon View
+         * @param {Bitmask} actions The drag source actions. See IWL.Draggable.Actions
          * @returns The object
          * */
-        setModelDragDest: function(bool) {
+        setModelDragDest: function(bool, actions) {
             if (this.options.dragDest == (bool = !!bool))
                 return;
 
@@ -783,8 +789,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!map.eventIconViewDrop)
                 map.eventIconViewDrop = eventIconViewDrop.bind(this);
 
+            this.dropActions = actions || IWL.Draggable.Actions.MOVE;
+
             if (bool) {
-                this.setDragDest({accept: ['iwl-node', 'iwl-node-container']});
+                this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
                 this.signalConnect('iwl:drag_hover', map.eventIconViewHover);
                 this.signalConnect('iwl:drag_drop', map.eventIconViewDrop);
             } else {
@@ -839,7 +847,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 initialActive: [],
                 maxHeight: 400,
                 popUpDelay: 0.2,
-                boxSelectionOpacity: 0.5
+                boxSelectionOpacity: 0.5,
+                dragActions: IWL.Draggable.Actions.MOVE
             }, arguments[1]);
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
