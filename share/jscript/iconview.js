@@ -155,9 +155,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function changeHighlight(node) {
         var current = this.currentNodeHighlight;
         if (current) {
-            var element = nodeMap[this.id][current.attributes.id].element;
-            element.removeClassName('iconview_node_highlight');
-            element.highlight = false;
+            var n = findByNodeId(current.attributes.id);
+            if (n[1] && n[1].element) {
+                var element = n[1].element;
+                element.removeClassName('iconview_node_highlight');
+                element.highlight = false;
+            }
         }
         if (node) {
             var element = nodeMap[this.id][node.attributes.id].element;
@@ -220,30 +223,39 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.pageChanging = undefined;
     }
 
-    function findViewByNodeId(id) {
+    function findByNodeId(id) {
         for (var i in nodeMap) {
             var view;
             if (view = nodeMap[i][id])
-                return view;
+                return [nodeMap[i], view];
         }
     }
 
     function nodesSwap(event, node1, node2) {
-        var n1View = findViewByNodeId(node1.attributes.id),
-            n2View = findViewByNodeId(node2.attributes.id);
+        var n1 = findByNodeId(node1.attributes.id),
+            n2 = findByNodeId(node2.attributes.id);
 
-        n1View.element.remove();
+        if (n1) {
+            n1[1].element.remove();
+            delete n1[0][node1.attributes.id];
+        }
         nodeChange.call(this, event, node1);
 
-        n2View.element.remove();
+        if (n2) {
+            n2[1].element.remove();
+            delete n2[0][node2.attributes.id];
+        }
         nodeChange.call(this, event, node2);
     }
 
     function nodeMove(event, node) {
-        var view = findViewByNodeId(node.attributes.id);
-        if (view.element && view.element.parentNode)
-            view.element.remove();
+        var n = findByNodeId(node.attributes.id);
+        if (n) {
+            if (n[1].element && n[1].element.parentNode)
+                n[1].element.remove();
 
+            delete n[0][node.attributes.id];
+        }
         nodeInsert.call(this, event, node);
     }
 
@@ -260,10 +272,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeRemove(event, node) {
-        var view = findViewByNodeId(node.attributes.id);
-        var element = view.element;
+        var n = findByNodeId(node.attributes.id);
 
-        element.remove();
+        if (n) {
+            n[1].element.remove();
+            delete n[0][node.attributes.id];
+        }
 
         if (this.model.rootNodes.length) {
             replaceRowSeparators.call(this);
@@ -389,10 +403,13 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function unselectNode(node, skipRemoval) {
-        if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
+        var view = nodeMap[this.id][node.attributes.id];
+        var exists = view && view.element;
+        if (exists && !view.element.sensitive) return;
         if (!skipRemoval)
             this.selectedNodes = this.selectedNodes.without(node);
-        nodeMap[this.id][node.attributes.id].element.removeClassName('iconview_node_selected');
+        if (exists)
+            view.element.removeClassName('iconview_node_selected');
     }
 
     function unselectAll() {

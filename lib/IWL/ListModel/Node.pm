@@ -117,7 +117,7 @@ sub _init {
     my $self = shift;
 
     $self->{values} = [];
-    $self->{attributes} =  {id => "$self" =~ /.*0x([0-9a-fA-F]+)/};
+    $self->{attributes} =  {id => rand()};
     $self->{previousSibling} = $self->{nextSibling} = undef;
     $self->insert(@_) if $_[0];
 }
