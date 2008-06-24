@@ -118,7 +118,8 @@ sub dataReader {
                 . ($options{limitParameter} || 'limit')
                 . '=' . $options{limit};
         }
-        my $r = IO::Socket::INET->new(Proto => $options{proto}, PeerAddr => $options{host}, PeerPort => $options{port});
+        my $r = IO::Socket::INET->new(Proto => $options{proto}, PeerAddr => $options{host}, PeerPort => $options{port})
+            or return $self->_pushFatalError(__"Error creating INET socket.");
         my @printer = ("GET $uri HTTP/1.1", "Host: $options{host}:$options{port}");
         my $body;
 

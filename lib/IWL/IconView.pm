@@ -249,11 +249,60 @@ sub setPageControlOptions {
     return $self->{__pager} = $pager;
 }
 
+=item B<setModelDragSource> (B<BOOL>, [B<ACTIONS>])
+
+Enables or disables icon dragging in the icon view
+
+Parameters: B<BOOL> - if true, icon dragging is enabled. B<ACTIONS> - Can be either B<MOVE> (I<default>) or B<COPY>, where B<MOVE> - with remove the node, associated with the icon on a successfull drop.
+
+=cut
+
+sub setModelDragSource {
+    my ($self, $bool, $actions) = @_;
+
+    $self->{__dragSource} = !(!$bool);
+    $self->{__dragSourceActions} = $actions;
+
+    return $self;
+}
+
+=item B<setModelDragDest> (B<BOOL>, [B<ACTIONS>])
+
+Enables or disables drag destination to the icon view icons.
+
+Parameters: B<BOOL> - if true, icon destination is enabled. B<ACTIONS> - Can be either B<MOVE> (I<default>) or B<COPY>, where B<MOVE> - with remove the node, associated with the drag source icon on a successfull drop.
+
+=cut
+
+sub setModelDragDest {
+    my ($self, $bool, $actions) = @_;
+
+    $self->{__dragDest} = !(!$bool);
+    $self->{__dragDestActions} = $actions;
+
+    return $self;
+}
+
+=item B<setReorderable> (B<BOOL>)
+
+Enables automatic reordering of nodes via D&D
+
+Parameters: B<BOOL> - if true, D&D reordering will be enabled
+
+=cut
+
+sub setReorderable {
+    my ($self, $bool) = @_;
+    $self->{__reorderable} = !(!$bool);
+
+    return $self;
+}
+
 # Protected
 #
 sub _realize {
-    my $self    = shift;
-    my $id      = $self->getId;
+    my $self = shift;
+    my $id   = $self->getId;
 
     $self->SUPER::_realize;
 
@@ -304,8 +353,20 @@ sub _realize {
         unless $self->{_options}{columns} || $self->{_options}{columnWidth};
 
     my $options = toJSON($self->{_options});
+    my $dragAction = 'IWL.Draggable.Actions.' . ($self->{__dragSourceActions} || 'MOVE');
+    my $dropAction = 'IWL.Draggable.Actions.' . ($self->{__dragDestActions} || 'MOVE');
 
-    $self->_appendInitScript("IWL.IconView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);");
+    $self->_appendInitScript(<<EOF);
+(function() {
+    var iv = IWL.IconView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);
+    if ('$self->{__dragSource}')
+        iv.setModelDragSource(true, $dragAction);
+    if ('$self->{__dragDest}')
+        iv.setModelDragDest(true, $dropAction);
+    if ('$self->{__reorderable}')
+        iv.setReorderable(true);
+})();
+EOF
 }
 
 sub _init {
