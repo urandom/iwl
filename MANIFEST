@@ -242,6 +242,7 @@ share/jscript/contentbox.js
 share/jscript/demo.js
 share/jscript/dist/accordion.js
 share/jscript/dist/controls.js
+share/jscript/dist/delegate.js
 share/jscript/dist/dragdrop.js
 share/jscript/dist/effects.js
 share/jscript/dist/excanvas.js

@@ -337,6 +337,7 @@ sub _init {
     $self->{_options}{columnMap}     = $args{columnMap}     if 'ARRAY' eq ref $args{columnMap};
     $self->{_options}{contentHeight} = $args{contentHeight} if $args{contentHeight};
     $self->{_options}{maxHeight}     = $args{maxHeight}     if defined $args{maxHeight};
+    $self->{_options}{editable}      = $args{editable}      if defined $args{editable};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -346,10 +347,11 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
+    delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model editable)};
 
-    $self->requiredJs('base.js', 'cellrenderer.js', 'comboview.js');
+    $self->requiredJs('base.js', 'dist/delegate.js', 'cellrenderer.js', 'comboview.js');
     $self->_constructorArguments(%args);
+    $self->{_customSignals} = {change => [], popup => [], popdown => []};
 
     return $self;
 }

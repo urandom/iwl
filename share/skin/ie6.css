@@ -119,3 +119,11 @@ div.expander_collapsed .expander_icon {
 .progress_bar_label {
     margin: -16px 0 0 0;
 }
+
+.iconview_node {
+    border: 1px solid white;
+}
+.iconview_node_text, .iconview_node_image {
+    border: 1px solid white;
+}
+

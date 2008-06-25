@@ -1573,6 +1573,18 @@ div.tooltip_content {
     margin: 10px 0px 0px 10px;
 }
 
+/* Cells */
+.iwl-cell-value {
+    margin: 0;
+    width: 100%;
+}
+.iwl-cell-editable {
+    border: none;
+    width: 100%;
+    background: transparent;
+    font-size: 12px;
+}
+
 /* ComboView */
 .comboview {
     border: 1px solid #7F9DB9;
@@ -1581,7 +1593,7 @@ div.tooltip_content {
     margin: 1px 0;
 }
 .comboview_editable {
-    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    background: url('/iwl/skin/default/images/entry/entry_bg.gif') repeat-x;
     color: #525C65;
 }
 
@@ -1735,6 +1747,7 @@ div.tooltip_content {
     text-align: center;
     color: #111;
     border: 1px solid transparent;
+    overflow: hidden;
 }
 .iconview_node_text_vertical {
     margin: 0px;

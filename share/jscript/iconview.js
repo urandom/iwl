@@ -49,7 +49,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element: element
         });
         element.sensitive = true;
-        element._node = node;
+        element.node = node;
 
         if (node.attributes.insensitive)
             this.setSensitivity(node, false);
@@ -403,22 +403,26 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
         nodeMap[this.id][node.attributes.id].element.addClassName('iconview_node_selected');
         this.selectedNodes.push(node);
+        this.emitSignal('iwl:select');
     }
 
     function unselectNode(node, skipRemoval) {
         var view = nodeMap[this.id][node.attributes.id];
         var exists = view && view.element;
         if (exists && !view.element.sensitive) return;
-        if (!skipRemoval)
-            this.selectedNodes = this.selectedNodes.without(node);
         if (exists)
             view.element.removeClassName('iconview_node_selected');
+        if (!skipRemoval) {
+            this.selectedNodes = this.selectedNodes.without(node);
+            this.emitSignal('iwl:unselect');
+        }
     }
 
     function unselectAll() {
         for (var i = 0, l = this.selectedNodes.length; i < l; i++)
             unselectNode.call(this, this.selectedNodes[i], true);
         this.selectedNodes = [];
+        this.emitSignal('iwl:unselect_all');
     }
 
     function boxSelectionEnd(event, draggable, coords) {
@@ -494,7 +498,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
-        var dropNode = dropElement._node, index;
+        var dropNode = dropElement.node, index;
         switch(dropElement.__hoverState) {
             case hoverOverlapState.TOP:
                 var pivot = dropNode.previous(this.columns - 1);
@@ -532,7 +536,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragHover(event, dragElement, dropElement) {
-        var dropNode = dropElement._node;
+        var dropNode = dropElement.node;
         if (this.selectedNodes.indexOf(dropNode) > -1)
             return;
 
@@ -638,7 +642,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventIconViewDrop(event, dragElement, dropElement) {
-        var dropNode = dropElement._node;
+        var dropNode = dropElement.node;
         for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
             this.model.move(dragElement.selectedNodes[i]);
         unselectAll.call(dragElement);

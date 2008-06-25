@@ -86,6 +86,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
           });
           this.dummy.originalElement = this.element;
           document.body.appendChild(this.view);
+          document.body.appendChild(this.dummy);
         }
       } else if (this.options.outline) {
         this.outline = new Element('div', {className: 'draggable_outline'});
@@ -130,6 +131,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
             Position.relativize(this.element);
         }
         this.view.remove();
+        this.dummy.remove();
         delete this.view;
       } else if (this.outline) {
         if (!this.options.revert) {

@@ -396,6 +396,7 @@ sub _init {
 
     $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'cellrenderer.js', 'iconview.js');
     $self->_constructorArguments(%args);
+    $self->{_customSignals} = {toggle_active => [], select => [], unselect => [], unselect_all => []};
 
     return $self;
 }

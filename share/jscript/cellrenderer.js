@@ -6,25 +6,53 @@ IWL.CellRenderer = Class.create((function() {
 })());
 
 IWL.CellTemplateRenderer = Class.create((function() {
+  var editable = new Template(
+    '<p class="iwl-cell-value">#{value}</p><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
+  );
   return {
+    initialize: function() {
+      this.options = Object.extend({}, arguments[0] || {});
+
+      if (this.options.editable && this.options.view) {
+        var view = this.options.view;
+        Event.delegate(view, 'click', '.iwl-cell-value', function(event) {
+            var va = Event.element(event),
+                en = va.nextSibling;
+            en.value = Element.getText(va);
+            Element.show(en);
+            Element.hide(va);
+            en.focus();
+            en.select();
+        });
+        Event.delegate(view, 'keypress', '.iwl-cell-editable', function(event) {
+            if (event.keyCode != Event.KEY_ESC && event.keyCode != Event.KEY_RETURN) return;
+            var en = Event.element(event),
+                va = en.previousSibling;
+            if (event.keyCode == Event.KEY_RETURN)
+              va.innerHTML = en.value;
+            Element.hide(en);
+            Element.show(va);
+            if (event.keyCode == Event.KEY_RETURN)
+              Event.emitSignal(view, 'iwl:edit', Element.extend(en.parentNode), en.value);
+        });
+      }
+    },
     render: function(value, node) {
-        return value.toString();
+      return this.options.editable
+        ? editable.evaluate({value: value.toString()})
+        : value.toString();
     }
   };
 })());
 
-IWL.CellTemplateRenderer.String = Class.create(IWL.CellTemplateRenderer, (function() {
-  return {
-    render: function(value, node) {
-        return value.toString();
-    }
-  };
-})());
+IWL.CellTemplateRenderer.String = Class.create(IWL.CellTemplateRenderer);
 
 IWL.CellTemplateRenderer.Int = Class.create(IWL.CellTemplateRenderer, (function() {
   return {
     render: function(value, node) {
-        return parseInt(value);
+      return this.options.editable
+        ? editable.evaluate({value: parseInt(value)})
+        : parseInt(value);
     }
   };
 })());
@@ -32,7 +60,9 @@ IWL.CellTemplateRenderer.Int = Class.create(IWL.CellTemplateRenderer, (function(
 IWL.CellTemplateRenderer.Float = Class.create(IWL.CellTemplateRenderer, (function() {
   return {
     render: function(value, node) {
-        return parseFloat(value);
+      return this.options.editable
+        ? editable.evaluate({value: parseFloat(value)})
+        : parseFloat(value);
     }
   };
 })());
@@ -40,7 +70,10 @@ IWL.CellTemplateRenderer.Float = Class.create(IWL.CellTemplateRenderer, (functio
 IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (function() {
   return {
     render: function(value, node) {
-        return (!!value).toString();
+      var bool = (!!value).toString();
+      return this.options.editable
+        ? editable.evaluate({value: bool})
+        : bool;
     }
   };
 })());
@@ -48,7 +81,7 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
 IWL.CellTemplateRenderer.Count = Class.create(IWL.CellTemplateRenderer, (function() {
   return {
     render: function(value, node) {
-        return node.getIndex() + 1 + (node.model.options.offset || 0);
+      return node.getIndex() + 1 + (node.model.options.offset || 0);
     }
   };
 })());
