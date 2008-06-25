@@ -1752,6 +1752,7 @@ div.tooltip_content {
 .iconview_node_text_vertical {
     margin: 0px;
     margin-top: 2px;
+    width: auto;
 }
 
 .iconview_node_highlight .iconview_node_text {

@@ -383,6 +383,7 @@ sub _init {
     $self->{_options}{columnWidth} = $args{columnWidth} if defined $args{columnWidth};
     $self->{_options}{textColumn}  = $args{textColumn}  if defined $args{textColumn};
     $self->{_options}{imageColumn} = $args{imageColumn} if defined $args{imageColumn};
+    $self->{_options}{editable}    = $args{editable}    if defined $args{editable};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -392,11 +393,11 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model)};
+    delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model editable)};
 
-    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'cellrenderer.js', 'iconview.js');
+    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'dist/delegate.js', 'cellrenderer.js', 'iconview.js');
     $self->_constructorArguments(%args);
-    $self->{_customSignals} = {toggle_active => [], select => [], unselect => [], unselect_all => []};
+    $self->{_customSignals} = {toggle_active => [], select => [], unselect => [], unselect_all => [], edit => []};
 
     return $self;
 }

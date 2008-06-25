@@ -351,7 +351,7 @@ sub _init {
 
     $self->requiredJs('base.js', 'dist/delegate.js', 'cellrenderer.js', 'comboview.js');
     $self->_constructorArguments(%args);
-    $self->{_customSignals} = {change => [], popup => [], popdown => []};
+    $self->{_customSignals} = {change => [], popup => [], popdown => [], edit => []};
 
     return $self;
 }

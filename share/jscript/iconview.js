@@ -197,13 +197,14 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     ? renderFunction.objectize()
                     : undefined;
             } else {
-                var type = this.model.columns[this.options[names[i]]].type;
+                var type = this.model.columns[this.options[names[i]]].type,
+                    options = {view: this, editable: this.options.editable};
                 switch(type) {
                     case IWL.ListModel.DataTypes.STRING:
                         if (this.options.orientation == IWL.IconView.Orientation.HORIZONTAL)
-                            cAttrs.templateRenderer = new IWL.IconView.horizontalTextRenderer();
+                            cAttrs.templateRenderer = new IWL.IconView.horizontalTextRenderer(options);
                         else
-                            cAttrs.templateRenderer = new IWL.IconView.verticalTextRenderer();
+                            cAttrs.templateRenderer = new IWL.IconView.verticalTextRenderer(options);
                         break;
                     case IWL.ListModel.DataTypes.IMAGE:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Image();
@@ -908,7 +909,7 @@ IWL.IconView.CellType = {
     IMAGE: 1
 };
 IWL.IconView.horizontalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
-    hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal">#{cellValue}</span>');
+    hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal iwl-cell-value">#{cellValue}</span><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>');
     return {
         render: function(value, node) {
             return hTextTemplate.evaluate({cellValue: value});
@@ -916,7 +917,7 @@ IWL.IconView.horizontalTextRenderer = Class.create(IWL.CellTemplateRenderer, (fu
     };
 })());
 IWL.IconView.verticalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
-    vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical">#{cellValue}</p>');
+    vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical iwl-cell-value">#{cellValue}</p><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>');
     return {
         render: function(value, node) {
             return vTextTemplate.evaluate({cellValue: value});
