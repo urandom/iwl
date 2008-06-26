@@ -369,6 +369,14 @@ sub _realize {
 EOF
 }
 
+sub _setupDefaultClass {
+    my $self = shift;
+
+    $self->prependClass($self->{_defaultClass} . '_editable')
+        if $self->{_options}{editable};
+    $self->prependClass($self->{_defaultClass});
+}
+
 sub _init {
     my ($self, %args) = @_;
 

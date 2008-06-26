@@ -1789,3 +1789,10 @@ div.tooltip_content {
     background-color: #d2d4e3;
     font-size: 2em;
 }
+
+.iconview .iwl-cell-editable {
+    border: 1px solid #7F9DB9;
+    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    margin: 1px 0px;
+    width: 98%;
+}

@@ -52,7 +52,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
     },
 
     initDrag: function($super, event) {
-      this.element.emitSignal('iwl:drag_init', this, eventOptions.call(this, event));
+      (Event.element(event) || this.element).emitSignal('iwl:drag_init', this, eventOptions.call(this, event));
       if (this.terminated) {
         delete this.terminated;
         return;
@@ -78,12 +78,10 @@ IWL.Draggable = Class.create(Draggable, (function() {
           this.view = undefined;
 
         if (this.view) {
-          this.dummy = new Element('div');
-          Object.extend(this.view.style, {
-            position: 'absolute',
-            left: point.x + 'px',
-            top: point.y + 'px'
-          });
+          this.dummy = new Element('div'), style = this.view.style;
+          style.position = 'absolute';
+          style.left = (point.x || 0) + 'px';
+          style.top = (point.y || 0) + 'px';
           this.dummy.originalElement = this.element;
           document.body.appendChild(this.view);
           document.body.appendChild(this.dummy);
@@ -212,7 +210,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
   var scrollbarSize = document.viewport.getScrollbarSize();
 
   function initDrag(event) {
-    this.element.emitSignal('iwl:box_selection_init', this);
+    (Event.element(event) || this.element).emitSignal('iwl:box_selection_init', this);
     if (this.terminated) {
       delete this.terminated;
       return;

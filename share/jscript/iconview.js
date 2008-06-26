@@ -416,6 +416,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!skipRemoval) {
             this.selectedNodes = this.selectedNodes.without(node);
             this.emitSignal('iwl:unselect');
+            if (this.__focusable)
+                this.__focusable.focus();
         }
     }
 
@@ -423,7 +425,15 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = this.selectedNodes.length; i < l; i++)
             unselectNode.call(this, this.selectedNodes[i], true);
         this.selectedNodes = [];
+        if (this.__focusable)
+            this.__focusable.focus();
         this.emitSignal('iwl:unselect_all');
+    }
+    
+    function boxSelectionInit(event) {
+        var element = Event.element(event);
+        if (element.hasClassName('iwl-cell-value') || element.hasClassName('iwl-cell-editable'))
+            return this.boxSelection.terminateDrag();
     }
 
     function boxSelectionEnd(event, draggable, coords) {
@@ -884,6 +894,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.state = 0;
             this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
+            if (this.options.editable) {
+                this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
+                this.__focusable = this.appendChild(new Element('input', {type: 'hidden'}));
+            }
 
             if (window.attachEvent)
                 window.attachEvent("onunload", function() {
