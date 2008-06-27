@@ -30,3 +30,8 @@ div.iconbox_icon_container {
     position: static;
     _position: relative;
 }
+
+.iconview input.iwl-cell-editable {
+    margin-left: -10px;
+    width: 97%;
+}

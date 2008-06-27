@@ -207,8 +207,6 @@ IWL.Droppable = Class.create((function() {
 })());
 
 IWL.BoxSelection = Class.create(Draggable, (function() {
-  var scrollbarSize = document.viewport.getScrollbarSize();
-
   function initDrag(event) {
     (Event.element(event) || this.element).emitSignal('iwl:box_selection_init', this);
     if (this.terminated) {
@@ -223,8 +221,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
     this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
     pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
-    if ( this.element.offsetWidth - scrollbarSize < pointer[0]
-      || this.element.offsetHeight - scrollbarSize < pointer[1])
+    if ( this.element.clientWidth < pointer[0]
+      || this.element.clientHeight < pointer[1])
       return;
 
     Draggables.activate(this);

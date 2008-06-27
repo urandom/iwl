@@ -80,10 +80,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function recreateNode(node) {
         var cellTemplate = cellTemplateRenderer.call(this, node), id = this.id;
-        var bugs = Prototype.Browser.IE ? 3 * this.options.colums : Prototype.Browser.Gecko ? this.options.columns : 0;
-        this.columnWidth = this.options.columns > 0
-            ? this.offsetWidth / this.columns - this.iconMarginX - bugs
-            : this.options.columnWidth;
         var width = 'width: ' + this.columnWidth + 'px;';
 
         cellTemplate.nodeStyle = width;
@@ -119,10 +115,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function createNodes(nodes) {
         var html = [], nodeLength = nodes.length, column = 0;
-        var bugs = Prototype.Browser.IE ? 3 * this.options.colums : Prototype.Browser.Gecko ? this.options.columns : 0;
-        this.columnWidth = this.options.columns > 0
-            ? this.offsetWidth / this.columns - this.iconMarginX - bugs
-            : this.options.columnWidth;
         var width = 'width: ' + this.columnWidth + 'px;';
         for (var i = 0, node = nodes[0]; i < nodeLength; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
@@ -304,7 +296,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function getIconMargin() {
-        var div = new Element('div');
+        var div = document.body.appendChild(new Element('div', {style: 'position: absolute; left: -1000px'}));
         div.innerHTML = nodeTemplate.evaluate({});
         var icon = Element.extend(div.firstChild);
         this.iconMarginLeft = parseFloat(icon.getStyle('margin-left') || 0);
@@ -313,6 +305,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.iconMarginBottom = parseFloat(icon.getStyle('margin-bottom') || 0);
         this.iconMarginX = this.iconMarginLeft + this.iconMarginRight;
         this.iconMarginY = this.iconMarginTop + this.iconMarginBottom;
+        div.remove();
     }
 
     function replaceRowSeparators() {
@@ -347,8 +340,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var pointer = [Event.pointerX(event), Event.pointerY(event)];
         var pos     = Element.cumulativeOffset(this);
         pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
-        if (   this.offsetWidth - scrollbarSize < pointer[0]
-            || this.offsetHeight - scrollbarSize < pointer[1])
+        if (   this.clientWidth < pointer[0]
+            || this.clientHeight < pointer[1])
             return;
         unselectAll.call(this);
     }
@@ -375,6 +368,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var first = this.selectedNodes[0];
         if (event.type == 'mousedown')
             nodeMap[this.id].iconSelected = true;
+        if (!event.ctrlKey && !event.shiftKey && this.selectedNodes.indexOf(node) > -1)
+            return;
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {
@@ -861,10 +856,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         _init: function(model) {
             this.options = Object.extend({
-                columnWidth: [],
                 columnClass: [],
                 cellAttributes: [],
                 initialActive: [],
+                columnWidth: 0,
                 maxHeight: 400,
                 popUpDelay: 0.2,
                 boxSelectionOpacity: 0.5,
@@ -880,8 +875,16 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.selectedPaths = [];
 
             getIconMargin.call(this);
+            var width = this.clientWidth - scrollbarSize;
             this.columns = this.options.columns
-                || parseInt((this.offsetWidth - scrollbarSize) / (this.options.columnWidth + this.iconMarginX));
+                || parseInt(width / (this.options.columnWidth + this.iconMarginX));
+
+            var bugs = Prototype.Browser.IE
+                ? 4 * this.options.columns
+                : this.options.columns;
+            this.columnWidth = this.options.columnWidth
+                || parseInt(width / this.columns) - this.iconMarginX - bugs;
+
             nodeMap[this.id] = {};
 
             if (model) {
@@ -896,7 +899,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
             if (this.options.editable) {
                 this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
-                this.__focusable = this.appendChild(new Element('input', {type: 'hidden'}));
+                this.__focusable = $('__iwl_focusable') || document.body.appendChild(
+                    new Element('input', {id: '__iwl_focusable', style: 'position: absolute; left: -1000px; top: -1000px'})
+                );
             }
 
             if (window.attachEvent)
