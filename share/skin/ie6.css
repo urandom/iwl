@@ -120,9 +120,26 @@ div.expander_collapsed .expander_icon {
     margin: -16px 0 0 0;
 }
 
-.iconview .iconview_node {
+.iconview .iconview_node, .draggable_html_view .iconview_node {
     border: 1px solid white;
 }
-.iconview .iconview_node_text, .iconview .iconview_node_image {
+.iconview .iconview_node_text, .iconview .iconview_node_image,
+.draggable_html_view .iconview_node_text, .draggable_html_view .iconview_node_image {
     border: 1px solid white;
+}
+
+.iconview .iconview_node_hover_top {
+    border-top: 1px dotted #273346;
+}
+.iconview .iconview_node_hover_right {
+    border-right: 1px dotted #273346;
+}
+.iconview .iconview_node_hover_bottom {
+    border-bottom: 1px dotted #273346;
+}
+.iconview .iconview_node_hover_left {
+    border-left: 1px dotted #273346;
+}
+.iconview .iconview_node_hover_center {
+    border: 1px dotted #273346;
 }

@@ -549,7 +549,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var hOverlap = Position.overlap('horizontal', dropElement);
         var vOverlap = Position.overlap('vertical', dropElement);
         var state = hoverOverlapState.NONE;
-        var hCenter = vCenter = center = left = right = top = bottom = false;
+        var hCenter = vCenter = false;
         if (hOverlap < 0.3)
             state = hoverOverlapState.RIGHT;
         else if (hOverlap > 0.7)
@@ -773,6 +773,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             } else {
                 this.unsetDragSource();
                 this.signalDisconnect('iwl:drag_init', map.eventDragInit);
+            }
+
+            if (this.boxSelection) {
+                this.boxSelection.destroy();
+                this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
             }
 
             return this;

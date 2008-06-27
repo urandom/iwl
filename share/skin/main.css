@@ -1113,7 +1113,8 @@ div#status_bar {
     background: white;
     width: 70%;
     left: 15%;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     bottom: 10px;
     position: absolute;
     z-index: 50;

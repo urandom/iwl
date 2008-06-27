@@ -373,7 +373,8 @@ Object.extend(IWL, (function() {
 })());
 
 Object.extend(IWL, (function() {
-    var display_status_cnt = 0;
+    var display_status_cnt = 0,
+        max_visible = 10;
     var appear;
 
     function hideStatus(options) {
@@ -387,7 +388,7 @@ Object.extend(IWL, (function() {
          * @param {String} text The text to be displayed
          * */
         display: function(text) {
-            var options = Object.extend({
+            options = Object.extend({
                 duration: 10
             }, arguments[1]);
             if (display_status_cnt++) {
@@ -397,6 +398,8 @@ Object.extend(IWL, (function() {
                     IWL.Status.display(text);
                     return;
                 }
+                if (display_status_cnt > max_visible)
+                    status_bar.style.height = status_bar.clientHeight + 'px';
                 status_bar.appendChild(new Element('div').update(text));
                 hideStatus(options);
             } else {
@@ -415,6 +418,8 @@ Object.extend(IWL, (function() {
             if (display_status_cnt >= 2) {
                 if (status_bar.firstChild)
                     status_bar.removeChild(status_bar.firstChild);
+                if (display_status_cnt < max_visible)
+                    status_bar.style.height = '';
             }
             if (display_status_cnt-- <= 1) {
                 if (appear) {
