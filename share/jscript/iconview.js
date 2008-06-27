@@ -775,7 +775,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.signalDisconnect('iwl:drag_init', map.eventDragInit);
             }
 
-            if (this.boxSelection) {
+            if (Prototype.Browser.IE && this.boxSelection) {
                 this.boxSelection.destroy();
                 this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
             }
