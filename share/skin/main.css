@@ -1796,4 +1796,5 @@ div.tooltip_content {
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
     margin: 1px 0px;
     width: 98%;
+    text-align: center;
 }
