@@ -52,6 +52,13 @@ IWL.Draggable = Class.create(Draggable, (function() {
     },
 
     initDrag: function($super, event) {
+      var pointer = Event.pointer(event);
+      var pos     = Element.cumulativeOffset(this.element);
+      pointer = [pointer.x - pos[0], pointer.y - pos[1]];
+      if ( this.element.clientWidth < pointer[0]
+        || this.element.clientHeight < pointer[1])
+        return;
+
       (Event.element(event) || this.element).emitSignal('iwl:drag_init', this, eventOptions.call(this, event));
       if (this.terminated) {
         delete this.terminated;
@@ -208,12 +215,6 @@ IWL.Droppable = Class.create((function() {
 
 IWL.BoxSelection = Class.create(Draggable, (function() {
   function initDrag(event) {
-    (Event.element(event) || this.element).emitSignal('iwl:box_selection_init', this);
-    if (this.terminated) {
-      delete this.terminated;
-      return;
-    }
-
     var pointer = [Event.pointerX(event), Event.pointerY(event)];
     var pos     = Element.cumulativeOffset(this.element);
     this.offset = [0,1].map( function(i) { return (pointer[i] - pos[i]) });
@@ -224,6 +225,12 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     if ( this.element.clientWidth < pointer[0]
       || this.element.clientHeight < pointer[1])
       return;
+
+    (Event.element(event) || this.element).emitSignal('iwl:box_selection_init', this);
+    if (this.terminated) {
+      delete this.terminated;
+      return;
+    }
 
     Draggables.activate(this);
     Event.stop(event);
