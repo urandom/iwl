@@ -411,8 +411,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!skipRemoval) {
             this.selectedNodes = this.selectedNodes.without(node);
             this.emitSignal('iwl:unselect');
-            if (this.__focusable)
-                this.__focusable.focus();
+            if (this._focusedElement)
+                this._focusedElement.blur();
         }
     }
 
@@ -420,8 +420,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = this.selectedNodes.length; i < l; i++)
             unselectNode.call(this, this.selectedNodes[i], true);
         this.selectedNodes = [];
-        if (this.__focusable)
-            this.__focusable.focus();
+        if (this._focusedElement)
+            this._focusedElement.blur();
         this.emitSignal('iwl:unselect_all');
     }
     
@@ -902,12 +902,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.state = 0;
             this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
-            if (this.options.editable) {
+            if (this.options.editable)
                 this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
-                this.__focusable = $('__iwl_focusable') || document.body.appendChild(
-                    new Element('input', {id: '__iwl_focusable', style: 'position: absolute; left: -1000px; top: -1000px'})
-                );
-            }
 
             if (window.attachEvent)
                 window.attachEvent("onunload", function() {

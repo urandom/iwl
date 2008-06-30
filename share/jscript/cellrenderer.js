@@ -23,6 +23,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
             Element.hide(va);
             en.focus();
             en.select();
+            view._focusedElement = en;
         });
         Event.delegate(view, 'keypress', '.iwl-cell-editable', function(event) {
             if (event.keyCode != Event.KEY_ESC && event.keyCode != Event.KEY_RETURN) return;
