@@ -284,7 +284,7 @@ Object.extend(IWL.ListModel, (function() {
       DESCENDING: 1,
       ASCENDING:  2
     },
-    DataTypes: {
+    DataType: {
       NONE:     ++index,
       STRING:   ++index,
       INT:      ++index,
@@ -299,7 +299,7 @@ Object.extend(IWL.ListModel, (function() {
         IWL.ListModel.Types[types.shift()] = ++index;
     },
     overrideDefaultDataTypes: function(types) {
-      IWL.ListModel.DataTypes = types;
+      IWL.ListModel.DataType = types;
       index = Math.max.apply(Math, Object.values(types));
     }
   }

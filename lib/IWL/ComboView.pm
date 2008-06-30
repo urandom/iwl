@@ -243,8 +243,6 @@ sub setNodeSeparatorCallback {
 sub _setupDefaultClass {
     my $self = shift;
 
-    $self->prependClass($self->{_defaultClass} . '_editable')
-        if $self->{_options}{editable};
     $self->prependClass($self->{_defaultClass});
     $self->{__button}->prependClass($self->{_defaultClass} . '_button');
     $self->{__content}->prependClass($self->{_defaultClass} . '_content ' . $self->{_defaultClass} . '_content_empty');
@@ -304,7 +302,10 @@ sub _realize {
         next unless 'HASH' eq ref $attrs;
         $attrs->{renderTemplate} = $attrs->{renderTemplate}->getContent
             if $attrs->{renderTemplate};
+        $self->{_options}{editable} = 1 if $attrs->{editable};
     }
+    $self->appendClass($self->{_defaultClass} . '_editable')
+        if $self->{_options}{editable};
     my $options = toJSON($self->{_options});
 
     $self->_appendInitScript("IWL.ComboView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);");
@@ -337,7 +338,6 @@ sub _init {
     $self->{_options}{columnMap}     = $args{columnMap}     if 'ARRAY' eq ref $args{columnMap};
     $self->{_options}{contentHeight} = $args{contentHeight} if $args{contentHeight};
     $self->{_options}{maxHeight}     = $args{maxHeight}     if defined $args{maxHeight};
-    $self->{_options}{editable}      = $args{editable}      if defined $args{editable};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -347,7 +347,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model editable)};
+    delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
 
     $self->requiredJs('base.js', 'dist/delegate.js', 'cellrenderer.js', 'comboview.js');
     $self->_constructorArguments(%args);

@@ -125,7 +125,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function cellTemplateRenderer(node, editable) {
+    function cellTemplateRenderer(node) {
         var cellTemplate = {}, values = [], cMap = this.options.columnMap, mappedValues = {};
         for (var i = 0, l = cMap.length; i < l; i++)
             values.push(node.values[cMap[i]]);
@@ -500,24 +500,24 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     : undefined;
             } else {
                 var type = this.model.columns[this.options.columnMap[i]].type,
-                    options = {view: this, editable: this.options.editable};
+                    options = {view: this, editable: cAttrs.editable};
                 switch(type) {
-                    case IWL.ListModel.DataTypes.STRING:
+                    case IWL.ListModel.DataType.STRING:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.String(options);
                         break;
-                    case IWL.ListModel.DataTypes.INT:
+                    case IWL.ListModel.DataType.INT:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Int(options);
                         break;
-                    case IWL.ListModel.DataTypes.FLOAT:
+                    case IWL.ListModel.DataType.FLOAT:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Float(options);
                         break;
-                    case IWL.ListModel.DataTypes.BOOLEAN:
+                    case IWL.ListModel.DataType.BOOLEAN:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Boolean(options);
                         break;
-                    case IWL.ListModel.DataTypes.COUNT:
+                    case IWL.ListModel.DataType.COUNT:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Count(options);
                         break;
-                    case IWL.ListModel.DataTypes.IMAGE:
+                    case IWL.ListModel.DataType.IMAGE:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Image(options);
                         break;
                 }
@@ -683,7 +683,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!node || !nodeMap[this.id][node.attributes.id].element.sensitive) return;
             this.content.removeClassName('comboview_content_empty');
             this.values = node.getValues();
-            var cellTemplate = cellTemplateRenderer.call(this, node, this.options.editable);
+            var cellTemplate = cellTemplateRenderer.call(this, node);
             setContent.call(this, cellTemplate, node);
 
             return this.emitSignal('iwl:change', this.values);

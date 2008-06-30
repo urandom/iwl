@@ -20,8 +20,8 @@ use constant Orientation => {
 };
 
 use constant CellType => {
-    TEXT => 0,
-    IMAGE => 1,
+    IMAGE => 0,
+    TEXT => 1
 };
 
 my $default_columns = 5;
@@ -348,7 +348,10 @@ sub _realize {
         next unless 'HASH' eq ref $attrs;
         $attrs->{renderTemplate} = $attrs->{renderTemplate}->getContent
             if $attrs->{renderTemplate};
+        $self->{_options}{editable} = 1 if $attrs->{editable};
     }
+    $self->prependClass($self->{_defaultClass} . '_editable')
+        if $self->{_options}{editable};
     $self->{_options}{columns} = $default_columns
         unless $self->{_options}{columns} || $self->{_options}{columnWidth};
 
@@ -369,14 +372,6 @@ sub _realize {
 EOF
 }
 
-sub _setupDefaultClass {
-    my $self = shift;
-
-    $self->prependClass($self->{_defaultClass} . '_editable')
-        if $self->{_options}{editable};
-    $self->prependClass($self->{_defaultClass});
-}
-
 sub _init {
     my ($self, %args) = @_;
 
@@ -391,7 +386,6 @@ sub _init {
     $self->{_options}{columnWidth} = $args{columnWidth} if defined $args{columnWidth};
     $self->{_options}{textColumn}  = $args{textColumn}  if defined $args{textColumn};
     $self->{_options}{imageColumn} = $args{imageColumn} if defined $args{imageColumn};
-    $self->{_options}{editable}    = $args{editable}    if defined $args{editable};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -401,7 +395,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model editable)};
+    delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model)};
 
     $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'dist/delegate.js', 'cellrenderer.js', 'iconview.js');
     $self->_constructorArguments(%args);

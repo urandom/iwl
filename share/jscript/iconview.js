@@ -1,6 +1,6 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
-    var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataTypes.IMAGE, IWL.ListModel.DataTypes.STRING],
+    var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataType.IMAGE, IWL.ListModel.DataType.STRING],
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iwl-node iconview_node #{nodePosition}">#{imageColumn}#{textColumn}</div>');
         dragMultipleIcons = new Template('<span class="iconview_dragged_nodes"><strong>#{number}</strong> #{text}</span>'),
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
@@ -190,15 +190,15 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     : undefined;
             } else {
                 var type = this.model.columns[this.options[names[i]]].type,
-                    options = {view: this, editable: this.options.editable};
+                    options = {view: this, editable: cAttrs.editable};
                 switch(type) {
-                    case IWL.ListModel.DataTypes.STRING:
+                    case IWL.ListModel.DataType.STRING:
                         if (this.options.orientation == IWL.IconView.Orientation.HORIZONTAL)
                             cAttrs.templateRenderer = new IWL.IconView.horizontalTextRenderer(options);
                         else
                             cAttrs.templateRenderer = new IWL.IconView.verticalTextRenderer(options);
                         break;
-                    case IWL.ListModel.DataTypes.IMAGE:
+                    case IWL.ListModel.DataType.IMAGE:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Image();
                         break;
                 }
