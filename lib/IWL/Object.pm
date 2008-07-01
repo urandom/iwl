@@ -1058,6 +1058,12 @@ sub require {
     if (my $css = $resources{css}) {
         $self->requiredCSS('ARRAY' eq ref $css ? @$css : $css);
     }
+    if (my $expr = $resources{jsExpressions}) {
+        $self->{_required}{jsExpressions} = []
+            unless $self->{_required}{jsExpressions};
+        push @{$self->{_required}{jsExpressions}},
+            'ARRAY' eq ref $expr ? @$expr : $expr;
+    }
     return $self;
 }
 
@@ -1746,6 +1752,12 @@ sub __addRequired {
             } @{$required{js}};
         }
 
+    }
+
+    if (ref $required{jsExpressions} eq 'ARRAY') {
+        my $required = join ";\n", @{$required{jsExpressions}};
+        push @scripts, 
+            IWL::Script->new->setAttribute('iwl:requiredJSExpression')->setScript($required);
     }
 
     $top->{___lastShared} = $scripts[-1];

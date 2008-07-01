@@ -141,7 +141,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             } else {
                 var template = this.options.cellAttributes[i].templateRenderer;
                 if (template)
-                    cellTemplate['column' + i] = template.render(values[i], node);
+                    cellTemplate['column' + i] = template.render(values[i], node, i);
             }
         }
         return cellTemplate;

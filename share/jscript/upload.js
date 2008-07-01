@@ -89,6 +89,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 })());
+IWL.Upload.messages = {};
 
 /* Deprecated */
 var Upload = IWL.Upload;

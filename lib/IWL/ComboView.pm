@@ -25,7 +25,7 @@ L<IWL::Error> -> L<IWL::Object> -> L<IWL::Widget> -> L<IWL::ComboView>
 
 =head1 DESCRIPTION
 
-The ComboView widget is similar to the L<IWL::Combo> widget, but uses a L<IWL::TreeModel> to represent its data
+The ComboView widget is similar to the L<IWL::Combo> widget, but uses a L<IWL::ListModel> or L<IWL::TreeModel> to represent its data
 
 =head1 CONSTRUCTOR
 
@@ -37,7 +37,7 @@ Where B<%ARGS> is an optional hash parameter with with key-values.
 
 =item B<model>
 
-The L<IWL::TreeModel> for the ComboView
+The L<IWL::ListModel> or L<IWL::TreeModel> for the ComboView
 
 =item B<columnWidth>
 
@@ -365,9 +365,9 @@ sub _init {
 
     delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
 
-    $self->requiredJs('base.js', 'dist/delegate.js', 'cellrenderer.js', 'comboview.js');
+    $self->require(js => ['base.js', 'dist/delegate.js', 'cellrenderer.js', 'comboview.js']);
     $self->_constructorArguments(%args);
-    $self->{_customSignals} = {change => [], popup => [], popdown => [], edit => []};
+    $self->{_customSignals} = {change => [], popup => [], popdown => [], edit_begin => [], edit_end => []};
 
     return $self;
 }

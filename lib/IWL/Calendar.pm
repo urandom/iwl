@@ -351,20 +351,7 @@ sub _realize {
 
     $self->SUPER::_realize;
     my $options = toJSON($self->{_options});
-    my $translations = {};
-    foreach my $key (keys %$strings) {
-        $translations->{$key} = [];
-        foreach my $value (@{$strings->{$key}}) {
-            if ((index $key, 'abbreviated') == 0) {
-                push @{$translations->{$key}}, substr __($value), 6;
-            } else {
-                push @{$translations->{$key}}, __ $value;
-            }
-        }
-    }
-    $translations = toJSON($translations);
-
-    my $script = "IWL.Calendar.create('$id', $options, $translations);";
+    my $script = "IWL.Calendar.create('$id', $options);";
     foreach my $update (@{$self->{__updates}}) {
         $script .= qq|\$('$id').updateOnSignal('$update->[0]', '$update->[1]', '$update->[2]');|;
     }
@@ -406,7 +393,23 @@ sub _init {
 
     $self->{_defaultClass} = $default_class;
     $self->setId($id);
-    $self->requiredJs('base.js', 'calendar.js');
+
+    my $translations = {};
+    foreach my $key (keys %$strings) {
+        $translations->{$key} = [];
+        foreach my $value (@{$strings->{$key}}) {
+            if ((index $key, 'abbreviated') == 0) {
+                push @{$translations->{$key}}, substr __($value), 6;
+            } else {
+                push @{$translations->{$key}}, __ $value;
+            }
+        }
+    }
+    $translations = toJSON($translations);
+    $self->require(
+        js => ['base.js', 'calendar.js'],
+        jsExpressions => 'IWL.Calendar.messages = ' . $translations
+    );
 
     $self->_constructorArguments(%args);
     $self->{_customSignals} = {

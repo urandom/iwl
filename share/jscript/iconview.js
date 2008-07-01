@@ -2,7 +2,7 @@
 IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {}, names = ['imageColumn', 'textColumn'], types = [IWL.ListModel.DataType.IMAGE, IWL.ListModel.DataType.STRING],
         nodeTemplate  = new Template('<div style="#{nodeStyle}" class="iwl-node iconview_node #{nodePosition}">#{imageColumn}#{textColumn}</div>');
-        dragMultipleIcons = new Template('<span class="iconview_dragged_nodes"><strong>#{number}</strong> #{text}</span>'),
+        dragMultipleIcons = new Template('<span class="iconview_dragged_nodes">#{text}</span>'),
         rowSeparator  = '<div class="iwl-clear iconview_row_separator"></div>',
         scrollbarSize = document.viewport.getScrollbarSize(),
         hoverOverlapState = {
@@ -34,7 +34,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     continue;
                 var template = this.options.cellAttributes[i].templateRenderer;
                 if (template)
-                    cellTemplate[names[i]] = template.render(nValues[i], node);
+                    cellTemplate[names[i]] = template.render(nValues[i], node, i);
             }
         }
         return cellTemplate;
@@ -579,7 +579,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             cellTemplate.nodeStyle = "width: " + this.columnWidth + "px;";
             draggable.options.viewOptions = {string: nodeTemplate.evaluate(cellTemplate)};
         } else if (this.selectedNodes.length > 1) {
-            draggable.options.viewOptions = {string: dragMultipleIcons.evaluate({number: this.selectedNodes.length, text: 'selected icons'})};
+            var text = {text: IWL.IconView.messages.multipleDrag.interpolate({count: "<strong>" + this.selectedNodes.length + "</strong>"})};
+            draggable.options.viewOptions = {string: dragMultipleIcons.evaluate(text)};
         }
 
         if (this.scrollLeft || this.scrollTop) {
@@ -944,3 +945,6 @@ IWL.IconView.verticalTextRenderer = Class.create(IWL.CellTemplateRenderer, (func
         }
     };
 })());
+IWL.IconView.messages = {
+    multipleDrag: "#{count} selected icons"
+};

@@ -189,8 +189,7 @@ sub _realize {
     $self->{__file}->setStyle(visibility => 'hidden');
     my $file = $self->{__file}->getJSON;
     my $options = toJSON($self->{_options});
-    my $uploading = __"Uploading ...";
-    $self->_appendInitScript("IWL.Upload.create('$id', $file, $options, {uploading: '$uploading'})");
+    $self->_appendInitScript("IWL.Upload.create('$id', $file, $options)");
 }
 
 sub _setupDefaultClass {
@@ -224,7 +223,11 @@ sub _init {
 
     $button->setLabel(__('Browse ...'));
     $file->_constructorArguments(%args);
-    $self->requiredJs('base.js', 'upload.js', 'tooltip.js');
+    my $translations = toJSON({uploading => __"Uploading ..."});
+    $self->require(
+        js => ['base.js', 'upload.js', 'tooltip.js'],
+        jsExpressions => 'IWL.Upload.messages = ' . $translations
+    );
     $self->{_customSignals} = { upload => [], load => [] };
 
     return $self;
