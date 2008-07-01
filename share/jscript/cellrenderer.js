@@ -25,7 +25,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
             en.select();
             view._focusedElement = en;
             var parent = Element.up(en, '.iwl-node');
-            Event.emitSignal(view, 'iwl:edit_start', parent, parent.node, en.value);
+            Event.emitSignal(view, 'iwl:edit_begin', parent, parent.node, en.value);
         });
         Event.delegate(view, 'keypress', '.iwl-cell-editable', function(event) {
             if (event.keyCode != Event.KEY_ESC && event.keyCode != Event.KEY_RETURN) return;
@@ -37,7 +37,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
             Element.show(va);
             if (event.keyCode == Event.KEY_RETURN) {
               var parent = Element.up(en, '.iwl-node');
-              Event.emitSignal(view, 'iwl:edit_done', parent, parent.node, en.value);
+              Event.emitSignal(view, 'iwl:edit_end', parent, parent.node, en.value);
             }
         });
       }

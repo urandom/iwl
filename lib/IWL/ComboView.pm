@@ -151,6 +151,22 @@ The current node
 
 I<renderFunction> and I<renderClass> are mutually exclusive. If a I<renderClass> is defined, it will be instantiated, and if it has a B<render> method, it will be used as a I<renderFunction>.
 
+=item B<editable>
+
+If true, and if the renderer supports it, the cell will be made editable. Editable cells cause the view to emit the following signals:
+
+=over 12
+
+=item B<edit_begin>
+
+Fires when editing has started. The callback receives the event, the cell, the node and the value as parameters
+
+=item B<edit_end>
+
+Fires when editing has ended, changing the value of the cell. The callback receives the event, the cell, the node and the value as parameters. Note that the actual node values do not change.
+
+=back
+
 =back
 
 =cut

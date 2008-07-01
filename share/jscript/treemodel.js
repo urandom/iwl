@@ -36,14 +36,6 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
     return ret;
   }
 
-  function flatIterator(node) {
-    return node.childCount != 0;
-  }
-
-  function flatLocalIterator(node) {
-    return node.childCount > 0;
-  }
-
   function RPCStartCallback(event, params, options) {
     if (event.endsWith('refresh')) {
       options.totalCount = this.options.totalCount;
@@ -72,11 +64,6 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
         node = node.childNodes[path[i]];
 
       return node;
-    },
-    isFlat: function() {
-      return this.hasEvent('IWL-TreeModel-requestChildren')
-        ? !this.rootNodes.any(flatIterator)
-        : !this.rootNodes.any(flatLocalIterator);
     },
 
     insertNode: function(index, parentNode) {
