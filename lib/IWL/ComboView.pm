@@ -159,11 +159,11 @@ If true, and if the renderer supports it, the cell will be made editable. Editab
 
 =item B<edit_begin>
 
-Fires when editing has started. The callback receives the event, the cell, the node and the value as parameters
+Fires when editing has started. The callback receives the event and the value as parameters
 
 =item B<edit_end>
 
-Fires when editing has ended, changing the value of the cell. The callback receives the event, the cell, the node and the value as parameters. Note that the actual node values do not change.
+Fires when editing has ended, changing the value of the cell. The callback receives the event and the value as parameters. Note that the actual node values do not change.
 
 =back
 
