@@ -21,17 +21,6 @@ sub getNodeByPath {
     return $node;
 }
 
-sub isFlat {
-    my $self = shift;
-    my $ret = '';
-    $self->each(sub {
-        return 'last' if $ret = (
-            $_[0]->{childNodes} && @{$_[0]->{childNodes}} > 0
-        ) || $_[0]->{attributes}{isParent}
-    });
-    return !$ret;
-}
-
 sub insertNode {
     my ($self, $index, $parent) = @_;
     return IWL::TreeModel::Node->new($self, $index, $parent);

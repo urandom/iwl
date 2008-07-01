@@ -272,7 +272,7 @@ sub _realize {
 
     my $model = $self->{_model};
     if ($model) {
-        if ($model->{options}{limit} && ($model->can('isFlat') ? $model->isFlat : 1) && @{$self->{__pageControlEvent}}) {
+        if ($model->{options}{limit} && (!$model->isa('IWL::TreeModel')) && @{$self->{__pageControlEvent}}) {
             my $event = ref($self->{_model}) . "::refresh";
             $event =~ s/::/-/g;
             $self->{_options}{pageControlEventName} = $event;

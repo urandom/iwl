@@ -12,7 +12,6 @@ is(@{$t->{rootNodes}}, 7);
 is(@{$t->{rootNodes}[0]{childNodes}}, 2);
 is($t->getNodeByPath([1]), $t->{rootNodes}[1]);
 is($t->getNodeByPath([2,2]), $t->{rootNodes}[2]{childNodes}[2]);
-ok!($t->isFlat);
 
 my $count = 0;
 $t->each(sub { $count++ });
