@@ -108,17 +108,26 @@ IWL.CellTemplateRenderer.Image = Class.create(IWL.CellTemplateRenderer, (functio
 IWL.CellTemplateRenderer.Checkbox = Class.create(IWL.CellTemplateRenderer, (function() {
   var checkTemplate = new Template('<input type="checkbox" class="iwl-cell-checkbox" #{active} name="#{name}" value="#{value}"/>');
   return {
-    header: new Template('<input type="checkbox" class="iwl-header-checkbox"/>'),
+    header: new Template('<input type="checkbox" class="iwl-header-checkbox" iwl:columnIndex="#{columnIndex}"/>'),
     initialize: function() {
       this.options = Object.extend({}, arguments[0] || {});
 
       if (this.options.view) {
         var view = this.options.view;
         Event.delegate(view, 'change', '.iwl-header-checkbox', function(event) {
-            var boxes = Element.select(view, '.iwl-cell-checkbox'),
-                checked = Event.element(event).checked;
-            for (var i = 0, l = boxes.length; i < l; i++)
+            var element = Event.element(event),
+                boxes = Element.select(view, '.iwl-cell-checkbox'),
+                checked = element.checked,
+                columnIndex = parseInt(Element.readAttribute(element, 'iwl:columnIndex'));
+            for (var i = 0, l = boxes.length; i < l; i++) {
               boxes[i].checked = checked;
+              Event.emitSignal(boxes[i], 'change', columnIndex);
+            }
+        });
+        Event.delegate(view, 'change', '.iwl-cell-checkbox', function(event, columnIndex) {
+            var element = Event.element(event);
+            var parent = Element.up(element, '.iwl-node');
+            if (parent) parent.node.setValues(columnIndex, element.checked);
         });
       }
     },
