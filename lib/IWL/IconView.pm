@@ -413,10 +413,11 @@ sub _init {
 
     delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model)};
 
+    # TRANSLATORS: #{count} is a placeholder
+    my $translations = toJSON({multipleDrag => __"#{count} selected icons"});
     $self->require(
         js => ['base.js', 'dist/dragdrop.js', 'dnd.js', 'dist/delegate.js', 'cellrenderer.js', 'iconview.js'],
-        # TRANSLATORS: #{count} is a placeholder
-        jsExpressions => 'IWL.IconView.messages.mulitpleDrag = "' . __"#{count} selected icons" . '"'
+        jsExpressions => 'IWL.IconView.messages = ' . $translations
     );
     $self->_constructorArguments(%args);
     $self->{_customSignals} = {toggle_active => [], select => [], unselect => [], unselect_all => [], edit_begin => [], edit_end => []};
