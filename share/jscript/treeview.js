@@ -1,6 +1,28 @@
 // vim: set autoindent shiftwidth=4 tabstop=8:
 IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
-    var nodeMap = {};
+    var nodeMap = {},
+        nodeIndent = '<div class="treeview_node_indent"></div>',
+        nodeStraightLine = '<div class="treeview_node_indent treeview_node_straight_line"></div>',
+        nodeOnlyParent = '<div class="treeview_node_indent treeview_node_single_parent"></div>',
+        nodeOnlyParentE = '<div class="treeview_node_indent treeview_node_single_parent treeview_node_expanded"></div>',
+        nodeOnlyPartial = '<div class="treeview_node_indent treeview_node_single_partial"></div>',
+        nodeOnlyPartialE = '<div class="treeview_node_indent treeview_node_single_partial treeview_node_expanded"></div>',
+        nodeOnlyLine = '<div class="treeview_node_indent treeview_node_single_line"></div>',
+        nodeTopParent = '<div class="treeview_node_indent treeview_node_top_parent"></div>',
+        nodeTopParentE = '<div class="treeview_node_indent treeview_node_top_parent treeview_node_expanded"></div>',
+        nodeTopPartial = '<div class="treeview_node_indent treeview_node_top_partial"></div>',
+        nodeTopPartialE = '<div class="treeview_node_indent treeview_node_top_partial treeview_node_expanded"></div>',
+        nodeTopLine = '<div class="treeview_node_indent treeview_node_top_line"></div>',
+        nodeBottomParent = '<div class="treeview_node_indent treeview_node_bottom_parent"></div>',
+        nodeBottomParentE = '<div class="treeview_node_indent treeview_node_bottom_parent treeview_node_expanded"></div>',
+        nodeBottomPartial = '<div class="treeview_node_indent treeview_node_bottom_partial"></div>',
+        nodeBottomPartialE = '<div class="treeview_node_indent treeview_node_bottom_partial treeview_node_expanded"></div>',
+        nodeBottomLine = '<div class="treeview_node_indent treeview_node_bottom_line"></div>',
+        nodeParent = '<div class="treeview_node_indent treeview_node_parent"></div>',
+        nodeParentE = '<div class="treeview_node_indent treeview_node_parent treeview_node_expanded"></div>',
+        nodePartial = '<div class="treeview_node_indent treeview_node_partial"></div>',
+        nodePartialE = '<div class="treeview_node_indent treeview_node_partial treeview_node_expanded"></div>',
+        nodeLine = '<div class="treeview_node_indent treeview_node_line"></div>';
 
     function generateNodeTemplate() {
         /* Individual rows can't be dragged. Each node has to be a full table */
@@ -14,7 +36,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (i == l - 1) classNames.push('treeview_column_last');
             if (this.options.columnWidth[i])
                 width = ' style="width: ' + this.options.columnWidth[i] + 'px;"';
-            node.push('<td class="', classNames.join(' '), '"', width, '>#{column', i, '}</td>');
+            node.push('<td class="', classNames.join(' '), '"', width, '>', (i == 0 && !this.flat ? '#{indent}' : ''), '#{column', i, '}</td>');
         }
         node.push('</tr></tbody></table>');
 
@@ -147,7 +169,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function createHeader() {
         var template = generateNodeTemplate.call(this), html, id = this.id,
             headerTemplate = headerTemplateRenderer.call(this);
-        template.nodePosition = 'treeview_header_node';
+        headerTemplate.nodePosition = 'treeview_header_node';
+        if (!this.flat)
+            headerTemplate.indent = nodeIndent;
         html = template.evaluate(headerTemplate);
         this.header.innerHTML = html;
     }
@@ -187,9 +211,13 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
     }
 
-    function createNodes(nodes, template) {
-        var html = [], container, nodeLength = nodes.length;
-        var container = createContainer.call(this, nodes[0] ? nodes[0].parentNode : null);
+    function createNodes(nodes, template, indent) {
+        var html = [], container, nodeLength = nodes.length, parent = nodes[0] ? nodes[0].parentNode : null, depth = 1;
+        var container = createContainer.call(this, parent);
+        if (!this.flat && !indent) {
+            if (parent) depth = parent.getDepth();
+            indent = '';
+        }
         for (var i = 0, node = nodes[0]; i < nodeLength; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             if (cellTemplate.separator) {
@@ -197,12 +225,36 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 continue;
             }
 
-            if (i + 1 == nodeLength && i == 0)
+            var childCount = node.childCount, newIndent = '';
+            if (i + 1 == nodeLength && i == 0) {
                 cellTemplate.nodePosition = 'treeview_node_first treeview_node_last'
-            else if (i == 0)
+                if (!this.flat) {
+                    cellTemplate.indent = indent + (childCount != 0 
+                        ? childCount ? nodeOnlyParent : nodeOnlyPartial
+                        : nodeOnlyLine);
+                    for (j = 0; j < depth; j++)
+                        newIndent += nodeIndent;
+                }
+            } else if (i == 0) {
                 cellTemplate.nodePosition = 'treeview_node_first'
-            else if (i + 1 == nodeLength)
+                if (!this.flat)
+                    cellTemplate.indent = indent + (childCount != 0 
+                        ? childCount ? nodeTopParent : nodeTopPartial
+                        : nodeTopLine);
+            } else if (i + 1 == nodeLength) {
                 cellTemplate.nodePosition = 'treeview_node_last'
+                if (!this.flat) {
+                    cellTemplate.indent = indent + (childCount != 0 
+                        ? childCount ? nodeBottomParent : nodeBottomPartial
+                        : nodeBottomLine);
+                    for (j = 0; j < depth; j++)
+                        newIndent += nodeIndent;
+                }
+            } else if (!this.flat) {
+                cellTemplate.indent = indent + (childCount != 0 
+                    ? childCount ? nodeParent : nodePartial
+                    : nodeLine);
+            }
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
