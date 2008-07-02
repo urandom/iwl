@@ -266,13 +266,13 @@ share/jscript/notebook.js
 share/jscript/pagecontrol.js
 share/jscript/progressbar.js
 share/jscript/prototype_extensions.js
-share/jscript/require.js
 share/jscript/resizer.js
 share/jscript/scriptaculous_extensions.js
 share/jscript/spinner.js
 share/jscript/tooltip.js
 share/jscript/tree.js
 share/jscript/treemodel.js
+share/jscript/treeview.js
 share/jscript/unittest_extensions.js
 share/jscript/upload.js
 share/skin/demo.css

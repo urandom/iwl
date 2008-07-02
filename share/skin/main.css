@@ -1798,3 +1798,26 @@ div.tooltip_content {
     width: 98%;
     text-align: center;
 }
+
+/* TreeView */
+.treeview {
+    border: 1px solid #7F9DB9;
+    background-color: white;
+    color: #111;
+    margin: 1px 0;
+    padding: 1px 2px;
+}
+
+.treeview_node_highlight {
+    background: #8ac6f2
+}
+.treeview_node_separator {
+    margin: 0 auto;
+}
+.treeview_node_separator div {
+    line-height: 1px;
+    height: 1px;
+    border-bottom: 2px solid #444;
+    margin-bottom: 1px;
+}
+

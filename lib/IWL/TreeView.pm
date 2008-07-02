@@ -7,7 +7,6 @@ use strict;
 
 use base 'IWL::Container';
 
-use IWL::Container;
 use IWL::String qw(randomize);
 use IWL::JSON qw(toJSON);
 
@@ -121,6 +120,8 @@ Parameter: B<INDEX> - a cell index, B<ATTRIBUTES> - a hash reference of attribut
 
 =item B<renderTemplate>
 
+An L<IWL::Widget> which will be used to draw the cell, overriding the default template
+
 =item B<renderFunction>
 
 A function which can manipulate the given cell for every node. It will receive the following parameters:
@@ -162,6 +163,22 @@ Fires when editing has started. The callback receives the event and the value as
 =item B<edit_end>
 
 Fires when editing has ended, changing the value of the cell. The callback receives the event and the value as parameters. Note that the actual node values do not change.
+
+=back
+
+=item B<header>
+
+A hashref of options for the header of the column, this cell belongs to
+
+=over 12
+
+=item B<title>
+
+The title, which is displayed in the header
+
+=item B<template>
+
+An L<IWL::Widget> which will be used to draw the header, overriding the default template
 
 =back
 
@@ -256,14 +273,6 @@ sub setNodeSeparatorCallback {
 
 # Protected
 #
-sub _setupDefaultClass {
-    my $self = shift;
-
-    $self->prependClass($self->{_defaultClass});
-    $self->{__button}->prependClass($self->{_defaultClass} . '_button');
-    $self->{__content}->prependClass($self->{_defaultClass} . '_content ' . $self->{_defaultClass} . '_content_empty');
-}
-
 sub _realize {
     my $self    = shift;
     my $id      = $self->getId;
@@ -329,11 +338,12 @@ sub _realize {
 
 sub _init {
     my ($self, %args) = @_;
-    my ($header, $body) = IWL::Container->newMultiple(2);
+    my ($header, $content) = IWL::Container->newMultiple(2);
 
     $self->{_defaultClass}   = 'treeview';
     $header->{_defaultClass} = 'treeview_header';
-    $body->{_defaultClass}   = 'treeview_body';
+    $content->{_defaultClass}   = 'treeview_content treeview_node_container';
+    $self->appendChild($header, $content);
     $args{id} ||= randomize('treeview');
 
     $self->{_options}  = {columnWidth => [], cellAttributes => []};
@@ -357,7 +367,7 @@ sub _init {
 
     $self->requiredJs('base.js', 'dist/delegate.js', 'cellrenderer.js', 'treeview.js');
     $self->_constructorArguments(%args);
-    $self->{_customSignals} = {change => [], popup => [], popdown => [], edit => []};
+    $self->{_customSignals} = {change => [], popup => [], popdown => [], edit_begin => [], edit_end => []};
 
     return $self;
 }

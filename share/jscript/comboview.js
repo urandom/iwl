@@ -159,7 +159,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         element.node = node;
         if (element.hasClassName('comboview_node_separator'))
             return;
-        if (this.model.constructor == IWL.ListModel) {
+        if (this.flat) {
             var childContainer = null;
             var hasChildren = false;
         } else {
@@ -289,7 +289,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             else
                 container.innerHTML = html;
         }
-        var element = next ? map[next.attributes.id].element.previousSibling : container.lastChild;
+        element = next ? map[next.attributes.id].element.previousSibling : container.lastChild;
         var values = [], cMap = this.options.columnMap;
         for (var j = 0, l = cMap.length; j < l; j++) {
             var index = cMap[j];
@@ -731,7 +731,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     }
                 }
 
-                this.flat = model.constructor == IWL.ListModel;
+                this.flat = model instanceof IWL.ListModel && (!IWL.TreeModel || !(model instanceof IWL.TreeModel));
+
 
                 normalizeCellAttributes.call(this);
                 setContent.call(this);

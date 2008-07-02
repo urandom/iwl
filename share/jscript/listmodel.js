@@ -404,14 +404,16 @@ IWL.ListModel.Node = Class.create(Enumerable, (function() {
       if (!this.model) return;
       var args = $A(arguments);
       var v = this.values;
+      var changed = [];
       while (args.length) {
         var tuple = args.splice(0, 2);
         if (!this.columns[tuple[0]])
           continue;
         v[tuple[0]] = tuple[1];
+        changed.push(tuple[0]);
       }
 
-      this.model.emitSignal('iwl:node_change', this);
+      this.model.emitSignal('iwl:node_change', this, changed);
 
       return this;
     },
