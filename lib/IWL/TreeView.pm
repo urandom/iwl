@@ -271,6 +271,32 @@ sub setNodeSeparatorCallback {
     return $self;
 }
 
+=item B<setHeaderVisibility> (B<BOOL>)
+
+Sets whether the header of the view is visible
+
+Parameters: B<BOOL> - if true, the header will be visible
+
+=cut
+
+sub setHeaderVisibility {
+    my ($self, $bool) = @_;
+
+    $self->{_options}{headerVisible} = !(!$bool);
+
+    return $self;
+}
+
+=item B<getHeaderVisibility>
+
+Returns true if the header of the view is visible
+
+=cut
+
+sub getHeaderVisibility {
+    return shift->{_options}{headerVisible};
+}
+
 # Protected
 #
 sub _realize {
@@ -343,7 +369,7 @@ sub _init {
     $self->{_defaultClass}   = 'treeview';
     $header->{_defaultClass} = 'treeview_header';
     $content->{_defaultClass}   = 'treeview_content treeview_node_container';
-    $self->appendChild($header, $content);
+    $self->appendChild($header->setStyle(display => 'none'), $content);
     $args{id} ||= randomize('treeview');
 
     $self->{_options}  = {columnWidth => [], cellAttributes => []};

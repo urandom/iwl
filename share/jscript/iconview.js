@@ -34,7 +34,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     continue;
                 var template = this.options.cellAttributes[i].templateRenderer;
                 if (template)
-                    cellTemplate[names[i]] = template.render(nValues[i], node, i);
+                    cellTemplate[names[i]] = template.render(nValues[i], node, i ? this.options.textColumn : this.options.imageColumn);
             }
         }
         return cellTemplate;
