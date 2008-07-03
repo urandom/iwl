@@ -14,7 +14,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         nodeBottomLine = '<div class="treeview_node_indent treeview_node_bottom_line"></div>',
         nodeParent = '<div class="treeview_node_indent treeview_node_parent treeview_node_normal_parent"></div>',
         nodePartial = '<div class="treeview_node_indent treeview_node_parent treeview_node_normal_partial"></div>',
-        nodeLine = '<div class="treeview_node_indent treeview_node_line"></div>';
+        nodeLine = '<div class="treeview_node_indent treeview_node_line"></div>',
+        indentFragment = /^(.*)<div[^>]+><\/div>$/;
 
     function connectSignals() {
         Event.delegate(this, 'click', '.treeview_node_parent', function(event) {
@@ -182,17 +183,48 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.header.innerHTML = html;
     }
 
-    function recreateNode(node, template, container) {
+    function recreateNode(node, template, container, indent) {
         var cellTemplate = cellTemplateRenderer.call(this, node), html, id = this.id;
         if (cellTemplate.separator) {
             html = generateSeparator.call(this);
         } else {
-            if (!node.previousSibling && !node.nextSibling)
+            if (!this.flat && !indent)
+                indent = '';
+            var childCount = node.childCount, indent = indent.replace(indentFragment, "$1"), newIndent;
+            if (!node.previousSibling && !node.nextSibling) {
                 cellTemplate.nodePosition = 'treeview_node_first treeview_node_last'
-            else if (!node.previousSibling)
+                if (!this.flat && this.options.drawExpanders) {
+                    cellTemplate.indent = indent + (childCount != 0 
+                        ? childCount 
+                            ? parent ? nodeBottomParent : nodeOnlyParent
+                            : parent ? nodeBottomPartial : nodeOnlyPartial
+                        : parent ? nodeBottomLine : nodeLine);
+                    newIndent = indent + nodeIndent;
+                }
+            } else if (!node.previousSibling) {
                 cellTemplate.nodePosition = 'treeview_node_first'
-            else if (!node.nextSibling)
+                if (!this.flat && this.options.drawExpanders) {
+                    cellTemplate.indent = indent + (childCount != 0 
+                        ? childCount
+                            ? parent ? nodeParent : nodeTopParent
+                            : parent ? nodePartial : nodeTopPartial
+                        : parent ? nodeLine : nodeTopLine);
+                    newIndent = indent + nodeStraightLine;
+                }
+            } else if (!node.nextSibling) {
                 cellTemplate.nodePosition = 'treeview_node_last'
+                if (!this.flat && this.options.drawExpanders) {
+                    cellTemplate.indent = indent + (childCount != 0 
+                        ? childCount ? nodeBottomParent : nodeBottomPartial
+                        : nodeBottomLine);
+                    newIndent = indent + nodeIndent;
+                }
+            } else if (!this.flat && this.options.drawExpanders) {
+                cellTemplate.indent = indent + (childCount != 0 
+                    ? childCount ? nodeParent : nodePartial
+                    : nodeLine);
+                newIndent = indent + nodeStraightLine;
+            }
             html = template.evaluate(cellTemplate);
         }
         var next = node.nextSibling, previous = node.previousSibling,
@@ -213,7 +245,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var index = cMap[j];
             values.push(node.values[index]);
         }
-        setNodeAttributes.call(this, container, element, node);
+        setNodeAttributes.call(this, container, element, node, newIndent);
         cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
     }
 
@@ -365,15 +397,25 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function requestChildren(event, parentNode) {
+        if (!parentNode) return;
+        var view = nodeMap[this.id][parentNode.attributes.id];
+        var highlight = view.element.highlight;
+        recreateNode.call(this, parentNode, generateNodeTemplate.call(this), view.container, view.indent);
+        Element.removeClassName(view.element, 'treeview_node_loading');
+        this.expandNode(parentNode);
+        if (highlight)
+            changeHighlight.call(this, parentNode);
+    }
+
     function loadData(event, parentNode) {
         var template = generateNodeTemplate.call(this);
         if (parentNode) {
             var view = nodeMap[this.id][parentNode.attributes.id];
             var highlight = view.element.highlight;
-            recreateNode.call(this, parentNode, template, view.container);
-            if (highlight) {
+            recreateNode.call(this, parentNode, template, view.container, view.indent);
+            if (highlight)
                 changeHighlight.call(this, parentNode);
-            }
         } else {
             createNodes.call(this, this.model.rootNodes, template);
         }
@@ -439,7 +481,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!change) return;
         var template = generateNodeTemplate.call(this)
         var highlight = view.element.highlight;
-        recreateNode.call(this, node, template, view.container);
+        recreateNode.call(this, node, template, view.container, view.indent);
         if (highlight) {
             changeHighlight.call(this, node);
         }
@@ -452,7 +494,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
         if (!node.nextSibling && node.previousSibling)
             nodeMap[id][node.previousSibling.attributes.id].element.removeClassName('treeview_node_last');
-        recreateNode.call(this, parentNode || node, template, container);
+        recreateNode.call(this, parentNode || node, template, container, parentNode ? nodeMap[id][parentNode.attributes.id].indent : '');
     }
 
     function nodeRemove(event, node, parentNode) {
@@ -476,7 +518,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             removeContainers.call(this, container);
             var template = generateNodeTemplate.call(this)
             var container = parentNode ? createContainer.call(this, parentNode) : this.container;
-            recreateNode.call(this, parentNode || node, template, container);
+            recreateNode.call(this, parentNode || node, template, container, parentNode ? nodeMap[id][parentNode.attributes.id].indent : '');
         }
     }
     
@@ -649,7 +691,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 }
             }
 
-            view.expanded = true;
             if (null == node.childCount && node.requestChildren())
                 Element.addClassName(view.element, 'treeview_node_loading');
             else {
@@ -661,6 +702,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.options.expandEffect && !arguments[2]
                     ? Effect.toggle(view.childContainer, this.options.expandEffect, this.options.expandEffectOptions)
                     : view.childContainer.style.display = '';
+                view.expanded = true;
                 this.emitSignal('iwl:node_expand', node);
             }
             return this;
@@ -730,6 +772,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.toggleActive.apply(this, this.options.initialActive);
 
                 var callback = loadData.bind(this);
+                this.model.signalConnect('iwl:request_children_response', requestChildren.bind(this));
                 this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
                 this.model.signalConnect('iwl:clear', callback);
                 this.model.signalConnect('iwl:load_data', callback);

@@ -47,7 +47,10 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
   }
 
   function requestChildrenResponse(json, params, options) {
-    this.loadData(json.data);
+    this.freeze();
+    var parentNode = json.data && json.data.options ? this.getNodeByPath(json.data.options.parentNode) : undefined;
+    this.loadData(json.data, parentNode);
+    this.thaw().emitSignal('iwl:request_children_response', parentNode);
   }
 
   return {
@@ -124,7 +127,7 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
       return this.thaw().emitSignal('iwl:node_move', node, parentNode, previous);
     },
 
-    loadData: function(data) {
+    loadData: function(data, parentNode) {
       if (!Object.isObject(data)) return;
       if (!Object.isObject(data.options)) data.options = {};
       Object.extend(this.options, {
@@ -146,7 +149,8 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
           IWL.RPC.registerEvent(this._emitter, name, events[name][0], events[name][1], options);
         }
       }
-      var parentNode = this.getNodeByPath(data.options.parentNode);
+      if (!parentNode)
+        parentNode = this.getNodeByPath(data.options.parentNode);
 
       this.freeze();
       if (Object.isArray(data.nodes))

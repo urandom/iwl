@@ -1826,6 +1826,7 @@ div.tooltip_content {
     height: 17px;
     float: left;
     background-image: url('/iwl/skin/default/images/treeview/indent_sprite.gif');
+    background-repeat: no-repeat;
 }
 
 .treeview_node_straight_line {
@@ -1898,4 +1899,8 @@ div.tooltip_content {
 }
 .treeview_node_line {
     background-position: -300px 0px;
+}
+.treeview_node_loading .treeview_node_parent {
+    background-image: url('/iwl/skin/default/images/loader/loader10x10.gif');
+    background-position: 2.5px 3.5px;
 }

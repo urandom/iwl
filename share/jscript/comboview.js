@@ -744,6 +744,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.model.signalConnect('iwl:event_abort', eventAbort.bind(this));
                 this.model.signalConnect('iwl:clear', callback);
                 this.model.signalConnect('iwl:load_data', callback);
+                this.model.signalConnect('iwl:request_children_response', callback);
                 this.model.signalConnect('iwl:sort_column_change', callback);
                 this.model.signalConnect('iwl:nodes_reorder', callback);
                 this.model.signalConnect('iwl:nodes_swap',  nodesSwap.bind(this));
