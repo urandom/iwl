@@ -1823,7 +1823,7 @@ div.tooltip_content {
 
 .treeview_node_indent {
     width: 15px;
-    height: 15px;
+    height: 17px;
     float: left;
     background-image: url('/iwl/skin/default/images/treeview/indent_sprite.gif');
 }
@@ -1835,14 +1835,14 @@ div.tooltip_content {
     background-position: -15px 0px;
     cursor: pointer;
 }
-.treeview_node_single_parent.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_single_parent {
     background-position: -30px 0px;
 }
 .treeview_node_single_partial {
     background-position: -45px 0px;
     cursor: pointer;
 }
-.treeview_node_single_partial.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_single_partial {
     background-position: -60px 0px;
 }
 .treeview_node_single_line {
@@ -1852,14 +1852,14 @@ div.tooltip_content {
     background-position: -90px 0px;
     cursor: pointer;
 }
-.treeview_node_top_parent.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_top_parent {
     background-position: -105px 0px;
 }
 .treeview_node_top_partial {
     background-position: -120px 0px;
     cursor: pointer;
 }
-.treeview_node_top_partial.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_top_partial {
     background-position: -135px 0px;
 }
 .treeview_node_top_line {
@@ -1869,31 +1869,31 @@ div.tooltip_content {
     background-position: -165px 0px;
     cursor: pointer;
 }
-.treeview_node_bottom_parent.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_bottom_parent {
     background-position: -180px 0px;
 }
 .treeview_node_bottom_partial {
     background-position: -195px 0px;
     cursor: pointer;
 }
-.treeview_node_bottom_partial.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_bottom_partial {
     background-position: -210px 0px;
 }
 .treeview_node_bottom_line {
     background-position: -225px 0px;
 }
-.treeview_node_parent {
+.treeview_node_normal_parent {
     background-position: -240px 0px;
     cursor: pointer;
 }
-.treeview_node_parent.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_normal_parent {
     background-position: -255px 0px;
 }
-.treeview_node_partial {
+.treeview_node_normal_partial {
     background-position: -270px 0px;
     cursor: pointer;
 }
-.treeview_node_partial.treeview_node_expanded {
+.treeview_node_expanded .treeview_node_normal_partial {
     background-position: -285px 0px;
 }
 .treeview_node_line {

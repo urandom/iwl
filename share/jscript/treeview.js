@@ -3,26 +3,31 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     var nodeMap = {},
         nodeIndent = '<div class="treeview_node_indent"></div>',
         nodeStraightLine = '<div class="treeview_node_indent treeview_node_straight_line"></div>',
-        nodeOnlyParent = '<div class="treeview_node_indent treeview_node_single_parent"></div>',
-        nodeOnlyParentE = '<div class="treeview_node_indent treeview_node_single_parent treeview_node_expanded"></div>',
-        nodeOnlyPartial = '<div class="treeview_node_indent treeview_node_single_partial"></div>',
-        nodeOnlyPartialE = '<div class="treeview_node_indent treeview_node_single_partial treeview_node_expanded"></div>',
+        nodeOnlyParent = '<div class="treeview_node_indent treeview_node_parent treeview_node_single_parent"></div>',
+        nodeOnlyPartial = '<div class="treeview_node_indent treeview_node_parent treeview_node_single_partial"></div>',
         nodeOnlyLine = '<div class="treeview_node_indent treeview_node_single_line"></div>',
-        nodeTopParent = '<div class="treeview_node_indent treeview_node_top_parent"></div>',
-        nodeTopParentE = '<div class="treeview_node_indent treeview_node_top_parent treeview_node_expanded"></div>',
-        nodeTopPartial = '<div class="treeview_node_indent treeview_node_top_partial"></div>',
-        nodeTopPartialE = '<div class="treeview_node_indent treeview_node_top_partial treeview_node_expanded"></div>',
+        nodeTopParent = '<div class="treeview_node_indent treeview_node_parent treeview_node_top_parent"></div>',
+        nodeTopPartial = '<div class="treeview_node_indent treeview_node_parent treeview_node_top_partial"></div>',
         nodeTopLine = '<div class="treeview_node_indent treeview_node_top_line"></div>',
-        nodeBottomParent = '<div class="treeview_node_indent treeview_node_bottom_parent"></div>',
-        nodeBottomParentE = '<div class="treeview_node_indent treeview_node_bottom_parent treeview_node_expanded"></div>',
-        nodeBottomPartial = '<div class="treeview_node_indent treeview_node_bottom_partial"></div>',
-        nodeBottomPartialE = '<div class="treeview_node_indent treeview_node_bottom_partial treeview_node_expanded"></div>',
+        nodeBottomParent = '<div class="treeview_node_indent treeview_node_parent treeview_node_bottom_parent"></div>',
+        nodeBottomPartial = '<div class="treeview_node_indent treeview_node_parent treeview_node_bottom_partial"></div>',
         nodeBottomLine = '<div class="treeview_node_indent treeview_node_bottom_line"></div>',
-        nodeParent = '<div class="treeview_node_indent treeview_node_parent"></div>',
-        nodeParentE = '<div class="treeview_node_indent treeview_node_parent treeview_node_expanded"></div>',
-        nodePartial = '<div class="treeview_node_indent treeview_node_partial"></div>',
-        nodePartialE = '<div class="treeview_node_indent treeview_node_partial treeview_node_expanded"></div>',
+        nodeParent = '<div class="treeview_node_indent treeview_node_parent treeview_node_normal_parent"></div>',
+        nodePartial = '<div class="treeview_node_indent treeview_node_parent treeview_node_normal_partial"></div>',
         nodeLine = '<div class="treeview_node_indent treeview_node_line"></div>';
+
+    function connectSignals() {
+        Event.delegate(this, 'click', '.treeview_node_parent', function(event) {
+            var element = Event.element(event);
+            if (!Element.hasClassName(element, 'treeview_node'))
+                element = Element.up(element, '.treeview_node');
+            if (!element || Element.hasClassName(element, 'treeview_node_loading')) return;
+            if (Element.hasClassName(element, 'treeview_node_expanded'))
+                this.collapseNode(element.node);
+            else
+                this.expandNode(element.node, event.shiftKey);
+        }.bind(this));
+    }
 
     function generateNodeTemplate() {
         /* Individual rows can't be dragged. Each node has to be a full table */
@@ -86,14 +91,15 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         return cellTemplate;
     }
 
-    function setNodeAttributes(container, element, node) {
+    function setNodeAttributes(container, element, node, indent) {
         var id = this.id, nId = node.attributes.id;
         if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
         var nView = nodeMap[id][nId];
         Object.extend(nView, {
             node: node,
             element: element,
-            container: container
+            container: container,
+            indent: indent
         });
         element.node = node;
         if (element.hasClassName('treeview_node_separator'))
@@ -141,11 +147,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             container.path = pathString;
 
             nodeMap[id][nId].childContainer = container;
-            container.parentContainer = parentNode.parentNode
+            var parentContainer = parentNode.parentNode
                                      && nodeMap[id][parentNode.parentNode.attributes.id].childContainer
                 ? nodeMap[id][parentNode.parentNode.attributes.id].childContainer
                 : this.container;
-            container.parentContainer.childContainers.push(container);
+            parentContainer.childContainers.push(container);
             container.childContainers = [];
             container.node = parentNode;
         } else {
@@ -212,12 +218,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function createNodes(nodes, template, indent) {
-        var html = [], container, nodeLength = nodes.length, parent = nodes[0] ? nodes[0].parentNode : null, depth = 1;
+        var html = [], container, indents = {}, nodeLength = nodes.length, parent = nodes[0] ? nodes[0].parentNode : null;
         var container = createContainer.call(this, parent);
-        if (!this.flat && !indent) {
-            if (parent) depth = parent.getDepth();
+        if (!this.flat && !indent)
             indent = '';
-        }
         for (var i = 0, node = nodes[0]; i < nodeLength; node = nodes[++i]) {
             var cellTemplate = cellTemplateRenderer.call(this, node);
             if (cellTemplate.separator) {
@@ -225,48 +229,56 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 continue;
             }
 
-            var childCount = node.childCount, newIndent = '';
+            var childCount = node.childCount;
             if (i + 1 == nodeLength && i == 0) {
                 cellTemplate.nodePosition = 'treeview_node_first treeview_node_last'
-                if (!this.flat) {
+                if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
-                        ? childCount ? nodeOnlyParent : nodeOnlyPartial
-                        : nodeOnlyLine);
-                    for (j = 0; j < depth; j++)
-                        newIndent += nodeIndent;
+                        ? childCount 
+                            ? parent ? nodeBottomParent : nodeOnlyParent
+                            : parent ? nodeBottomPartial : nodeOnlyPartial
+                        : parent ? nodeBottomLine : nodeLine);
+                    indents[node.attributes.id] = indent + nodeIndent;
                 }
             } else if (i == 0) {
                 cellTemplate.nodePosition = 'treeview_node_first'
-                if (!this.flat)
+                if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
-                        ? childCount ? nodeTopParent : nodeTopPartial
-                        : nodeTopLine);
+                        ? childCount
+                            ? parent ? nodeParent : nodeTopParent
+                            : parent ? nodePartial : nodeTopPartial
+                        : parent ? nodeLine : nodeTopLine);
+                    indents[node.attributes.id] = indent + nodeStraightLine;
+                }
             } else if (i + 1 == nodeLength) {
                 cellTemplate.nodePosition = 'treeview_node_last'
-                if (!this.flat) {
+                if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
                         ? childCount ? nodeBottomParent : nodeBottomPartial
                         : nodeBottomLine);
-                    for (j = 0; j < depth; j++)
-                        newIndent += nodeIndent;
+                    indents[node.attributes.id] = indent + nodeIndent;
                 }
-            } else if (!this.flat) {
+            } else if (!this.flat && this.options.drawExpanders) {
                 cellTemplate.indent = indent + (childCount != 0 
                     ? childCount ? nodeParent : nodePartial
                     : nodeLine);
+                indents[node.attributes.id] = indent + nodeStraightLine;
             }
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
         var children = container.childElements();
-        for (var i = 0; i < nodeLength; i++) {
-            var values = [], cMap = this.options.columnMap, node = nodes[i];
-            for (var j = 0, l = cMap.length; j < l; j++) {
-                var index = cMap[j];
+        for (var i = 0, j = 0, l = children.length; i < l; i++) {
+            var element = children[i];
+            if (!Element.hasClassName(element, 'iwl-node'))
+                continue;
+            var values = [], cMap = this.options.columnMap, node = nodes[j++];
+            for (var k = 0, m = cMap.length; k < m; k++) {
+                var index = cMap[k];
                 values.push(node.values[index]);
             }
-            setNodeAttributes.call(this, container, children[i], node);
-            cellFunctionRenderer.call(this, children[i].rows[0].cells, values, node);
+            setNodeAttributes.call(this, container, element, node, indents[node.attributes.id]);
+            cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
         }
     }
 
@@ -609,6 +621,90 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.emitSignal('iwl:sensitivity_change', node);
         },
         /**
+         * Expands the node so its children are visible
+         * @param path The path (or index for flat models) of the item to be expanded
+         * @param {Boolean} recursive If true, all descendants of the node will be made visible, recursively
+         * @returns The object
+         * */
+        expandNode: function(path, recursive) {
+            if (this.flat) return;
+            var node;
+            if (path instanceof IWL.ListModel.Node) {
+                node = path;
+            } else {
+                if (!Object.isArray(path)) path = [path];
+                node = this.model.getNodeByPath(path) || this.model.getFirstNode();
+            }
+            if (!node || node.childCount == 0) return;
+            var view = nodeMap[this.id][node.attributes.id];
+            if (!view.element || view.expanded) return;
+            if (node.childCount) {
+                if (!view.childContainer) {
+                    createNodes.call(this, node.childNodes, generateNodeTemplate.call(this), view.indent);
+                    view.childContainer.style.display = 'none';
+                    var next = view.element.nextSibling;
+                    next
+                        ? view.element.parentNode.insertBefore(view.childContainer, next)
+                        : view.element.parentNode.appendChild(view.childContainer);
+                }
+            }
+
+            view.expanded = true;
+            if (null == node.childCount && node.requestChildren())
+                Element.addClassName(view.element, 'treeview_node_loading');
+            else {
+                Element.addClassName(view.element, 'treeview_node_expanded');
+                if (recursive) {
+                    for (var i = 0, l = node.childCount; i < l; i++)
+                        this.expandNode(node.childNodes[i], recursive, true);
+                }
+                this.options.expandEffect && !arguments[2]
+                    ? Effect.toggle(view.childContainer, this.options.expandEffect, this.options.expandEffectOptions)
+                    : view.childContainer.style.display = '';
+                this.emitSignal('iwl:node_expand', node);
+            }
+            return this;
+        },
+        /**
+         * Collapses the node so its children are visible
+         * @param path The path (or index for flat models) of the item to be collapsed
+         * @returns The object
+         * */
+        collapseNode: function(path) {
+            if (this.flat) return;
+            var node;
+            if (path instanceof IWL.ListModel.Node) {
+                node = path;
+            } else {
+                if (!Object.isArray(path)) path = [path];
+                node = this.model.getNodeByPath(path) || this.model.getFirstNode();
+            }
+            if (!node || node.childCount == 0) return;
+            var view = nodeMap[this.id][node.attributes.id];
+            if (!view.element || !view.expanded) return;
+            if (this.options.expandEffect && !arguments[1]) {
+                Effect.toggle(
+                    view.childContainer,
+                    this.options.expandEffect,
+                    Object.extend({
+                        afterFinish: function() {
+                            for (var i = 0, l = node.childCount; i < l; i++)
+                                this.collapseNode(node.childNodes[i], true);
+                        }.bind(this)
+                    }, this.options.expandEffectOptions)
+                );
+            } else {
+                view.childContainer.style.display = 'none';
+                for (var i = 0, l = node.childCount; i < l; i++)
+                    this.collapseNode(node.childNodes[i], true);
+            }
+
+            view.expanded = false;
+            Element.removeClassName(view.element, 'treeview_node_expanded');
+            this.emitSignal('iwl:node_collapse', node);
+            return this;
+        },
+        /**
          * Sets the model for the view
          * @param {IWL.ObservableModel} model The model, this view will associate with. If none is given, the current model will be removed
          * @returns The object
@@ -687,16 +783,22 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 initialPath: [],
                 maxHeight: 400,
                 popUpDelay: 0.2,
-                headerVisible: true
+                headerVisible: true,
+                drawExpanders: true,
+                expandEffect: 'blind',
+                expandEffectOptions: {duration: 0.1}
             }, arguments[1]);
             this.header = this.down('.treeview_header');
             this.container = this.down('.treeview_content');
+            this.container.childContainers = [];
             this.containers = {};
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
+
+            connectSignals.call(this);
 
             nodeMap[this.id] = {};
 
