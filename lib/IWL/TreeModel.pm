@@ -114,12 +114,17 @@ sub _requestChildrenEvent {
     my ($event, $handler) = @_;
     my %options = %{$event->{options}};
     my %params = %{$event->{params}};
-    my $model = ($options{class} || __PACKAGE__)->new($options{columns}, preserve => 1, id => $options{id}, parentNode => $options{parentNode});
+    my $model = ($options{class} || __PACKAGE__)->new(
+        $options{columns},
+        preserve => 1,
+        id => $options{id},
+        parentNode => $options{parentNode}
+    );
 
     $model = ('CODE' eq ref $handler)
-      ? $handler->(\%params, $model, {values => $options{values}})
+      ? $handler->(\%params, $model, {values => $options{values}, allDescendants => $options{allDescendants}})
       : undef;
-    IWL::RPC::eventResponse($event, {data => $model->toJSON});
+    IWL::RPC::eventResponse($event, {data => $model->toJSON, extras => {allDescendants => $options{allDescendants}}});
 }
 
 sub _registerEvent {

@@ -397,13 +397,13 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
-    function requestChildren(event, parentNode) {
+    function requestChildren(event, parentNode, options) {
         if (!parentNode) return;
         var view = nodeMap[this.id][parentNode.attributes.id];
         var highlight = view.element.highlight;
         recreateNode.call(this, parentNode, generateNodeTemplate.call(this), view.container, view.indent);
         Element.removeClassName(view.element, 'treeview_node_loading');
-        this.expandNode(parentNode);
+        this.expandNode(parentNode, options.allDescendants);
         if (highlight)
             changeHighlight.call(this, parentNode);
     }
@@ -425,15 +425,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (eventName == 'IWL-TreeModel-requestChildren') {
             var node = this.model.getNodeByPath(options.parentNode);
             var element = nodeMap[this.id][node.attributes.id].element;
-            var arrow = element.down('.treeview_partial_loading');
-            arrow.removeClassName('treeview_partial_loading').addClassName('treeview_partial_parental_arrow');
-            var callback = function(event) {
-                element.signalDisconnect('dom:mouseenter', callback);
-                if (node.requestChildren())
-                    arrow.removeClassName('treeview_partial_parental_arrow').addClassName('treeview_partial_loading');
-                else arrow.remove();
-            }.bind(this);
-            element.signalConnect('dom:mouseenter', callback);
+            Element.removeClassName(element, 'treeview_node_loading');
         }
     }
 
@@ -691,7 +683,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 }
             }
 
-            if (null == node.childCount && node.requestChildren())
+            if (null == node.childCount && node.requestChildren({allDescendants: recursive}))
                 Element.addClassName(view.element, 'treeview_node_loading');
             else {
                 Element.addClassName(view.element, 'treeview_node_expanded');

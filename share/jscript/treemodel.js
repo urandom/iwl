@@ -50,7 +50,7 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
     this.freeze();
     var parentNode = json.data && json.data.options ? this.getNodeByPath(json.data.options.parentNode) : undefined;
     this.loadData(json.data, parentNode);
-    this.thaw().emitSignal('iwl:request_children_response', parentNode);
+    this.thaw().emitSignal('iwl:request_children_response', parentNode, json.extras);
   }
 
   return {
@@ -306,18 +306,18 @@ IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
       if (!this.model) return -1;
       return this.childCount;
     },
-    requestChildren: function() {
+    requestChildren: function(options) {
       if (this.childCount !== null
        || !this.model
        || !this.model.hasEvent('IWL-TreeModel-requestChildren'))
          return;
       this.model.emitSignal('iwl:request_children', this);
-      var emitOptions = {
+      var emitOptions = Object.extend(options || {}, {
         columns: this.model.columns,
         id: this.model.options.id,
         parentNode: this.getPath(),
         values: this.values
-      };
+      });
 
       return this.model.emitEvent('IWL-TreeModel-requestChildren', {}, emitOptions);
     },

@@ -1805,7 +1805,6 @@ div.tooltip_content {
     background-color: white;
     color: #111;
     margin: 1px 0;
-    padding: 1px 2px;
 }
 
 .treeview_node_highlight {
@@ -1903,4 +1902,11 @@ div.tooltip_content {
 .treeview_node_loading .treeview_node_parent {
     background-image: url('/iwl/skin/default/images/loader/loader10x10.gif');
     background-position: 2.5px 3.5px;
+}
+.treeview_header_node {
+    background: transparent url(/iwl/skin/default/images/treeview/header_bg.png) repeat-x top left;
+    font-weight: bold;
+    white-space: nowrap;
+    padding: 2px 3px;
+    color: black;
 }
