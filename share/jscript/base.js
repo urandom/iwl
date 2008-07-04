@@ -159,7 +159,8 @@ IWL.Widget = {
 	if (this.current._init)
             this.current._init.apply(this.current, $A(arguments).slice(1));
 
-        this.current.emitSignal('iwl:init');
+        if (!Prototype.Browser.IE || this.current.parentNode)
+            this.current.emitSignal('iwl:init');
         return this.current;
     },
     _abortEvent: function(collection, eventName, exception) {
