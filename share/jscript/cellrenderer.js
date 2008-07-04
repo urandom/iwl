@@ -41,9 +41,15 @@ IWL.CellTemplateRenderer = Class.create((function() {
             Element.show(va);
             if (event.keyCode == Event.KEY_RETURN) {
               var parent = Element.up(en, '.iwl-node');
-              parent
-                ? Event.emitSignal(view, 'iwl:edit_end', parent, parent.node, en.value)
-                : Event.emitSignal(view, 'iwl:edit_end', en.value);
+              if (parent) {
+                if (this.options.editable.commitChange) {
+                  var columnIndex = parseInt(Element.readAttribute(element, 'iwl:modelColumnIndex'));
+                  parent.node.setValues(columnIndex, en.value)
+                }
+                Event.emitSignal(view, 'iwl:edit_end', parent, parent.node, en.value);
+              } else {
+                Event.emitSignal(view, 'iwl:edit_end', en.value);
+              }
             }
         });
       }

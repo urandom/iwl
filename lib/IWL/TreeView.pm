@@ -152,7 +152,21 @@ I<renderFunction> and I<renderClass> are mutually exclusive. If a I<renderClass>
 
 =item B<editable>
 
-If true, and if the renderer supports it, the cell will be made editable. Editable cells cause the view to emit the following signals:
+If true (or hashref), and if the renderer supports it, the cell will be made editable. If a hashref value is given, it will be used as the options for the editable. The following keys are currently recognized:
+
+=item B<booleanRadio>
+
+By default, editable columns of type I<BOOLEAN> will be converted into checkboxes. If this option is true, radio buttons will be used instead. The radio button group will be based on the view's id, as well as the depth of the nodes. Furthermore, only one node in the current depth will have a true value.
+
+=over 12
+
+=item B<commitChange>
+
+If true, the new value of the cell will be used to set the corresponding value of the model node.
+
+=back
+
+Editable cells cause the view to emit the following signals:
 
 =over 12
 

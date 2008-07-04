@@ -1583,7 +1583,6 @@ div.tooltip_content {
 }
 .iwl-cell-editable {
     border: none;
-    width: 100%;
     background: transparent;
     font-size: 12px;
     margin: 1px 2px;
@@ -1728,6 +1727,10 @@ div.tooltip_content {
     height: 1px;
     border-bottom: 2px solid #444;
     margin-bottom: 1px;
+}
+
+.iconview .iwl-cell-editable {
+    width: 100%;
 }
 
 /* IconView */
@@ -1939,6 +1942,5 @@ div.tooltip_content {
 .treeview .iwl-cell-editable {
     border: 1px solid #7F9DB9;
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
-    width: 98%;
 }
 

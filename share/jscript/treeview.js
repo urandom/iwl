@@ -464,12 +464,19 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             for (var i = 0, l = columns.length; i < l; i++) {
                 var index = cMap.indexOf(columns[i]);
                 if (index == -1) continue;
-                if (this.model.columns[columns[i]].type == IWL.ListModel.DataType.BOOLEAN) {
-                    var input = view.element.down('.treeview_column' + index + ' input');
-                    var value = node.values[columns[i]];
-                    if (value == input.checked) continue;
+                var value = node.values[columns[i]];
+                switch (this.model.columns[columns[i]].type) {
+                    case IWL.ListModel.DataTypes.BOOLEAN:
+                        var input = view.element.down('.treeview_column' + index + ' input');
+                        if (value == input.checked) continue;
+                        break;
+                    default:
+                        var text = Element.getText(view.element);
+                        if (value == text) continue;
+                        break;
                 }
                 change = true;
+                break;
             }
         } else change = true;
         if (!change) return;
