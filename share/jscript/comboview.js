@@ -566,7 +566,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         nodeInsert.call(this, event, node, parentNode);
     }
 
-    function nodeChange(event, node) {
+    function nodeChange(event, node, columns) {
         var view = nodeMap[this.id][node.attributes.id];
         var template = generateNodeTemplate.call(this)
         var highlight = view.element.highlight;

@@ -1575,8 +1575,11 @@ div.tooltip_content {
 }
 
 /* Cells */
+.iwl-header-value {
+    margin: 1px 2px;
+}
 .iwl-cell-value {
-    margin: 0;
+    margin: 1px 2px;
     width: 100%;
 }
 .iwl-cell-editable {
@@ -1584,6 +1587,14 @@ div.tooltip_content {
     width: 100%;
     background: transparent;
     font-size: 12px;
+    margin: 1px 2px;
+}
+.iwl-cell-checkbox .checkbox, .iwl-header-checkbox .checkbox {
+    margin: 0;
+}
+
+.iwl-header-checkbox, .iwl-cell-checkbox {
+    text-align: center;
 }
 
 /* ComboView */
@@ -1673,7 +1684,6 @@ div.tooltip_content {
 }
 .comboview_column {
     border-right: 1px dotted gray;
-    padding: 1px;
 }
 .comboview_column_last {
     border-right: none;
@@ -1903,10 +1913,40 @@ div.tooltip_content {
     background-image: url('/iwl/skin/default/images/loader/loader10x10.gif');
     background-position: 2.5px 3.5px;
 }
-.treeview_header_node {
-    background: transparent url(/iwl/skin/default/images/treeview/header_bg.png) repeat-x top left;
+.treeview_header {
+    background: #797879 url(/iwl/skin/default/images/treeview/header_bg.png) repeat-x top left;
     font-weight: bold;
     white-space: nowrap;
-    padding: 2px 3px;
     color: black;
 }
+.treeview_column {
+    border-right: 1px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea;
+}
+.treeview_content .treeview_column {
+    padding-right: 1px;
+}
+
+.treeview_column_last {
+    border-right: none;
+}
+.treeview_header .treeview_column,
+.treeview_node_last .treeview_column {
+    border-bottom: none;
+}
+
+.treeview_header .treeview_column {
+    border-right: 2px groove gray;
+}
+.treeview_header .treeview_column_last {
+    border-right: none;
+}
+.treeview_header .iwl-header-checkbox {
+    margin-right: 1px;
+}
+.treeview .iwl-cell-editable {
+    border: 1px solid #7F9DB9;
+    background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
+    width: 98%;
+}
+

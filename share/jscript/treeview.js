@@ -190,7 +190,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         } else {
             if (!this.flat && !indent)
                 indent = '';
-            var childCount = node.childCount, indent = indent.replace(indentFragment, "$1"), newIndent;
+            var childCount = node.childCount, newIndent;
+            if (!this.flat && indent)
+                indent = indent.replace(indentFragment, "$1");
             if (!node.previousSibling && !node.nextSibling) {
                 cellTemplate.nodePosition = 'treeview_node_first treeview_node_last'
                 if (!this.flat && this.options.drawExpanders) {
