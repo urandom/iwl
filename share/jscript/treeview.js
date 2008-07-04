@@ -693,10 +693,22 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     for (var i = 0, l = node.childCount; i < l; i++)
                         this.expandNode(node.childNodes[i], recursive, true);
                 }
-                this.options.expandEffect && !arguments[2]
-                    ? Effect.toggle(view.childContainer, this.options.expandEffect, this.options.expandEffectOptions)
-                    : view.childContainer.style.display = '';
-                view.expanded = true;
+                if (this.options.expandEffect && !arguments[2]) {
+                    Effect.toggle(
+                        view.childContainer,
+                        this.options.expandEffect,
+                        Object.extend({
+                            afterFinish: function() {
+                                delete view.expanding;
+                                view.expanded = true;
+                            }
+                        }, this.options.expandEffectOptions)
+                    );
+                    view.expanding = true;
+                } else {
+                    view.childContainer.style.display = '';
+                    view.expanded = true;
+                }
                 this.emitSignal('iwl:node_expand', node);
             }
             return this;
@@ -726,6 +738,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         afterFinish: function() {
                             for (var i = 0, l = node.childCount; i < l; i++)
                                 this.collapseNode(node.childNodes[i], true);
+                            view.expanded = false;
                         }.bind(this)
                     }, this.options.expandEffectOptions)
                 );
@@ -733,9 +746,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 view.childContainer.style.display = 'none';
                 for (var i = 0, l = node.childCount; i < l; i++)
                     this.collapseNode(node.childNodes[i], true);
+                view.expanded = false;
             }
 
-            view.expanded = false;
             Element.removeClassName(view.element, 'treeview_node_expanded');
             this.emitSignal('iwl:node_collapse', node);
             return this;
@@ -823,7 +836,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 headerVisible: true,
                 drawExpanders: true,
                 expandEffect: 'blind',
-                expandEffectOptions: {duration: 0.1}
+                expandEffectOptions: {duration: 0.2}
             }, arguments[1]);
             this.header = this.down('.treeview_header');
             this.container = this.down('.treeview_content');

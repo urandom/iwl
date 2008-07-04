@@ -1580,7 +1580,6 @@ div.tooltip_content {
 }
 .iwl-cell-value {
     margin: 1px 2px;
-    width: 100%;
 }
 .iwl-cell-editable {
     border: none;
@@ -1923,10 +1922,6 @@ div.tooltip_content {
     border-right: 1px solid #eaeaea;
     border-bottom: 1px solid #eaeaea;
 }
-.treeview_content .treeview_column {
-    padding-right: 1px;
-}
-
 .treeview_column_last {
     border-right: none;
 }
@@ -1936,13 +1931,10 @@ div.tooltip_content {
 }
 
 .treeview_header .treeview_column {
-    border-right: 2px groove gray;
+    border-right: 1px solid #515151;
 }
 .treeview_header .treeview_column_last {
     border-right: none;
-}
-.treeview_header .iwl-header-checkbox {
-    margin-right: 1px;
 }
 .treeview .iwl-cell-editable {
     border: 1px solid #7F9DB9;
