@@ -470,7 +470,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (index == -1) continue;
                 var value = node.values[columns[i]];
                 switch (this.model.columns[columns[i]].type) {
-                    case IWL.ListModel.DataTypes.BOOLEAN:
+                    case IWL.ListModel.DataType.BOOLEAN:
                         var input = view.element.down('.treeview_column' + index + ' input');
                         if (value == input.checked) continue;
                         break;

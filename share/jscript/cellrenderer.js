@@ -97,21 +97,40 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
   var checkTemplate = new Template('<div class="iwl-cell-value iwl-cell-checkbox"><input type="checkbox" class="checkbox" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
   var radioTemplate = new Template('<div class="iwl-cell-value iwl-cell-radio"><input type="radio" class="radio" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
 
-  function commitChange(element, columnIndex) {
+  function checkCommitChange(element, columnIndex) {
     var parent = Element.up(element, '.iwl-node');
     if (!columnIndex)
         columnIndex = parseInt(Element.readAttribute(element, 'iwl:modelColumnIndex'));
     if (parent) parent.node.setValues(columnIndex, element.checked);
   }
 
+  function radioCommitChange(element, columnIndex) {
+    var parent = Element.up(element, '.iwl-node');
+    if (!columnIndex)
+        columnIndex = parseInt(Element.readAttribute(element, 'iwl:modelColumnIndex'));
+    if (!parent) return;
+    var node = parent.node;
+    var nodes = node.parentNode
+      ? node.parentNode.childNodes
+      : node.model.rootNodes;
+    for (var i = 0, l = nodes.length; i < l; i++) {
+      var n = nodes[i];
+      if (n == node) continue;
+      if (n.values[columnIndex])
+        n.setValues(columnIndex, false)
+    }
+    node.setValues(columnIndex, true)
+  }
+
   return {
     initialize: function() {
       this.options = Object.extend({}, arguments[0] || {});
 
-      var view = this.options.view;
-      if (this.options.editable && view) {
-        var commit = this.options.editable.commitChange, headerSelector, cellSelector;
-        if (this.options.editable.booleanRadio) {
+      var view = this.options.view,
+          editable = this.options.editable;
+      if (editable && view) {
+        var commit = editable.commitChange, headerSelector, cellSelector;
+        if (editable.booleanRadio) {
           this.header = new Template('<div class="iwl-header-value">#{title}</div>');
           headerSelector = '.iwl-header-radio input';
           cellSelector = '.iwl-cell-radio input';
@@ -134,7 +153,9 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
         if (commit) {
           Event.delegate(view, 'change', cellSelector, function(event) {
               var element = Event.element(event);
-              commitChange(elemet);
+              editable.booleanRadio
+                ? radioCommitChange(element)
+                : checkCommitChange(elemet);
           });
         }
       }
