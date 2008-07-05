@@ -1587,11 +1587,13 @@ div.tooltip_content {
     font-size: 12px;
     margin: 1px 2px;
 }
-.iwl-cell-checkbox .checkbox, .iwl-header-checkbox .checkbox {
+.iwl-cell-checkbox .checkbox, .iwl-header-checkbox .checkbox,
+.iwl-cell-radio .radio, .iwl-header-radio .radio {
     margin: 0;
 }
 
-.iwl-header-checkbox, .iwl-cell-checkbox {
+.iwl-header-checkbox, .iwl-cell-checkbox,
+.iwl-header-radio, .iwl-cell-radio {
     text-align: center;
 }
 

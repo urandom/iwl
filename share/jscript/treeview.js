@@ -301,19 +301,23 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
-        var children = container.childElements();
-        for (var i = 0, j = 0, l = children.length; i < l; i++) {
-            var element = children[i];
-            if (!Element.hasClassName(element, 'iwl-node'))
-                continue;
-            var values = [], cMap = this.options.columnMap, node = nodes[j++];
-            for (var k = 0, m = cMap.length; k < m; k++) {
-                var index = cMap[k];
-                values.push(node.values[index]);
+        var temp = {};
+        setTimeout(function() {
+            var children = temp.children;
+            for (var i = 0, j = 0, l = children.length; i < l; i++) {
+                var element = children[i];
+                if (!Element.hasClassName(element, 'iwl-node'))
+                    continue;
+                var values = [], cMap = this.options.columnMap, node = nodes[j++];
+                for (var k = 0, m = cMap.length; k < m; k++) {
+                    var index = cMap[k];
+                    values.push(node.values[index]);
+                }
+                setNodeAttributes.call(this, container, element, node, indents[node.attributes.id]);
+                cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
             }
-            setNodeAttributes.call(this, container, element, node, indents[node.attributes.id]);
-            cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
-        }
+        }.bind(this), 10);
+        temp.children = container.childElements();
     }
 
     function changeHighlight(node) {
@@ -371,7 +375,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Float(options);
                         break;
                     case IWL.ListModel.DataType.BOOLEAN:
-                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Checkbox(options);
+                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Boolean(options);
                         break;
                     case IWL.ListModel.DataType.COUNT:
                         cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Count(options);
