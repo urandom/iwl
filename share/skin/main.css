@@ -1831,6 +1831,12 @@ div.tooltip_content {
 .treeview_node_highlight {
     background: #8ac6f2
 }
+.treeview_node_selected {
+    background-color: #d2d4e3;
+}
+.treeview_node_highlight.treeview_node_selected {
+    background-color: #70b3ea;
+}
 .treeview_node_separator {
     margin: 0 auto;
 }

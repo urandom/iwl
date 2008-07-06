@@ -666,11 +666,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var args = $A(arguments);
             while (args.length) {
                 var path = args.shift(), node;
-                if (path instanceof IWL.ListModel.Node) {
+                if (path instanceof IWL.ListModel.Node)
                     node = path;
-                    this.selectedPaths.push(node.getPath());
-                } else {
-                    this.selectedPaths.push(path);
+                else {
                     if (!Object.isArray(path)) path = [path];
                     node = this.model.getNodeByPath(path) || this.model.getFirstNode();
                 }
@@ -684,7 +682,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The active items of the IconView
          * */
         getActive: function() {
-            return this.selectedPaths;
+            return this.selectedNodes;
         },
         /**
          * Sets the sentisitivy of the item
@@ -878,7 +876,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
             this.addClassName('iwl-node-container');
             this.selectedNodes = [];
-            this.selectedPaths = [];
 
             getIconMargin.call(this);
             var width = this.clientWidth - scrollbarSize;

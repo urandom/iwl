@@ -668,15 +668,14 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         setActive: function(path) {
             var node;
-            if (path instanceof IWL.ListModel.Node) {
+            if (path instanceof IWL.ListModel.Node)
                 node = path;
-                this.selectedPath = node.getPath();
-            } else {
-                this.selectedPath = path;
+            else {
                 if (!Object.isArray(path)) path = [path];
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node || !nodeMap[this.id][node.attributes.id].element.sensitive) return;
+            this.selectedNode = node;
             this.content.removeClassName('comboview_content_empty');
             this.values = node.getValues();
             var cellTemplate = cellTemplateRenderer.call(this, node);
@@ -688,7 +687,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The active item of the ComboView
          * */
         getActive: function() {
-            return this.selectedPath;
+            return this.selectedNode;
         },
         /**
          * Sets the sentisitivy of the item

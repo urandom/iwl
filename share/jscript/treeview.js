@@ -116,6 +116,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         if (node.attributes.insensitive)
             this.setSensitivity(node, false);
+
+        element.signalConnect('mousedown', eventNodeMouseDown.bindAsEventListener(this, node));
+        element.signalConnect('mouseup', eventNodeMouseUp.bindAsEventListener(this, node));
     }
 
     function cellFunctionRenderer(cells, values, node) {
@@ -550,27 +553,82 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
     }
 
+    function eventMouseDown(event) {
+        if (nodeMap[this.id].nodeSelected) {
+            delete nodeMap[this.id].nodeSelected;
+            return;
+        }
+        if (nodeMap[this.id].skipNodeSelect)
+            return;
+        if (event.ctrlKey || event.shiftKey)
+            return;
+
+        var pointer = [Event.pointerX(event), Event.pointerY(event)];
+        var pos     = Element.cumulativeOffset(this);
+        pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
+        if (   this.clientWidth < pointer[0]
+            || this.clientHeight < pointer[1])
+            return;
+        unselectAll.call(this);
+    }
+
+    function eventNodeMouseDown(event, node) {
+        if (this.selectedNodes.indexOf(node) > -1) {
+            nodeMap[this.id].skipNodeSelect = true;
+            return;
+        }
+        toggleSelectNode.call(this, event, node);
+    }
+
+    function eventNodeMouseUp(event, node) {
+        var dragging = this.iwl && this.iwl.draggable
+                ? this.iwl.draggable.dragging
+                : false;
+        if (nodeMap[this.id].skipNodeSelect && !dragging) {
+            toggleSelectNode.call(this, event, node);
+            delete nodeMap[this.id].skipNodeSelect;
+        }
+    }
+
     function toggleSelectNode(event, node) {
         var first = this.selectedNodes[0];
         if (event.type == 'mousedown')
-            nodeMap[this.id].iconSelected = true;
+            nodeMap[this.id].nodeSelected = true;
         if (!event.ctrlKey && !event.shiftKey && this.selectedNodes.indexOf(node) > -1)
             return;
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {
+            /*
             var map = nodeMap[this.id];
-            var fIndex = first.getIndex();
-            var cIndex = node.getIndex();
-            if (cIndex == fIndex)
-                return selectNode.call(this, node);
+            var fPath = first.getPath(),
+                cPath = node.getPath();
+            if (cPath.toString() == fPath.toString())
+                return;
 
-            var property = fIndex < cIndex ? 'nextSibling' : 'previousSibling';
+            var property, from, to;
+            for (var i = 0, l = fPath.length; i < l; i++) {
+                if (fPath[i] == cPath[i])
+                    continue;
+                if (fPath[i] < cPath[i]) {
+                    from = cPath;
+                    to = fPath;
+                } else {
+                    from = fPath;
+                    to = cPath;
+                }
+                break;
+            }
             var sibling = first;
             for (var i = 0, l = Math.abs(fIndex - cIndex) + 1; i < l; i++) {
                 selectNode.call(this, sibling);
+                if (!this.flat && sibling.childCount) {
+                    for (var j = 0, m = sibling.childCount; j < m; j++)
+                        selectNode.call(this, sibling.childNodes[j]);
+                }
                 sibling = sibling[property];
             }
+            */
         } else if (event.ctrlKey && this.selectedNodes.length) {
             if (this.selectedNodes.indexOf(node) > -1)
                 unselectNode.call(this, node);
@@ -583,7 +641,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function selectNode(node) {
         if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
-        nodeMap[this.id][node.attributes.id].element.addClassName('iconview_node_selected');
+        nodeMap[this.id][node.attributes.id].element.addClassName('treeview_node_selected');
         this.selectedNodes.push(node);
         this.emitSignal('iwl:select');
     }
@@ -593,7 +651,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var exists = view && view.element;
         if (exists && !view.element.sensitive) return;
         if (exists)
-            view.element.removeClassName('iconview_node_selected');
+            view.element.removeClassName('treeview_node_selected');
         if (!skipRemoval) {
             this.selectedNodes = this.selectedNodes.without(node);
             this.emitSignal('iwl:unselect');
@@ -622,11 +680,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var args = $A(arguments);
             while (args.length) {
                 var path = args.shift(), node;
-                if (path instanceof IWL.ListModel.Node) {
+                if (path instanceof IWL.ListModel.Node)
                     node = path;
-                    this.selectedPaths.push(node.getPath());
-                } else {
-                    this.selectedPaths.push(path);
+                else {
                     if (!Object.isArray(path)) path = [path];
                     node = this.model.getNodeByPath(path) || this.model.getFirstNode();
                 }
@@ -637,7 +693,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
         /**
-         * @returns The active items of the IconView
+         * @returns The active items of the TreeView
          * */
         getActive: function() {
             return this.selectedPaths;
@@ -850,6 +906,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.header = this.down('.treeview_header');
             this.container = this.down('.treeview_content');
             this.container.childContainers = [];
+            this.selectedNodes = [];
             this.containers = {};
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
@@ -885,6 +942,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     normalizeCellAttributes.call(this);
                 this.setHeaderVisibility(true);
             }
+
+            this.signalConnect('mousedown', eventMouseDown.bind(this));
 
             this.emitSignal('iwl:load');
         }
