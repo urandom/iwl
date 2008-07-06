@@ -23,6 +23,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
         Event.delegate(view, 'click', '.iwl-cell-value', function(event) {
             var va = Event.element(event),
                 en = va.nextSibling;
+            if (!en) return;
             en.value = Element.getText(va);
             Element.show(en);
             Element.hide(va);
