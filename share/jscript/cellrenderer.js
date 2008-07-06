@@ -6,17 +6,20 @@ IWL.CellRenderer = Class.create((function() {
 })());
 
 IWL.CellTemplateRenderer = Class.create((function() {
-  var editable = new Template(
-    '<div class="iwl-cell-value">#{value}</div><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
+  var editableCell = new Template(
+    '<div class="iwl-cell-value" iwl:modelColumnIndex="#{modelColumnIndex}">#{value}</div><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
   );
-  var cell = new Template('<div class="iwl-cell-value">#{value}</div>');
+
   return {
     header: new Template('<div class="iwl-header-value">#{title}</div>'),
+    cell: new Template('<div class="iwl-cell-value">#{value}</div>'),
     initialize: function() {
       this.options = Object.extend({}, arguments[0] || {});
 
-      if (this.options.editable && this.options.view) {
+      var editable = this.options.editable;
+      if (editable && this.options.view) {
         var view = this.options.view;
+        this.cell = editableCell;
         Event.delegate(view, 'click', '.iwl-cell-value', function(event) {
             var va = Event.element(event),
                 en = va.nextSibling;
@@ -42,8 +45,8 @@ IWL.CellTemplateRenderer = Class.create((function() {
             if (event.keyCode == Event.KEY_RETURN) {
               var parent = Element.up(en, '.iwl-node');
               if (parent) {
-                if (this.options.editable.commitChange) {
-                  var columnIndex = parseInt(Element.readAttribute(element, 'iwl:modelColumnIndex'));
+                if (editable.commitChange) {
+                  var columnIndex = parseInt(Element.readAttribute(va, 'iwl:modelColumnIndex'));
                   parent.node.setValues(columnIndex, en.value)
                 }
                 Event.emitSignal(view, 'iwl:edit_end', parent, parent.node, en.value);
@@ -55,9 +58,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
       }
     },
     render: function(value, node, columnIndex) {
-      return this.options.editable
-        ? editable.evaluate({value: value})
-        : cell.evaluate({value: value});
+      return this.cell.evaluate({value: value, modelColumnIndex: columnIndex});
     }
   };
 })());
@@ -65,37 +66,41 @@ IWL.CellTemplateRenderer = Class.create((function() {
 IWL.CellTemplateRenderer.String = Class.create(IWL.CellTemplateRenderer);
 
 IWL.CellTemplateRenderer.Int = Class.create(IWL.CellTemplateRenderer, (function() {
-  var editable = new Template(
-    '<div class="iwl-cell-value iwl-cell-value-int">#{value}</div><input style="display: none" class="iwl-cell-editable iwl-cell-editable-int" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
+  var editableCell = new Template(
+    '<div class="iwl-cell-value iwl-cell-value-int" iwl:modelColumnIndex="#{modelColumnIndex}">#{value}</div><input style="display: none" class="iwl-cell-editable iwl-cell-editable-int" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
   );
   var cell = new Template('<div class="iwl-cell-value iwl-cell-int">#{value}</div>');
   return {
+    initialize: function($super, options) {
+      $super(options);
+      this.cell = this.options.editable ? editableCell : cell;
+    },
     render: function(value, node, columnIndex) {
-      return this.options.editable
-        ? editable.evaluate({value: parseInt(value)})
-        : cell.evaluate({value: parseInt(value)});
+      return this.cell.evaluate({value: parseInt(value), modelColumnIndex: columnIndex});
     }
   };
 })());
 
 IWL.CellTemplateRenderer.Float = Class.create(IWL.CellTemplateRenderer, (function() {
-  var editable = new Template(
-    '<div class="iwl-cell-value iwl-cell-value-float">#{value}</div><input style="display: none" class="iwl-cell-editable iwl-cell-editable-float" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
+  var editableCell = new Template(
+    '<div class="iwl-cell-value iwl-cell-value-float" iwl:modelColumnIndex="#{modelColumnIndex}">#{value}</div><input style="display: none" class="iwl-cell-editable iwl-cell-editable-float" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
   );
   var cell = new Template('<div class="iwl-cell-value iwl-cell-float">#{value}</div>');
   return {
+    initialize: function($super, options) {
+      $super(options);
+      this.cell = this.options.editable ? editableCell : cell;
+    },
     render: function(value, node, columnIndex) {
-      return this.options.editable
-        ? editable.evaluate({value: parseFloat(value)})
-        : cell.evaluate({value: parseFloat(value)});
+      return this.cell.evaluate({value: parseFloat(value), modelColumnIndex: columnIndex});
     }
   };
 })());
 
 IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (function() {
   var cell = new Template('<div class="iwl-cell-value iwl-cell-boolean"><div class="#{active}"/></div>');
-  var checkTemplate = new Template('<div class="iwl-cell-value iwl-cell-checkbox"><input type="checkbox" class="checkbox" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
-  var radioTemplate = new Template('<div class="iwl-cell-value iwl-cell-radio"><input type="radio" class="radio" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
+  var checkCell = new Template('<div class="iwl-cell-value iwl-cell-checkbox"><input type="checkbox" class="checkbox" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
+  var radioCell = new Template('<div class="iwl-cell-value iwl-cell-radio"><input type="radio" class="radio" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
 
   function checkCommitChange(element, columnIndex) {
     var parent = Element.up(element, '.iwl-node');
@@ -125,6 +130,7 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
   return {
     initialize: function() {
       this.options = Object.extend({}, arguments[0] || {});
+      this.cell = cell;
 
       var view = this.options.view,
           editable = this.options.editable;
@@ -132,10 +138,12 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
         var commit = editable.commitChange, headerSelector, cellSelector;
         if (editable.booleanRadio) {
           this.header = new Template('<div class="iwl-header-value">#{title}</div>');
+          this.cell = radioCell;
           headerSelector = '.iwl-header-radio input';
           cellSelector = '.iwl-cell-radio input';
         } else {
           this.header = new Template('<div class="iwl-header-value iwl-header-checkbox"><input type="checkbox" class="checkbox" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
+          this.cell = checkCell;
           headerSelector = '.iwl-header-checkbox input';
           cellSelector = '.iwl-cell-checkbox input';
           Event.delegate(view, 'change', headerSelector, function(event) {
@@ -164,38 +172,40 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
       var editable = this.options.editable;
       if (editable) {
         var name = node.columns[columnIndex].name;
-        return (editable.booleanRadio ? radioTemplate : checkTemplate).evaluate({
+        return this.cell.evaluate({
           active: value ? 'checked="checked"' : '',
           name: name + (node.getDepth ? '_' + node.getDepth() : ''),
           value: name + '_' + node.getIndex(),
           modelColumnIndex: columnIndex
         });
       }
-      return cell.evaluate({active: value ? 'iwl-active' : 'iwl-inactive'});
+      return this.cell.evaluate({active: value ? 'iwl-active' : 'iwl-inactive'});
     }
   };
 })());
 
 IWL.CellTemplateRenderer.Count = Class.create(IWL.CellTemplateRenderer, (function() {
-  var editable = new Template(
-    '<div class="iwl-cell-value iwl-cell-value-count">#{value}</div><input style="display: none" class="iwl-cell-editable iwl-cell-editable-count" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
-  );
   var cell = new Template('<div class="iwl-cell-value iwl-cell-count">#{value}</div>');
   return {
+    initialize: function($super, options) {
+      this.options = Object.extend({}, arguments[0] || {});
+      this.cell = cell;
+    },
     render: function(value, node, columnIndex) {
-      return cell.evaluate({value: node.getIndex() + 1 + (node.model.options.offset || 0)});
+      return this.cell.evaluate({value: node.getIndex() + 1 + (node.model.options.offset || 0)});
     }
   };
 })());
 
 IWL.CellTemplateRenderer.Image = Class.create(IWL.CellTemplateRenderer, (function() {
-  var imageTemplate = new Template('<div class="iwl-cell-value iwl-cell-image"><img class="image" src="#{src}" alt="#{alt}" /></div>');
+  var cell = new Template('<div class="iwl-cell-value iwl-cell-image"><img class="image" src="#{src}" alt="#{alt}" /></div>');
   return {
     initialize: function() {
       this.options = Object.extend({}, arguments[0] || {});
+      this.cell = cell;
     },
     render: function(value, node, columnIndex) {
-      return imageTemplate.evaluate(value);
+      return this.cell.evaluate(value);
     }
   };
 })());

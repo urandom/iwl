@@ -117,11 +117,13 @@ sub getModel {
 
 Sets the cell attributes for a particular cell index
 
-Parameter: B<INDEX> - a cell index, B<ATTRIBUTES> - a hash reference of attributes, with the following possible keys:
+Parameter: B<INDEX> - a cell index, B<ATTRIBUTES> - a hash of attributes, with the following possible keys:
 
 =over 8
 
 =item B<renderTemplate>
+
+An L<IWL::Widget> which will be used to draw the cell, overriding the default template. Use L<IWL::String::tS|IWL::String/templateSymbol> to set replace-able template symbols.
 
 =item B<renderFunction>
 
@@ -172,24 +174,24 @@ Fires when editing has ended, changing the value of the cell. The callback recei
 =cut
 
 sub setCellAttributes {
-    my ($self, $index, $attr) = @_;
-    return unless %$attr;
+    my ($self, $index, %attr) = @_;
+    return unless %attr;
 
-    $self->{_options}{cellAttributes}[$index] = $attr;
+    $self->{_options}{cellAttributes}[$index] = \%attr;
 
     return $self;
 }
 
 =item B<getCellAttributes> (B<INDEX>)
 
-Sets the get attributes for a particular cell index
+Gets the get attributes for a particular cell index
 
 Parameter: B<INDEX> - a cell index
 
 =cut
 
 sub getCellAttributes {
-    return shift->{_options}{cellAttributes}[shift];
+    return %{shift->{_options}{cellAttributes}[shift] || {}};
 }
 
 =item B<setActive> (B<PATH>)

@@ -142,11 +142,13 @@ The image cell
 
 =back
 
-B<ATTRIBUTES> - a hash reference of attributes, with the following possible keys:
+B<ATTRIBUTES> - a hash of attributes, with the following possible keys:
 
 =over 8
 
 =item B<renderTemplate>
+
+An L<IWL::Widget> which will be used to draw the cell, overriding the default template. Use L<IWL::String::tS|IWL::String/templateSymbol> to set replace-able template symbols.
 
 =item B<renderFunction>
 
@@ -197,24 +199,24 @@ Fires when editing has ended, changing the value of the cell. The callback recei
 =cut
 
 sub setCellAttributes {
-    my ($self, $type, $attr) = @_;
-    return unless %$attr;
+    my ($self, $type, %attr) = @_;
+    return unless %attr;
 
-    $self->{_options}{cellAttributes}[$type] = $attr;
+    $self->{_options}{cellAttributes}[$type] = \%attr;
 
     return $self;
 }
 
 =item B<getCellAttributes> (B<TYPE>)
 
-Sets the get attributes for a particular cell type
+Gets the get attributes for a particular cell type
 
 Parameter: B<TYPE> - the cell type. See L<IWL::IconView::setCellAttributes|IWL::IconView/setCellAttributes> for more details
 
 =cut
 
 sub getCellAttributes {
-    return shift->{_options}{cellAttributes}[shift];
+    return %{shift->{_options}{cellAttributes}[shift] || {}};
 }
 
 =item B<toggleActive> (B<PATH>)
