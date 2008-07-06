@@ -93,7 +93,7 @@ IWL.CellTemplateRenderer.Float = Class.create(IWL.CellTemplateRenderer, (functio
 })());
 
 IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (function() {
-  var cell = new Template('<div class="iwl-cell-value iwl-cell-boolean">#{value}</div>');
+  var cell = new Template('<div class="iwl-cell-value iwl-cell-boolean"><div class="#{active}"/></div>');
   var checkTemplate = new Template('<div class="iwl-cell-value iwl-cell-checkbox"><input type="checkbox" class="checkbox" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
   var radioTemplate = new Template('<div class="iwl-cell-value iwl-cell-radio"><input type="radio" class="radio" #{active} name="#{name}" value="#{value}" iwl:modelColumnIndex="#{modelColumnIndex}"/></div>');
 
@@ -161,7 +161,6 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
       }
     },
     render: function(value, node, columnIndex) {
-      var bool = (!!value).toString();
       var editable = this.options.editable;
       if (editable) {
         var name = node.columns[columnIndex].name;
@@ -172,7 +171,7 @@ IWL.CellTemplateRenderer.Boolean = Class.create(IWL.CellTemplateRenderer, (funct
           modelColumnIndex: columnIndex
         });
       }
-      return cell.evaluate({value: bool});
+      return cell.evaluate({active: value ? 'iwl-active' : 'iwl-inactive'});
     }
   };
 })());

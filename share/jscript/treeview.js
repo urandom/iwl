@@ -301,9 +301,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
-        var temp = {};
+        var children = container.childElements();
         setTimeout(function() {
-            var children = temp.children;
             for (var i = 0, j = 0, l = children.length; i < l; i++) {
                 var element = children[i];
                 if (!Element.hasClassName(element, 'iwl-node'))
@@ -316,8 +315,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 setNodeAttributes.call(this, container, element, node, indents[node.attributes.id]);
                 cellFunctionRenderer.call(this, element.rows[0].cells, values, node);
             }
-        }.bind(this), 10);
-        temp.children = container.childElements();
+        }.bind(this), 1);
     }
 
     function changeHighlight(node) {
