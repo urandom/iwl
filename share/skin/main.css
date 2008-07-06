@@ -1598,14 +1598,7 @@ div.tooltip_content {
 }
 
 .iwl-cell-boolean .iwl-active {
-    background: url(/iwl/skin/default/images/menu/menu_checkbox.png) no-repeat center;
-    width: 16px;
-    height: 16px;
-    margin: 0 auto;
-}
-
-.iwl-cell-boolean .iwl-inactive {
-    background: url(/iwl/skin/default/images/menu/menu_checkbox_active.png) no-repeat center;
+    background: url(/iwl/skin/default/images/cellrenderer/boolean_active.png) no-repeat center;
     width: 16px;
     height: 16px;
     margin: 0 auto;

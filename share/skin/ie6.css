@@ -120,6 +120,10 @@ div.expander_collapsed .expander_icon {
     margin: -16px 0 0 0;
 }
 
+.iwl-cell-boolean .iwl-active {
+    background-image: url(/iwl/skin/default/images/cellrenderer/boolean_active.gif);
+}
+
 .iconview .iconview_node, .draggable_html_view .iconview_node {
     border: 1px solid white;
 }

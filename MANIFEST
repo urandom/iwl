@@ -157,6 +157,8 @@ share/icons/upload.gif
 share/images/button/button_static.gif
 share/images/button/button_horizontal.gif
 share/images/button/button_vertical.gif
+share/images/cellrenderer/boolean_active.gif
+share/images/cellrenderer/boolean_active.png
 share/images/comboview/arrow.png
 share/images/comboview/button.png
 share/images/contentbox/arrow_left.gif
