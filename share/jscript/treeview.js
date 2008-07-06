@@ -301,11 +301,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
-        var children = container.childElements();
+        var children = container.childNodes;
         setTimeout(function() {
             for (var i = 0, j = 0, l = children.length; i < l; i++) {
                 var element = children[i];
-                if (!Element.hasClassName(element, 'iwl-node'))
+                if (element.nodeType != 1 || !Element.hasClassName(element, 'iwl-node'))
                     continue;
                 var values = [], cMap = this.options.columnMap, node = nodes[j++];
                 for (var k = 0, m = cMap.length; k < m; k++) {
