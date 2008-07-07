@@ -635,7 +635,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function setPager() {
         this.pageControl.unbind();
-        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
+        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
     }
 
     return {

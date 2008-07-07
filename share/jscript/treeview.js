@@ -550,7 +550,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function setPager() {
         this.pageControl.unbind();
-        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
+        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
     }
 
     function eventMouseDown(event) {
@@ -573,7 +573,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventNodeMouseDown(event, node) {
-        if (this.selectedNodes.indexOf(node) > -1) {
+        if (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length)) {
             nodeMap[this.id].skipNodeSelect = true;
             return;
         }
@@ -584,7 +584,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var dragging = this.iwl && this.iwl.draggable
                 ? this.iwl.draggable.dragging
                 : false;
-        if (nodeMap[this.id].skipNodeSelect && !dragging) {
+        if (nodeMap[this.id].skipNodeSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
             toggleSelectNode.call(this, event, node);
             delete nodeMap[this.id].skipNodeSelect;
         }

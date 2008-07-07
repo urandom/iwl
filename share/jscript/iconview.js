@@ -64,8 +64,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
                 changeHighlight.call(this);
             }.bind(this));
-            child.signalConnect('mousedown', eventIconMouseDown.bindAsEventListener(this, node));
-            child.signalConnect('mouseup', eventIconMouseUp.bindAsEventListener(this, node));
+            child.signalConnect('mousedown', eventNodeMouseDown.bindAsEventListener(this, node));
+            child.signalConnect('mouseup', eventNodeMouseUp.bindAsEventListener(this, node));
         }
     }
 
@@ -284,7 +284,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function setPager() {
         this.pageControl.unbind();
-        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName)
+        this.pageControl.bindToWidget($(this.model.options.id), this.options.pageControlEventName);
         if (!this.pageContainer && !this.options.placedPageControl) {
             var pageContainer = new Element('div', {className: 'iconview_page_container', style: "width: " + this.offsetWidth + "px"});
             this.insert({after: pageContainer});
@@ -346,19 +346,19 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         unselectAll.call(this);
     }
 
-    function eventIconMouseDown(event, node) {
-        if (this.selectedNodes.indexOf(node) > -1) {
+    function eventNodeMouseDown(event, node) {
+        if (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length)) {
             nodeMap[this.id].skipIconSelect = true;
             return;
         }
         toggleSelectNode.call(this, event, node);
     }
 
-    function eventIconMouseUp(event, node) {
+    function eventNodeMouseUp(event, node) {
         var dragging = this.iwl && this.iwl.draggable
                 ? this.iwl.draggable.dragging
                 : false;
-        if (nodeMap[this.id].skipIconSelect && !dragging) {
+        if (nodeMap[this.id].skipIconSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
             toggleSelectNode.call(this, event, node);
             delete nodeMap[this.id].skipIconSelect;
         }
@@ -641,12 +641,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         Element.addClassName(element, className);
     }
 
-    function eventIconViewHover(event) {
+    function eventNodeViewHover(event) {
         if (this.__hoverElement && Event.element(event) != this.__hoverElement)
             setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
     }
 
-    function eventIconViewDrop(event, dragElement, dropElement) {
+    function eventNodeViewDrop(event, dragElement, dropElement) {
         var dropNode = dropElement.node;
         for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
             this.model.move(dragElement.selectedNodes[i]);
@@ -801,21 +801,21 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 map.eventDragHover = eventDragHover.bind(this);
             if (!map.eventDragDrop)
                 map.eventDragDrop = eventDragDrop.bind(this);
-            if (!map.eventIconViewHover)
-                map.eventIconViewHover = eventIconViewHover.bind(this);
-            if (!map.eventIconViewDrop)
-                map.eventIconViewDrop = eventIconViewDrop.bind(this);
+            if (!map.eventNodeViewHover)
+                map.eventNodeViewHover = eventNodeViewHover.bind(this);
+            if (!map.eventNodeViewDrop)
+                map.eventNodeViewDrop = eventNodeViewDrop.bind(this);
 
             this.dropActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
                 this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
-                this.signalConnect('iwl:drag_hover', map.eventIconViewHover);
-                this.signalConnect('iwl:drag_drop', map.eventIconViewDrop);
+                this.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
+                this.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
             } else {
                 this.unsetDragDest();
-                this.signalDisconnect('iwl:drag_hover', map.eventIconViewHover);
-                this.signalDisconnect('iwl:drag_drop', map.eventIconViewDrop);
+                this.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
+                this.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
             }
 
             for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
