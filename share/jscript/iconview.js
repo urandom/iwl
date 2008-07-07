@@ -194,12 +194,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 switch(type) {
                     case IWL.ListModel.DataType.STRING:
                         if (this.options.orientation == IWL.IconView.Orientation.HORIZONTAL)
-                            cAttrs.templateRenderer = new IWL.IconView.horizontalTextRenderer(options);
+                            cAttrs.templateRenderer = new IWL.IconView.HorizontalTextRenderer(options);
                         else
-                            cAttrs.templateRenderer = new IWL.IconView.verticalTextRenderer(options);
+                            cAttrs.templateRenderer = new IWL.IconView.VerticalTextRenderer(options);
                         break;
                     case IWL.ListModel.DataType.IMAGE:
-                        cAttrs.templateRenderer = new IWL.CellTemplateRenderer.Image();
+                        cAttrs.templateRenderer = new IWL.IconView.ImageRenderer(options);
                         break;
                 }
             }
@@ -924,19 +924,35 @@ IWL.IconView.CellType = {
     TEXT: 0,
     IMAGE: 1
 };
-IWL.IconView.horizontalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
-    hTextTemplate = new Template('<span class="iconview_node_text iconview_node_text_horizontal iwl-cell-value">#{cellValue}</span><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>');
+IWL.IconView.HorizontalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
+    var editableCell = new Template('<span class="iconview_node_text iconview_node_text_horizontal iwl-cell-value" iwl:modelColumnIndex="#{modelColumnIndex}">#{value}</span><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>');
+    var cell = new Template('<span class="iconview_node_text iconview_node_text_horizontal iwl-cell-value">#{value}</span>');
     return {
-        render: function(value, node) {
-            return hTextTemplate.evaluate({cellValue: value});
+        initialize: function($super, options) {
+            $super(options);
+            this.cell = this.options.editable ? editableCell : cell;
         }
     };
 })());
-IWL.IconView.verticalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
-    vTextTemplate = new Template('<p class="iconview_node_text iconview_node_text_vertical iwl-cell-value">#{cellValue}</p><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>');
+IWL.IconView.VerticalTextRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
+    var editableCell = new Template('<div class="iconview_node_text iconview_node_text_vertical iwl-cell-value" iwl:modelColumnIndex="#{modelColumnIndex}">#{value}</div><input style="display: none" class="iwl-cell-editable" onblur="Element.hide(this); Element.show(this.previousSibling);"/>');
+    var cell = new Template('<div class="iconview_node_text iconview_node_text_vertical iwl-cell-value">#{value}</div>');
     return {
-        render: function(value, node) {
-            return vTextTemplate.evaluate({cellValue: value});
+        initialize: function($super, options) {
+            $super(options);
+            this.cell = this.options.editable ? editableCell : cell;
+        }
+    };
+})());
+IWL.IconView.ImageRenderer = Class.create(IWL.CellTemplateRenderer, (function() {
+    var cell = new Template('<img class="iconview_node_image iwl-cell-value image" src="#{src}" alt="#{alt}" />');
+    return {
+        initialize: function() {
+            this.options = Object.extend({}, arguments[0] || {});
+            this.cell = cell;
+        },
+        render: function(value, node, columnIndex) {
+            return this.cell.evaluate(value);
         }
     };
 })());

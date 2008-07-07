@@ -64,7 +64,18 @@ IWL.CellTemplateRenderer = Class.create((function() {
   };
 })());
 
-IWL.CellTemplateRenderer.String = Class.create(IWL.CellTemplateRenderer);
+IWL.CellTemplateRenderer.String = Class.create(IWL.CellTemplateRenderer, (function() {
+  var editableCell = new Template(
+    '<div class="iwl-cell-value iwl-cell-value-string" iwl:modelColumnIndex="#{modelColumnIndex}">#{value}</div><input style="display: none" class="iwl-cell-editable iwl-cell-editable-string" onblur="Element.hide(this); Element.show(this.previousSibling);"/>'
+  );
+  var cell = new Template('<div class="iwl-cell-value iwl-cell-string">#{value}</div>');
+  return {
+    initialize: function($super, options) {
+      $super(options);
+      this.cell = this.options.editable ? editableCell : cell;
+    }
+  };
+})());
 
 IWL.CellTemplateRenderer.Int = Class.create(IWL.CellTemplateRenderer, (function() {
   var editableCell = new Template(

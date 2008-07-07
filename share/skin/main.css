@@ -1777,18 +1777,25 @@ div.tooltip_content {
     width: auto;
 }
 
-.iconview_node_highlight .iconview_node_text {
-    color: #333;
-    font-style: italic;
-}
 .iconview_node_text, .iconview_node_image {
     border: 1px solid transparent;
 }
 
+.iconview_node_highlight .iconview_node_text,
+.iconview_node_highlight .iconview_node_image {
+    border: 1px solid #6a81a2;
+    background-color: #8ac6f2;
+}
 .iconview_node_selected .iconview_node_text,
 .iconview_node_selected .iconview_node_image {
     border: 1px solid #6a81a2;
-    background-color: #d2d4e3;
+    background-color: #5c8aac;
+    color: white;
+}
+.iconview_node_highlight.iconview_node_selected .iconview_node_text,
+.iconview_node_highlight.iconview_node_selected .iconview_node_image {
+    border: 1px solid #6a81a2;
+    background-color: #348dce;
 }
 
 .iconview_node_hover_top {
@@ -1808,7 +1815,8 @@ div.tooltip_content {
 }
 .iconview_dragged_nodes {
     border: 1px dashed #6a81a2;
-    background-color: #d2d4e3;
+    background-color: #5c8aac;
+    color: white;
     font-size: 2em;
 }
 
@@ -1832,10 +1840,11 @@ div.tooltip_content {
     background: #8ac6f2
 }
 .treeview_node_selected {
-    background-color: #d2d4e3;
+    background-color: #5c8aac;
+    color: white;
 }
 .treeview_node_highlight.treeview_node_selected {
-    background-color: #70b3ea;
+    background-color: #348dce;
 }
 .treeview_node_separator {
     margin: 0 auto;
