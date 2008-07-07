@@ -368,8 +368,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var first = this.selectedNodes[0];
         if (event.type == 'mousedown')
             nodeMap[this.id].iconSelected = true;
-        if (!event.ctrlKey && !event.shiftKey && this.selectedNodes.indexOf(node) > -1)
-            return;
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {

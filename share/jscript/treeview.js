@@ -187,7 +187,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function recreateNode(node, template, container, indent) {
-        var cellTemplate = cellTemplateRenderer.call(this, node), html, id = this.id;
+        var cellTemplate = cellTemplateRenderer.call(this, node), html, id = this.id, parentNode = node.parentNode;
         if (cellTemplate.separator) {
             html = generateSeparator.call(this);
         } else {
@@ -201,9 +201,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
                         ? childCount 
-                            ? parent ? nodeBottomParent : nodeOnlyParent
-                            : parent ? nodeBottomPartial : nodeOnlyPartial
-                        : parent ? nodeBottomLine : nodeLine);
+                            ? parentNode ? nodeBottomParent : nodeOnlyParent
+                            : parentNode ? nodeBottomPartial : nodeOnlyPartial
+                        : parentNode ? nodeBottomLine : nodeLine);
                     newIndent = indent + nodeIndent;
                 }
             } else if (!node.previousSibling) {
@@ -211,9 +211,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
                         ? childCount
-                            ? parent ? nodeParent : nodeTopParent
-                            : parent ? nodePartial : nodeTopPartial
-                        : parent ? nodeLine : nodeTopLine);
+                            ? parentNode ? nodeParent : nodeTopParent
+                            : parentNode ? nodePartial : nodeTopPartial
+                        : parentNode ? nodeLine : nodeTopLine);
                     newIndent = indent + nodeStraightLine;
                 }
             } else if (!node.nextSibling) {
@@ -255,8 +255,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function createNodes(nodes, template, indent) {
-        var html = [], container, indents = {}, nodeLength = nodes.length, parent = nodes[0] ? nodes[0].parentNode : null;
-        var container = createContainer.call(this, parent);
+        var html = [], container, indents = {}, nodeLength = nodes.length, parentNode = nodes[0] ? nodes[0].parentNode : null;
+        var container = createContainer.call(this, parentNode);
         if (!this.flat && !indent)
             indent = '';
         for (var i = 0, node = nodes[0]; i < nodeLength; node = nodes[++i]) {
@@ -272,9 +272,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
                         ? childCount 
-                            ? parent ? nodeBottomParent : nodeOnlyParent
-                            : parent ? nodeBottomPartial : nodeOnlyPartial
-                        : parent ? nodeBottomLine : nodeLine);
+                            ? parentNode ? nodeBottomParent : nodeOnlyParent
+                            : parentNode ? nodeBottomPartial : nodeOnlyPartial
+                        : parentNode ? nodeBottomLine : nodeLine);
                     indents[node.attributes.id] = indent + nodeIndent;
                 }
             } else if (i == 0) {
@@ -282,9 +282,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!this.flat && this.options.drawExpanders) {
                     cellTemplate.indent = indent + (childCount != 0 
                         ? childCount
-                            ? parent ? nodeParent : nodeTopParent
-                            : parent ? nodePartial : nodeTopPartial
-                        : parent ? nodeLine : nodeTopLine);
+                            ? parentNode ? nodeParent : nodeTopParent
+                            : parentNode ? nodePartial : nodeTopPartial
+                        : parentNode ? nodeLine : nodeTopLine);
                     indents[node.attributes.id] = indent + nodeStraightLine;
                 }
             } else if (i + 1 == nodeLength) {
@@ -590,45 +590,71 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function selectNodeRange(from, to, fromPath, toPath) {
+        var tree = !this.flat, depth = from.getDepth(), sibling = from, path = fromPath.clone();
+        do {
+            selectNode.call(this, sibling);
+            if (path[depth] == toPath[depth]) {
+                if (tree && sibling.childCount) {
+                    if (!nodeMap[this.id][sibling.attributes.id].expanded)
+                        return;
+                    var child = sibling.childNodes[0];
+                    path.push(0);
+                    selectNodeRange.call(this, child, to, path, toPath);
+                }
+                return;
+            }
+            if (tree && sibling.childCount)
+                selectDescendantNodes.call(this, sibling);
+            if (sibling == to) return;
+            path[depth]++;
+        } while (sibling = sibling.nextSibling);
+        var parentNode = from.parentNode;
+        if (parentNode && parentNode.nextSibling)
+            selectNodeRange.call(this, parentNode.nextSibling, to, parentNode.nextSibling.getPath(), toPath);
+    }
+
+    function selectDescendantNodes(parentNode) {
+        if (!nodeMap[this.id][parentNode.attributes.id].expanded) return;
+        for (var i = 0, l = parentNode.childCount; i < l; i++) {
+            var child = parentNode.childNodes[i];
+            selectNode.call(this, child);
+            if (child.childCount)
+                selectDescendantNodes.call(this, child);
+        }
+    }
+
     function toggleSelectNode(event, node) {
         var first = this.selectedNodes[0];
         if (event.type == 'mousedown')
             nodeMap[this.id].nodeSelected = true;
-        if (!event.ctrlKey && !event.shiftKey && this.selectedNodes.indexOf(node) > -1)
-            return;
         if (!event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first) {
-            /*
             var map = nodeMap[this.id];
             var fPath = first.getPath(),
                 cPath = node.getPath();
             if (cPath.toString() == fPath.toString())
                 return;
 
-            var property, from, to;
+            var property, from, to, fromPath, toPath;
             for (var i = 0, l = fPath.length; i < l; i++) {
                 if (fPath[i] == cPath[i])
                     continue;
                 if (fPath[i] < cPath[i]) {
-                    from = cPath;
-                    to = fPath;
+                    from = first;
+                    to = node;
+                    fromPath = fPath;
+                    toPath = cPath;
                 } else {
-                    from = fPath;
-                    to = cPath;
+                    from = node;
+                    to = first;
+                    fromPath = cPath;
+                    toPath = fPath;
                 }
                 break;
             }
-            var sibling = first;
-            for (var i = 0, l = Math.abs(fIndex - cIndex) + 1; i < l; i++) {
-                selectNode.call(this, sibling);
-                if (!this.flat && sibling.childCount) {
-                    for (var j = 0, m = sibling.childCount; j < m; j++)
-                        selectNode.call(this, sibling.childNodes[j]);
-                }
-                sibling = sibling[property];
-            }
-            */
+            selectNodeRange.call(this, from, to, fromPath, toPath);
         } else if (event.ctrlKey && this.selectedNodes.length) {
             if (this.selectedNodes.indexOf(node) > -1)
                 unselectNode.call(this, node);
