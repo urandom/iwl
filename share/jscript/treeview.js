@@ -554,12 +554,17 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventMouseDown(event) {
-        if (nodeMap[this.id].nodeSelected) {
-            delete nodeMap[this.id].nodeSelected;
+        var map = nodeMap[this.id];
+        if (map.nodeSelected) {
+            delete map.nodeSelected;
             return;
         }
-        if (nodeMap[this.id].skipNodeSelect)
+        if (map.skipNodeSelect)
             return;
+        if (map.expandNode) {
+            delete map.expandNode;
+            return;
+        }
         if (event.ctrlKey || event.shiftKey)
             return;
 
@@ -573,6 +578,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventNodeMouseDown(event, node) {
+        if (Element.hasClassName(Event.element(event), 'treeview_node_parent')) {
+            nodeMap[this.id].expandNode = true;
+            return;
+        }
         if (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length)) {
             nodeMap[this.id].skipNodeSelect = true;
             return;
