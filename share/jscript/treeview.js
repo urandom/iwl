@@ -108,9 +108,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         element.sensitive = true;
         element.signalConnect('dom:mouseenter', function(event) {
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
             changeHighlight.call(this, node);
         }.bind(this));
         element.signalConnect('dom:mouseleave', function(event) {
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
             changeHighlight.call(this);
         }.bind(this));
 
@@ -704,6 +706,40 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.emitSignal('iwl:unselect_all');
     }
     
+    function boxSelectionInit(event) {
+        var element = Event.element(event);
+        if (element.hasClassName('iwl-cell-editable'))
+            return this.boxSelection.terminateDrag();
+    }
+
+    function boxSelectionEnd(event, draggable, coords) {
+        if (! event.shiftKey && !event.ctrlKey)
+            unselectAll.call(this);
+        var tlCoords = coords[0];
+        var brCoords = coords[1];
+        if (tlCoords[0] < 1) tlCoords[0] = 1;
+        if (tlCoords[1] < 1) tlCoords[1] = 1;
+        
+        var elements = this.container.select('.iwl-node'), tNode, bNode, y1 = tlCoords[1], y2 = brCoords[1];
+        while (elements && !bNode) {
+            var element = elements.shift();
+            var dims = [element.offsetWidth, element.offsetHeight];
+            var pos = [element.offsetLeft, element.offsetTop];
+            if (!tNode) {
+                if (y1 >= pos[1] && y1 <= pos[1] + dims[1]) {
+                    tNode = element.node;
+                    selectNode.call(this, tNode);
+                }
+            }
+            if (tNode && !bNode) {
+                var node = element.node;
+                selectNode.call(this, node);
+                if (y2 >= pos[1] && y2 <= pos[1] + dims[1])
+                    bNode = node;
+            }
+        }
+    }
+
     return {
         /**
          * Sets/unsets the given items as active
@@ -936,6 +972,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 drawExpanders: true,
                 expandEffect: 'blind',
                 expandEffectOptions: {duration: 0.2},
+                boxSelectionOpacity: 0.5,
                 multipleSelection: false,
                 boxSelection: true
             }, arguments[1]);
@@ -967,10 +1004,18 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.setModel(model);
             }
 
+            if (this.options.multipleSelection && this.options.boxSelection) {
+                this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
+                if (this.options.editable)
+                    this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
+            }
+
             if (window.attachEvent)
                 window.attachEvent("onunload", function() {
                     this.model = null;
                     nodeMap[this.id] = {};
+                    if (this.boxSelection)
+                        this.boxSelection.destroy();
                 }.bind(this));
 
             if (this.options.headerVisible) {
@@ -980,6 +1025,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
 
             this.signalConnect('mousedown', eventMouseDown.bind(this));
+            this.signalConnect('iwl:box_selection_end', boxSelectionEnd.bind(this));
 
             this.emitSignal('iwl:load');
         }

@@ -913,9 +913,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         this.boxSelection.destroy();
                 }.bind(this));
 
-            this.emitSignal('iwl:load');
             this.signalConnect('mousedown', eventMouseDown.bind(this));
             this.signalConnect('iwl:box_selection_end', boxSelectionEnd.bind(this));
+
+            this.emitSignal('iwl:load');
         }
     }
 })());
