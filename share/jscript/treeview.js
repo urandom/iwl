@@ -253,7 +253,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             else
                 container.innerHTML = html;
         }
-        var element = next ? map[next.attributes.id].element.previousSibling : container.lastChild;
+        element = next ? map[next.attributes.id].element.previous('.iwl-node') : container.lastChild;
+        if (Element.hasClassName(element.next(), 'treeview_node_container'))
+            createNodes.call(this, node.childNodes, template, newIndent);
         var values = [], cMap = this.options.columnMap;
         for (var j = 0, l = cMap.length; j < l; j++) {
             var index = cMap[j];
@@ -466,7 +468,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function nodeMove(event, node, parentNode, previousParent) {
         var view = nodeMap[this.id][node.attributes.id];
-        if (view.element && view.element.parentNode == previousParent)
+        if (view.element && view.element.parentNode)
             view.element.remove();
 
         nodeInsert.call(this, event, node, parentNode);
@@ -775,27 +777,31 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
-        var dropNode = dropElement.node, index;
+        var dropNode = dropElement.node, index, parentNode;
         switch(dropElement.__hoverState) {
             case hoverOverlapState.TOP:
                 var pivot = dropNode.previousSibling;
                 if (pivot) index = pivot.getIndex() + 1;
                 else index = 0;
+                parentNode = dropNode.parentNode;
                 break;
             case hoverOverlapState.BOTTOM:
-                index = dropNode.getIndex() + 1;
+                index = dropNode.getIndex();
+                parentNode = dropNode.parentNode;
                 break;
             case hoverOverlapState.CENTER:
-                index = dropNode.getIndex() + 1;
+                index = 0;
+                parentNode = dropNode;
                 break;
         }
+        console.log(index, parentNode);
         if (!isNaN(index)) {
             if (actions & IWL.Draggable.Actions.MOVE) {
                 for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-                    this.model.move(dragElement.selectedNodes[i], index);
+                    this.model.move(dragElement.selectedNodes[i], index, parentNode);
             } else if (actions & IWL.Draggable.Actions.COPY) {
                 for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-                    this.model.move(dragElement.selectedNodes[i].clone(), index);
+                    this.model.move(dragElement.selectedNodes[i].clone(), index, parentNode);
             }
         }
         unselectAll.call(dragElement);
@@ -868,8 +874,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (element.__hoverState == state) return;
 
         var view = nodeMap[this.id][element.node.attributes.id];
+        /* Can't bind and pass expandNode, since it will receive a bogus 'recursive' argument */
         if (element.node.childCount && !view.expanded && state == hoverOverlapState.CENTER)
-            view.hoverExpandDelay = setTimeout(function() { this.expandNode(element.node) }.bind(this), 1500);
+            view.hoverExpandDelay = setTimeout(function() { this.expandNode(element.node) }.bind(this), 2000);
 
         if (element.__hoverState) {
             var className;
@@ -1001,7 +1008,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         setTimeout(function() {
                             for (var i = 0, l = node.childCount; i < l; i++) {
                                 var cNode = node.childNodes[i], cView = map[cNode.attributes.id];
-                                unsetDroppableNode.call(this, cNode, cView, map);
+                                setDroppableNode.call(this, cNode, cView, map);
                             }
                         }.bind(this), 10);
                 }

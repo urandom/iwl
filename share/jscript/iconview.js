@@ -104,7 +104,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
         replaceRowSeparators.call(this);
         element = next
-            ? map[next.attributes.id].element.previous('.iconview_node')
+            ? map[next.attributes.id].element.previous('.iwl-node')
             : this.childElements().grep(new Selector('.iwl-node')).last();
         var values = node.getValues(this.options.imageColumn, this.options.textColumn);
         setNodeAttributes.call(this, element, node);
