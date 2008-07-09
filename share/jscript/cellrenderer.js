@@ -23,7 +23,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
         Event.delegate(view, 'click', '.iwl-cell-value', function(event) {
             var va = Event.element(event),
                 en = va.nextSibling;
-            if (!en) return;
+            if (!en || !Element.hasClassName(en, 'iwl-cell-editable')) return;
             en.value = Element.getText(va);
             Element.show(en);
             Element.hide(va);
@@ -39,6 +39,7 @@ IWL.CellTemplateRenderer = Class.create((function() {
             if (event.keyCode != Event.KEY_ESC && event.keyCode != Event.KEY_RETURN) return;
             var en = Event.element(event),
                 va = en.previousSibling;
+            if (!va || !Element.hasClassName(va, 'iwl-cell-value')) return;
             if (event.keyCode == Event.KEY_RETURN)
               va.innerHTML = en.value;
             Element.hide(en);

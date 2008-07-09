@@ -636,7 +636,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function toggleSelectNode(event, node) {
-        var first = this.selectedNodes[0], multiple = this.options.multipleSelection;
+        var first = this.selectedNodes[0], multiple = this.options.multipleSelection, element = Event.element(event);
+        if (element && Element.hasClassName(element, 'iwl-cell-editable'))
+            return;
         if (event.type == 'mousedown')
             nodeMap[this.id].nodeSelected = true;
         if (!multiple || !event.ctrlKey)
