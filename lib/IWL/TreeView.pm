@@ -223,7 +223,7 @@ sub getCellAttributes {
 
 =item B<toggleActive> (B<PATH>)
 
-Sets the active item of the L<IWL::IconView>
+Sets the active item of the L<IWL::TreeView>
 
 Parameters: B<PATH> - the model path (or an index for flat models) for the item
 
@@ -311,6 +311,55 @@ sub getHeaderVisibility {
     return shift->{_options}{headerVisible};
 }
 
+=item B<setModelDragSource> (B<BOOL>, [B<ACTIONS>])
+
+Enables or disables item dragging in the tree view
+
+Parameters: B<BOOL> - if true, item dragging is enabled. B<ACTIONS> - Can be either B<MOVE> (I<default>) or B<COPY>, where B<MOVE> - with remove the node, associated with the item on a successfull drop.
+
+=cut
+
+sub setModelDragSource {
+    my ($self, $bool, $actions) = @_;
+
+    $self->{__dragSource} = !(!$bool);
+    $self->{__dragSourceActions} = $actions;
+
+    return $self;
+}
+
+=item B<setModelDragDest> (B<BOOL>, [B<ACTIONS>])
+
+Enables or disables drag destination to the tree view items.
+
+Parameters: B<BOOL> - if true, item destination is enabled. B<ACTIONS> - Can be either B<MOVE> (I<default>) or B<COPY>, where B<MOVE> - with remove the node, associated with the drag source item on a successfull drop.
+
+=cut
+
+sub setModelDragDest {
+    my ($self, $bool, $actions) = @_;
+
+    $self->{__dragDest} = !(!$bool);
+    $self->{__dragDestActions} = $actions;
+
+    return $self;
+}
+
+=item B<setReorderable> (B<BOOL>)
+
+Enables automatic reordering of nodes via D&D
+
+Parameters: B<BOOL> - if true, D&D reordering will be enabled
+
+=cut
+
+sub setReorderable {
+    my ($self, $bool) = @_;
+    $self->{__reorderable} = !(!$bool);
+
+    return $self;
+}
+
 # Protected
 #
 sub _realize {
@@ -366,11 +415,24 @@ sub _realize {
             if $attrs->{renderTemplate};
         $self->{_options}{editable} = 1 if $attrs->{editable};
     }
+    $self->prependClass('iwl-node-container');
     $self->appendClass($self->{_defaultClass} . '_editable')
         if $self->{_options}{editable};
     my $options = toJSON($self->{_options});
+    my $dragAction = 'IWL.Draggable.Actions.' . ($self->{__dragSourceActions} || 'MOVE');
+    my $dropAction = 'IWL.Draggable.Actions.' . ($self->{__dragDestActions} || 'MOVE');
 
-    $self->_appendInitScript("IWL.TreeView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);");
+    $self->_appendInitScript(<<EOF);
+(function() {
+    var tv = IWL.TreeView.create('$id', @{[$model ? $model->toJSON : 'null']}, $options);
+    if ('$self->{__dragSource}')
+        tv.setModelDragSource(true, $dragAction);
+    if ('$self->{__dragDest}')
+        tv.setModelDragDest(true, $dropAction);
+    if ('$self->{__reorderable}')
+        tv.setReorderable(true);
+})();
+EOF
 }
 
 sub _init {

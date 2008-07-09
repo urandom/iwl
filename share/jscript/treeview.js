@@ -15,7 +15,14 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         nodeParent = '<div class="treeview_node_indent treeview_node_parent treeview_node_normal_parent"></div>',
         nodePartial = '<div class="treeview_node_indent treeview_node_parent treeview_node_normal_partial"></div>',
         nodeLine = '<div class="treeview_node_indent treeview_node_line"></div>',
-        indentFragment = /^(.*)<div[^>]+><\/div>$/;
+        indentFragment = /^(.*)<div[^>]+><\/div>$/,
+        dragMultipleNodes = new Template('<span class="treeview_dragged_nodes">#{text}</span>'),
+        hoverOverlapState = {
+            NONE:   0,
+            TOP:    1,
+            BOTTOM: 2,
+            CENTER: 3
+        };
 
     function connectSignals() {
         Event.delegate(this, 'click', '.treeview_node_parent', function(event) {
@@ -742,6 +749,149 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 
+    function setDroppableNode(node, view, map) {
+        var element = view.element, self = this;
+        setTimeout(function() {
+            element.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: self.dropActions});
+            element.signalConnect('iwl:drag_hover', map.eventDragHover);
+            element.signalConnect('iwl:drag_drop', map.eventDragDrop);
+        }, 5);
+    }
+
+    function unsetDroppableNode(node, view, map) {
+        var element = view.element;
+        setTimeout(function() {
+            element.unsetDragDest();
+            element.signalDisconnect('iwl:drag_hover', map.eventDragHover);
+            element.signalDisconnect('iwl:drag_drop', map.eventDragDrop);
+        }, 5);
+    }
+
+    function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
+        var dropNode = dropElement.node, index;
+        switch(dropElement.__hoverState) {
+            case hoverOverlapState.TOP:
+                var pivot = dropNode.previousSibling;
+                if (pivot) index = pivot.getIndex() + 1;
+                else index = 0;
+                break;
+            case hoverOverlapState.BOTTOM:
+                index = dropNode.getIndex() + 1;
+                break;
+            case hoverOverlapState.CENTER:
+                index = dropNode.getIndex() + 1;
+                break;
+        }
+        if (!isNaN(index)) {
+            if (actions & IWL.Draggable.Actions.MOVE) {
+                for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
+                    this.model.move(dragElement.selectedNodes[i], index);
+            } else if (actions & IWL.Draggable.Actions.COPY) {
+                for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
+                    this.model.move(dragElement.selectedNodes[i].clone(), index);
+            }
+        }
+        unselectAll.call(dragElement);
+        setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
+    }
+
+    function eventDragHover(event, dragElement, dropElement) {
+        var dropNode = dropElement.node;
+        if (dropNode.isAncestor) {
+            for (var i = 0, l = dragElement.selectedNodes.length; i < l; i++) {
+                if (dropNode.isAncestor(dragElement.selectedNodes[i]))
+                    return;
+            }
+        }
+        if (this.selectedNodes.indexOf(dropNode) > -1)
+            return;
+
+        var vOverlap = Position.overlap('vertical', dropElement);
+        var state = hoverOverlapState.NONE;
+        var vCenter = false;
+
+        if (vOverlap < 0.3)
+            state = hoverOverlapState.BOTTOM;
+        else if (vOverlap > 0.7)
+            state = hoverOverlapState.TOP;
+        else
+            state = hoverOverlapState.CENTER;
+
+        setElementHoverState.call(this, dropElement, state);
+    }
+
+    function eventDragInit(event, draggable) {
+        draggable.options.view = IWL.Draggable.HTMLView;
+        if (this.selectedNodes.length == 0)
+            return draggable.terminateDrag();
+        if (this.selectedNodes.length == 1) {
+            var cellTemplate = cellTemplateRenderer.call(this, this.selectedNodes[0]);
+            draggable.options.viewOptions = {string: generateNodeTemplate.call(this).evaluate(cellTemplate)};
+        } else if (this.selectedNodes.length > 1) {
+            var text = {text: IWL.TreeView.messages.multipleDrag.interpolate({count: "<strong>" + this.selectedNodes.length + "</strong>"})};
+            draggable.options.viewOptions = {string: dragMultipleNodes.evaluate(text)};
+        }
+
+        if (this.scrollLeft || this.scrollTop) {
+            Position.__includeScrollOffsets = Position.includeScrollOffsets;
+            Position.includeScrollOffsets = true;
+        } else if (Position.__includeScrollOffsets) {
+            Position.includeScrollOffsets = Position.__includeScrollOffsets;
+        }
+    }
+
+    function setElementHoverState(element, state) {
+        if (this.__hoverElement && this.__hoverElement != element)
+            setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
+
+        if (element.__hoverState) {
+            var className;
+            switch(element.__hoverState) {
+                case hoverOverlapState.TOP:
+                    className = 'treeview_node_hover_top';
+                    break;
+                case hoverOverlapState.BOTTOM:
+                    className = 'treeview_node_hover_bottom';
+                    break;
+                case hoverOverlapState.CENTER:
+                    className = 'treeview_node_hover_center';
+                    break;
+            }
+            Element.removeClassName(element, className);
+        }
+
+        element.__hoverState = state;
+        var className = '';
+        switch(state) {
+            case hoverOverlapState.TOP:
+                className = 'treeview_node_hover_top';
+                break;
+            case hoverOverlapState.BOTTOM:
+                className = 'treeview_node_hover_bottom';
+                break;
+            case hoverOverlapState.CENTER:
+                className = 'treeview_node_hover_center';
+                break;
+            default:
+                this.__hoverElement = undefined;
+                return;
+        }
+        this.__hoverElement = element;
+        Element.addClassName(element, className);
+    }
+
+    function eventNodeViewHover(event) {
+        if (this.__hoverElement && Event.element(event) != this.__hoverElement)
+            setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
+    }
+
+    function eventNodeViewDrop(event, dragElement, dropElement) {
+        var dropNode = dropElement.node;
+        for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
+            this.model.move(dragElement.selectedNodes[i]);
+        unselectAll.call(dragElement);
+    }
+
     return {
         /**
          * Sets/unsets the given items as active
@@ -810,7 +960,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node || node.childCount == 0) return;
-            var view = nodeMap[this.id][node.attributes.id];
+            var map = nodeMap[this.id], view = map[node.attributes.id];
             if (!view.element || view.expanded) return;
             if (node.childCount) {
                 if (!view.childContainer) {
@@ -820,6 +970,13 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     next
                         ? view.element.parentNode.insertBefore(view.childContainer, next)
                         : view.element.parentNode.appendChild(view.childContainer);
+                    if (this.options.dragDest)
+                        setTimeout(function() {
+                            for (var i = 0, l = node.childCount; i < l; i++) {
+                                var cNode = node.childNodes[i], cView = map[cNode.attributes.id];
+                                unsetDroppableNode.call(this, cNode, cView, map);
+                            }
+                        }.bind(this), 10);
                 }
             }
 
@@ -829,7 +986,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 Element.addClassName(view.element, 'treeview_node_expanded');
                 if (recursive) {
                     for (var i = 0, l = node.childCount; i < l; i++)
-                        this.expandNode(node.childNodes[i], recursive, true);
+                        this.expandNode.bind(this, node.childNodes[i], recursive, true).defer();
                 }
                 if (this.options.expandEffect && !arguments[2]) {
                     Effect.toggle(
@@ -963,6 +1120,117 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.header.visible();
         },
 
+        /**
+         * Enables/Disables icon dragging for the Icon View
+         * @param {Boolean} bool If true, dragging will be enabled for the Icon View
+         * @param {Bitmask} actions The drag source actions. See IWL.Draggable.Actions
+         * @returns The object
+         * */
+        setModelDragSource: function(bool, actions) {
+            if (this.options.dragSource == (bool = !!bool))
+                return;
+
+            this.options.dragSource = bool;
+            var map = nodeMap[this.id];
+            if (!map.eventDragInit)
+                map.eventDragInit = eventDragInit.bind(this);
+            this.dragActions = actions || IWL.Draggable.Actions.MOVE;
+
+            if (bool) {
+                this.setDragSource({revert: true, actions: this.dragActions});
+                this.signalConnect('iwl:drag_init', map.eventDragInit);
+            } else {
+                this.unsetDragSource();
+                this.signalDisconnect('iwl:drag_init', map.eventDragInit);
+            }
+
+            if (Prototype.Browser.IE && this.boxSelection) {
+                this.boxSelection.destroy();
+                this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
+            }
+
+            return this;
+        },
+        /**
+         * @returns True, if the Icon View is a drag source
+         * */
+        getModelDragSource: function() {
+            return this.options.dragSource;
+        },
+        /**
+         * Enables/Disables icon dropping for the Icon View
+         * @param {Boolean} bool If true, icon dropping will be enabled for the Icon View
+         * @param {Bitmask} actions The drag source actions. See IWL.Draggable.Actions
+         * @returns The object
+         * */
+        setModelDragDest: function(bool, actions) {
+            if (this.options.dragDest == (bool = !!bool))
+                return;
+
+            this.options.dragDest = bool;
+            var map = nodeMap[this.id];
+            if (!map.eventDragHover)
+                map.eventDragHover = eventDragHover.bind(this);
+            if (!map.eventDragDrop)
+                map.eventDragDrop = eventDragDrop.bind(this);
+            if (!map.eventNodeViewHover)
+                map.eventNodeViewHover = eventNodeViewHover.bind(this);
+            if (!map.eventNodeViewDrop)
+                map.eventNodeViewDrop = eventNodeViewDrop.bind(this);
+
+            this.dropActions = actions || IWL.Draggable.Actions.MOVE;
+
+            if (bool) {
+                this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
+                this.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
+                this.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
+            } else {
+                this.unsetDragDest();
+                this.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
+                this.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
+            }
+
+            var self = this;
+            setTimeout(function() {
+                self.model._each(function(node) {
+                    var view = map[node.attributes.id];
+                    if (!view) return;
+                    bool
+                        ? setDroppableNode.call(self, node, view, map)
+                        : unsetDroppableNode.call(self, node, view, map);
+                    });
+            }, 10);
+            
+            return this;
+        },
+        /**
+         * @returns True, if the Icon View is a drag destination
+         * */
+        getModelDragDest: function() {
+            return this.options.dragDest;
+        },
+        /**
+         * Sets whether the user can reorder the model by dragging/dropping icons
+         * @param {Boolean} bool If true, the user can drag icons in order to reorder the model
+         * @returns The object
+         * */
+        setReorderable: function(bool) {
+            bool = !!bool;
+            if (this.options.reorderable == bool)
+                return;
+
+            this.options.reorderable = bool;
+            this.setModelDragSource(bool);
+            this.setModelDragDest(bool);
+            return this;
+        },
+        /**
+         * @returns True, if the icons can be reordered by dragging
+         * */
+        getReorderable: function() {
+            return this.options.reorderable;
+        },
+
         _init: function(model) {
             this.options = Object.extend({
                 columnWidth: [],
@@ -1033,3 +1301,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
     }
 })());
+IWL.TreeView.messages = {
+    multipleDrag: "#{count} selected nodes"
+};

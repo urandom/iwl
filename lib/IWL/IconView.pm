@@ -376,6 +376,7 @@ sub _realize {
             if $attrs->{renderTemplate};
         $self->{_options}{editable} = 1 if $attrs->{editable};
     }
+    $self->prependClass('iwl-node-editable');
     $self->prependClass($self->{_defaultClass} . '_editable')
         if $self->{_options}{editable};
     $self->{_options}{columns} = $default_columns

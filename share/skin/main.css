@@ -1968,3 +1968,18 @@ div.tooltip_content {
     background-image:url('/iwl/skin/default/images/entry/entry_bg.gif');
 }
 
+.treeview_node_hover_top {
+    border-top: 1px dotted #273346;
+}
+.treeview_node_hover_bottom {
+    border-bottom: 1px dotted #273346;
+}
+.treeview_node_hover_center {
+    border: 1px dotted #273346;
+}
+.treeview_dragged_nodes {
+    border: 1px dashed #6a81a2;
+    background-color: #5c8aac;
+    color: white;
+    font-size: 2em;
+}

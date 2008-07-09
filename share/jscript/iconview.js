@@ -622,19 +622,19 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         switch(state) {
             case hoverOverlapState.TOP:
                 className = 'iconview_node_hover_top';
-                    break;
+                break;
             case hoverOverlapState.BOTTOM:
                 className = 'iconview_node_hover_bottom';
-                    break;
+                break;
             case hoverOverlapState.LEFT:
                 className = 'iconview_node_hover_left';
-                    break;
+                break;
             case hoverOverlapState.RIGHT:
                 className = 'iconview_node_hover_right';
-                    break;
+                break;
             case hoverOverlapState.CENTER:
                 className = 'iconview_node_hover_center';
-                    break;
+                break;
             default:
                 this.__hoverElement = undefined;
                 return;
@@ -876,7 +876,6 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));
                 this.pageControl.signalConnect('iwl:current_page_change', pageChange.bind(this));
             }
-            this.addClassName('iwl-node-container');
             this.selectedNodes = [];
 
             getIconMargin.call(this);
