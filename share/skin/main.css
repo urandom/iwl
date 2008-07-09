@@ -1983,3 +1983,8 @@ div.tooltip_content {
     color: white;
     font-size: 2em;
 }
+
+.draggable_html_view .treeview_node {
+    background-color: #5c8aac;
+    color: white;
+}

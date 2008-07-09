@@ -503,6 +503,13 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }, 5);
     }
 
+    function eventDropMouseOver(event) {
+        var element = Event.element(event);
+        if (Element.hasClassName(element, 'iwl-cell-value') || Element.up(element, '.iwl-cell-value') || !this.__hoverElement)
+            return;
+        setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
+    }
+
     function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
         var dropNode = dropElement.node, index;
         switch(dropElement.__hoverState) {
@@ -594,6 +601,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function setElementHoverState(element, state) {
         if (this.__hoverElement && this.__hoverElement != element)
             setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
+        if (element.__hoverState == state) return;
 
         if (element.__hoverState) {
             var className;
@@ -803,6 +811,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 map.eventDragHover = eventDragHover.bind(this);
             if (!map.eventDragDrop)
                 map.eventDragDrop = eventDragDrop.bind(this);
+            if (!map.eventDropMouseOver)
+                map.eventDropMouseOver = eventDropMouseOver.bind(this);
             if (!map.eventNodeViewHover)
                 map.eventNodeViewHover = eventNodeViewHover.bind(this);
             if (!map.eventNodeViewDrop)
@@ -814,10 +824,14 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
                 this.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
                 this.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
+                this.signalConnect('mouseover', map.eventDropMouseOver);
+                this.signalConnect('mouseout', map.eventDropMouseOver);
             } else {
                 this.unsetDragDest();
                 this.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
                 this.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
+                this.signalDisconnect('mouseover', map.eventDropMouseOver);
+                this.signalDisconnect('mouseout', map.eventDropMouseOver);
             }
 
             for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
