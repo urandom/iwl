@@ -382,8 +382,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
 })());
 
 (function() {
-  var show       = Droppables.show,
-      isAffected = Droppables.isAffected;
+  var show = Droppables.show;
 
   Droppables.show = function(point, element) {
     if (element.originalElement)
@@ -392,20 +391,41 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       show.call(Droppables, point, element);
   };
   Droppables.isAffected = function(point, element, drop) {
+    if (drop.element == element) return false;
     if (element.iwl && element.iwl.draggable) {
       if (!(element.iwl.draggable.options.actions & drop.actions))
         return false;
     }
-    return isAffected.call(Droppables, point, element, drop);
-  };
-  Droppables.isContained = function(element, drop) {
-    var containmentNode;
-    if(drop.tree) {
-      containmentNode = element.treeNode; 
-    } else {
-      containmentNode = element.parentNode;
+    if (drop._containers) {
+      var containmentNode;
+      if(drop.tree) {
+        containmentNode = element.treeNode; 
+      } else {
+        containmentNode = element.parentNode;
+      }
+      var contained = false;
+      for (var i = 0, l = drop._containers.length; i < l; i ++) {
+        var c = drop._containers[i];
+        if (element == c || containmentNode ==c) {
+          contained = true;
+          break;
+        }
+      }
+      if (!contained) return false;
     }
-    return drop._containers.detect(function(c) { return element == c || containmentNode == c });
+
+    if (drop.accept) {
+      var classNames = element.className.split(/\s+/), accepted = false;
+      for (var i = 0, l = classNames.length; i < l; i++) {
+        if (drop.accept.indexOf(classNames[i]) > -1) {
+          accepted = true;
+          break;
+        }
+      }
+      if (!accepted) return false;
+    }
+
+    return Position.within(drop.element, point[0], point[1]);
   };
 })();
 

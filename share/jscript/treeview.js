@@ -828,6 +828,19 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var cellTemplate = cellTemplateRenderer.call(this, this.selectedNodes[0]);
             draggable.options.viewOptions = {string: generateNodeTemplate.call(this).evaluate(cellTemplate)};
         } else if (this.selectedNodes.length > 1) {
+            if (this.selectedNodes[0].isDescendant) {
+                var descendants = [];
+                for (var i = 0, l = this.selectedNodes.length; i < l; i++) {
+                    for (var j = 0, m = this.selectedNodes.length; j < m; j++) {
+                        if (this.selectedNodes[i].isDescendant(this.selectedNodes[j])) {
+                            descendants.push(this.selectedNodes[i]);
+                            break;
+                        }
+                    }
+                }
+                for (var i = 0, l = descendants.length; i < l; i++)
+                    unselectNode.call(this, descendants[i]);
+            }
             var text = {text: IWL.TreeView.messages.multipleDrag.interpolate({count: "<strong>" + this.selectedNodes.length + "</strong>"})};
             draggable.options.viewOptions = {string: dragMultipleNodes.evaluate(text)};
         }
