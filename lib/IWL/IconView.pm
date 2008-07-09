@@ -74,6 +74,14 @@ The name/index of the column in the model, which will be used to display the ima
 
 Sets the orientation of the icons. With B<IWL::IconView::Orientation-E<gt>{VERTICAL}> (I<default>), the label will appear below the image. With B<IWL::IconView::Orientation-E<gt>{HORIZONTAL}>, the label will appear beside the image.
 
+=item B<multipleSelection>
+
+Sets whether multiple items can be selected. Defaults to I<''>
+
+=item B<boxSelection>
+
+If selecting multiple items is enabled, setting this option to a true value will allow the user to select multiple items by dragging a rectangular shape around them. Defaults to I<1>
+
 =back
 
 =cut
@@ -400,10 +408,12 @@ sub _init {
 
     $self->{_options} = {initialActive => []};
     $self->{_options}{orientation} = defined $args{orientation} ? $args{orientation} : Orientation->{VERTICAL};
-    $self->{_options}{columns}     = $args{columns}     if defined $args{columns};
-    $self->{_options}{columnWidth} = $args{columnWidth} if defined $args{columnWidth};
-    $self->{_options}{textColumn}  = $args{textColumn}  if defined $args{textColumn};
-    $self->{_options}{imageColumn} = $args{imageColumn} if defined $args{imageColumn};
+    $self->{_options}{columns}           = $args{columns}           if defined $args{columns};
+    $self->{_options}{columnWidth}       = $args{columnWidth}       if defined $args{columnWidth};
+    $self->{_options}{textColumn}        = $args{textColumn}        if defined $args{textColumn};
+    $self->{_options}{imageColumn}       = $args{imageColumn}       if defined $args{imageColumn};
+    $self->{_options}{multipleSelection} = $args{multipleSelection} if defined $args{multipleSelection};
+    $self->{_options}{boxSelection}      = $args{boxSelection}      if defined $args{boxSelection};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -413,7 +423,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columns columnWidth orientation textColumn imageColumn cellAttributes model)};
+    delete @args{qw(columns columnWidth orientation textColumn imageColumn multipleSelection boxSelection cellAttributes model)};
 
     # TRANSLATORS: #{count} is a placeholder
     my $translations = toJSON({multipleDrag => __"#{count} selected icons"});

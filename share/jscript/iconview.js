@@ -347,7 +347,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventNodeMouseDown(event, node) {
-        if (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length)) {
+        if (this.options.multipleSelection && (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length))) {
             nodeMap[this.id].skipIconSelect = true;
             return;
         }
@@ -365,12 +365,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function toggleSelectNode(event, node) {
-        var first = this.selectedNodes[0];
+        var first = this.selectedNodes[0], multiple = this.options.multipleSelection;
         if (event.type == 'mousedown')
             nodeMap[this.id].iconSelected = true;
-        if (!event.ctrlKey)
+        if (!multiple || !event.ctrlKey)
             unselectAll.call(this)
-        if (event.shiftKey && first) {
+        if (event.shiftKey && first && multiple) {
             var map = nodeMap[this.id];
             var fIndex = first.getIndex();
             var cIndex = node.getIndex();
@@ -865,7 +865,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 maxHeight: 400,
                 popUpDelay: 0.2,
                 boxSelectionOpacity: 0.5,
-                dragActions: IWL.Draggable.Actions.MOVE
+                dragActions: IWL.Draggable.Actions.MOVE,
+                multipleSelection: false,
+                boxSelection: true
             }, arguments[1]);
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
@@ -897,13 +899,15 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
 
             this.state = 0;
-            this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
-            if (this.options.editable)
-                this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
+            if (this.options.multipleSelection && this.options.boxSelection) {
+                this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
+                if (this.options.editable)
+                    this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
+            }
 
             if (window.attachEvent)
                 window.attachEvent("onunload", function() {
-                    this.model = this.pageContainer = this.boxSelection = null;
+                    this.model = this.pageContainer = null;
                     nodeMap[this.id] = {};
                     if (this.boxSelection)
                         this.boxSelection.destroy();

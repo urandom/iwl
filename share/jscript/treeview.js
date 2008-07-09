@@ -931,7 +931,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 columnClass: [],
                 cellAttributes: [],
                 initialPath: [],
-                maxHeight: 400,
                 popUpDelay: 0.2,
                 headerVisible: true,
                 drawExpanders: true,

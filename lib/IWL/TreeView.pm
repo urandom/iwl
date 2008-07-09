@@ -52,13 +52,13 @@ An array reference of column names/indices which will be used to build the combo
 
 An array reference of cell attributes per column. See L<IWL::TreeView::setCellAttributes|IWL::TreeView/setCellAttributes>
 
-=item B<contentHeight>
+=item B<multipleSelection>
 
-The height, in pixels, of the comboview content area
+Sets whether multiple items can be selected.
 
-=item B<maxHeight>
+=item B<boxSelection>
 
-The maximum height, in pixels, of the combo popups
+If selecting multiple items is enabled, setting this option to a true value will allow the user to select multiple items by dragging a rectangular shape around them. Defaults to I<1>
 
 =back
 
@@ -360,9 +360,6 @@ sub _realize {
         }
     }
 
-    $self->{__content}->setStyle(height => $self->{_options}{contentHeight} . 'px')
-        if $self->{_options}{contentHeight};
-
     foreach my $attrs (@{$self->{_options}{cellAttributes}}) {
         next unless 'HASH' eq ref $attrs;
         $attrs->{renderTemplate} = $attrs->{renderTemplate}->getContent
@@ -392,8 +389,9 @@ sub _init {
     $self->{_options}{columnWidth}   = $args{columnWidth}   if 'ARRAY' eq ref $args{columnWidth};
     $self->{_options}{columnClass}   = $args{columnClass}   if 'ARRAY' eq ref $args{columnClass};
     $self->{_options}{columnMap}     = $args{columnMap}     if 'ARRAY' eq ref $args{columnMap};
-    $self->{_options}{contentHeight} = $args{contentHeight} if $args{contentHeight};
-    $self->{_options}{maxHeight}     = $args{maxHeight}     if defined $args{maxHeight};
+
+    $self->{_options}{multipleSelection} = $args{multipleSelection} if defined $args{multipleSelection};
+    $self->{_options}{boxSelection}      = $args{boxSelection}      if defined $args{boxSelection};
 
     $self->setModel($args{model}) if defined $args{model};
 
@@ -403,7 +401,7 @@ sub _init {
             foreach @{$args{cellAttributes}};
     }
 
-    delete @args{qw(columnWidth columnClass columnMap cellAttributes contentHeight maxHeight model)};
+    delete @args{qw(columnWidth columnClass columnMap multipleSelection boxSelection cellAttributes model)};
 
     $self->requiredJs('base.js', 'dist/delegate.js', 'cellrenderer.js', 'treeview.js');
     $self->_constructorArguments(%args);
