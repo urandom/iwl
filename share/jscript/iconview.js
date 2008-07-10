@@ -510,11 +510,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
     }
 
-    function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
-        if (!Element.hasClassName(dragElement, 'iwl-view'))
-            dragElement = Element.up(dragElement, '.iwl-view');
-        var dropNode = dropElement.node, index;
-        switch(dropElement.__hoverState) {
+    function eventDragDrop(event, sourceElement, destElement, sourceEvent, actions) {
+        var sourceView = Element.getDragData(sourceElement), dropNode = destElement.node, index;
+        switch(destElement.__hoverState) {
             case hoverOverlapState.TOP:
                 var pivot = dropNode.previous(this.columns - 1);
                 if (pivot) index = pivot.getIndex() + 1;
@@ -539,24 +537,24 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
         if (!isNaN(index)) {
             if (actions & IWL.Draggable.Actions.MOVE) {
-                for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-                    this.model.move(dragElement.selectedNodes[i], index);
+                for (var i = sourceView.selectedNodes.length - 1; i > -1; --i)
+                    this.model.move(sourceView.selectedNodes[i], index);
             } else if (actions & IWL.Draggable.Actions.COPY) {
-                for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-                    this.model.move(dragElement.selectedNodes[i].clone(), index);
+                for (var i = sourceView.selectedNodes.length - 1; i > -1; --i)
+                    this.model.move(sourceView.selectedNodes[i].clone(), index);
             }
         }
-        unselectAll.call(dragElement);
-        setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
+        unselectAll.call(sourceView);
+        setElementHoverState.call(this, destElement, hoverOverlapState.NONE);
     }
 
-    function eventDragHover(event, dragElement, dropElement) {
-        var dropNode = dropElement.node;
+    function eventDragHover(event, sourceElement, destElement) {
+        var dropNode = destElement.node;
         if (this.selectedNodes.indexOf(dropNode) > -1)
             return;
 
-        var hOverlap = Position.overlap('horizontal', dropElement);
-        var vOverlap = Position.overlap('vertical', dropElement);
+        var hOverlap = Position.overlap('horizontal', destElement);
+        var vOverlap = Position.overlap('vertical', destElement);
         var state = hoverOverlapState.NONE;
         var hCenter = vCenter = false;
         if (hOverlap < 0.3)
@@ -576,7 +574,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (hCenter && vCenter)
             state = hoverOverlapState.CENTER;
 
-        setElementHoverState.call(this, dropElement, state);
+        setElementHoverState.call(this, destElement, state);
     }
 
     function eventDragInit(event, draggable) {
@@ -658,13 +656,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
     }
 
-    function eventNodeViewDrop(event, dragElement, dropElement) {
-        if (!Element.hasClassName(dragElement, 'iwl-view'))
-            dragElement = Element.up(dragElement, '.iwl-view');
-        var dropNode = dropElement.node;
-        for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-            this.model.move(dragElement.selectedNodes[i]);
-        unselectAll.call(dragElement);
+    function eventNodeViewDrop(event, sourceElement, destElement) {
+        var sourceView = Element.getDragData(sourceElement), dropNode = destElement.node;
+        for (var i = sourceView.selectedNodes.length - 1; i > -1; --i)
+            this.model.move(sourceView.selectedNodes[i]);
+        unselectAll.call(sourceView);
     }
 
     return {
@@ -780,6 +776,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             if (bool) {
                 this.setDragSource({revert: true, actions: this.dragActions});
+                this.content.setDragData(this);
                 this.signalConnect('iwl:drag_init', map.eventDragInit);
             } else {
                 this.unsetDragSource();

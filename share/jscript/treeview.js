@@ -789,11 +789,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
     }
 
-    function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
-        if (!Element.hasClassName(dragElement, 'iwl-view'))
-            dragElement = Element.up(dragElement, '.iwl-view');
-        var dropNode = dropElement.node, index, parentNode;
-        switch(dropElement.__hoverState) {
+    function eventDragDrop(event, sourceElement, destElement, sourceEvent, actions) {
+        var sourceView = Element.getDragData(sourceElement), dropNode = destElement.node, index, parentNode;
+        switch(destElement.__hoverState) {
             case hoverOverlapState.TOP:
                 var pivot = dropNode.previousSibling;
                 if (pivot) index = pivot.getIndex() + 1;
@@ -811,31 +809,29 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
         if (!isNaN(index)) {
             if (actions & IWL.Draggable.Actions.MOVE) {
-                for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-                    this.model.move(dragElement.selectedNodes[i], index, parentNode);
+                for (var i = sourceView.selectedNodes.length - 1; i > -1; --i)
+                    this.model.move(sourceView.selectedNodes[i], index, parentNode);
             } else if (actions & IWL.Draggable.Actions.COPY) {
-                for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-                    this.model.move(dragElement.selectedNodes[i].clone(), index, parentNode);
+                for (var i = sourceView.selectedNodes.length - 1; i > -1; --i)
+                    this.model.move(sourceView.selectedNodes[i].clone(), index, parentNode);
             }
         }
-        unselectAll.call(dragElement);
-        setElementHoverState.call(this, dropElement, hoverOverlapState.NONE);
+        unselectAll.call(sourceView);
+        setElementHoverState.call(this, destElement, hoverOverlapState.NONE);
     }
 
-    function eventDragHover(event, dragElement, dropElement) {
-        if (!Element.hasClassName(dragElement, 'iwl-view'))
-            dragElement = Element.up(dragElement, '.iwl-view');
-        var dropNode = dropElement.node;
+    function eventDragHover(event, sourceElement, destElement) {
+        var sourceView = Element.getDragData(sourceElement), dropNode = destElement.node;
         if (dropNode.isAncestor) {
-            for (var i = 0, l = dragElement.selectedNodes.length; i < l; i++) {
-                if (dropNode.isAncestor(dragElement.selectedNodes[i]))
+            for (var i = 0, l = sourceView.selectedNodes.length; i < l; i++) {
+                if (dropNode.isAncestor(sourceView.selectedNodes[i]))
                     return;
             }
         }
         if (this.selectedNodes.indexOf(dropNode) > -1)
             return;
 
-        var vOverlap = Position.overlap('vertical', dropElement);
+        var vOverlap = Position.overlap('vertical', destElement);
         var state = hoverOverlapState.NONE;
         var vCenter = false;
 
@@ -846,7 +842,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         else
             state = hoverOverlapState.CENTER;
 
-        setElementHoverState.call(this, dropElement, state);
+        setElementHoverState.call(this, destElement, state);
     }
 
     function eventDragInit(event, draggable) {
@@ -935,13 +931,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             setElementHoverState.call(this, this.__hoverElement, hoverOverlapState.NONE);
     }
 
-    function eventNodeViewDrop(event, dragElement, dropElement) {
-        if (!Element.hasClassName(dragElement, 'iwl-view'))
-            dragElement = Element.up(dragElement, '.iwl-view');
-        var dropNode = dropElement.node;
-        for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
-            this.model.move(dragElement.selectedNodes[i]);
-        unselectAll.call(dragElement);
+    function eventNodeViewDrop(event, sourceElement, destElement) {
+        var sourceView = Element.getDragData(sourceElement), dropNode = destElement.node;
+        for (var i = sourceView.selectedNodes.length - 1; i > -1; --i)
+            this.model.move(sourceView.selectedNodes[i]);
+        unselectAll.call(sourceView);
     }
 
     return {
@@ -1183,6 +1177,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             if (bool) {
                 this.content.setDragSource({revert: true, actions: this.dragActions});
+                this.content.setDragData(this);
                 this.content.signalConnect('iwl:drag_init', map.eventDragInit);
             } else {
                 this.content.unsetDragSource();
