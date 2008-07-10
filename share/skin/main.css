@@ -1953,7 +1953,7 @@ div.tooltip_content {
     border-right: none;
 }
 .treeview_header .treeview_column,
-.treeview_node_last .treeview_column {
+.treeview_content > .treeview_node_last .treeview_column {
     border-bottom: none;
 }
 
@@ -1975,7 +1975,8 @@ div.tooltip_content {
     border-bottom: 1px dotted #273346;
 }
 .treeview_node_hover_center {
-    border: 1px dotted #273346;
+    border-top: 1px dotted #273346;
+    border-bottom: 1px dotted #273346;
 }
 .treeview_dragged_nodes {
     border: 1px dashed #6a81a2;

@@ -147,3 +147,7 @@ div.expander_collapsed .expander_icon {
 .iconview .iconview_node_hover_center {
     border: 1px dotted #273346;
 }
+
+.treeview_node_last .treeview_column {
+    border-bottom: none;
+}
