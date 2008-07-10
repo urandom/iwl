@@ -775,8 +775,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
-                this.setDragSource({revert: true, actions: this.dragActions});
-                this.content.setDragData(this);
+                this.setDragSource({revert: true, revertEffect: false, actions: this.dragActions});
+                this.setDragData(this);
                 this.signalConnect('iwl:drag_init', map.eventDragInit);
             } else {
                 this.unsetDragSource();

@@ -994,7 +994,7 @@ sub generate_dnd {
     my $view = IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
     my $dest1 = IWL::Container->new(id => 'dest1');
 
-    $source1->setDragSource(outline => 1);
+    $source1->setDragSource(outline => 1, snap => 20);
     $source2->setDragSource(view => $view, revert => 1);
     $dest1->setDragDest(containment => $container, hoverclass => 'hover');
     $source1->appendChild(IWL::Label->new->setText('Drag me!'));

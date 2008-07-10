@@ -102,7 +102,7 @@ If true, a copy of the object will be dragged, while the original object stays i
 sub setDragSource {
     my ($self, %options) = @_;
 
-    $self->requiredJs('dist/effects.js', 'dist/dragdrop.js', 'dnd.js')
+    $self->require(js => ['dist/effects.js', 'dist/dragdrop.js', 'dnd.js'])
         unless $self->{__initDrag};
 
     $self->{__initDrag} = 1;
@@ -120,6 +120,7 @@ Unsets the L<IWL::Widget> as a drag source
 sub unsetDragSource {
     my $self = shift;
 
+    $self->unrequire(js => ['dist/effects.js', 'dist/dragdrop.js', 'dnd.js']);
     delete $self->{__initDrag};
     return $self;
 }
@@ -151,7 +152,7 @@ If specificed, the I<CSS> class will be added to the destination, while an accep
 sub setDragDest {
     my ($self, %options) = @_;
 
-    $self->requiredJs('dist/effects.js', 'dist/dragdrop.js', 'dnd.js')
+    $self->require(js => ['dist/effects.js', 'dist/dragdrop.js', 'dnd.js'])
         unless $self->{__initDrop};
 
     $self->{__initDrop} = 1;
@@ -169,6 +170,7 @@ Unsets the L<IWL::Widget> as a drag destination
 sub unsetDragDest {
     my $self = shift;
 
+    $self->unrequire(js => ['dist/effects.js', 'dist/dragdrop.js', 'dnd.js']);
     delete $self->{__initDrop};
     return $self;
 }

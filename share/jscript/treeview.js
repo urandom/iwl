@@ -1176,7 +1176,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
-                this.content.setDragSource({revert: true, actions: this.dragActions});
+                this.content.setDragSource({revert: true, revertEffect: false, actions: this.dragActions});
                 this.content.setDragData(this);
                 this.content.signalConnect('iwl:drag_init', map.eventDragInit);
             } else {
