@@ -230,18 +230,24 @@ IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
       if (isNaN(index) || index < 0)
         index = -1;
 
+      var childToggle = false;
       if (parentNode) {
         this.parentNode = parentNode;
         nodes = parentNode.childNodes;
-        parentNode.childCount++;
-      } else nodes = model.rootNodes;
+        if (!parentNode.childCount++)
+          childToggle = true;
+      } else {
+        nodes = model.rootNodes;
+        if (!nodes.length)
+          childToggle = true;
+      }
 
       this._addNodeRelationship(index, nodes);
 
       this.columns = model.columns.clone();
 
       this.model.emitSignal('iwl:node_insert', this, parentNode);
-      if ((parentNode && parentNode.childCount == 1) || this.model.rootNodes.length == 1)
+      if (childToggle)
         this.model.emitSignal('iwl:node_has_child_toggle', parentNode);
 
       return this;
@@ -250,12 +256,15 @@ IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
     remove: function() {
       var model = this.model;
       if (!model) return;
-      var parentNode = this.parentNode;
+      var parentNode = this.parentNode, childToggle = false;
       if (parentNode) {
         parentNode.childNodes = parentNode.childNodes.without(this);
+        if (parentNode.childCount == 1) childToggle = true;
         if (--parentNode.childCount < 0) parentNode.childCount = 0;
-      } else
+      } else {
+        if (model.rootNodes.length == 1) childToggle = true;
         model.rootNodes = model.rootNodes.without(this);
+      }
 
         this._removeNodeRelationship();
 
@@ -266,7 +275,7 @@ IWL.TreeModel.Node = Class.create(IWL.ListModel.Node, (function() {
       }
 
       model.emitSignal('iwl:node_remove', this, parentNode);
-      if ((parentNode && !parentNode.childCount) || !model.rootNodes.length)
+      if (childToggle)
         model.emitSignal('iwl:node_has_child_toggle', parentNode);
 
       return this;

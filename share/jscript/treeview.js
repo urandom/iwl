@@ -100,25 +100,30 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setNodeAttributes(container, element, node, indent) {
-        var id = this.id, nId = node.attributes.id;
-        if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
-        var nView = nodeMap[id][nId];
-        Object.extend(nView, {
-            node: node,
-            element: element,
-            container: container,
-            indent: indent
-        });
+        var id = this.id, nId = node.attributes.id, map = nodeMap[id];
+        if (!map[nId]) map[nId] = {};
+        var nView = map[nId];
+        nView.node = node, nView.element = element, nView.container = container, nView.indent = indent;
         element.node = node;
-        if (element.hasClassName('treeview_node_separator'))
+        if (nView.childContainer && !nView.childContainer.parentNode) {
+            var next = element.nextSibling;
+            next
+                ? element.parentNode.insertBefore(nView.childContainer, next)
+                : element.parentNode.appendChild(nView.childContainer);
+        }
+        if (nView.expanded)
+            Element.addClassName(element, 'treeview_node_expanded');
+        if (this.options.dragDest && !element.__droppableInit)
+            setDroppableNode.call(this, node, nView, map);
+        if (Element.hasClassName(element, 'treeview_node_separator'))
             return;
 
         element.sensitive = true;
-        element.signalConnect('dom:mouseenter', function(event) {
+        Element.signalConnect(element, 'dom:mouseenter', function(event) {
             if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
             changeHighlight.call(this, node);
         }.bind(this));
-        element.signalConnect('dom:mouseleave', function(event) {
+        Element.signalConnect(element, 'dom:mouseleave', function(event) {
             if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
             changeHighlight.call(this);
         }.bind(this));
@@ -126,8 +131,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (node.attributes.insensitive)
             this.setSensitivity(node, false);
 
-        element.signalConnect('mousedown', eventNodeMouseDown.bindAsEventListener(this, node));
-        element.signalConnect('mouseup', eventNodeMouseUp.bindAsEventListener(this, node));
+        Element.signalConnect(element, 'mousedown', eventNodeMouseDown.bindAsEventListener(this, node));
+        Element.signalConnect(element, 'mouseup', eventNodeMouseUp.bindAsEventListener(this, node));
     }
 
     function cellFunctionRenderer(cells, values, node) {
@@ -154,7 +159,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             container = this.containers[pathString];
             if (!container)
                 container = new Element('div', {
-                    className: 'treeview_node_container treeview_node_container_depth' + path.length
+                    className: 'treeview_node_container treeview_node_container_depth' + path.length,
+                    style: 'display: none'
                 });
             this.containers[pathString] = container;
             container.path = pathString;
@@ -505,13 +511,16 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function nodeInsert(event, node, parentNode) {
-        var template = generateNodeTemplate.call(this)
-        var id = this.id, nId = node.attributes.id;
+        var template = generateNodeTemplate.call(this), map = nodeMap[this.id];
+        var nId = node.attributes.id;
         var container = parentNode ? createContainer.call(this, parentNode) : this.container;
-        if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
+        var indent = parentNode ? map[parentNode.attributes.id].indent : '';
+        if (!map[nId]) map[nId] = {};
         if (!node.nextSibling && node.previousSibling)
-            nodeMap[id][node.previousSibling.attributes.id].element.removeClassName('treeview_node_last');
-        recreateNode.call(this, parentNode || node, template, container, parentNode ? nodeMap[id][parentNode.attributes.id].indent : '');
+            map[node.previousSibling.attributes.id].element.removeClassName('treeview_node_last');
+        recreateNode.call(this, parentNode || node, template, container, indent);
+        if ((parentNode && parentNode.childCount == 1) || this.model.rootNodes.length == 1)
+            createNodes.call(this, [node], generateNodeTemplate.call(this), indent);
     }
 
     function nodeRemove(event, node, parentNode) {
@@ -753,6 +762,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function setDroppableNode(node, view, map) {
         var element = view.element, self = this;
+        if (element.__droppableInit) return;
+        element.__droppableInit = true;
         setTimeout(function() {
             element.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: self.dropActions});
             element.signalConnect('iwl:drag_hover', map.eventDragHover);
@@ -762,6 +773,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function unsetDroppableNode(node, view, map) {
         var element = view.element;
+        if (!element.__droppableInit) return;
+        element.__droppableInit = undefined;
         setTimeout(function() {
             element.unsetDragDest();
             element.signalDisconnect('iwl:drag_hover', map.eventDragHover);
@@ -794,7 +807,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 parentNode = dropNode;
                 break;
         }
-        console.log(index, parentNode);
         if (!isNaN(index)) {
             if (actions & IWL.Draggable.Actions.MOVE) {
                 for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
@@ -997,20 +1009,13 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var map = nodeMap[this.id], view = map[node.attributes.id];
             if (!view.element || view.expanded) return;
             if (node.childCount) {
-                if (!view.childContainer) {
+                if (!view.childContainer)
                     createNodes.call(this, node.childNodes, generateNodeTemplate.call(this), view.indent);
-                    view.childContainer.style.display = 'none';
+                if (!view.childContainer.parentNode) {
                     var next = view.element.nextSibling;
                     next
                         ? view.element.parentNode.insertBefore(view.childContainer, next)
                         : view.element.parentNode.appendChild(view.childContainer);
-                    if (this.options.dragDest)
-                        setTimeout(function() {
-                            for (var i = 0, l = node.childCount; i < l; i++) {
-                                var cNode = node.childNodes[i], cView = map[cNode.attributes.id];
-                                setDroppableNode.call(this, cNode, cView, map);
-                            }
-                        }.bind(this), 10);
                 }
             }
 
@@ -1231,15 +1236,13 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
 
             var self = this;
-            setTimeout(function() {
-                self.model._each(function(node) {
-                    var view = map[node.attributes.id];
-                    if (!view) return;
-                    bool
-                        ? setDroppableNode.call(self, node, view, map)
-                        : unsetDroppableNode.call(self, node, view, map);
-                    });
-            }, 10);
+            self.model._each(function(node) {
+                var view = map[node.attributes.id];
+                if (!view) return;
+                bool
+                    ? setDroppableNode.call(self, node, view, map)
+                    : unsetDroppableNode.call(self, node, view, map);
+            });
             
             return this;
         },
