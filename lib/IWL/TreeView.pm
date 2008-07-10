@@ -429,7 +429,7 @@ sub _realize {
             if $attrs->{renderTemplate};
         $self->{_options}{editable} = 1 if $attrs->{editable};
     }
-    $self->prependClass('iwl-node-container');
+    $self->prependClass('iwl-view');
     $self->appendClass($self->{_defaultClass} . '_editable')
         if $self->{_options}{editable};
     my $options = toJSON($self->{_options});
@@ -455,7 +455,7 @@ sub _init {
 
     $self->{_defaultClass}   = 'treeview';
     $header->{_defaultClass} = 'treeview_header';
-    $content->{_defaultClass}   = 'treeview_content treeview_node_container';
+    $content->{_defaultClass}   = 'treeview_content treeview_node_container iwl-node-container';
     $self->appendChild($header->setStyle(display => 'none'), $content);
     $self->{header} = $header;
     $self->{content} = $content;

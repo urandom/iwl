@@ -313,6 +313,7 @@ sub _realize {
         }
     }
 
+    $self->prependClass('iwl-view');
     $self->{__content}->setStyle(height => $self->{_options}{contentHeight} . 'px')
         if $self->{_options}{contentHeight};
 

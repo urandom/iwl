@@ -511,6 +511,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
+        if (!Element.hasClassName(dragElement, 'iwl-view'))
+            dragElement = Element.up(dragElement, '.iwl-view');
         var dropNode = dropElement.node, index;
         switch(dropElement.__hoverState) {
             case hoverOverlapState.TOP:
@@ -657,6 +659,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventNodeViewDrop(event, dragElement, dropElement) {
+        if (!Element.hasClassName(dragElement, 'iwl-view'))
+            dragElement = Element.up(dragElement, '.iwl-view');
         var dropNode = dropElement.node;
         for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
             this.model.move(dragElement.selectedNodes[i]);

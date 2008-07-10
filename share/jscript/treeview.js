@@ -120,11 +120,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
         element.sensitive = true;
         Element.signalConnect(element, 'dom:mouseenter', function(event) {
-            if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !element.sensitive) return;
             changeHighlight.call(this, node);
         }.bind(this));
         Element.signalConnect(element, 'dom:mouseleave', function(event) {
-            if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !element.sensitive) return;
             changeHighlight.call(this);
         }.bind(this));
 
@@ -610,8 +610,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventNodeMouseUp(event, node) {
-        var dragging = this.iwl && this.iwl.draggable
-                ? this.iwl.draggable.dragging
+        var dragging = this.content.iwl && this.content.iwl.draggable
+                ? this.content.iwl.draggable.dragging
                 : false;
         if (nodeMap[this.id].skipNodeSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
             toggleSelectNode.call(this, event, node);
@@ -790,6 +790,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragDrop(event, dragElement, dropElement, dragEvent, actions) {
+        if (!Element.hasClassName(dragElement, 'iwl-view'))
+            dragElement = Element.up(dragElement, '.iwl-view');
         var dropNode = dropElement.node, index, parentNode;
         switch(dropElement.__hoverState) {
             case hoverOverlapState.TOP:
@@ -821,6 +823,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventDragHover(event, dragElement, dropElement) {
+        if (!Element.hasClassName(dragElement, 'iwl-view'))
+            dragElement = Element.up(dragElement, '.iwl-view');
         var dropNode = dropElement.node;
         if (dropNode.isAncestor) {
             for (var i = 0, l = dragElement.selectedNodes.length; i < l; i++) {
@@ -870,7 +874,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             draggable.options.viewOptions = {string: dragMultipleNodes.evaluate(text)};
         }
 
-        if (this.scrollLeft || this.scrollTop) {
+        if (this.container.scrollLeft || this.container.scrollTop) {
             Position.__includeScrollOffsets = Position.includeScrollOffsets;
             Position.includeScrollOffsets = true;
         } else if (Position.__includeScrollOffsets) {
@@ -932,6 +936,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventNodeViewDrop(event, dragElement, dropElement) {
+        if (!Element.hasClassName(dragElement, 'iwl-view'))
+            dragElement = Element.up(dragElement, '.iwl-view');
         var dropNode = dropElement.node;
         for (var i = dragElement.selectedNodes.length - 1; i > -1; --i)
             this.model.move(dragElement.selectedNodes[i]);
@@ -1176,16 +1182,16 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
-                this.setDragSource({revert: true, actions: this.dragActions});
-                this.signalConnect('iwl:drag_init', map.eventDragInit);
+                this.content.setDragSource({revert: true, actions: this.dragActions});
+                this.content.signalConnect('iwl:drag_init', map.eventDragInit);
             } else {
-                this.unsetDragSource();
-                this.signalDisconnect('iwl:drag_init', map.eventDragInit);
+                this.content.unsetDragSource();
+                this.content.signalDisconnect('iwl:drag_init', map.eventDragInit);
             }
 
             if (Prototype.Browser.IE && this.boxSelection) {
                 this.boxSelection.destroy();
-                this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
+                this.boxSelection = new IWL.BoxSelection(this.content, {boxOpacity: this.options.boxSelectionOpacity});
             }
 
             return this;
@@ -1222,17 +1228,17 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.dropActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
-                this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
-                this.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
-                this.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
-                this.signalConnect('mouseover', map.eventDropMouseOver);
-                this.signalConnect('mouseout', map.eventDropMouseOver);
+                this.content.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
+                this.content.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
+                this.content.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
+                this.content.signalConnect('mouseover', map.eventDropMouseOver);
+                this.content.signalConnect('mouseout', map.eventDropMouseOver);
             } else {
-                this.unsetDragDest();
-                this.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
-                this.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
-                this.signalDisconnect('mouseover', map.eventDropMouseOver);
-                this.signalDisconnect('mouseout', map.eventDropMouseOver);
+                this.content.unsetDragDest();
+                this.content.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
+                this.content.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
+                this.content.signalDisconnect('mouseover', map.eventDropMouseOver);
+                this.content.signalDisconnect('mouseout', map.eventDropMouseOver);
             }
 
             var self = this;
@@ -1290,7 +1296,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 boxSelection: true
             }, arguments[1]);
             this.header = this.down('.treeview_header');
-            this.container = this.down('.treeview_content');
+            this.content = this.container = this.down('.treeview_content');
             this.container.childContainers = [];
             this.selectedNodes = [];
             this.containers = {};
@@ -1318,7 +1324,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
 
             if (this.options.multipleSelection && this.options.boxSelection) {
-                this.boxSelection = new IWL.BoxSelection(this, {boxOpacity: this.options.boxSelectionOpacity});
+                this.boxSelection = new IWL.BoxSelection(this.content, {boxOpacity: this.options.boxSelectionOpacity});
                 if (this.options.editable)
                     this.signalConnect('iwl:box_selection_init', boxSelectionInit.bind(this));
             }
