@@ -1836,6 +1836,10 @@ div.tooltip_content {
     margin: 1px 0;
 }
 
+.treeview_content {
+    overflow: auto;
+}
+
 .treeview_node_highlight {
     background: #8ac6f2
 }

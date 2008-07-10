@@ -62,6 +62,20 @@ If selecting multiple items is enabled, setting this option to a true value will
 
 =back
 
+=head1 PROPERTIES
+
+=over 4
+
+=item B<header>
+
+The header L<IWL::Container>
+
+=item B<content>
+
+The content L<IWL::Container>
+
+=back
+
 =cut
 
 sub new {
@@ -443,6 +457,8 @@ sub _init {
     $header->{_defaultClass} = 'treeview_header';
     $content->{_defaultClass}   = 'treeview_content treeview_node_container';
     $self->appendChild($header->setStyle(display => 'none'), $content);
+    $self->{header} = $header;
+    $self->{content} = $content;
     $args{id} ||= randomize('treeview');
 
     $self->{_options}  = {columnWidth => [], cellAttributes => []};
