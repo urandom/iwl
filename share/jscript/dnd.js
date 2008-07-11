@@ -9,8 +9,9 @@ IWL.Draggable = Class.create(Draggable, (function() {
   function initDrag(event) {
     if (!Event.isLeftClick(event)) return;
     var pointer = Event.pointer(event);
-    var pos     = Element.cumulativeOffset(this.element);
-    this.offset = [pointer.x - pos[0], pointer.y - pos[1]];
+    this.initialPosition = Element.cumulativeOffset(this.element);
+    this.offsetDelta = [0, 0];
+    this.offset = [pointer.x - this.initialPosition[0], pointer.y - this.initialPosition[1]];
     // don't drag on the scrollbar
     if ( this.element.clientWidth < this.offset[0]
       || this.element.clientHeight < this.offset[1])
@@ -87,7 +88,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
       this._clone = this.element.cloneNode(true);
       this.element._originallyAbsolute = (this.element.getStyle('position') == 'absolute');
       if (!this.element._originallyAbsolute)
-        Position.absolutize(this.element);
+        Element.absolutize(this.element);
       this.element.parentNode.insertBefore(this._clone, this.element);
     }
 
@@ -106,6 +107,36 @@ IWL.Draggable = Class.create(Draggable, (function() {
         this.originalScrollTop = this.options.scroll.scrollTop;
       }
     }
+
+    if (this.options.within) {
+      var within = this.options.within;
+      if (Object.isElement(within)) {
+        this.withinElement = within;
+        this.withinPadding = [0, 0, 0, 0];
+      } else {
+        this.withinElement = within.element;
+        var padding = within.padding;
+        if (padding.length == 1) {
+          padding = padding[0];
+          this.withinPadding = [padding, padding, padding, padding];
+        } else if (padding.length == 2)
+          this.withinPadding = [padding[0], padding[1], padding[0], padding[1]];
+        else if (padding.length == 4)
+          this.withinPadding = [padding[0], padding[1], padding[2], padding[3]];
+        else
+          this.withinPadding = [0, 0, 0, 0];
+      }
+      var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
+      this.boundary = {
+        tl: [
+          this.initialPosition[0] + this.withinPadding[3],
+          this.initialPosition[1] + this.withinPadding[0]
+        ], br: [
+          this.initialPosition[0] + dim.width - this.withinPadding[1],
+          this.initialPosition[1] + dim.height - this.withinPadding[2]
+        ]
+      };
+    }
     
     this.element.emitSignal('iwl:drag_begin', this);
         
@@ -113,21 +144,25 @@ IWL.Draggable = Class.create(Draggable, (function() {
   }
   
   function draw(element, pointer) {
-    var pos = Element.cumulativeOffset(element);
-    if (this.options.ghosting) {
-      var r   = Element.cumulativeScrollOffset(element);
-      pos[0] += r[0] - Position.deltaX; pos[1] += r[1] - Position.deltaY;
+    if (this.view) {
+      var p = [pointer[0], pointer[1]];
+    } else {
+      var pos = [this.initialPosition[0] - this.offsetDelta[0], this.initialPosition[1] - this.offsetDelta[1]];
+      if (this.options.ghosting) {
+        var r   = Element.cumulativeScrollOffset(element);
+        pos[0] += r[0] - Position.deltaX; pos[1] += r[1] - Position.deltaY;
+      }
+      
+      var d = currentDelta(element);
+      pos[0] -= d[0]; pos[1] -= d[1];
+      
+      if (this.options.scroll && this.options.scroll != window && this._isScrollChild) {
+        pos[0] -= this.options.scroll.scrollLeft - this.originalScrollLeft;
+        pos[1] -= this.options.scroll.scrollTop - this.originalScrollTop;
+      }
+      
+      var p = [pointer[0] - pos[0] - this.offset[0], pointer[1] - pos[1] - this.offset[1]];
     }
-    
-    var d = currentDelta(element);
-    pos[0] -= d[0]; pos[1] -= d[1];
-    
-    if (this.options.scroll && this.options.scroll != window && this._isScrollChild) {
-      pos[0] -= this.options.scroll.scrollLeft - this.originalScrollLeft;
-      pos[1] -= this.options.scroll.scrollTop - this.originalScrollTop;
-    }
-    
-    var p = [pointer[0] - pos[0] - this.offset[0], pointer[1] - pos[1] - this.offset[1]];
     
     if (this.options.snap) {
       if (this.snapFunction)
@@ -150,11 +185,12 @@ IWL.Draggable = Class.create(Draggable, (function() {
     if ((!this.options.constraint) || (this.options.constraint == 'vertical'))
       style.top  = p[1] + "px";
     
+    this.offsetDelta = [this.initialPosition[0] - p[0], this.initialPosition[1] - p[1]];
     if (style.visibility == "hidden") style.visibility = ""; // fix gecko rendering
   }
 
   function eventOptions(event) {
-    var options = {};
+    var options = {eventElement: Event.element(event)};
     var names = ['ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'which', 'detail'];
     for (var i = 0, l = names.length; i < l; i++) {
       options[names[i]] = event[names[i]];
@@ -240,12 +276,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
         Droppables.show(pointer, this.element);
       }
       
-      if (this.view) {
-        this.view.style.left = pointer[0] + 'px';
-        this.view.style.top = pointer[1] + 'px';
-      } else {
-        draw.call(this, this.draggableElement, pointer);
-      }
+      draw.call(this, this.draggableElement, pointer);
       
       this.element.emitSignal('iwl:drag_motion', this);
       
@@ -256,7 +287,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
         if (this.options.scroll == window) {
           with(this._getWindowScroll(this.options.scroll)) { p = [ left, top, left+width, top+height ]; }
         } else {
-          p = Position.page(this.options.scroll);
+          p = Element.viewportOffset(this.options.scroll);
           p[0] += this.options.scroll.scrollLeft + Position.deltaX;
           p[1] += this.options.scroll.scrollTop + Position.deltaY;
           p.push(p[0]+this.options.scroll.offsetWidth);
@@ -374,12 +405,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
           Draggables._lastScrollPointer[0] = 0;
         if (Draggables._lastScrollPointer[1] < 0)
           Draggables._lastScrollPointer[1] = 0;
-        if (this.view) {
-          this.view.style.left = Draggables._lastScrollPointer[0] + 'px';
-          this.view.style.top = Draggables._lastScrollPointer[1] + 'px';
-        } else {
-          draw.call(this, this.draggableElement, Draggables._lastScrollPointer);
-        }
+        draw.call(this, this.draggableElement, Draggables._lastScrollPointer);
       }
 
       this.element.emitSignal('iwl:drag_motion', this);
@@ -484,7 +510,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
   }
 
   function eventOptions(event) {
-    var options = {};
+    var options = {eventElement: Event.element(event)};
     var names = ['ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'which', 'detail'];
     for (var i = 0, l = names.length; i < l; i++) {
       options[names[i]] = event[names[i]];
