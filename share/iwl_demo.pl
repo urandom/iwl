@@ -995,7 +995,7 @@ sub generate_dnd {
     my $view = IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
     my $dest1 = IWL::Container->new(id => 'dest1');
 
-    $source1->setDragSource(outline => 1, scroll => 'content');
+    $source1->setDragSource(outline => 1, snap => 20, revert => 1, scroll => 'content');
     $source2->setDragSource(view => $view, within => 'main_notebook_content');
     $source3->setDragSource(constraint => 'vertical');
     $dest1->setDragDest(containment => $container, hoverclass => 'hover');
@@ -1011,7 +1011,7 @@ sub generate_dnd {
     return $container->appendChild(
         IWL::Label->new(expand => 1)->appendTextType("The green containers are draggable, while the blue one is both draggable, and accepts the green ones as targets", 'em'),
         $source1, $dest1, $source2, $source3, IWL::Container->new(style => {position => 'relative', width => '10px', height => '10px', left => '500px', top => '220px'}),
-        IWL::Script->new->setScript('$("dnd_container").scrollTop = 0; $("dnd_container").scrollLeft = 0;')
+        IWL::Script->new->setScript('setTimeout(function() { $("dnd_container").scrollTop = 0; $("dnd_container").scrollLeft = 0; }, 100)')
     );
 }
 

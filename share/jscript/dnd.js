@@ -299,6 +299,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
         Droppables.show(pointer, this.element);
       }
       
+      draw.call(this, this.draggableElement, pointer);
+      
       if (this.options.scroll) {
         this.stopScrolling();
         
@@ -319,8 +321,6 @@ IWL.Draggable = Class.create(Draggable, (function() {
         if(pointer[1] > (p[3]-this.options.scrollSensitivity)) speed[1] = pointer[1]-(p[3]-this.options.scrollSensitivity);
         this.startScrolling(speed);
       }
-      
-      draw.call(this, this.draggableElement, pointer);
       
       this.element.emitSignal('iwl:drag_motion', this);
       
@@ -444,10 +444,14 @@ IWL.Draggable = Class.create(Draggable, (function() {
           Draggables._lastScrollPointer[1] = 0;
         this.initialScrollOffset[0] -= actual[0];
         this.initialScrollOffset[1] -= actual[1];
-        draw.call(this, this.draggableElement, Draggables._lastScrollPointer);
+        if (!this.absolutePosition)
+          draw.call(this, this.draggableElement, Draggables._lastScrollPointer);
       }
 
       this.element.emitSignal('iwl:drag_motion', this);
+
+      if (!actual[0] && !actual[1])
+        this.stopScrolling();
     }
   };
 })());
