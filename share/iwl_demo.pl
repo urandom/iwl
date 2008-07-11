@@ -995,11 +995,11 @@ sub generate_dnd {
     my $view = IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
     my $dest1 = IWL::Container->new(id => 'dest1');
 
-    $source1->setDragSource(outline => 1, snap => 20, within => 'dnd_container', revert => 1);
+    $source1->setDragSource(outline => 1, scroll => 'content');
     $source2->setDragSource(view => $view, within => 'main_notebook_content');
     $source3->setDragSource(constraint => 'vertical');
     $dest1->setDragDest(containment => $container, hoverclass => 'hover');
-    $source1->appendChild(IWL::Label->new->setText('outline, snap, within, revert'));
+    $source1->appendChild(IWL::Label->new->setText('outline, snap, scroll, revert'));
     $source2->appendChild(IWL::Label->new->setText('view, within'));
     $source3->appendChild(IWL::Label->new->setText('vertical constrain'));
     $dest1->setDragSource(ghosting => 1);

@@ -299,10 +299,6 @@ IWL.Draggable = Class.create(Draggable, (function() {
         Droppables.show(pointer, this.element);
       }
       
-      draw.call(this, this.draggableElement, pointer);
-      
-      this.element.emitSignal('iwl:drag_motion', this);
-      
       if (this.options.scroll) {
         this.stopScrolling();
         
@@ -323,6 +319,10 @@ IWL.Draggable = Class.create(Draggable, (function() {
         if(pointer[1] > (p[3]-this.options.scrollSensitivity)) speed[1] = pointer[1]-(p[3]-this.options.scrollSensitivity);
         this.startScrolling(speed);
       }
+      
+      draw.call(this, this.draggableElement, pointer);
+      
+      this.element.emitSignal('iwl:drag_motion', this);
       
       // fix AppleWebKit rendering
       if (Prototype.Browser.WebKit) window.scrollBy(0,0);
@@ -412,33 +412,38 @@ IWL.Draggable = Class.create(Draggable, (function() {
       Draggables.deactivate(this);
     },
     scroll: function() {
-      var current = new Date();
-      var delta = current - this.lastScrolled;
+      var scroll = this.options.scroll, current = new Date(), actual;
+      var delta = current - this.lastScrolled, d = delta / 1000;
+      var leftSpeed = this.scrollSpeed[0] * d, topSpeed = this.scrollSpeed[1] * d;
       this.lastScrolled = current;
-      if (this.options.scroll == window) {
-        with (this._getWindowScroll(this.options.scroll)) {
+      if (scroll == window) {
+        with (this._getWindowScroll(scroll)) {
+          actual = [left, top];
           if (this.scrollSpeed[0] || this.scrollSpeed[1]) {
-            var d = delta / 1000;
-            this.options.scroll.scrollTo(
-              left + d * this.scrollSpeed[0], top + d * this.scrollSpeed[1]
-            );
+            scroll.scrollTo(left + leftSpeed, top + topSpeed);
           }
         }
+        actual[0] -= document.body.parentNode.scrollLeft;
+        actual[1] -= document.body.parentNode.scrollTop;
       } else {
-        this.options.scroll.scrollLeft += this.scrollSpeed[0] * delta / 1000;
-        this.options.scroll.scrollTop  += this.scrollSpeed[1] * delta / 1000;
+        actual = [scroll.scrollLeft, scroll.scrollTop];
+        scroll.scrollLeft += leftSpeed;
+        scroll.scrollTop  += topSpeed;
+        actual[0] -= scroll.scrollLeft;
+        actual[1] -= scroll.scrollTop;
       }
-      
       Position.prepare();
       Droppables.show(Draggables._lastPointer, this.element);
       if (this._isScrollChild) {
         Draggables._lastScrollPointer = Draggables._lastScrollPointer || $A(Draggables._lastPointer);
-        Draggables._lastScrollPointer[0] += this.scrollSpeed[0] * delta / 1000;
-        Draggables._lastScrollPointer[1] += this.scrollSpeed[1] * delta / 1000;
+        Draggables._lastScrollPointer[0] += leftSpeed;
+        Draggables._lastScrollPointer[1] += topSpeed;
         if (Draggables._lastScrollPointer[0] < 0)
           Draggables._lastScrollPointer[0] = 0;
         if (Draggables._lastScrollPointer[1] < 0)
           Draggables._lastScrollPointer[1] = 0;
+        this.initialScrollOffset[0] -= actual[0];
+        this.initialScrollOffset[1] -= actual[1];
         draw.call(this, this.draggableElement, Draggables._lastScrollPointer);
       }
 
