@@ -991,13 +991,17 @@ sub generate_dnd {
     my $container = IWL::Container->new(id => 'dnd_container');
     my $source1 = IWL::Container->new(id => 'source1');
     my $source2 = IWL::Container->new(id => 'source2');
+    my $source3 = IWL::Container->new(id => 'source3');
     my $view = IWL::Image->new->set($IWLConfig{IMAGE_DIR} . '/demo/moon.gif');
     my $dest1 = IWL::Container->new(id => 'dest1');
 
-    $source1->setDragSource(outline => 1, snap => 20);
-    $source2->setDragSource(view => $view, revert => 1);
+    $source1->setDragSource(outline => 1, snap => 20, within => 'dnd_container', revert => 1);
+    $source2->setDragSource(view => $view, within => 'main_notebook_content');
+    $source3->setDragSource(constraint => 'vertical');
     $dest1->setDragDest(containment => $container, hoverclass => 'hover');
-    $source1->appendChild(IWL::Label->new->setText('Drag me!'));
+    $source1->appendChild(IWL::Label->new->setText('outline, snap, within, revert'));
+    $source2->appendChild(IWL::Label->new->setText('view, within'));
+    $source3->appendChild(IWL::Label->new->setText('vertical constrain'));
     $dest1->setDragSource(ghosting => 1);
     $dest1->appendChild(IWL::Label->new->setText('Drop something here'));
     $dest1->signalConnect('drag_drop', 'dest1_drop(arguments[1], arguments[2])');
@@ -1006,7 +1010,8 @@ sub generate_dnd {
 
     return $container->appendChild(
         IWL::Label->new(expand => 1)->appendTextType("The green containers are draggable, while the blue one is both draggable, and accepts the green ones as targets", 'em'),
-        $source1, $dest1, $source2
+        $source1, $dest1, $source2, $source3, IWL::Container->new(style => {position => 'relative', width => '10px', height => '10px', left => '500px', top => '220px'}),
+        IWL::Script->new->setScript('$("dnd_container").scrollTop = 0; $("dnd_container").scrollLeft = 0;')
     );
 }
 

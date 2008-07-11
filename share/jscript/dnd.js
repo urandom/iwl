@@ -10,6 +10,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
     if (!Event.isLeftClick(event)) return;
     var pointer = Event.pointer(event);
     this.initialPosition = Element.cumulativeOffset(this.element);
+    this.initialScrollOffset = Element.cumulativeScrollOffset(this.element);
     this.offsetDelta = [0, 0];
     this.offset = [pointer.x - this.initialPosition[0], pointer.y - this.initialPosition[1]];
     // don't drag on the scrollbar
@@ -17,6 +18,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
       || this.element.clientHeight < this.offset[1])
       return;
 
+    if (this.initialScrollOffset[0] || this.initialScrollOffset[1])
+      Position.includeScrollOffsets = true;
     (Event.element(event) || this.element).emitSignal('iwl:drag_init', this, eventOptions.call(this, event));
     if (this.terminated) {
       delete this.terminated;
@@ -71,6 +74,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
         style.top = (pointer[1] || 0) + 'px';
         document.body.appendChild(this.view);
         this.draggableElement = this.view;
+        this.absolutePosition = true;
       }
     } else if (this.options.outline) {
       this.outline = new Element('div', {className: 'draggable_outline'});
@@ -84,13 +88,16 @@ IWL.Draggable = Class.create(Draggable, (function() {
       this.element.insert({after: this.outline});
       this.outline.setOpacity(this.options.outlineOpacity);
       this.draggableElement = this.outline;
+      this.absolutePosition = true;
     } else if (this.options.ghosting) {
       this._clone = this.element.cloneNode(true);
-      this.element._originallyAbsolute = (this.element.getStyle('position') == 'absolute');
+      this.element._originallyAbsolute = this.element.getStyle('position') == 'absolute';
       if (!this.element._originallyAbsolute)
         Element.absolutize(this.element);
       this.element.parentNode.insertBefore(this._clone, this.element);
-    }
+      this.absolutePosition = true;
+    } else
+      this.absolutePosition = this.element.getStyle('position') == 'absolute';
 
     if (this.options.zindex) {
       this.originalZ = parseInt(Element.getStyle(this.element,'z-index') || 0);
@@ -110,12 +117,12 @@ IWL.Draggable = Class.create(Draggable, (function() {
 
     if (this.options.within) {
       var within = this.options.within;
-      if (Object.isElement(within)) {
-        this.withinElement = within;
+      if (Object.isElement(within) || Object.isString(within)) {
+        this.withinElement = $(within);
         this.withinPadding = [0, 0, 0, 0];
       } else {
-        this.withinElement = within.element;
-        var padding = within.padding;
+        this.withinElement = $(within.element);
+        var padding = within.padding || [];
         if (padding.length == 1) {
           padding = padding[0];
           this.withinPadding = [padding, padding, padding, padding];
@@ -126,18 +133,26 @@ IWL.Draggable = Class.create(Draggable, (function() {
         else
           this.withinPadding = [0, 0, 0, 0];
       }
-      var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
-      this.boundary = {
-        tl: [
-          this.initialPosition[0] + this.withinPadding[3],
-          this.initialPosition[1] + this.withinPadding[0]
-        ], br: [
-          this.initialPosition[0] + dim.width - this.withinPadding[1],
-          this.initialPosition[1] + dim.height - this.withinPadding[2]
+      if (!this.absolutePosition) {
+        this.draggableElement.absolutize();
+        this.draggableElement._originallyAbsolute = false;
+        this.absolutePosition = true;
+      }
+      var dim = {width: this.withinElement.scrollWidth, height: this.withinElement.scrollHeight};
+      var pos = Element.cumulativeOffset(this.withinElement);
+      this.boundary = [
+        [
+          pos[0] + this.withinPadding[3], pos[1] + this.withinPadding[0]
+        ], [
+          pos[0] + dim.width - this.withinPadding[1] - this.draggableElement.offsetWidth,
+          pos[1] + dim.height - this.withinPadding[2] - this.draggableElement.offsetHeight
         ]
-      };
+      ];
     }
     
+    if (!this.absolutePosition)
+      this.initialStyledOffset = [parseFloat(Element.getStyle(this.element, 'left')), parseFloat(Element.getStyle(this.element, 'top'))];
+
     this.element.emitSignal('iwl:drag_begin', this);
         
     if (this.options.startEffect) this.options.startEffect(this.draggableElement);
@@ -147,14 +162,15 @@ IWL.Draggable = Class.create(Draggable, (function() {
     if (this.view) {
       var p = [pointer[0], pointer[1]];
     } else {
-      var pos = [this.initialPosition[0] - this.offsetDelta[0], this.initialPosition[1] - this.offsetDelta[1]];
-      if (this.options.ghosting) {
-        var r   = Element.cumulativeScrollOffset(element);
-        pos[0] += r[0] - Position.deltaX; pos[1] += r[1] - Position.deltaY;
+      if (this.absolutePosition) {
+        var d = currentDelta(element);
+        var pos = [
+          this.initialPosition[0] + this.initialScrollOffset[0] - Position.deltaX - this.offsetDelta[0] - d[0],
+          this.initialPosition[1] + this.initialScrollOffset[1] - Position.deltaY - this.offsetDelta[1] - d[1]
+        ];
+      } else {
+        var pos = [this.initialPosition[0] - this.initialStyledOffset[0], this.initialPosition[1] - this.initialStyledOffset[1]];
       }
-      
-      var d = currentDelta(element);
-      pos[0] -= d[0]; pos[1] -= d[1];
       
       if (this.options.scroll && this.options.scroll != window && this._isScrollChild) {
         pos[0] -= this.options.scroll.scrollLeft - this.originalScrollLeft;
@@ -177,6 +193,14 @@ IWL.Draggable = Class.create(Draggable, (function() {
           Math.round(p[0] / this.options.snap) * this.options.snap,
           Math.round(p[1] / this.options.snap) * this.options.snap
         ];
+    }
+
+    if (this.boundary) {
+      var tl = this.boundary[0], br = this.boundary[1], so = [this.withinElement.scrollLeft, this.withinElement.scrollTop];
+      if (p[0] < tl[0] - so[0]) p[0] = tl[0] - so[0];
+      else if (p[0] > br[0] - so[0]) p[0] = br[0] - so[0];
+      if (p[1] < tl[1] - so[1]) p[1] = tl[1] - so[1];
+      else if (p[1] > br[1] - so[1]) p[1] = br[1] - so[1];
     }
     
     var style = element.style;
@@ -252,7 +276,6 @@ IWL.Draggable = Class.create(Draggable, (function() {
       Element.makePositioned(this.element); // fix IE    
 
       this.dragging = false;   
-
       this.draggableElement = this.element;
 
       this.eventMouseDown = initDrag.bindAsEventListener(this);
@@ -321,11 +344,12 @@ IWL.Draggable = Class.create(Draggable, (function() {
         
       if (this.view) {
         if (!this.options.revert || this.options.revertEffect) {
-          var absolute = Element.getStyle(this.element, 'position') == 'absolute';
+          var absolute = Element.getStyle(this.element, 'position') == 'absolute',
+              r = Element.cumulativeScrollOffset(this.element.parentNode);
           if (!absolute)
             Element.absolutize(this.element);
-          this.element.style.top = this.view.style.top;
-          this.element.style.left = this.view.style.left;
+          this.element.style.left = parseFloat(this.view.style.left) +  r[0] - Position.deltaX + 'px';
+          this.element.style.top = parseFloat(this.view.style.top) + r[1] - Position.deltaY + 'px';
           if (!absolute)
             Element.relativize(this.element);
         }
@@ -333,22 +357,28 @@ IWL.Draggable = Class.create(Draggable, (function() {
         delete this.view;
       } else if (this.outline) {
         if (!this.options.revert || this.options.revertEffect) {
-          var absolute = Element.getStyle(this.element, 'position') == 'absolute';
+          var absolute = Element.getStyle(this.element, 'position') == 'absolute',
+              r = Element.cumulativeScrollOffset(this.outline);
           if (!absolute)
             Element.absolutize(this.element);
-          this.element.style.top = this.outline.style.top;
-          this.element.style.left = this.outline.style.left;
+          this.element.style.left = parseFloat(this.outline.style.left) +  r[0] - Position.deltaX + 'px';
+          this.element.style.top = parseFloat(this.outline.style.top) + r[1] - Position.deltaY + 'px';
           if (!absolute)
             Element.relativize(this.element);
         }
         Element.remove(this.outline);
         delete this.outline;
-      } else if (this.options.ghosting) {
+      } else {
+        var r = this.absolutePosition ? Element.cumulativeScrollOffset(this.element) : [0, 0];
+        this.element.style.left = parseFloat(this.element.style.left) +  r[0] - Position.deltaX + 'px';
+        this.element.style.top = parseFloat(this.element.style.top) + r[1] - Position.deltaY + 'px';
         if (!this.element._originallyAbsolute)
           Element.relativize(this.element);
         this.element._originallyAbsolute = undefined;
-        Element.remove(this._clone);
-        delete this._clone;
+        if (this.options.ghosting) {
+          Element.remove(this._clone);
+          delete this._clone;
+        }
       }
 
       var dropped = false; 
@@ -361,9 +391,13 @@ IWL.Draggable = Class.create(Draggable, (function() {
       if(revert && Object.isFunction(revert)) revert = revert(this.element);
       
       var d = currentDelta(this.element);
-      if (revert && this.options.revertEffect) {
-        if (!dropped || revert != 'failure')
+      if (revert && (!dropped || revert != 'failure')) {
+        if (this.options.revertEffect)
           this.options.revertEffect(this.element, d[1] - this.delta[1], d[0] - this.delta[0]);
+        else {
+          this.element.style.left = parseFloat(this.element.style.left) + this.delta[0] - d[0] + 'px';
+          this.element.style.top = parseFloat(this.element.style.top) + this.delta[1] - d[1] + 'px';
+        }
       } else this.delta = d;
 
       if(this.options.zindex)
@@ -472,7 +506,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     this.offset = [0,1].map( function(i) { return (pointer[i] - pos[i]) });
 
     var dim = {width: this.element.scrollWidth, height: this.element.scrollHeight};
-    this.boundary = {tl: [pos[0], pos[1]], br: [pos[0] + dim.width, pos[1] + dim.height]};
+    this.boundary = [[pos[0], pos[1]], [pos[0] + dim.width, pos[1] + dim.height]];
     pointer = [pointer[0] - pos[0], pointer[1] - pos[1]];
     if ( this.element.clientWidth < pointer[0]
       || this.element.clientHeight < pointer[1])
@@ -523,8 +557,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     pointer[1] += this.element.scrollTop;
     var delta = [this.initialPointer[0] - pointer[0],
                  this.initialPointer[1] - pointer[1]];
-    var tl = this.boundary.tl;
-    var br = this.boundary.br;
+    var tl = this.boundary[0], br = this.boundary[1];
     if (pointer[0] > tl[0] && pointer[0] < br[0]) {
       if (delta[0] > 0) {
         this.box.style.left = pointer[0] - tl[0] + 'px';
@@ -565,7 +598,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
   }
 
   function relativeCoordinates() {
-    var pos = this.boundary.tl;
+    var pos = this.boundary[0];
     var pointers = [];
     for (var i = 0; i < 2; i++) {
       pointers[i] = arguments[i].clone();
