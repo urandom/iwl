@@ -62,6 +62,7 @@ IWL.TreeModel = Class.create(IWL.ListModel, (function() {
 
     getNodeByPath: function(path) {
       if (!Object.isArray(path)) return;
+      path = [].concat(path);
       var node = this.rootNodes[path.shift()];
       for (var i = 0, l = path.length; node && i < l; i++)
         node = node.childNodes[path[i]];

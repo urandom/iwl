@@ -989,6 +989,18 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             newIndex == -1 ? indices[i].push(res[0]) : indices[i].splice(newIndex, 0, res[0]);
         }
         this.setModel(this.model);
+        setColumnsReorderable.call(this, true);
+    }
+
+    function nodeExpandEvent(event, fullPath, node) {
+        var path = node.getPath(), map = nodeMap[this.id];
+        if (path.length == fullPath.length) {
+            this.signalDisconnect('iwl:node_expand', map.nodeExpandEvent);
+            delete map.nodeExpandEvent;
+            return;
+        }
+        path.push(fullPath[path.length]);
+        this.expandNode(path);
     }
 
     return {
@@ -1045,7 +1057,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         },
         /**
          * Expands the node so its children are visible
-         * @param path The path (or index for flat models) of the item to be expanded
+         * @param path The path/IWL.ListModel.Node (or index for flat models) of the item to be expanded
          * @param {Boolean} recursive If true, all descendants of the node will be made visible, recursively
          * @returns The object
          * */
@@ -1081,6 +1093,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         this.expandNode.bind(this, node.childNodes[i], recursive, true).defer();
                 }
                 if (this.options.expandEffect && !arguments[2]) {
+                    var self = this;
                     Effect.toggle(
                         view.childContainer,
                         this.options.expandEffect,
@@ -1088,6 +1101,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                             afterFinish: function() {
                                 delete view.expanding;
                                 view.expanded = true;
+                                self.emitSignal('iwl:node_expand', node);
                             }
                         }, this.options.expandEffectOptions)
                     );
@@ -1095,10 +1109,29 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 } else {
                     view.childContainer.style.display = '';
                     view.expanded = true;
+                    this.emitSignal('iwl:node_expand', node);
                 }
-                this.emitSignal('iwl:node_expand', node);
             }
             return this;
+        },
+        /**
+         * Expands all nodes along the given path
+         * @param path The path (or an IWL.TreeModel.Node) of the item to be expanded
+         * @returns The object
+         * */
+        expandTo: function(path) {
+            if (this.flat) return;
+            var node;
+            if (path instanceof IWL.ListModel.Node) {
+                node = path;
+                path = node.getPath();
+            } else {
+                node = this.model.getNodeByPath(path);
+            }
+            if (!node) return;
+            nodeMap[this.id].nodeExpandEvent = nodeExpandEvent.bindAsEventListener(this, path);
+            this.signalConnect('iwl:node_expand', nodeMap[this.id].nodeExpandEvent);
+            return this.expandNode(path[0]);
         },
         /**
          * Collapses the node so its children are visible
