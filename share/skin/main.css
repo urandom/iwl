@@ -1993,3 +1993,14 @@ div.tooltip_content {
     background-color: #5c8aac;
     color: white;
 }
+.draggable_html_view .treeview_column {
+    background-color: #5c8aac;
+    padding: 2px 4px;
+    font-weight: bold;
+}
+.treeview_column_hover {
+    border-left: 3px inset #5c8aac;
+}
+.treeview_header_hover {
+    border-right: 3px outset #5c8aac;
+}

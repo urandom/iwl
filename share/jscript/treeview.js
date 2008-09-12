@@ -549,8 +549,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
     
     function removeContainers(container) {
-        if (container.parentNode)
+        if (container.parentNode && container != this.container)
             container.remove();
+        else if (container == this.container)
+            this.container.innerHTML = '';
         delete this.containers[container.path];
         if (container.node) {
             var view = nodeMap[this.id][container.node.attributes.id];
@@ -565,7 +567,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function removeModel() {
         removeContainers.call(this, this.container);
         nodeMap[this.id] = {};
-        this.model = this.container = undefined;
+        this.model = undefined;
+        this.container.innerHTML = '';
+        this.header.innerHTML = '';
     }
 
     function setPager() {
@@ -938,6 +942,55 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         unselectAll.call(sourceView);
     }
 
+    function setColumnsReorderable(bool) {
+        var columns = Element.select(this.header, '.treeview_column');
+        var map = nodeMap[this.id];
+        if (bool) {
+            map.columnDragDrop = columnDragDrop.bind(this);
+            for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
+                var header = this.options.cellAttributes[i].header;
+                c.setDragSource({
+                    view: ['<span class="treeview_column">', (header.title ? header.title : '<span style="padding: 0 5px;">&nbsp;</span>'), '</span>'].join(''),
+                    within: this.header,
+                    revert: true,
+                    revertEffect: false,
+                    actions: IWL.Draggable.Actions.MOVE,
+                    constraint: 'horizontal'
+                });
+                c.setDragDest({accept: ['treeview_column'], actions: IWL.Draggable.Actions.MOVE, hoverclass: 'treeview_column_hover'});
+                c.signalConnect('iwl:drag_drop', map.columnDragDrop);
+            }
+            this.header.setDragDest({accept: ['treeview_column'], actions: IWL.Draggable.Actions.MOVE, hoverclass: 'treeview_header_hover'});
+            this.header.signalConnect('iwl:drag_drop', map.columnDragDrop);
+        } else {
+            for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
+                c.unsetDragSource();
+                c.unsetDragDest();
+                c.signalDisconnect('iwl:drag_drop', map.columnDragDrop);
+            }
+            this.header.unsetDragDest();
+            this.header.signalDisconnect('iwl:drag_drop', map.columnDragDrop);
+        }
+    }
+
+    function columnDragDrop(event, sourceElement, destElement, sourceEvent, actions) {
+        Event.stop(event);
+        var columns = Element.select(this.header, '.treeview_column');
+        var index = columns.indexOf(sourceElement);
+        var newIndex = columns.indexOf(destElement);
+        var indices = [
+            this.options.columnMap,
+            this.options.cellAttributes,
+            this.options.columnWidth,
+            this.options.columnClass
+        ];
+        for (var i = 0, l = indices.length; i < l; i++) {
+            var res = indices[i].splice(index, 1);
+            newIndex == -1 ? indices[i].push(res[0]) : indices[i].splice(newIndex, 0, res[0]);
+        }
+        this.setModel(this.model);
+    }
+
     return {
         /**
          * Sets/unsets the given items as active
@@ -1108,6 +1161,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this.flat = model instanceof IWL.ListModel && (!IWL.TreeModel || !(model instanceof IWL.TreeModel));
 
                 normalizeCellAttributes.call(this);
+                createHeader.call(this);
                 loadData.call(this, null);
 
                 this.toggleActive.apply(this, this.options.initialActive);
@@ -1254,8 +1308,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this.options.dragDest;
         },
         /**
-         * Sets whether the user can reorder the model by dragging/dropping icons
-         * @param {Boolean} bool If true, the user can drag icons in order to reorder the model
+         * Sets whether the user can reorder the model by dragging/dropping rows
+         * @param {Boolean} bool If true, the user can drag rows in order to reorder the model
          * @returns The object
          * */
         setReorderable: function(bool) {
@@ -1269,10 +1323,32 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return this;
         },
         /**
-         * @returns True, if the icons can be reordered by dragging
+         * @returns True, if the rows can be reordered by dragging
          * */
         getReorderable: function() {
             return this.options.reorderable;
+        },
+        /**
+         * Sets whether the user can reorder the columns by dragging/dropping the headers of columns
+         * @param {Boolean} bool If true, the user can drag a column header in order to reorder them
+         * @returns The object
+         * */
+        setColumnsReorderable: function(bool) {
+            if (!this.options.headerVisible) return;
+
+            bool = !!bool;
+            if (this.options.columnsReorderable == bool)
+                return;
+
+            this.options.columnsReorderable = bool;
+            setColumnsReorderable.call(this, bool);
+            return this;
+        },
+        /**
+         * @returns True, if the columns can be reordered by dragging
+         * */
+        getColumnsReorderable: function() {
+            return this.options.columnsReorderable;
         },
 
         _init: function(model) {
