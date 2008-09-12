@@ -701,8 +701,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function selectNode(node) {
-        if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
-        nodeMap[this.id][node.attributes.id].element.addClassName('treeview_node_selected');
+        var view = nodeMap[this.id][node.attributes.id];
+        if (!view.element.sensitive || view.active) return;
+        view.element.addClassName('treeview_node_selected');
+        view.active = true;
         this.selectedNodes.push(node);
         this.emitSignal('iwl:select');
     }
@@ -710,9 +712,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function unselectNode(node, skipRemoval) {
         var view = nodeMap[this.id][node.attributes.id];
         var exists = view && view.element;
-        if (exists && !view.element.sensitive) return;
+        if ((exists && !view.element.sensitive) || !view.active) return;
         if (exists)
             view.element.removeClassName('treeview_node_selected');
+        view.active = false;
         if (!skipRemoval) {
             this.selectedNodes = this.selectedNodes.without(node);
             this.emitSignal('iwl:unselect');
@@ -1382,6 +1385,28 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * */
         getColumnsReorderable: function() {
             return this.options.columnsReorderable;
+        },
+        /**
+         * Sets the state of the treeview. The state includes the active and expand states for nodes
+         * @param state The state to set
+         * @returns The object
+         * */
+        setState: function(state) {
+        },
+        /**
+         * @returns The current state of the treeview
+         * */
+        getState: function() {
+            var map = nodeMap[this.id];
+            var state = {};
+            for (var i in map) {
+                if (!map[i].expanded && !map[i].active) continue;
+                state[i] = {
+                    expanded: map[i].expanded,
+                    active: map[i].active
+                };
+            }
+            return state;
         },
 
         _init: function(model) {
