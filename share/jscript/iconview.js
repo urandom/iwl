@@ -278,7 +278,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
     
     function removeModel() {
-        nodeMap[this.id] = {};
+        nodeMap[this.id] = {callbacks: {}, flags: {}};
         this.model = undefined;
     }
 
@@ -328,11 +328,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function eventMouseDown(event) {
-        if (nodeMap[this.id].iconSelected) {
-            delete nodeMap[this.id].iconSelected;
+        if (nodeMap[this.id].flags.iconSelected) {
+            delete nodeMap[this.id].flags.iconSelected;
             return;
         }
-        if (nodeMap[this.id].skipIconSelect)
+        if (nodeMap[this.id].flags.skipIconSelect)
             return;
         if (event.ctrlKey || event.shiftKey)
             return;
@@ -348,7 +348,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function eventNodeMouseDown(event, node) {
         if (this.options.multipleSelection && (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length))) {
-            nodeMap[this.id].skipIconSelect = true;
+            nodeMap[this.id].flags.skipIconSelect = true;
             return;
         }
         toggleSelectNode.call(this, event, node);
@@ -358,9 +358,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var dragging = this.iwl && this.iwl.draggable
                 ? this.iwl.draggable.dragging
                 : false;
-        if (nodeMap[this.id].skipIconSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
+        if (nodeMap[this.id].flags.skipIconSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
             toggleSelectNode.call(this, event, node);
-            delete nodeMap[this.id].skipIconSelect;
+            delete nodeMap[this.id].flags.skipIconSelect;
         }
     }
 
@@ -369,11 +369,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (element && Element.hasClassName(element, 'iwl-cell-editable'))
             return;
         if (event.type == 'mousedown')
-            nodeMap[this.id].iconSelected = true;
+            nodeMap[this.id].flags.iconSelected = true;
         if (!multiple || !event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first && multiple) {
-            var map = nodeMap[this.id];
             var fIndex = first.getIndex();
             var cIndex = node.getIndex();
             if (cIndex == fIndex)
@@ -489,8 +488,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var element = view.element, self = this;
         setTimeout(function() {
             element.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: self.dropActions});
-            element.signalConnect('iwl:drag_hover', map.eventDragHover);
-            element.signalConnect('iwl:drag_drop', map.eventDragDrop);
+            element.signalConnect('iwl:drag_hover', map.callbacks.eventDragHover);
+            element.signalConnect('iwl:drag_drop', map.callbacks.eventDragDrop);
         }, 5);
     }
 
@@ -498,8 +497,8 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var element = view.element;
         setTimeout(function() {
             element.unsetDragDest();
-            element.signalDisconnect('iwl:drag_hover', map.eventDragHover);
-            element.signalDisconnect('iwl:drag_drop', map.eventDragDrop);
+            element.signalDisconnect('iwl:drag_hover', map.callbacks.eventDragHover);
+            element.signalDisconnect('iwl:drag_drop', map.callbacks.eventDragDrop);
         }, 5);
     }
 
@@ -770,17 +769,17 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.options.dragSource = bool;
             var map = nodeMap[this.id];
-            if (!map.eventDragInit)
-                map.eventDragInit = eventDragInit.bind(this);
+            if (!map.callbacks.eventDragInit)
+                map.callbacks.eventDragInit = eventDragInit.bind(this);
             this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
                 this.setDragSource({revert: true, revertEffect: false, actions: this.dragActions});
                 this.setDragData(this);
-                this.signalConnect('iwl:drag_init', map.eventDragInit);
+                this.signalConnect('iwl:drag_init', map.callbacks.eventDragInit);
             } else {
                 this.unsetDragSource();
-                this.signalDisconnect('iwl:drag_init', map.eventDragInit);
+                this.signalDisconnect('iwl:drag_init', map.callbacks.eventDragInit);
             }
 
             if (Prototype.Browser.IE && this.boxSelection) {
@@ -808,31 +807,31 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.options.dragDest = bool;
             var map = nodeMap[this.id];
-            if (!map.eventDragHover)
-                map.eventDragHover = eventDragHover.bind(this);
-            if (!map.eventDragDrop)
-                map.eventDragDrop = eventDragDrop.bind(this);
-            if (!map.eventDropMouseOver)
-                map.eventDropMouseOver = eventDropMouseOver.bind(this);
-            if (!map.eventNodeViewHover)
-                map.eventNodeViewHover = eventNodeViewHover.bind(this);
-            if (!map.eventNodeViewDrop)
-                map.eventNodeViewDrop = eventNodeViewDrop.bind(this);
+            if (!map.callbacks.eventDragHover)
+                map.callbacks.eventDragHover = eventDragHover.bind(this);
+            if (!map.callbacks.eventDragDrop)
+                map.callbacks.eventDragDrop = eventDragDrop.bind(this);
+            if (!map.callbacks.eventDropMouseOver)
+                map.callbacks.eventDropMouseOver = eventDropMouseOver.bind(this);
+            if (!map.callbacks.eventNodeViewHover)
+                map.callbacks.eventNodeViewHover = eventNodeViewHover.bind(this);
+            if (!map.callbacks.eventNodeViewDrop)
+                map.callbacks.eventNodeViewDrop = eventNodeViewDrop.bind(this);
 
             this.dropActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
                 this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
-                this.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
-                this.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
-                this.signalConnect('mouseover', map.eventDropMouseOver);
-                this.signalConnect('mouseout', map.eventDropMouseOver);
+                this.signalConnect('iwl:drag_hover', map.callbacks.eventNodeViewHover);
+                this.signalConnect('iwl:drag_drop', map.callbacks.eventNodeViewDrop);
+                this.signalConnect('mouseover', map.callbacks.eventDropMouseOver);
+                this.signalConnect('mouseout', map.callbacks.eventDropMouseOver);
             } else {
                 this.unsetDragDest();
-                this.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
-                this.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
-                this.signalDisconnect('mouseover', map.eventDropMouseOver);
-                this.signalDisconnect('mouseout', map.eventDropMouseOver);
+                this.signalDisconnect('iwl:drag_hover', map.callbacks.eventNodeViewHover);
+                this.signalDisconnect('iwl:drag_drop', map.callbacks.eventNodeViewDrop);
+                this.signalDisconnect('mouseover', map.callbacks.eventDropMouseOver);
+                this.signalDisconnect('mouseout', map.callbacks.eventDropMouseOver);
             }
 
             for (var i = 0, l = this.model.rootNodes.length; i < l; i++) {
@@ -904,7 +903,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.columnWidth = this.options.columnWidth
                 || parseInt(width / this.columns) - this.iconMarginX - bugs;
 
-            nodeMap[this.id] = {};
+            nodeMap[this.id] = {callbacks: {}, flags: {}};
 
             if (model) {
                 if (Object.keys(model.options.columnTypes).length)

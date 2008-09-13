@@ -566,7 +566,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function removeModel() {
         removeContainers.call(this, this.container);
-        nodeMap[this.id] = {};
+        nodeMap[this.id] = {callbacks: {}, flags: {}};
         this.model = undefined;
         this.container.innerHTML = '';
         this.header.innerHTML = '';
@@ -579,14 +579,14 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function eventMouseDown(event) {
         var map = nodeMap[this.id];
-        if (map.nodeSelected) {
-            delete map.nodeSelected;
+        if (map.flags.nodeSelected) {
+            delete map.flags.nodeSelected;
             return;
         }
-        if (map.skipNodeSelect)
+        if (map.flags.skipNodeSelect)
             return;
-        if (map.expandNode) {
-            delete map.expandNode;
+        if (map.flags.expandNode) {
+            delete map.flags.expandNode;
             return;
         }
         if (event.ctrlKey || event.shiftKey)
@@ -603,11 +603,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function eventNodeMouseDown(event, node) {
         if (Element.hasClassName(Event.element(event), 'treeview_node_parent')) {
-            nodeMap[this.id].expandNode = true;
+            nodeMap[this.id].flags.expandNode = true;
             return;
         }
         if (this.options.multipleSelection && (this.selectedNodes.indexOf(node) > -1 || (event.shiftKey && this.selectedNodes.length))) {
-            nodeMap[this.id].skipNodeSelect = true;
+            nodeMap[this.id].flags.skipNodeSelect = true;
             return;
         }
         toggleSelectNode.call(this, event, node);
@@ -617,9 +617,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var dragging = this.content.iwl && this.content.iwl.draggable
                 ? this.content.iwl.draggable.dragging
                 : false;
-        if (nodeMap[this.id].skipNodeSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
+        if (nodeMap[this.id].flags.skipNodeSelect && !dragging && (!this.boxSelection || !this.boxSelection.dragging)) {
             toggleSelectNode.call(this, event, node);
-            delete nodeMap[this.id].skipNodeSelect;
+            delete nodeMap[this.id].flags.skipNodeSelect;
         }
     }
 
@@ -662,11 +662,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (element && Element.hasClassName(element, 'iwl-cell-editable'))
             return;
         if (event.type == 'mousedown')
-            nodeMap[this.id].nodeSelected = true;
+            nodeMap[this.id].flags.nodeSelected = true;
         if (!multiple || !event.ctrlKey)
             unselectAll.call(this)
         if (event.shiftKey && first && multiple) {
-            var map = nodeMap[this.id];
             var fPath = first.getPath(),
                 cPath = node.getPath();
             if (cPath.toString() == fPath.toString())
@@ -773,8 +772,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         element.__droppableInit = true;
         setTimeout(function() {
             element.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: self.dropActions});
-            element.signalConnect('iwl:drag_hover', map.eventDragHover);
-            element.signalConnect('iwl:drag_drop', map.eventDragDrop);
+            element.signalConnect('iwl:drag_hover', map.callbacks.eventDragHover);
+            element.signalConnect('iwl:drag_drop', map.callbacks.eventDragDrop);
         }, 5);
     }
 
@@ -784,8 +783,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         element.__droppableInit = undefined;
         setTimeout(function() {
             element.unsetDragDest();
-            element.signalDisconnect('iwl:drag_hover', map.eventDragHover);
-            element.signalDisconnect('iwl:drag_drop', map.eventDragDrop);
+            element.signalDisconnect('iwl:drag_hover', map.callbacks.eventDragHover);
+            element.signalDisconnect('iwl:drag_drop', map.callbacks.eventDragDrop);
         }, 5);
     }
 
@@ -949,7 +948,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var columns = Element.select(this.header, '.treeview_column');
         var map = nodeMap[this.id];
         if (bool) {
-            map.columnDragDrop = columnDragDrop.bind(this);
+            map.callbacks.columnDragDrop = columnDragDrop.bind(this);
             for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
                 var header = this.options.cellAttributes[i].header;
                 c.setDragSource({
@@ -961,18 +960,18 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     constraint: 'horizontal'
                 });
                 c.setDragDest({accept: ['treeview_column'], actions: IWL.Draggable.Actions.MOVE, hoverclass: 'treeview_column_hover'});
-                c.signalConnect('iwl:drag_drop', map.columnDragDrop);
+                c.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
             }
             this.header.setDragDest({accept: ['treeview_column'], actions: IWL.Draggable.Actions.MOVE, hoverclass: 'treeview_header_hover'});
-            this.header.signalConnect('iwl:drag_drop', map.columnDragDrop);
+            this.header.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
         } else {
             for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
                 c.unsetDragSource();
                 c.unsetDragDest();
-                c.signalDisconnect('iwl:drag_drop', map.columnDragDrop);
+                c.signalDisconnect('iwl:drag_drop', map.callbacks.columnDragDrop);
             }
             this.header.unsetDragDest();
-            this.header.signalDisconnect('iwl:drag_drop', map.columnDragDrop);
+            this.header.signalDisconnect('iwl:drag_drop', map.callbacks.columnDragDrop);
         }
     }
 
@@ -998,8 +997,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function nodeExpandEvent(event, fullPath, node) {
         var path = node.getPath(), map = nodeMap[this.id];
         if (path.length == fullPath.length) {
-            this.signalDisconnect('iwl:node_expand', map.nodeExpandEvent);
-            delete map.nodeExpandEvent;
+            this.signalDisconnect('iwl:node_expand', map.callbacks.nodeExpandEvent);
+            delete map.callbacks.nodeExpandEvent;
             return;
         }
         path.push(fullPath[path.length]);
@@ -1132,8 +1131,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path);
             }
             if (!node) return;
-            nodeMap[this.id].nodeExpandEvent = nodeExpandEvent.bindAsEventListener(this, path);
-            this.signalConnect('iwl:node_expand', nodeMap[this.id].nodeExpandEvent);
+            nodeMap[this.id].callbacks.nodeExpandEvent = nodeExpandEvent.bindAsEventListener(this, path);
+            this.signalConnect('iwl:node_expand', nodeMap[this.id].callbacks.nodeExpandEvent);
             return this.expandNode(path[0]);
         },
         /**
@@ -1261,17 +1260,17 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.options.dragSource = bool;
             var map = nodeMap[this.id];
-            if (!map.eventDragInit)
-                map.eventDragInit = eventDragInit.bind(this);
+            if (!map.callbacks.eventDragInit)
+                map.callbacks.eventDragInit = eventDragInit.bind(this);
             this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
                 this.content.setDragSource({revert: true, revertEffect: false, actions: this.dragActions});
                 this.content.setDragData(this);
-                this.content.signalConnect('iwl:drag_init', map.eventDragInit);
+                this.content.signalConnect('iwl:drag_init', map.callbacks.eventDragInit);
             } else {
                 this.content.unsetDragSource();
-                this.content.signalDisconnect('iwl:drag_init', map.eventDragInit);
+                this.content.signalDisconnect('iwl:drag_init', map.callbacks.eventDragInit);
             }
 
             if (Prototype.Browser.IE && this.boxSelection) {
@@ -1299,31 +1298,31 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             this.options.dragDest = bool;
             var map = nodeMap[this.id];
-            if (!map.eventDragHover)
-                map.eventDragHover = eventDragHover.bind(this);
-            if (!map.eventDragDrop)
-                map.eventDragDrop = eventDragDrop.bind(this);
-            if (!map.eventDropMouseOver)
-                map.eventDropMouseOver = eventDropMouseOver.bind(this);
-            if (!map.eventNodeViewHover)
-                map.eventNodeViewHover = eventNodeViewHover.bind(this);
-            if (!map.eventNodeViewDrop)
-                map.eventNodeViewDrop = eventNodeViewDrop.bind(this);
+            if (!map.callbacks.eventDragHover)
+                map.callbacks.eventDragHover = eventDragHover.bind(this);
+            if (!map.callbacks.eventDragDrop)
+                map.callbacks.eventDragDrop = eventDragDrop.bind(this);
+            if (!map.callbacks.eventDropMouseOver)
+                map.callbacks.eventDropMouseOver = eventDropMouseOver.bind(this);
+            if (!map.callbacks.eventNodeViewHover)
+                map.callbacks.eventNodeViewHover = eventNodeViewHover.bind(this);
+            if (!map.callbacks.eventNodeViewDrop)
+                map.callbacks.eventNodeViewDrop = eventNodeViewDrop.bind(this);
 
             this.dropActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
                 this.content.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
-                this.content.signalConnect('iwl:drag_hover', map.eventNodeViewHover);
-                this.content.signalConnect('iwl:drag_drop', map.eventNodeViewDrop);
-                this.content.signalConnect('mouseover', map.eventDropMouseOver);
-                this.content.signalConnect('mouseout', map.eventDropMouseOver);
+                this.content.signalConnect('iwl:drag_hover', map.callbacks.eventNodeViewHover);
+                this.content.signalConnect('iwl:drag_drop', map.callbacks.eventNodeViewDrop);
+                this.content.signalConnect('mouseover', map.callbacks.eventDropMouseOver);
+                this.content.signalConnect('mouseout', map.callbacks.eventDropMouseOver);
             } else {
                 this.content.unsetDragDest();
-                this.content.signalDisconnect('iwl:drag_hover', map.eventNodeViewHover);
-                this.content.signalDisconnect('iwl:drag_drop', map.eventNodeViewDrop);
-                this.content.signalDisconnect('mouseover', map.eventDropMouseOver);
-                this.content.signalDisconnect('mouseout', map.eventDropMouseOver);
+                this.content.signalDisconnect('iwl:drag_hover', map.callbacks.eventNodeViewHover);
+                this.content.signalDisconnect('iwl:drag_drop', map.callbacks.eventNodeViewDrop);
+                this.content.signalDisconnect('mouseover', map.callbacks.eventDropMouseOver);
+                this.content.signalDisconnect('mouseout', map.callbacks.eventDropMouseOver);
             }
 
             var self = this;
@@ -1437,7 +1436,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
             connectSignals.call(this);
 
-            nodeMap[this.id] = {};
+            nodeMap[this.id] = {callbacks: {}, flags: {}};
 
             this.nodeSeparatorCallback = Object.isString(this.options.nodeSeparatorCallback)
                 ? this.options.nodeSeparatorCallback.objectize()
