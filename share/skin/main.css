@@ -1840,6 +1840,13 @@ div.tooltip_content {
     overflow: auto;
 }
 
+.treeview_node_insensitive {
+    color: #bbb;
+}
+.treeview_partial_node_insensitive {
+    color: inherit;
+}
+
 .treeview_node_highlight {
     background: #8ac6f2
 }

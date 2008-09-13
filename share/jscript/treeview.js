@@ -103,7 +103,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var id = this.id, nId = node.attributes.id, map = nodeMap[id];
         if (!map[nId]) map[nId] = {};
         var nView = map[nId];
-        nView.node = node, nView.element = element, nView.container = container, nView.indent = indent;
+        nView.node = node, nView.element = element, nView.container = container, nView.indent = indent, nView.sensitive = true;
         element.node = node;
         if (nView.childContainer && !nView.childContainer.parentNode) {
             var next = element.nextSibling;
@@ -118,13 +118,12 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (Element.hasClassName(element, 'treeview_node_separator'))
             return;
 
-        element.sensitive = true;
         Element.signalConnect(element, 'dom:mouseenter', function(event) {
-            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !element.sensitive) return;
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !nView.sensitive) return;
             changeHighlight.call(this, node);
         }.bind(this));
         Element.signalConnect(element, 'dom:mouseleave', function(event) {
-            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !element.sensitive) return;
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !nView.sensitive) return;
             changeHighlight.call(this);
         }.bind(this));
 
@@ -346,8 +345,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element.highlight = false;
         }
         if (node) {
+            var view = nodeMap[this.id][node.attributes.id];
             var element = nodeMap[this.id][node.attributes.id].element;
-            if (element.sensitive || node.childCount != 0)
+            if (view.sensitive || node.childCount != 0)
                 element.addClassName('treeview_node_highlight');
             element.highlight = true;
         }
@@ -418,6 +418,14 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.pageChanging = undefined;
         if (this.popDownRequest) {
             this.popDownRequest = undefined;
+        }
+    }
+
+    function findByNodeId(id) {
+        for (var i in nodeMap) {
+            var view;
+            if (view = nodeMap[i][id])
+                return view;
         }
     }
 
@@ -658,7 +666,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function toggleSelectNode(event, node) {
-        var first = this.selectedNodes[0], multiple = this.options.multipleSelection, element = Event.element(event);
+        var first = this.selectedNodes[0],
+            multiple = this.options.multipleSelection,
+            element = Object.isObject(event) ? null : Event.element(event);
         if (element && Element.hasClassName(element, 'iwl-cell-editable'))
             return;
         if (event.type == 'mousedown')
@@ -701,7 +711,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function selectNode(node) {
         var view = nodeMap[this.id][node.attributes.id];
-        if (!view.element.sensitive || view.active) return;
+        if (!view.sensitive || view.active) return;
         view.element.addClassName('treeview_node_selected');
         view.active = true;
         this.selectedNodes.push(node);
@@ -711,7 +721,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function unselectNode(node, skipRemoval) {
         var view = nodeMap[this.id][node.attributes.id];
         var exists = view && view.element;
-        if ((exists && !view.element.sensitive) || !view.active) return;
+        if ((exists && !view.sensitive) || !view.active) return;
         if (exists)
             view.element.removeClassName('treeview_node_selected');
         view.active = false;
@@ -730,6 +740,13 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (this._focusedElement)
             this._focusedElement.blur();
         this.emitSignal('iwl:unselect_all');
+    }
+
+    function collapseAll() {
+        for (var i = 0, l = this.expandedNodes.length; i < l; i++)
+            this.collapseNode(this.expandedNodes[i]);
+        this.expandedNodes = [];
+        this.emitSignal('iwl:collapse_all');
     }
     
     function boxSelectionInit(event) {
@@ -994,17 +1011,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         setColumnsReorderable.call(this, true);
     }
 
-    function nodeExpandEvent(event, fullPath, node) {
-        var path = node.getPath(), map = nodeMap[this.id];
-        if (path.length == fullPath.length) {
-            this.signalDisconnect('iwl:node_expand', map.callbacks.nodeExpandEvent);
-            delete map.callbacks.nodeExpandEvent;
-            return;
-        }
-        path.push(fullPath[path.length]);
-        this.expandNode(path);
-    }
-
     return {
         /**
          * Sets/unsets the given items as active
@@ -1049,11 +1055,12 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node) return;
-            var element = nodeMap[this.id][node.attributes.id].element;
+            var view = nodeMap[this.id][node.attributes.id];
+            var element = view.element;
             if (!element) return;
             var hasChildren = node.childCount != 0;
+            view.sensitive = !!sensitive;
             element[sensitive ? 'removeClassName' : 'addClassName'](hasChildren ? 'treeview_partial_node_insensitive' : 'treeview_node_insensitive');
-            element.sensitive = !!sensitive;
 
             return this.emitSignal('iwl:sensitivity_change', node);
         },
@@ -1073,8 +1080,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node || node.childCount == 0) return;
-            var map = nodeMap[this.id], view = map[node.attributes.id];
-            if (!view.element || view.expanded) return;
+            var map = nodeMap[this.id], view = map[node.attributes.id], pView = node.parentNode ? map[node.parentNode.attributes.id] : null;
+            if (!view.element || view.expanded || (pView && !pView.expanded && !pView.expanding)) return;
+
+            /* Create a container, if none exists */
             if (node.childCount) {
                 if (!view.childContainer)
                     createNodes.call(this, node.childNodes, generateNodeTemplate.call(this), view.indent);
@@ -1086,6 +1095,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 }
             }
 
+            /* We don't have the actual children yet */
             if (null == node.childCount && node.requestChildren({allDescendants: recursive}))
                 Element.addClassName(view.element, 'treeview_node_loading');
             else {
@@ -1096,21 +1106,26 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 }
                 if (this.options.expandEffect && !arguments[2]) {
                     var self = this;
-                    Effect.toggle(
-                        view.childContainer,
-                        this.options.expandEffect,
-                        Object.extend({
-                            afterFinish: function() {
-                                delete view.expanding;
-                                view.expanded = true;
-                                self.emitSignal('iwl:node_expand', node);
-                            }
-                        }, this.options.expandEffectOptions)
-                    );
+                    this.queue.add(function() {
+                        Effect.toggle(
+                            view.childContainer,
+                            self.options.expandEffect,
+                            Object.extend({
+                                afterFinish: function() {
+                                    delete view.expanding;
+                                    view.expanded = true;
+                                    self.expandedNodes.push(node);
+                                    self.emitSignal('iwl:node_expand', node);
+                                    self.queue.end();
+                                },
+                            }, self.options.expandEffectOptions)
+                        );
+                    });
                     view.expanding = true;
                 } else {
                     view.childContainer.style.display = '';
                     view.expanded = true;
+                    this.expandedNodes.push(node);
                     this.emitSignal('iwl:node_expand', node);
                 }
             }
@@ -1131,9 +1146,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path);
             }
             if (!node) return;
-            nodeMap[this.id].callbacks.nodeExpandEvent = nodeExpandEvent.bindAsEventListener(this, path);
-            this.signalConnect('iwl:node_expand', nodeMap[this.id].callbacks.nodeExpandEvent);
-            return this.expandNode(path[0]);
+            var callbacks = nodeMap[this.id].callbacks;
+            for (var i = 0, l = path.length; i < l; i++) {
+                this.expandNode(path.slice(0, i+1));
+            }
+            return this;
         },
         /**
          * Collapses the node so its children are visible
@@ -1153,26 +1170,30 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var view = nodeMap[this.id][node.attributes.id];
             if (!view.element || !view.expanded) return;
             if (this.options.expandEffect && !arguments[1]) {
+                var self = this;
                 Effect.toggle(
                     view.childContainer,
-                    this.options.expandEffect,
+                    self.options.expandEffect,
                     Object.extend({
                         afterFinish: function() {
                             for (var i = 0, l = node.childCount; i < l; i++)
-                                this.collapseNode(node.childNodes[i], true);
+                                self.collapseNode(node.childNodes[i], true);
                             view.expanded = false;
-                        }.bind(this)
-                    }, this.options.expandEffectOptions)
+                            self.expandedNodes.splice(self.expandedNodes.indexOf(node), 1);
+                            self.emitSignal('iwl:node_collapse', node);
+                        }
+                    }, self.options.expandEffectOptions)
                 );
             } else {
                 view.childContainer.style.display = 'none';
                 for (var i = 0, l = node.childCount; i < l; i++)
                     this.collapseNode(node.childNodes[i], true);
                 view.expanded = false;
+                this.expandedNodes.splice(this.expandedNodes.indexOf(node), 1);
+                this.emitSignal('iwl:node_collapse', node);
             }
 
             Element.removeClassName(view.element, 'treeview_node_expanded');
-            this.emitSignal('iwl:node_collapse', node);
             return this;
         },
         /**
@@ -1391,19 +1412,37 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setState: function(state) {
+            if (!state) return;
+            unselectAll.call(this);
+            collapseAll.call(this);
+            if (state.nodes) {
+                for (var i in state.nodes) {
+                    var view = findByNodeId(i);
+                    if (state.nodes[i].expanded)
+                        this.expandNode(view.node);
+                    if (state.nodes[i].active)
+                        this.toggleActive(view.node);
+                    if (!state.nodes[i].sensitive)
+                        this.setSensitivity(view.node, false);
+                }
+            }
         },
         /**
          * @returns The current state of the treeview
          * */
         getState: function() {
             var map = nodeMap[this.id];
-            var state = {};
+            var state = {nodes: {}};
             for (var i in map) {
-                if (!map[i].expanded && !map[i].active) continue;
-                state[i] = {
-                    expanded: map[i].expanded,
-                    active: map[i].active
-                };
+                if ('callbacks' == i || 'flags' == i)
+                    continue;
+                if (map[i].expanded || map[i].active || !map[i].sensitive) {
+                    state.nodes[i] = {
+                        expanded: map[i].expanded,
+                        active: map[i].active,
+                        sensitive: map[i].sensitive
+                    };
+                }
             }
             return state;
         },
@@ -1427,7 +1466,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.content = this.container = this.down('.treeview_content');
             this.container.childContainers = [];
             this.selectedNodes = [];
+            this.expandedNodes = [];
             this.containers = {};
+            this.queue = new IWL.Queue;
             if (this.options.pageControl) {
                 this.pageControl = $(this.options.pageControl);
                 this.pageControl.signalConnect('iwl:current_page_is_changing', pageChanging.bind(this));

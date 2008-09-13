@@ -481,7 +481,7 @@ sub _init {
 
     delete @args{qw(columnWidth columnClass columnMap multipleSelection boxSelection cellAttributes model)};
 
-    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'dist/delegate.js', 'cellrenderer.js', 'treeview.js');
+    $self->requiredJs('base.js', 'dist/dragdrop.js', 'dnd.js', 'dist/delegate.js', 'cellrenderer.js', 'queue.js', 'treeview.js');
     $self->_constructorArguments(%args);
     $self->{_customSignals} = {change => [], popup => [], popdown => [], edit_begin => [], edit_end => []};
 

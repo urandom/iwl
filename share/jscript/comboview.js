@@ -154,7 +154,8 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         Object.extend(nView, {
             node: node,
             element: element,
-            container: container
+            container: container,
+            sensitive: true
         });
         element.node = node;
         if (element.hasClassName('comboview_node_separator'))
@@ -167,7 +168,6 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var hasChildren = node.hasChildren();
         }
 
-        element.sensitive = true;
         element.signalConnect('dom:mouseenter', function(event) {
             changeHighlight.call(this, node);
             if (!childContainer || !Object.isElement(childContainer.parentNode) || !childContainer.visible())
@@ -464,8 +464,9 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             element.highlight = false;
         }
         if (node) {
-            var element = nodeMap[this.id][node.attributes.id].element;
-            if (element.sensitive || node.childCount != 0)
+            var view = nodeMap[this.id][node.attributes.id];
+            var element = view.element;
+            if (view.sensitive || node.childCount != 0)
                 element.addClassName('comboview_node_highlight');
             element.highlight = true;
         }
@@ -674,7 +675,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 if (!Object.isArray(path)) path = [path];
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
-            if (!node || !nodeMap[this.id][node.attributes.id].element.sensitive) return;
+            if (!node || !nodeMap[this.id][node.attributes.id].sensitive) return;
             this.selectedNode = node;
             this.content.removeClassName('comboview_content_empty');
             this.values = node.getValues();
@@ -704,11 +705,12 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node) return;
-            var element = nodeMap[this.id][node.attributes.id].element;
+            var view = nodeMap[this.id][node.attributes.id];
+            var element = view.element;
             if (!element) return;
             var hasChildren = node.childCount != 0;
+            view.sensitive = !!sensitive;
             element[sensitive ? 'removeClassName' : 'addClassName'](hasChildren ? 'comboview_partial_node_insensitive' : 'comboview_node_insensitive');
-            element.sensitive = !!sensitive;
 
             return this.emitSignal('iwl:sensitivity_change', node);
         },

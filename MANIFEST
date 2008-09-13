@@ -268,6 +268,7 @@ share/jscript/model.js
 share/jscript/navbar.js
 share/jscript/notebook.js
 share/jscript/pagecontrol.js
+share/jscript/queue.js
 share/jscript/progressbar.js
 share/jscript/prototype_extensions.js
 share/jscript/resizer.js

@@ -46,9 +46,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var nView = nodeMap[id][nId];
         Object.extend(nView, {
             node: node,
-            element: element
+            element: element,
+            sensitive: true
         });
-        element.sensitive = true;
         element.node = node;
 
         if (node.attributes.insensitive)
@@ -57,11 +57,11 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         for (var i = 0, l = children.length; i < l; i++) {
             var child = children[i];
             child.signalConnect('mouseover', function(event) {
-                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
+                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !nView.sensitive) return;
                 changeHighlight.call(this, node);
             }.bind(this));
             child.signalConnect('mouseout', function(event) {
-                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !element.sensitive) return;
+                if ((this.boxSelection && this.boxSelection.dragging) || (this.iwl && this.iwl.draggable && this.iwl.draggable.dragging) || !nView.sensitive) return;
                 changeHighlight.call(this);
             }.bind(this));
             child.signalConnect('mousedown', eventNodeMouseDown.bindAsEventListener(this, node));
@@ -155,8 +155,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             }
         }
         if (node) {
-            var element = nodeMap[this.id][node.attributes.id].element;
-            if (element.sensitive || node.childCount != 0)
+            var view = nodeMap[this.id][node.attributes.id];
+            var element = view.element;
+            if (view.sensitive || node.childCount != 0)
                 element.addClassName('iconview_node_highlight');
             element.highlight = true;
         }
@@ -395,7 +396,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function selectNode(node) {
-        if (!nodeMap[this.id][node.attributes.id].element.sensitive) return;
+        if (!nodeMap[this.id][node.attributes.id].sensitive) return;
         nodeMap[this.id][node.attributes.id].element.addClassName('iconview_node_selected');
         this.selectedNodes.push(node);
         this.emitSignal('iwl:select');
@@ -404,7 +405,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function unselectNode(node, skipRemoval) {
         var view = nodeMap[this.id][node.attributes.id];
         var exists = view && view.element;
-        if (exists && !view.element.sensitive) return;
+        if (exists && !view.sensitive) return;
         if (exists)
             view.element.removeClassName('iconview_node_selected');
         if (!skipRemoval) {
@@ -706,11 +707,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 node = this.model.getNodeByPath(path) || this.model.getFirstNode();
             }
             if (!node) return;
-            var element = nodeMap[this.id][node.attributes.id].element;
+            var view = nodeMap[this.id][node.attributes.id];
+            var element = view.element;
             if (!element) return;
             var hasChildren = node.childCount != 0;
+            view.sensitive = !!sensitive;
             element[sensitive ? 'removeClassName' : 'addClassName'](hasChildren ? 'iconview_partial_node_insensitive' : 'iconview_node_insensitive');
-            element.sensitive = !!sensitive;
 
             return this.emitSignal('iwl:sensitivity_change', node);
         },
