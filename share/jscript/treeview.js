@@ -1010,7 +1010,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             newIndex == indices[i].splice(newIndex, 0, res[0]);
         }
         this.setModel(this.model);
-        setColumnsReorderable.call(this, true);
+        this.options.columnsReorderable = false;
         this.setState(state);
     }
 
@@ -1432,13 +1432,28 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         this.setSensitivity(view.node, false);
                 }
             }
+            if (state.options) {
+                for (var i in state.options) {
+                    switch(i) {
+                        case 'columnsReorderable':
+                            this.setColumnsReorderable(state.options[i]);
+                            break;
+                        case 'headerVisible':
+                            this.setHeaderVisibility(state.options[i]);
+                            break;
+                        case 'reorderable':
+                            this.setReorderable(state.options[i]);
+                            break;
+                    }
+                }
+            }
         },
         /**
          * @returns The current state of the treeview
          * */
         getState: function() {
             var map = nodeMap[this.id];
-            var state = {nodes: {}};
+            var state = {nodes: {}, options: {}};
             for (var i in map) {
                 if ('callbacks' == i || 'flags' == i)
                     continue;
@@ -1450,6 +1465,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     };
                 }
             }
+            var options = ['columnsReorderable', 'headerVisible', 'reorderable'];
+            for (var i = 0, l = options.length; i < l; i++)
+                state.options[options[i]] = this.options[options[i]];
             return state;
         },
 
