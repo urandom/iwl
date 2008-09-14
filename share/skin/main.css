@@ -2005,9 +2005,7 @@ div.tooltip_content {
     padding: 2px 4px;
     font-weight: bold;
 }
-.treeview_column_hover {
-    border-left: 3px inset #5c8aac;
-}
-.treeview_header_hover {
-    border-right: 3px outset #5c8aac;
+.treeview_column.treeview_column_hover, .treeview_header .treeview_node_indent.treeview_column_hover {
+    background: url('/iwl/skin/default/images/treeview/target.png') 100% center no-repeat;
+    padding-right: 7px;
 }

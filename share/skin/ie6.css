@@ -151,3 +151,6 @@ div.expander_collapsed .expander_icon {
 .treeview_node_last .treeview_column {
     border-bottom: none;
 }
+.treeview_column.treeview_column_hover, .treeview_header .treeview_node_indent.treeview_column_hover {
+    background: url('/iwl/skin/default/images/treeview/target.gif') 100% center no-repeat;
+}

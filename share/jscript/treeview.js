@@ -963,9 +963,12 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function setColumnsReorderable(bool) {
         var columns = Element.select(this.header, '.treeview_column');
+        var indent = columns[0].down('.treeview_node_indent');
         var map = nodeMap[this.id];
         if (bool) {
             map.callbacks.columnDragDrop = columnDragDrop.bind(this);
+            indent.setDragDest({accept: ['treeview_column'], hoverclass: 'treeview_column_hover'});
+            indent.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
             for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
                 var header = this.options.cellAttributes[i].header;
                 c.setDragSource({
@@ -973,27 +976,25 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     within: this.header,
                     revert: true,
                     revertEffect: false,
-                    actions: IWL.Draggable.Actions.MOVE,
                     constraint: 'horizontal'
                 });
-                c.setDragDest({accept: ['treeview_column'], actions: IWL.Draggable.Actions.MOVE, hoverclass: 'treeview_column_hover'});
+                c.setDragDest({accept: ['treeview_column'], hoverclass: 'treeview_column_hover'});
                 c.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
             }
-            this.header.setDragDest({accept: ['treeview_column'], actions: IWL.Draggable.Actions.MOVE, hoverclass: 'treeview_header_hover'});
-            this.header.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
         } else {
             for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
                 c.unsetDragSource();
                 c.unsetDragDest();
                 c.signalDisconnect('iwl:drag_drop', map.callbacks.columnDragDrop);
             }
-            this.header.unsetDragDest();
-            this.header.signalDisconnect('iwl:drag_drop', map.callbacks.columnDragDrop);
+            indent.unsetDragDest();
+            indent.signalDisconnect('iwl:drag_drop', map.callbacks.columnDragDrop);
         }
     }
 
     function columnDragDrop(event, sourceElement, destElement, sourceEvent, actions) {
         Event.stop(event);
+        var state = this.getState();
         var columns = Element.select(this.header, '.treeview_column');
         var index = columns.indexOf(sourceElement);
         var newIndex = columns.indexOf(destElement);
@@ -1003,12 +1004,14 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.options.columnWidth,
             this.options.columnClass
         ];
+        if (newIndex < index) newIndex++;
         for (var i = 0, l = indices.length; i < l; i++) {
             var res = indices[i].splice(index, 1);
-            newIndex == -1 ? indices[i].push(res[0]) : indices[i].splice(newIndex, 0, res[0]);
+            newIndex == indices[i].splice(newIndex, 0, res[0]);
         }
         this.setModel(this.model);
         setColumnsReorderable.call(this, true);
+        this.setState(state);
     }
 
     return {
@@ -1171,19 +1174,22 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!view.element || !view.expanded) return;
             if (this.options.expandEffect && !arguments[1]) {
                 var self = this;
-                Effect.toggle(
-                    view.childContainer,
-                    self.options.expandEffect,
-                    Object.extend({
-                        afterFinish: function() {
-                            for (var i = 0, l = node.childCount; i < l; i++)
-                                self.collapseNode(node.childNodes[i], true);
-                            view.expanded = false;
-                            self.expandedNodes.splice(self.expandedNodes.indexOf(node), 1);
-                            self.emitSignal('iwl:node_collapse', node);
-                        }
-                    }, self.options.expandEffectOptions)
-                );
+                this.queue.add(function() {
+                    Effect.toggle(
+                        view.childContainer,
+                        self.options.expandEffect,
+                        Object.extend({
+                            afterFinish: function() {
+                                for (var i = 0, l = node.childCount; i < l; i++)
+                                    self.collapseNode(node.childNodes[i], true);
+                                view.expanded = false;
+                                self.expandedNodes.splice(self.expandedNodes.indexOf(node), 1);
+                                self.emitSignal('iwl:node_collapse', node);
+                                self.queue.end();
+                            }
+                        }, self.options.expandEffectOptions)
+                    );
+                });
             } else {
                 view.childContainer.style.display = 'none';
                 for (var i = 0, l = node.childCount; i < l; i++)
