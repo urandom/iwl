@@ -374,6 +374,21 @@ sub setReorderable {
     return $self;
 }
 
+=item B<setColumnsReorderable> (B<BOOL>)
+
+Enables automatic reordering of columns via D&D
+
+Parameters: B<BOOL> - if true, D&D reordering will be enabled
+
+=cut
+
+sub setColumnsReorderable {
+    my ($self, $bool) = @_;
+    $self->{__columnsReorderable} = !(!$bool);
+
+    return $self;
+}
+
 # Protected
 #
 sub _realize {
@@ -445,6 +460,8 @@ sub _realize {
         tv.setModelDragDest(true, $dropAction);
     if ('$self->{__reorderable}')
         tv.setReorderable(true);
+    if ('$self->{__columnsReorderable}')
+        tv.setColumnsReorderable(true);
 })();
 EOF
 }

@@ -1430,29 +1430,30 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (state.nodes) {
                 var self = this;
                 for (var i in state.nodes) {
-                    var node = state.nodes[i].node;
-                    if (state.nodes[i].expanded)
+                    var sNode = state.nodes[i],
+                        node = sNode.node;
+                    if (sNode.expanded)
                         this.expandTo(node);
                     this.queue.add(function(queue) {
-                        if (state.nodes[i].active)
+                        if (sNode.active)
                             self.toggleActive(node);
-                        if (!state.nodes[i].sensitive)
+                        if (!sNode.sensitive)
                             self.setSensitivity(node, false);
                         queue.end();
                     });
                 }
             }
             if (state.options) {
-                for (var i in state.options) {
-                    switch(i) {
+                for (var j in state.options) {
+                    switch(j) {
                         case 'columnsReorderable':
-                            this.setColumnsReorderable(state.options[i]);
+                            this.setColumnsReorderable(state.options[j]);
                             break;
                         case 'headerVisible':
-                            this.setHeaderVisibility(state.options[i]);
+                            this.setHeaderVisibility(state.options[j]);
                             break;
                         case 'reorderable':
-                            this.setReorderable(state.options[i]);
+                            this.setReorderable(state.options[j]);
                             break;
                     }
                 }
