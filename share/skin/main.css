@@ -1956,6 +1956,9 @@ div.tooltip_content {
     white-space: nowrap;
     color: black;
 }
+.treeview_header_reorderable {
+    cursor: move;
+}
 .treeview_column {
     border-right: 1px solid #eaeaea;
     border-bottom: 1px solid #eaeaea;

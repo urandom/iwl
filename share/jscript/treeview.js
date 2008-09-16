@@ -1043,6 +1043,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var indent = columns[0].down('.treeview_node_indent');
         var map = nodeMap[this.id];
         if (bool) {
+            Element.addClassName(this.header, 'treeview_header_reorderable');
             map.callbacks.columnDragDrop = columnDragDrop.bind(this);
             indent.setDragDest({accept: ['treeview_column'], hoverclass: 'treeview_column_hover'});
             indent.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
@@ -1059,6 +1060,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 c.signalConnect('iwl:drag_drop', map.callbacks.columnDragDrop);
             }
         } else {
+            Element.removeClassName(this.header, 'treeview_header_reorderable');
             for (var i = 0, l = columns.length, c = columns[0]; i < l; c = columns[++i]) {
                 c.unsetDragSource();
                 c.unsetDragDest();
@@ -1428,19 +1430,18 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             unselectAll.call(this);
             collapseAll.call(this);
             if (state.nodes) {
-                var self = this;
                 for (var i in state.nodes) {
                     var sNode = state.nodes[i],
                         node = sNode.node;
                     if (sNode.expanded)
                         this.expandTo(node);
-                    this.queue.add(function(queue) {
-                        if (sNode.active)
-                            self.toggleActive(node);
-                        if (!sNode.sensitive)
-                            self.setSensitivity(node, false);
+                    this.queue.add(function(s, queue) {
+                        if (s.active)
+                            this.toggleActive(s.node);
+                        if (!s.sensitive)
+                            this.setSensitivity(s.node, false);
                         queue.end();
-                    });
+                    }.bind(this, sNode));
                 }
             }
             if (state.options) {
