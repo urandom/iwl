@@ -70,8 +70,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
       if (this.view) {
         var style = this.view.style;
         style.position = 'absolute';
-        style.left = (pointer[0] || 0) + 'px';
-        style.top = (pointer[1] || 0) + 'px';
+        style.left = (this.options.viewPosition[0] || pointer[0] || 0) + 'px';
+        style.top = (this.options.viewPosition[1] || pointer[1] || 0) + 'px';
         document.body.appendChild(this.view);
         this.draggableElement = this.view;
         this.absolutePosition = true;
@@ -97,7 +97,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
       this.element.parentNode.insertBefore(this._clone, this.element);
       this.absolutePosition = true;
     } else
-      this.absolutePosition = this.element.getStyle('position') == 'absolute';
+      this.absolutePosition = this.element._originallyAbsolute = this.element.getStyle('position') == 'absolute';
 
     if (this.options.zindex) {
       this.originalZ = parseInt(Element.getStyle(this.element,'z-index') || 0);
@@ -251,6 +251,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
         snap: false,
         delay: 0,
         view: false,
+        viewPosition: [],
         outline: false,
         ghosting: false,
         outlineOpacity: 0.6,

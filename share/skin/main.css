@@ -1834,10 +1834,11 @@ div.tooltip_content {
     background-color: white;
     color: #111;
     margin: 1px 0;
+    overflow: hidden;
 }
 
 .treeview_content {
-    overflow: auto;
+    overflow-y: auto;
 }
 
 .treeview_node_insensitive {
@@ -1955,9 +1956,21 @@ div.tooltip_content {
     font-weight: bold;
     white-space: nowrap;
     color: black;
+    position: relative;
 }
 .treeview_header_reorderable {
     cursor: move;
+}
+.treeview_column_resize_handle {
+    background: url(/iwl/skin/default/images/treeview/resize_handle.gif) repeat-x center left;
+    width: 4px;
+    height: 17px;
+    border-left: 1px solid #515151;
+    cursor: col-resize;
+}
+.treeview_column_resize_bar {
+    width: 1px;
+    background: black;
 }
 .treeview_column {
     border-right: 1px solid #eaeaea;

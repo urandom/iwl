@@ -164,13 +164,13 @@ The current node
 
 I<renderFunction> and I<renderClass> are mutually exclusive. If a I<renderClass> is defined, it will be instantiated, and if it has a B<render> method, it will be used as a I<renderFunction>.
 
+=item B<resizable>
+
+If true, the user can resize the column by dragging the right edge of the header cell
+
 =item B<editable>
 
 If true (or hashref), and if the renderer supports it, the cell will be made editable. If a hashref value is given, it will be used as the options for the editable. The following keys are currently recognized:
-
-=item B<booleanRadio>
-
-By default, editable columns of type I<BOOLEAN> will be converted into checkboxes. If this option is true, radio buttons will be used instead. The radio button group will be based on the view's id, as well as the depth of the nodes. Furthermore, only one node in the current depth will have a true value.
 
 =over 12
 
@@ -193,6 +193,10 @@ Fires when editing has started. The callback receives the event and the value as
 Fires when editing has ended, changing the value of the cell. The callback receives the event and the value as parameters. Note that the actual node values do not change.
 
 =back
+
+=item B<booleanRadio>
+
+By default, editable columns of type I<BOOLEAN> will be converted into checkboxes. If this option is true, radio buttons will be used instead. The radio button group will be based on the view's id, as well as the depth of the nodes. Furthermore, only one node in the current depth will have a true value.
 
 =item B<header>
 

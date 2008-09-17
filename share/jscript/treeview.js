@@ -567,7 +567,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function removeModel() {
         removeContainers.call(this, this.container);
-        nodeMap[this.id] = {callbacks: {}, flags: {}};
+        var map = nodeMap[this.id], callbacks = map.callbacks, flags = map.flags;
+        nodeMap[this.id] = {callbacks: callbacks, flags: flags};
         this.model = undefined;
         this.container.innerHTML = '';
         this.header.innerHTML = '';
@@ -1097,6 +1098,75 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         this.options.columnsReorderable = false;
     }
 
+    function contentScrollEvent(event) {
+        var offset = this.content.scrollLeft;
+        if (this.content.lastHorizontalScrollOffset == offset) return;
+        this.content.lastHorizontalScrollOffset = offset;
+        this.header.style.marginLeft = -offset + 'px';
+    }
+
+    function createResizableBorders() {
+        var resizeBar = new Element('div', {className: "treeview_column_resize_bar", style: "height: " + this.offsetHeight + "px;"});
+        var position = Element.cumulativeOffset(this);
+        var callbacks = nodeMap[this.id].callbacks;
+        if (!callbacks.resizeColumnEvent)
+            callbacks.resizeColumnEvent = resizeColumnEvent.bind(this);
+        for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
+            if (!this.options.cellAttributes[i].resizable) continue;
+            var column = this.header.firstChild.tBodies[0].rows[0].cells[i];
+            var dims = Element.getDimensions(column);
+            var handle = new Element('div', {className: 'treeview_column_resize_handle', style: 'position: absolute; left: -10000px'});
+            this.header.appendChild(handle);
+            var handleDims = Element.getDimensions(handle);
+            handle.style.left = column.offsetLeft + dims.width - handleDims.width + 'px';
+            handle.style.top = 0 + 'px';
+            handle.setDragSource({
+                within: {element: this, padding: [0, 10]},
+                constraint: 'horizontal',
+                view: resizeBar,
+                viewPosition: [0, position[1]],
+                revert: true,
+                revertEffect: false
+            });
+            handle.index = i;
+            handle.column = column;
+            column.resizeHandle = handle;
+            handle.signalConnect('iwl:drag_end', callbacks.resizeColumnEvent);
+        }
+    }
+
+    function removeResizableBorders() {
+        var callbacks = nodeMap[this.id].callbacks;
+        for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
+            if (!this.options.cellAttributes[i].resizable) continue;
+            var column = this.header.firstChild.tBodies[0].rows[0].cells[i];
+            var handle = column.resizeHandle;
+            handle.unsetDragSource();
+            handle.signalDisconnect('iwl:drag_end', callbacks.resizeColumnEvent);
+            Element.remove(handle);
+            handle.column = undefined;
+            column.resizeHandle = undefined;
+        }
+    }
+
+    function resizeColumnEvent(event, draggable) {
+        var delta = -draggable.offsetDelta[0];
+        var handle = Event.element(event);
+        var nodes = this.select('.iwl-node');
+        var columns = this.select('.treeview_column' + handle.index);
+        var nodeWidth = nodes[0].offsetWidth;
+        var columnWidth = columns[0].offsetWidth;
+        removeResizableBorders.call(this);
+        nodeWidth += delta;
+        columnWidth += delta;
+        for (var i = 0, l = nodes.length; i < l; i++) {
+            nodes[i].style.width = nodeWidth + 'px';
+            columns[i].style.width = columnWidth + 'px';
+        }
+        this.options.columnWidth[handle.index] = columnWidth;
+        createResizableBorders.call(this);
+    }
+
     return {
         /**
          * Sets/unsets the given items as active
@@ -1264,14 +1334,22 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setHeaderVisibility: function(bool) {
+            var callbacks = nodeMap[this.id].callbacks;
             if (bool) {
-                if (!this.header.__built) {
+                if (!nodeMap[this.id].flags.headerExists) {
                     createHeader.call(this);
-                    this.header.__built = true;
+                    nodeMap[this.id].flags.headerExists = true;
+                }
+                if (!callbacks.contentScrollEvent) {
+                    callbacks.contentScrollEvent = contentScrollEvent.bind(this);
+                    this.content.signalConnect('scroll', callbacks.contentScrollEvent);
                 }
                 this.header.style.display = '';
+                createResizableBorders.call(this);
             } else {
                 this.header.style.display = 'none';
+                this.content.signalDisconnect('scroll', callbacks.contentScrollEvent);
+                removeResizableBorders.call(this);
             }
 
             return this;
