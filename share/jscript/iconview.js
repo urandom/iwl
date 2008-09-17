@@ -579,7 +579,7 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function eventDragInit(event, draggable) {
         draggable.options.view = IWL.Draggable.HTMLView;
-        if (this.selectedNodes.length == 0)
+        if (this.selectedNodes.length == 0 || (this.options.boxSelection && (event.shiftKey || event.ctrlKey)))
             return draggable.terminateDrag();
         if (this.selectedNodes.length == 1) {
             var cellTemplate = cellTemplateRenderer.call(this, this.selectedNodes[0]);
