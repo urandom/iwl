@@ -39,7 +39,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function generateNodeTemplate() {
         /* Individual rows can't be dragged. Each node has to be a full table */
-        var node = ['<table cellpadding="0" cellspacing="0" class="iwl-node treeview_node #{nodePosition}"><tbody><tr>'];
+        var node = ['<table cellpadding="0" cellspacing="0" class="iwl-node treeview_node #{nodePosition}" style="#{nodeStyle}"><tbody><tr>'];
 
         for (var i = 0, l = this.options.columnMap.length; i < l; i++) {
             var classNames = ['treeview_column', 'treeview_column' + i], width = '';
@@ -194,6 +194,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var template = generateNodeTemplate.call(this), html, id = this.id,
             headerTemplate = headerTemplateRenderer.call(this);
         headerTemplate.nodePosition = 'treeview_header_node';
+        if (this.options.nodeWidth)
+            headerTemplate.nodeStyle = "width: " + this.options.nodeWidth + "px";
         if (!this.flat)
             headerTemplate.indent = nodeIndent;
         html = template.evaluate(headerTemplate);
@@ -244,6 +246,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     : nodeLine);
                 newIndent = indent + nodeStraightLine;
             }
+            if (this.options.nodeWidth)
+                cellTemplate.nodeStyle = "width: " + this.options.nodeWidth + "px";
             html = template.evaluate(cellTemplate);
         }
         var next = node.nextSibling, previous = node.previousSibling,
@@ -317,6 +321,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                     : nodeLine);
                 indents[node.attributes.id] = indent + nodeStraightLine;
             }
+            if (this.options.nodeWidth)
+                cellTemplate.nodeStyle = "width: " + this.options.nodeWidth + "px";
             html.push(template.evaluate(cellTemplate));
         };
         container.innerHTML = html.join('');
@@ -521,7 +527,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             map[node.previousSibling.attributes.id].element.removeClassName('treeview_node_last');
         recreateNode.call(this, parentNode || node, template, container, indent);
         if ((parentNode && parentNode.childCount == 1) || this.model.rootNodes.length == 1)
-            createNodes.call(this, [node], generateNodeTemplate.call(this), indent);
+            createNodes.call(this, [node], template, indent);
     }
 
     function nodeRemove(event, node, parentNode) {
@@ -1164,6 +1170,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             columns[i].style.width = columnWidth + 'px';
         }
         this.options.columnWidth[handle.index] = columnWidth;
+        this.options.nodeWidth = nodeWidth;
         createResizableBorders.call(this);
     }
 
