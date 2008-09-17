@@ -411,7 +411,7 @@ IWL.ComboView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var parent_position = this.getStyle('position') == 'absolute'
                 ? this.cumulativeOffset()
                 : this.positionedOffset();
-            parent_position[1] += this.content.getHeight();
+            parent_position[1] += this.getHeight();
         }
         container.setStyle({
             left: parent_position[0] + 'px',
