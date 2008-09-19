@@ -119,11 +119,11 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             return;
 
         Element.signalConnect(element, 'dom:mouseenter', function(event) {
-            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !nView.sensitive) return;
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging)) return;
             changeHighlight.call(this, node);
         }.bind(this));
         Element.signalConnect(element, 'dom:mouseleave', function(event) {
-            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging) || !nView.sensitive) return;
+            if ((this.boxSelection && this.boxSelection.dragging) || (this.content.iwl && this.content.iwl.draggable && this.content.iwl.draggable.dragging)) return;
             changeHighlight.call(this);
         }.bind(this));
 
