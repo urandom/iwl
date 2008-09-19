@@ -1570,6 +1570,15 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 state.options[options[i]] = this.options[options[i]];
             return state;
         },
+        /**
+         * In edit mode, this function is called by the cell renderer. If it returns true, the cell will be made editable
+         * @returns True, if the cell can be edited
+         * */
+        canStartEditing: function(element, node) {
+            var view = nodeMap[this.id][node.attributes.id];
+            if (!view.sensitive) return false;
+            return true;
+        },
 
         _init: function(model) {
             this.options = Object.extend({

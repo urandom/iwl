@@ -22,15 +22,16 @@ IWL.CellTemplateRenderer = Class.create((function() {
         this.cell = editableCell;
         Event.delegate(view, 'click', '.iwl-cell-value', function(event) {
             var va = Event.element(event),
-                en = va.nextSibling;
+                en = va.nextSibling,
+                parent = Element.up(en, '.iwl-node');
             if (!en || !Element.hasClassName(en, 'iwl-cell-editable')) return;
+            if (view.canStartEditing && !view.canStartEditing(parent, parent.node)) return;
             en.value = Element.getText(va);
             Element.show(en);
             Element.hide(va);
             en.focus();
             en.select();
             view._focusedElement = en;
-            var parent = Element.up(en, '.iwl-node');
             parent
               ? Event.emitSignal(view, 'iwl:edit_begin', parent, parent.node, en.value)
               : Event.emitSignal(view, 'iwl:edit_begin', en.value);
