@@ -760,9 +760,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
 
         /* We don't have the actual children yet */
-        if (null == node.childCount && node.requestChildren({allDescendants: recursive}))
+        if (null == node.childCount && node.requestChildren({allDescendants: recursive})) {
             Element.addClassName(view.element, 'treeview_node_loading');
-        else {
+            this.queue.end();
+        } else {
             Element.addClassName(view.element, 'treeview_node_expanded');
             if (this.options.expandEffect) {
                 var self = this;
