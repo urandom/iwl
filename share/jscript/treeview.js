@@ -434,6 +434,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var highlight = view.element.highlight;
         recreateNode.call(this, parentNode, generateNodeTemplate.call(this), view.container, view.indent);
         Element.removeClassName(view.element, 'treeview_node_loading');
+        this.queue.end();
         this.expandNode(parentNode, options.allDescendants);
         if (highlight)
             changeHighlight.call(this, parentNode);
@@ -457,6 +458,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var node = this.model.getNodeByPath(options.parentNode);
             var element = nodeMap[this.id][node.attributes.id].element;
             Element.removeClassName(element, 'treeview_node_loading');
+            this.queue.end();
         }
     }
 
@@ -760,10 +762,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
 
         /* We don't have the actual children yet */
-        if (null == node.childCount && node.requestChildren({allDescendants: recursive})) {
+        if (null == node.childCount && node.requestChildren({allDescendants: recursive}))
             Element.addClassName(view.element, 'treeview_node_loading');
-            this.queue.end();
-        } else {
+        else {
             Element.addClassName(view.element, 'treeview_node_expanded');
             if (this.options.expandEffect) {
                 var self = this;
