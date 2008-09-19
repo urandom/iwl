@@ -777,7 +777,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                             self.expandedNodes.push(node);
                             self.emitSignal('iwl:node_expand', node);
                             self.queue.end();
-                        },
+                        }
                     }, self.options.expandEffectOptions)
                 );
                 view.expanding = true;
@@ -1585,7 +1585,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 columnWidth: [],
                 columnClass: [],
                 cellAttributes: [],
-                initialPath: [],
+                initialActive: [],
                 popUpDelay: 0.2,
                 headerVisible: true,
                 drawExpanders: true,
