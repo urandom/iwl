@@ -349,8 +349,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
               r = Element.cumulativeScrollOffset(this.element.parentNode);
           if (!absolute)
             Element.absolutize(this.element);
-          this.element.style.left = parseFloat(this.view.style.left) +  r[0] - Position.deltaX + 'px';
-          this.element.style.top = parseFloat(this.view.style.top) + r[1] - Position.deltaY + 'px';
+          this.element.style.left = parseFloat(this.view.style.left || 0) +  r[0] - Position.deltaX + 'px';
+          this.element.style.top = parseFloat(this.view.style.top || 0) + r[1] - Position.deltaY + 'px';
           if (!absolute)
             Element.relativize(this.element);
         }
@@ -362,8 +362,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
               r = Element.cumulativeScrollOffset(this.outline);
           if (!absolute)
             Element.absolutize(this.element);
-          this.element.style.left = parseFloat(this.outline.style.left) +  r[0] - Position.deltaX + 'px';
-          this.element.style.top = parseFloat(this.outline.style.top) + r[1] - Position.deltaY + 'px';
+          this.element.style.left = parseFloat(this.outline.style.left || 0) +  r[0] - Position.deltaX + 'px';
+          this.element.style.top = parseFloat(this.outline.style.top || 0) + r[1] - Position.deltaY + 'px';
           if (!absolute)
             Element.relativize(this.element);
         }
@@ -371,8 +371,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
         delete this.outline;
       } else {
         var r = this.absolutePosition ? Element.cumulativeScrollOffset(this.element) : [0, 0];
-        this.element.style.left = parseFloat(this.element.style.left) +  r[0] - Position.deltaX + 'px';
-        this.element.style.top = parseFloat(this.element.style.top) + r[1] - Position.deltaY + 'px';
+        this.element.style.left = parseFloat(this.element.style.left || 0) +  r[0] - Position.deltaX + 'px';
+        this.element.style.top = parseFloat(this.element.style.top || 0) + r[1] - Position.deltaY + 'px';
         if (!this.element._originallyAbsolute)
           Element.relativize(this.element);
         this.element._originallyAbsolute = undefined;

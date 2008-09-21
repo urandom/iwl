@@ -1100,9 +1100,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             this.setState(state);
             this.signalDisconnect('iwl:load_data_end', callback);
         };
+        this.setColumnsReorderable(false);
         this.signalConnect('iwl:load_data_end', callback);
         this.setModel(this.model);
-        this.options.columnsReorderable = false;
     }
 
     function contentScrollEvent(event) {
