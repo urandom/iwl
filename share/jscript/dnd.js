@@ -20,7 +20,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
 
     if (this.initialScrollOffset[0] || this.initialScrollOffset[1])
       Position.includeScrollOffsets = true;
-    (Event.element(event) || this.element).emitSignal('iwl:drag_init', this, eventOptions.call(this, event));
+    Element.emitSignal(Event.element(event) || this.element, 'iwl:drag_init', this, eventOptions.call(this, event));
     if (this.terminated) {
       delete this.terminated;
       return;
@@ -153,7 +153,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
     if (!this.absolutePosition)
       this.initialStyledOffset = [parseFloat(Element.getStyle(this.element, 'left')), parseFloat(Element.getStyle(this.element, 'top'))];
 
-    this.element.emitSignal('iwl:drag_begin', this);
+    Element.emitSignal(this.element, 'iwl:drag_begin', this);
         
     if (this.options.startEffect) this.options.startEffect(this.draggableElement);
   }
@@ -323,7 +323,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
         this.startScrolling(speed);
       }
       
-      this.element.emitSignal('iwl:drag_motion', this);
+      Element.emitSignal(this.element, 'iwl:drag_motion', this);
       
       // fix AppleWebKit rendering
       if (Prototype.Browser.WebKit) window.scrollBy(0,0);
@@ -386,7 +386,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
       if (success)
         dropped = Droppables.fire(event, this.element); 
 
-      this.element.emitSignal('iwl:drag_end', this);
+      Element.emitSignal(this.element, 'iwl:drag_end', this);
 
       var revert = this.options.revert;
       if(revert && Object.isFunction(revert)) revert = revert(this.element);
@@ -396,8 +396,8 @@ IWL.Draggable = Class.create(Draggable, (function() {
         if (this.options.revertEffect)
           this.options.revertEffect(this.element, d[1] - this.delta[1], d[0] - this.delta[0]);
         else {
-          this.element.style.left = parseFloat(this.element.style.left) + this.delta[0] - d[0] + 'px';
-          this.element.style.top = parseFloat(this.element.style.top) + this.delta[1] - d[1] + 'px';
+          this.element.style.left = parseFloat(this.element.style.left || 0) + this.delta[0] - d[0] + 'px';
+          this.element.style.top = parseFloat(this.element.style.top || 0) + this.delta[1] - d[1] + 'px';
         }
       } else this.delta = d;
 
@@ -449,7 +449,7 @@ IWL.Draggable = Class.create(Draggable, (function() {
           draw.call(this, this.draggableElement, Draggables._lastScrollPointer);
       }
 
-      this.element.emitSignal('iwl:drag_motion', this);
+      Element.emitSignal(this.element, 'iwl:drag_motion', this);
 
       if (!actual[0] && !actual[1])
         this.stopScrolling();
@@ -480,11 +480,11 @@ IWL.Draggable.Actions = {
 
 IWL.Droppable = Class.create((function() {
   function onHover(sourceElement, destElement, overlap) {
-    this.element.emitSignal('iwl:drag_hover', sourceElement, destElement, overlap, this.options.actions)
+    Element.emitSignal(this.element, 'iwl:drag_hover', sourceElement, destElement, overlap, this.options.actions)
   }
 
   function onDrop(sourceElement, destElement, sourceEvent) {
-    this.element.emitSignal('iwl:drag_drop', sourceElement, destElement, sourceEvent, this.options.actions);
+    Element.emitSignal(this.element, 'iwl:drag_drop', sourceElement, destElement, sourceEvent, this.options.actions);
   }
 
   return {
@@ -522,7 +522,7 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
       || this.element.clientHeight < pointer[1])
       return;
 
-    (Event.element(event) || this.element).emitSignal('iwl:box_selection_init', this);
+    Element.emitSignal(Event.element(event) || this.element, 'iwl:box_selection_init', this);
     if (this.terminated) {
       delete this.terminated;
       return;
@@ -545,7 +545,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
 
     this.initialPointer = pointer;
 
-    this.element.emitSignal(
+    Element.emitSignal(
+      this.element,
       'iwl:box_selection_begin',
       this,
       relativeCoordinates.call(this, this.initialPointer, pointer),
@@ -596,7 +597,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
     pointer = [pointer.x, pointer.y];
     pointer[0] += this.element.scrollLeft;
     pointer[1] += this.element.scrollTop;
-    this.element.emitSignal(
+    Element.emitSignal(
+      this.element,
       'iwl:box_selection_end',
       this,
       relativeCoordinates.call(this, this.initialPointer, pointer),
@@ -644,7 +646,8 @@ IWL.BoxSelection = Class.create(Draggable, (function() {
 
       draw.call(this, pointer);
 
-      this.element.emitSignal(
+      Element.emitSignal(
+        this.element,
         'iwl:box_selection_motion',
         this,
         relativeCoordinates.call(this, this.initialPointer, pointer),

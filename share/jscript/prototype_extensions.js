@@ -287,6 +287,8 @@ Object.extend(Event, (function() {
     },
     emitSignal: function(element, name) {
       if (!(element = $(element)) || !name) return;
+      if (Prototype.Browser.IE && !Prototype.Browser.IE7 &&
+        (!element.parentNode || element.parentNode.nodeType != 1)) return;
 
       var args = $A(arguments);
       var element = args.shift();

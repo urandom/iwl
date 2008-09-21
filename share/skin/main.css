@@ -1597,6 +1597,12 @@ div.tooltip_content {
     text-align: center;
 }
 
+.iwl-cell-boolean {
+    background: transparent;
+    width: 16px;
+    height: 16px;
+}
+
 .iwl-cell-boolean .iwl-active {
     background: url(/iwl/skin/default/images/cellrenderer/boolean_active.png) no-repeat center;
     width: 16px;

@@ -120,7 +120,7 @@ div.expander_collapsed .expander_icon {
     margin: -16px 0 0 0;
 }
 
-.iwl-cell-boolean .iwl-active {
+body .iwl-cell-boolean .iwl-active {
     background-image: url(/iwl/skin/default/images/cellrenderer/boolean_active.gif);
 }
 
@@ -151,6 +151,6 @@ div.expander_collapsed .expander_icon {
 .treeview_node_last .treeview_column {
     border-bottom: none;
 }
-.treeview_column.treeview_column_hover, .treeview_header .treeview_node_indent.treeview_column_hover {
+body .treeview_column.treeview_column_hover, body .treeview_header .treeview_node_indent.treeview_column_hover {
     background: url('/iwl/skin/default/images/treeview/target.gif') 100% center no-repeat;
 }

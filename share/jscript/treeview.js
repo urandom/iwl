@@ -70,7 +70,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var template = header.template || this.options.cellAttributes[i].templateRenderer.header;
             if (!(template instanceof Template))
                 template = new Template(template);
-            var options = {title: header.title, modelColumnIndex: cMap[i]};
+            var options = {title: header.title || '&nbsp;', modelColumnIndex: cMap[i]};
             headerTemplate['column' + i] = template.evaluate(options);
         }
         return headerTemplate;
@@ -105,7 +105,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var nView = map[nId];
         nView.node = node, nView.element = element, nView.container = container, nView.indent = indent, nView.sensitive = true;
         element.node = node;
-        if (nView.childContainer && !nView.childContainer.parentNode) {
+        if (nView.childContainer && (!nView.childContainer.parentNode || nView.childContainer.parentNode.nodeType != 1)) {
             var next = element.nextSibling;
             next
                 ? element.parentNode.insertBefore(nView.childContainer, next)
@@ -252,7 +252,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         }
         var next = node.nextSibling, previous = node.previousSibling,
             map = nodeMap[id], element = nodeMap[id][node.attributes.id].element;
-        if (Object.isElement(element) && element.parentNode)
+        if (Object.isElement(element) && element.parentNode && element.parentNode.nodeType == 1)
             element.replace(html);
         else {
             if (next)
@@ -433,7 +433,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         var view = nodeMap[this.id][parentNode.attributes.id];
         var highlight = view.element.highlight;
         recreateNode.call(this, parentNode, generateNodeTemplate.call(this), view.container, view.indent);
-        Element.removeClassName(view.element, 'treeview_node_loading');
         this.queue.end();
         this.expandNode(parentNode, options.allDescendants);
         if (highlight)
@@ -483,7 +482,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function nodeMove(event, node, parentNode, previousParent) {
         var view = nodeMap[this.id][node.attributes.id];
-        if (view.element && view.element.parentNode)
+        if (view.element && view.element.parentNode && view.element.parentNode.nodeType == 1)
             view.element.remove();
 
         nodeInsert.call(this, event, node, parentNode);
@@ -558,7 +557,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
     
     function removeContainers(container) {
-        if (container.parentNode && container != this.container)
+        if (container.parentNode && container.parentNode.nodeType == 1 && container != this.container)
             container.remove();
         else if (container == this.container)
             this.container.innerHTML = '';
@@ -753,7 +752,7 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (node.childCount) {
             if (!view.childContainer)
                 createNodes.call(this, node.childNodes, generateNodeTemplate.call(this), view.indent);
-            if (!view.childContainer.parentNode) {
+            if (!view.childContainer.parentNode || view.childContainer.parentNode.nodeType != 1) {
                 var next = view.element.nextSibling;
                 next
                     ? view.element.parentNode.insertBefore(view.childContainer, next)
