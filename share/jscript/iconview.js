@@ -41,14 +41,12 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
     }
 
     function setNodeAttributes(element, node) {
-        var id = this.id, nId = node.attributes.id;
+        var id = this.id, nId = node.attributes.id, map = nodeMap[id];
         if (!nodeMap[id][nId]) nodeMap[id][nId] = {};
         var nView = nodeMap[id][nId];
-        Object.extend(nView, {
-            node: node,
-            element: element,
-            sensitive: true
-        });
+        if (nView.element && this.options.dragDest)
+            unsetDroppableNode.call(this, node, nView, map);
+        nView.node = node, nView.element = element, nView.sensitive = true;
         element.node = node;
 
         if (node.attributes.insensitive)
