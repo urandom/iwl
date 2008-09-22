@@ -21,8 +21,9 @@ IWL.CellTemplateRenderer = Class.create((function() {
         var view = this.options.view;
         this.cell = editableCell;
         Event.delegate(view, 'dblclick', '.iwl-cell-value', function(event) {
-            var va = Event.element(event),
-                en = va.nextSibling,
+            var va = Event.element(event);
+            if (!va.nextSibling) return;
+            var en = va.nextSibling,
                 parent = Element.up(en, '.iwl-node');
             if (!en || !Element.hasClassName(en, 'iwl-cell-editable')) return;
             if (view.canStartEditing && !view.canStartEditing(parent, parent.node)) return;

@@ -1081,7 +1081,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
 
     function columnDragDrop(event, sourceElement, destElement, sourceEvent, actions) {
         Event.stop(event);
-        var state = this.getState();
         var columns = Element.select(this.header, '.treeview_column');
         var index = columns.indexOf(sourceElement);
         var newIndex = columns.indexOf(destElement);
@@ -1096,12 +1095,6 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var res = indices[i].splice(index, 1);
             newIndex == indices[i].splice(newIndex, 0, res[0]);
         }
-        var callback = function() {
-            this.setState(state);
-            this.signalDisconnect('iwl:load_data_end', callback);
-        };
-        this.setColumnsReorderable(false);
-        this.signalConnect('iwl:load_data_end', callback);
         this.setModel(this.model);
     }
 
@@ -1294,8 +1287,19 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
          * @returns The object
          * */
         setModel: function(model) {
-            if (this.model)
+            if (this.model) {
+                var state  = this.getState();
+                var callback = function() {
+                    this.setState(state);
+                    this.signalDisconnect('iwl:load_data_end', callback);
+                };
+                this.signalConnect('iwl:load_data_end', callback);
+                this.setColumnsReorderable(false);
+                this.setModelDragSource(false);
+                this.setModelDragDest(false);
+                this.setReorderable(false);
                 removeModel.call(this);
+            }
             if (model instanceof IWL.ObservableModel) {
                 this.model = model;
                 if (this.pageControl && this.options.pageControlEventName) {
@@ -1383,9 +1387,10 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var map = nodeMap[this.id];
             if (!map.callbacks.eventDragInit)
                 map.callbacks.eventDragInit = eventDragInit.bind(this);
-            this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
+                this.dragActions = actions || IWL.Draggable.Actions.MOVE;
+
                 this.content.setDragSource({revert: true, revertEffect: false, actions: this.dragActions});
                 this.content.setDragData(this);
                 this.content.signalConnect('iwl:drag_init', map.callbacks.eventDragInit);
@@ -1430,9 +1435,9 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!map.callbacks.eventNodeViewDrop)
                 map.callbacks.eventNodeViewDrop = eventNodeViewDrop.bind(this);
 
-            this.dropActions = actions || IWL.Draggable.Actions.MOVE;
-
             if (bool) {
+                this.dropActions = actions || IWL.Draggable.Actions.MOVE;
+
                 this.content.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
                 this.content.signalConnect('iwl:drag_hover', map.callbacks.eventNodeViewHover);
                 this.content.signalConnect('iwl:drag_drop', map.callbacks.eventNodeViewDrop);
@@ -1542,6 +1547,12 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
                         case 'reorderable':
                             this.setReorderable(state.options[j]);
                             break;
+                        case 'dragSource':
+                            this.setModelDragSource(state.options[j].state, state.options[j].actions);
+                            break;
+                        case 'dragDest':
+                            this.setModelDragDest(state.options[j].state, state.options[j].actions);
+                            break;
                     }
                 }
             }
@@ -1567,6 +1578,8 @@ IWL.TreeView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var options = ['columnsReorderable', 'headerVisible', 'reorderable'];
             for (var i = 0, l = options.length; i < l; i++)
                 state.options[options[i]] = this.options[options[i]];
+            state.options.dragSource = {state: this.options.dragSource, actions: this.dragActions};
+            state.options.dragDest = {state: this.options.dragDest, actions: this.dropActions};
             return state;
         },
         /**

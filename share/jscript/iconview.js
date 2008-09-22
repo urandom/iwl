@@ -773,9 +773,10 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             var map = nodeMap[this.id];
             if (!map.callbacks.eventDragInit)
                 map.callbacks.eventDragInit = eventDragInit.bind(this);
-            this.dragActions = actions || IWL.Draggable.Actions.MOVE;
 
             if (bool) {
+                this.dragActions = actions || IWL.Draggable.Actions.MOVE;
+
                 this.setDragSource({revert: true, revertEffect: false, actions: this.dragActions});
                 this.setDragData(this);
                 this.signalConnect('iwl:drag_init', map.callbacks.eventDragInit);
@@ -820,9 +821,9 @@ IWL.IconView = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (!map.callbacks.eventNodeViewDrop)
                 map.callbacks.eventNodeViewDrop = eventNodeViewDrop.bind(this);
 
-            this.dropActions = actions || IWL.Draggable.Actions.MOVE;
-
             if (bool) {
+                this.dropActions = actions || IWL.Draggable.Actions.MOVE;
+
                 this.setDragDest({accept: ['iwl-node', 'iwl-node-container'], actions: this.dropActions});
                 this.signalConnect('iwl:drag_hover', map.callbacks.eventNodeViewHover);
                 this.signalConnect('iwl:drag_drop', map.callbacks.eventNodeViewDrop);
