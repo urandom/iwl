@@ -279,7 +279,7 @@ Object.extend(Event, (function() {
       var index;
       if ((index = c.pluck('observer').indexOf(observer)) == -1) return element;
       var callback = c[index];
-      c = c.without(callback);
+      c.splice(index, 1);
       return Event.stopObserving(element, real, callback);
     },
     signalDisconnectAll: function(element, name) {
