@@ -11,7 +11,7 @@ use IWL::Response;
 use IWL::Config '%IWLConfig';
 
 use File::Spec;
-use Locale::TextDomain qw(org.bloka.iwl);
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 use constant MAX_DEPTH => 64;
 

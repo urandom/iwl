@@ -78,6 +78,10 @@ A path, relative to the server document root, which points to a script to handle
 
 The absolute path to the document root. It is used by L<IWL::Static> to locate the static content.
 
+=item <TEXT_DOMAIN>
+
+The text domain for IWL localization. Default value: I<'org.bloka.iwl'>
+
 =item I<EXAMPLE CONFIG FILE>
 
     SKIN = "myskin"
@@ -169,6 +173,7 @@ sub readConfig {
         JS_DIR       => '/iwl/jscript',
         STRICT_LEVEL => 1,
         DEBUG        => '',
+        TEXT_DOMAIN  => 'org.bloka.iwl',
         JS_WHITELIST => 'SKIN,SKIN_DIR,IMAGE_DIR,ICON_DIR,ICON_EXT,JS_DIR,STRICT_LEVEL,DEBUG',
     );
 

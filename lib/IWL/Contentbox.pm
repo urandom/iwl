@@ -13,7 +13,7 @@ use IWL::JSON qw(toJSON);
 use IWL::Label;
 use IWL::Image;
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 use constant TYPE => {
     none     => 1,

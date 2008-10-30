@@ -9,7 +9,8 @@ use base 'IWL::Widget';
 
 use IWL::String 'randomize';
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::Config '%IWLConfig';
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 =head1 NAME
 

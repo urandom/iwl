@@ -6,7 +6,7 @@ package IWL::Stock;
 use strict;
 
 use IWL::Config qw(%IWLConfig);
-use Locale::TextDomain qw(org.bloka.iwl);
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 =head1 NAME
 
