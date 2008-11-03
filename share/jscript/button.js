@@ -350,14 +350,14 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 this._disabled = true;
                 this.addClassName(className + '_disabled ' + className + '_' + this.options.size + '_disabled');
                 createDisabledLayer.call(this);
-                positionDisabledLayer.call(this);
-                this.signalConnect('iwl:adjust', disableButton);
+                this._disabledCallback = disableButton.bind(this);
+                this.signalConnect('iwl:adjust', this._disabledCallback);
                 return adjust.call(this);
             } else {
                 this._disabled = false;
                 this.removeClassName(className + '_disabled ' + className + '_' + this.options.size + '_disabled');
                 removeDisabledLayer.call(this);
-                this.signalDisconnect('iwl:adjust', disableButton);
+                this.signalDisconnect('iwl:adjust', this._disabledCallback);
                 return adjust.call(this);
             }
         },
