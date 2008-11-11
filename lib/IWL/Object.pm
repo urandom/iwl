@@ -1754,7 +1754,7 @@ sub __addRequired {
         $script->{parentNode}->insertBefore($script, @scripts);
     } elsif ($pivot && $pivot->{parentNode}) {
         if ($self != $top) {
-            my $last = $pivot->next({package => 'IWL::Script'}, {attribute => ['iwl:requiredScript']});
+            my $last = $pivot->next(options => {last => 1}, criteria => [{package => 'IWL::Script'}, {attribute => ['iwl:requiredScript']}]);
             $pivot = $last if $last;
         }
         $pivot->{parentNode}->insertAfter($pivot, @scripts);
