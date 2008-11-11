@@ -1,4 +1,4 @@
-use Test::More tests => 126;
+use Test::More tests => 128;
 
 use IWL::Object;
 use IWL::Config '%IWLConfig';
@@ -155,8 +155,10 @@ my $output;
     $o2 = IWL::Test::Object2->new;
     $o->appendChild($o2);
     $data = $o->getObject;
-    is($data->{children}[0]{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
-    is($data->{children}[1]{attributes}{src}, '/jscript/foo.js');
+    is($data->{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
+    is($data->{children}[1]{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/bar.css";\n));
+    is($data->{children}[2]{attributes}{src}, '/jscript/foo.js');
+    is($data->{children}[3]{attributes}{src}, '/jscript/bar.js');
 }
 
 {
@@ -268,8 +270,15 @@ package IWL::Test::Object2;
 
 use base 'IWL::Object';
 
+sub new {
+    my $self = shift->SUPER::new;
+
+    $self->require(js => 'foo.js', css => 'foo.css');
+    return $self;
+}
+
 sub _realize {
     my $self = shift;
-    $self->require(js => 'foo.js', css => 'foo.css');
+    $self->require(js => 'bar.js', css => 'bar.css');
     $self->SUPER::_realize;
 }

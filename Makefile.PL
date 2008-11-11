@@ -4,6 +4,7 @@ name            'IWL';
 all_from        'lib/IWL.pm';
 license         'perl';
 
+requires        'Locale::Messages';
 requires        'Locale::TextDomain' => 1.10;
 requires        'File::ShareDir' => 0.05;
 requires        'HTML::Parser' => 2.25;

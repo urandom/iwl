@@ -1750,11 +1750,17 @@ sub __addRequired {
 
     $top->{___lastShared} = $scripts[-1];
 
-    $script && $script->{parentNode}
-        ? $script->{parentNode}->insertBefore($script, @scripts)
-        : $pivot && $pivot->{parentNode}
-            ? $pivot->{parentNode}->insertAfter($pivot, @scripts)
-            : ($body || $self)->appendChild(@scripts);
+    if ($script && $script->{parentNode}) {
+        $script->{parentNode}->insertBefore($script, @scripts);
+    } elsif ($pivot && $pivot->{parentNode}) {
+        if ($self != $top) {
+            my $last = $pivot->next({package => 'IWL::Script'}, {attribute => ['iwl:requiredScript']});
+            $pivot = $last if $last;
+        }
+        $pivot->{parentNode}->insertAfter($pivot, @scripts);
+    } else {
+        ($body || $self)->appendChild(@scripts);
+    }
 
     if (ref $required{css} eq 'ARRAY') {
         if ($head) {
