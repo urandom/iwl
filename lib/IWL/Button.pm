@@ -248,17 +248,6 @@ sub isDisabled {
 
 # Overrides
 #
-sub setId {
-    my ($self, $id) = @_;
-    $self->SUPER::setId($id);
-    $self->{image}->setId($id . '_image');
-    my $index = 0;
-    foreach (qw(tl top tr l content r bl bottom br)) {
-        $self->{__parts}[$index++]->setId($id . '_' . $_);
-    }
-    return $self;
-}
-
 sub setAlt {
     my ($self, $alt) = @_;
 
@@ -290,16 +279,14 @@ sub getHref {
 sub _realize {
     my $self       = shift;
     my $id         = $self->getId;
-    my $visibility = $self->getStyle('visibility');
     my $options    = {};
 
     $self->SUPER::_realize;
+    $self->__buildParts;
 
     $self->{__anchor}->prependChild($self->{image}->clone)
         unless $self->getLabel;
 
-    $self->{_options}{visibility} = $visibility if $visibility;
-    $self->setStyle(visibility => 'hidden');
     $options = toJSON($self->{_options});
     $self->_appendInitScript("IWL.Button.create('$id', $options);");
 }
@@ -308,12 +295,6 @@ sub _setupDefaultClass {
     my $self = shift;
     $self->SUPER::prependClass($self->{_defaultClass} . '_' . $self->{_options}{size});
     $self->SUPER::prependClass($self->{_defaultClass});
-    $self->{image}->prependClass($self->{_defaultClass} . '_image');
-    my $index = 0;
-    foreach (qw(tl top tr l content r bl bottom br)) {
-        $self->{__parts}[$index++]->prependClass(
-            $self->{_defaultClass} . '_' . $_);
-    }
     return $self;
 }
 
@@ -324,20 +305,14 @@ sub _init {
     my $id     = $args{id};
 
     $self->{_defaultClass}   = 'button';
-    $image->{_ignore}        = 1;
-
     $self->{image}           = $image;
     $self->{__anchor}        = $anchor;
-    $self->{__parts}         = [IWL::Widget->newMultiple(9)];
+    $image->{_ignore}        = 1;
 
     $id = randomize($self->{_defaultClass}) unless $id;
-    $self->{_tag} = 'div';
-    foreach (@{$self->{__parts}}) {
-        $_->{_tag} = 'div';
-        $self->appendChild($_);
-    }
-    $self->{__parts}[4]->appendChild($image);
-    $self->appendChild(IWL::Container->new(tag => 'noscript')->appendChild($anchor));
+    $self->{_tag} = 'table';
+    $self->setAttributes(cellspacing => 0, cellpadding => 0);
+    $self->appendAfter(IWL::Container->new(tag => 'noscript')->appendChild($anchor));
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
@@ -356,6 +331,44 @@ sub _init {
 
     $self->setSelectable(0);
     return $self;
+}
+
+# Internal
+#
+sub __buildParts {
+    my $self = shift;
+    for my $i (0 .. 2) {
+        my $row = IWL::Widget->new;
+        $row->{_tag} = 'tr';
+        $self->appendChild($row);
+        for (0 .. 2) {
+            my $cell = IWL::Widget->new;
+            $cell->{_tag} = 'td';
+            $row->appendChild($cell);
+            if ($i == 0 && $_ == 0) {
+                $cell->setClass($self->{_defaultClass} . '_top_left');
+            } elsif ($i == 0 && $_ == 1) {
+                $cell->setClass($self->{_defaultClass} . '_top_center');
+            } elsif ($i == 0 && $_ == 2) {
+                $cell->setClass($self->{_defaultClass} . '_top_right');
+            } elsif ($i == 1 && $_ == 0) {
+                $cell->setClass($self->{_defaultClass} . '_middle_left');
+            } elsif ($i == 1 && $_ == 1) {
+                $cell->setClass($self->{_defaultClass} . '_middle_center ' . $self->{_defaultClass} . '_content');
+                $cell->appendChild($self->{image}->setId($self->getId . '_image')->setClass($self->{_defaultClass} . '_image'));
+                $cell->appendChild(IWL::Label->new(id => $self->getId . '_label', class => $self->{_defaultClass} . '_label')
+                    ->setText($self->{_options}{label})) if $self->{_options}{label};
+            } elsif ($i == 1 && $_ == 2) {
+                $cell->setClass($self->{_defaultClass} . '_middle_right');
+            } elsif ($i == 2 && $_ == 0) {
+                $cell->setClass($self->{_defaultClass} . '_bottom_left');
+            } elsif ($i == 2 && $_ == 1) {
+                $cell->setClass($self->{_defaultClass} . '_bottom_center');
+            } elsif ($i == 2 && $_ == 2) {
+                $cell->setClass($self->{_defaultClass} . '_bottom_right');
+            }
+        }
+    }
 }
 
 1;
