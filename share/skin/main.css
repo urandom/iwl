@@ -329,10 +329,10 @@ a:hover {
     cursor: default;
 }
 .button_content {
-    background: #f0ebe6;
-}
-.button_disabled .button_content {
-    background: #cccccc;
+    background: none;
+    border: none;
+    padding: 0;
+    white-space: nowrap;
 }
 .button_image {
     margin: 0px 2px;
@@ -355,6 +355,9 @@ a:hover {
     font-size: 12px;
     text-align: center;
 }
+.button_left, .button_center, .button_right {
+    padding: 0 !important;
+}
 
 .button_hover .button_label {
     text-decoration: underline;
@@ -365,16 +368,18 @@ a:hover {
     font-weight: normal;
 }
 
-.button_medium .button_image {
-    height: 14px;
+.butotn_default .button_content {
+    height: 28px;
+}
+.button_medium .button_content {
+    height: 20px;
+}
+.button_small .button_content {
+    height: 16px;
 }
 
 .button_medium .button_label {
-    font-size: 10px;
-}
-
-.button_small .button_image {
-    height: 12px;
+    font-size: 12px;
 }
 
 .button_small .button_label {
@@ -383,267 +388,126 @@ a:hover {
     color: black;
 }
 
-.button_default .button_top_left {
+.button_medium .button_image {
+    max-height: 18px;
+}
+.button_small .button_image {
+    max-height: 14px;
+}
+
+.button_default .button_left div, .button_default .button_right div {
     width: 6px;
-    height: 6px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px 0px;
+    height: 28px;
+    line-height: 1px;
+    font-size: 1px;
 }
-.button_default .button_top_center {
-    height: 6px;
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px 0px;
+
+.button_default .button_left {
+    background: url(/iwl/skin/default/images/button/button_default.gif) no-repeat 0px 0px;
 }
-.button_default .button_top_right {
+.button_default .button_center {
+    background: url(/iwl/skin/default/images/button/button_default.gif) repeat-x 0px -28px;
+}
+.button_default .button_right {
+    background: url(/iwl/skin/default/images/button/button_default.gif) no-repeat 0px -56px;
+}
+
+.button_default_press .button_left {
+    background-position: 0px -84px;
+}
+.button_default_press .button_center {
+    background-position: 0px -112px;
+}
+.button_default_press .button_right {
+    background-position: 0px -140px;
+}
+
+.button_default_disabled .button_left {
+    background-position: 0px -168px;
+}
+.button_default_disabled .button_center {
+    background-position: 0px -196px;
+}
+.button_default_disabled .button_right {
+    background-position: 0px -224px;
+}
+
+.button_medium .button_left div, .button_medium .button_right div {
     width: 6px;
-    height: 6px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px 0px;
-}
-.button_default .button_middle_left {
-    width: 6px;
-    height: 100%;
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y 0px 0px;
-}
-.button_default .button_middle_right {
-    width: 6px;
-    height: 100%;
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -6px 0px;
-}
-.button_default .button_bottom_left {
-    width: 6px;
-    height: 6px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px -6px;
-}
-.button_default .button_bottom_center {
-    height: 6px;
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -6px;
-}
-.button_default .button_bottom_right {
-    width: 6px;
-    height: 6px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px -6px;
+    height: 20px;
+    line-height: 1px;
+    font-size: 1px;
 }
 
-.button_default.button_press .button_top_left {
-    background-position: -12px 0px;
+.button_medium .button_left {
+    background: url(/iwl/skin/default/images/button/button_medium.gif) no-repeat 0px 0px;
 }
-.button_default.button_press .button_top_center {
-    background-position: 0px -12px;
+.button_medium .button_center {
+    background: url(/iwl/skin/default/images/button/button_medium.gif) repeat-x 0px -20px;
 }
-.button_default.button_press .button_top_right {
-    background-position: -18px 0px;
-}
-.button_default.button_press .button_middle_left {
-    background-position: -12px 0px;
-}
-.button_default.button_press .button_middle_right {
-    background-position: -18px 0px;
-}
-.button_default.button_press .button_bottom_left {
-    background-position: -12px -6px;
-}
-.button_default.button_press .button_bottom_center {
-    background-position: 0px -18px;
-}
-.button_default.button_press .button_bottom_right {
-    background-position: -18px -6px;
+.button_medium .button_right {
+    background: url(/iwl/skin/default/images/button/button_medium.gif) no-repeat 0px -40px;
 }
 
-.button_default.button_disabled .button_top_left {
-    background-position: -24px 0px;
+.button_medium_press .button_left {
+    background-position: 0px -60px;
 }
-.button_default.button_disabled .button_top_center {
-    background-position: 0px -24px;
+.button_medium_press .button_center {
+    background-position: 0px -80px;
 }
-.button_default.button_disabled .button_top_right {
-    background-position: -30px 0px;
-}
-.button_default.button_disabled .button_middle_left {
-    background-position: -24px 0px;
-}
-.button_default.button_disabled .button_middle_right {
-    background-position: -29px 0px;
-}
-.button_default.button_disabled .button_bottom_left {
-    background-position: -24px -6px;
-}
-.button_default.button_disabled .button_bottom_center {
-    background-position: 0px -30px;
-}
-.button_default.button_disabled .button_bottom_right {
-    background-position: -30px -6px;
+.button_medium_press .button_right {
+    background-position: 0px -100px;
 }
 
-.button_medium .button_top_left {
+.button_medium_disabled .button_left {
+    background-position: 0px -120px;
+}
+.button_medium_disabled .button_center {
+    background-position: 0px -140px;
+}
+.button_medium_disabled .button_right {
+    background-position: 0px -160px;
+}
+
+.button_small .button_left div, .button_small .button_right div {
     width: 4px;
-    height: 4px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -2px 0px;
-}
-.button_medium .button_top_center {
-    height: 4px;
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x -0px 0px;
-}
-.button_medium .button_top_right {
-    width: 4px;
-    height: 4px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px 0px;
-}
-.button_medium .button_middle_left {
-    width: 4px;
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y 0px -0px;
-}
-.button_medium .button_middle_right {
-    width: 4px;
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -8px -0px;
-}
-.button_medium .button_bottom_left {
-    width: 4px;
-    height: 4px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px -6px;
-}
-.button_medium .button_bottom_center {
-    height: 4px;
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x -0px -8px;
-}
-.button_medium .button_bottom_right {
-    width: 4px;
-    height: 4px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -8px -6px;
+    height: 16px;
+    line-height: 1px;
+    font-size: 1px;
 }
 
-.button_medium.button_press .button_top_left {
-    background-position: -14px 0px;
+.button_small .button_left {
+    width: 4px;
+    height: 16px;
+    background: url(/iwl/skin/default/images/button/button_small.gif) no-repeat 0px 0px;
 }
-.button_medium.button_press .button_top_center {
-    background-position: 0px -12px;
+.button_small .button_center {
+    background: url(/iwl/skin/default/images/button/button_small.gif) repeat-x 0px -16px;
 }
-.button_medium.button_press .button_top_right {
-    background-position: -18px 0px;
-}
-.button_medium.button_press .button_middle_left {
-    background-position: -12px 0px;
-}
-.button_medium.button_press .button_middle_right {
-    background-position: -20px 0px;
-}
-.button_medium.button_press .button_bottom_left {
-    background-position: -12px -6px;
-}
-.button_medium.button_press .button_bottom_center {
-    background-position: 0px -20px;
-}
-.button_medium.button_press .button_bottom_right {
-    background-position: -20px -6px;
+.button_small .button_right {
+    width: 4px;
+    height: 16px;
+    background: url(/iwl/skin/default/images/button/button_small.gif) no-repeat 0px -32px;
 }
 
-.button_medium.button_disabled .button_top_left {
-    background-position: -24px 0px;
+.button_small_press .button_left {
+    background-position: 0px -48px;
 }
-.button_medium.button_disabled .button_top_center {
-    background-position: 0px -24px;
+.button_small_press .button_center {
+    background-position: 0px -64px;
 }
-.button_medium.button_disabled .button_top_right {
-    background-position: -30px 0px;
-}
-.button_medium.button_disabled .button_middle_left {
-    background-position: -24px 0px;
-}
-.button_medium.button_disabled .button_middle_right {
-    background-position: -31px 0px;
-}
-.button_medium.button_disabled .button_bottom_left {
-    background-position: -24px -6px;
-}
-.button_medium.button_disabled .button_bottom_center {
-    background-position: 0px -32px;
-}
-.button_medium.button_disabled .button_bottom_right {
-    background-position: -31px -6px;
+.button_small_press .button_right {
+    background-position: 0px -80px;
 }
 
-.button_small .button_top_left {
-    width: 3px;
-    height: 3px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -1px -1px;
+.button_small_disabled .button_left {
+    background-position: 0px -96px;
 }
-.button_small .button_top_center {
-    height: 3px;
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px 0px;
+.button_small_disabled .button_center {
+    background-position: 0px -112px;
 }
-.button_small .button_top_right {
-    width: 3px;
-    height: 3px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px 0px;
-}
-.button_small .button_middle_left {
-    width: 3px;
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y 0px 0px;
-}
-.button_small .button_middle_right {
-    width: 3px;
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -9px 0px;
-}
-.button_small .button_bottom_left {
-    width: 3px;
-    height: 3px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px -6px;
-}
-.button_small .button_bottom_center {
-    height: 3px;
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -9px;
-}
-.button_small .button_bottom_right {
-    width: 3px;
-    height: 3px;
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -7px -7px;
-}
-
-.button_small.button_press .button_top_left {
-    background-position: -13px -1px;
-}
-.button_small.button_press .button_top_center {
-    background-position: 0px -12px;
-}
-.button_small.button_press .button_top_right {
-    background-position: -18px 0px;
-}
-.button_small.button_press .button_middle_left {
-    background-position: -12px 0px;
-}
-.button_small.button_press .button_middle_right {
-    background-position: -21px 0px;
-}
-.button_small.button_press .button_bottom_left {
-    background-position: -12px -6px;
-}
-.button_small.button_press .button_bottom_center {
-    background-position: 0px -21px;
-}
-.button_small.button_press .button_bottom_right {
-    background-position: -20px -7px;
-}
-
-.button_small.button_disabled .button_top_left {
-    background-position: -25px -1px;
-}
-.button_small.button_disabled .button_top_center {
-    background-position: 0px -24px;
-}
-.button_small.button_disabled .button_top_right {
-    background-position: -30px 0px;
-}
-.button_small.button_disabled .button_middle_left {
-    background-position: -24px 0px;
-}
-.button_small.button_disabled .button_middle_right {
-    background-position: -32px 0px;
-}
-.button_small.button_disabled .button_bottom_left {
-    background-position: -24px -6px;
-}
-.button_small.button_disabled .button_bottom_center {
-    background-position: 0px -33px;
-}
-.button_small.button_disabled .button_bottom_right {
-    background-position: -31px -7px;
+.button_small_disabled .button_right {
+    background-position: 0px -128px;
 }
 
 /* ContentBox */

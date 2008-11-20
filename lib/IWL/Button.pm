@@ -337,36 +337,24 @@ sub _init {
 #
 sub __buildParts {
     my $self = shift;
-    for my $i (0 .. 2) {
-        my $row = IWL::Widget->new;
-        $row->{_tag} = 'tr';
-        $self->appendChild($row);
-        for (0 .. 2) {
-            my $cell = IWL::Widget->new;
-            $cell->{_tag} = 'td';
-            $row->appendChild($cell);
-            if ($i == 0 && $_ == 0) {
-                $cell->setClass($self->{_defaultClass} . '_top_left');
-            } elsif ($i == 0 && $_ == 1) {
-                $cell->setClass($self->{_defaultClass} . '_top_center');
-            } elsif ($i == 0 && $_ == 2) {
-                $cell->setClass($self->{_defaultClass} . '_top_right');
-            } elsif ($i == 1 && $_ == 0) {
-                $cell->setClass($self->{_defaultClass} . '_middle_left');
-            } elsif ($i == 1 && $_ == 1) {
-                $cell->setClass($self->{_defaultClass} . '_middle_center ' . $self->{_defaultClass} . '_content');
-                $cell->appendChild($self->{image}->setId($self->getId . '_image')->setClass($self->{_defaultClass} . '_image'));
-                $cell->appendChild(IWL::Label->new(id => $self->getId . '_label', class => $self->{_defaultClass} . '_label')
-                    ->setText($self->{_options}{label})) if $self->{_options}{label};
-            } elsif ($i == 1 && $_ == 2) {
-                $cell->setClass($self->{_defaultClass} . '_middle_right');
-            } elsif ($i == 2 && $_ == 0) {
-                $cell->setClass($self->{_defaultClass} . '_bottom_left');
-            } elsif ($i == 2 && $_ == 1) {
-                $cell->setClass($self->{_defaultClass} . '_bottom_center');
-            } elsif ($i == 2 && $_ == 2) {
-                $cell->setClass($self->{_defaultClass} . '_bottom_right');
-            }
+    my $body = IWL::Container->new(tag => 'tbody');
+    my $row = IWL::Container->new(tag => 'tr');
+    $self->appendChild($body);
+    $body->appendChild($row);
+    for (0 .. 2) {
+        my $cell = IWL::Container->new(tag => 'td');
+        $row->appendChild($cell);
+        if ($_ == 0) {
+            $cell->setClass($self->{_defaultClass} . '_left')->appendChild(IWL::Container->new);
+        } elsif ($_ == 1) {
+            my $button = IWL::Container->new(tag => 'button', class => $self->{_defaultClass} . '_content');
+            $cell->setClass($self->{_defaultClass} . '_center');
+            $cell->appendChild($button);
+            $button->appendChild($self->{image}->setId($self->getId . '_image')->setClass($self->{_defaultClass} . '_image'));
+            $button->appendChild(IWL::Label->new(id => $self->getId . '_label', class => $self->{_defaultClass} . '_label')
+                ->setText($self->{_options}{label}));
+        } elsif ($_ == 2) {
+            $cell->setClass($self->{_defaultClass} . '_right')->appendChild(IWL::Container->new);
         }
     }
 }

@@ -78,16 +78,6 @@ ul.completion {
     z-index: 50;
 }
 
-.button_small .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -10px;
-}
-.button_small_press .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -22px;
-}
-.button_small_disabled .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -34px;
-}
-
 li.menu_radio_item {
     background: url(/iwl/skin/default/images/menu/menu_radio.gif) no-repeat 2px center;
 }

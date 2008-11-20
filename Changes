@@ -3,6 +3,8 @@ Release: 0.61
       . Objects can unrequire resources (IWL::Object::unrequire)
       . Registering an event will automatically require the needed js files
       . IWL::RPC improvements
+      . New button, based on tables. Much faster.
+      . New method that checks whether a resource is required
 
 Release: 0.60 - 03.06.08
       . A logo and a move to github

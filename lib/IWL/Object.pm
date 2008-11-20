@@ -1097,6 +1097,31 @@ sub unrequire {
     return $self;
 }
 
+=item B<isRequired> (B<TYPE>, B<URL>)
+
+Returns true if the given resource are required
+
+Parameters: B<TYPE> - the type of resource. See L<IWL::Object::require|IWL::Object/require> for resource types, B<URL> - the B<URL> to check
+
+=cut
+
+sub isRequired {
+    my ($self, $type, $url) = @_;
+    if ($type eq 'js') {
+        $url = $IWLConfig{JS_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+    } elsif ($type eq 'css') {
+        $url = $IWLConfig{SKIN_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+    }
+
+    foreach (@{$self->{_required}{$type} || []}) {
+        return 1 if $_ eq $url;
+    }
+
+    return;
+}
+
 =item B<cleanStateful>
 
 Class method that initializes all state data of the library.  Stateful
