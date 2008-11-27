@@ -125,7 +125,7 @@ sub getLabel {
 
 Sets the given url as the source of the image
 
-Parameters: B<SRC> - the url for the image. If the B<SRC> begins with I<IWL_STOCK_>, the B<SRC> is treaded as a stock id, B<ALT> - the alternative text for the image, optional.
+Parameters: B<SRC> - the url for the image. If the B<SRC> begins with I<IWL_STOCK_>, the B<SRC> is treated as a stock id, B<ALT> - the alternative text for the image, optional.
 
 =cut
 

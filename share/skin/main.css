@@ -331,8 +331,12 @@ a:hover {
 .button_content {
     background: none;
     border: none;
-    padding: 0;
+    padding: 0 1px;
     white-space: nowrap;
+}
+.button_press .button_content {
+    padding-left: 2px;
+    padding-right: 0px;
 }
 .button_image {
     margin: 0px 2px;
