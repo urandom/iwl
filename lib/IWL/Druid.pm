@@ -11,7 +11,8 @@ use IWL::String qw(randomize escape);
 use IWL::Button;
 use IWL::Druid::Page;
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::Config '%IWLConfig';
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 =head1 NAME
 

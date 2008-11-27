@@ -10,7 +10,7 @@ use base qw(IWL::Container);
 use IWL::JSON 'toJSON';
 use IWL::String 'randomize';
 use IWL::Config '%IWLConfig';
-use Locale::TextDomain qw(org.bloka.iwl);
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 =head1 NAME
 

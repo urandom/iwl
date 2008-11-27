@@ -1,6 +1,7 @@
-use Test::More tests => 15;
+use Test::More tests => 18;
 
 use IWL::Button;
+use IWL::Environment;
 
 use Locale::TextDomain qw(org.bloka.iwl);
 
@@ -26,4 +27,14 @@ use Locale::TextDomain qw(org.bloka.iwl);
     is($button->getHref, 'iwl_demo.pl');
     is($button->setDisabled(1), $button);
     ok($button->isDisabled);
+}
+
+{
+    my $e = IWL::Environment->new;
+    my ($b1, $b2) = (IWL::Button->new(environment => $e), IWL::Button->new(environment => $e));
+    my ($o1, $o2) = ($b1->getObject, $b2->getObject);
+
+    is($o1->{children}[10]{attributes}{src}, '/jscript/dist/prototype.js');
+    ok(!exists $o2->{children}[10]{attributes}{src});
+    ok(exists $o2->{children}[10]{attributes}{'iwl:initScript'});
 }

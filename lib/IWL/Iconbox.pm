@@ -11,7 +11,8 @@ use IWL::JSON qw(toJSON);
 
 use base qw(IWL::Container);
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::Config '%IWLConfig';
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 use Scalar::Util qw(weaken);
 
 =head1 NAME

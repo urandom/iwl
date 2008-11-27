@@ -71,7 +71,7 @@ use IWL::VBox;
 
 use vars qw($VERSION);
 
-$VERSION = '0.61';
+$VERSION = '0.62';
 
 1;
 
@@ -81,7 +81,7 @@ IWL - A widget library for the web
 
 =head1 VERSION
 
-This documentation refers to B<IWL> version 0.61
+This documentation refers to B<IWL> version 0.62
 
 =head1 SYNOPSIS
 

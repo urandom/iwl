@@ -10,7 +10,8 @@ use base qw(IWL::Widget);
 use IWL::String qw(escape randomize);
 use IWL::JSON qw(toJSON);
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::Config '%IWLConfig';
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 =head1 NAME
 

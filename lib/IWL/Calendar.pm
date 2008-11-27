@@ -13,7 +13,8 @@ use IWL::JSON qw(toJSON);
 
 use base qw(IWL::Table);
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::Config '%IWLConfig';
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 my $strings = {
     # TRANSLATORS: week day abbreviations, {ABBR} is a placeholder

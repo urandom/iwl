@@ -13,7 +13,8 @@ use IWL::JSON qw(toJSON);
 
 use base 'IWL::Form';
 
-use Locale::TextDomain qw(org.bloka.iwl);
+use IWL::Config '%IWLConfig';
+use Locale::TextDomain $IWLConfig{TEXT_DOMAIN};
 
 =head1 NAME
 
