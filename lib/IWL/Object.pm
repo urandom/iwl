@@ -101,8 +101,6 @@ sub new {
     $self->{environment} = ref $args{environment} eq 'IWL::Environment'
         ? $args{environment} : undef;
 
-    delete $args{environment};
-
     return $self;
 }
 

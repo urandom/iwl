@@ -573,6 +573,9 @@ sub _constructorArguments {
 	    $self->setClass($args{$key});
 	} elsif ($key eq 'id') {
 	    $self->setId($args{$key});
+        } elsif ($key eq 'environment') {
+            $self->{environment} = $args{environment}
+                if 'IWL::Environment' eq ref $args{environment};
 	} else {
 	    $self->setAttribute($key => $args{$key});
 	}
