@@ -11,6 +11,7 @@ use IWL::Input;
 use IWL::Anchor;
 use IWL::Image;
 use IWL::Container;
+use IWL::Label;
 use IWL::String qw(randomize escape);
 use IWL::JSON qw(toJSON);
 
