@@ -1094,7 +1094,7 @@ sub unrequire {
 
 =item B<isRequired> (B<TYPE>, B<URL>)
 
-Returns true if the given resource are required
+Returns true if the given resource are required by the object, or its parents
 
 Parameters: B<TYPE> - the type of resource. See L<IWL::Object::require|IWL::Object/require> for resource types, B<URL> - the B<URL> to check
 
