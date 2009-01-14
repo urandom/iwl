@@ -7,7 +7,6 @@ use strict;
 
 use base 'IWL::Widget';
 
-use IWL::Input;
 use IWL::Anchor;
 use IWL::Image;
 use IWL::Container;
@@ -108,7 +107,7 @@ Parameters: B<TEXT> - the text for the label
 sub setLabel {
     my ($self, $text) = @_;
 
-    $self->{__anchor}->appendChild(IWL::Text->new($self->{_options}{label} = $text || ''));
+    $self->{_options}{label} = $text || '';
     return $self;
 }
 
@@ -203,7 +202,7 @@ sub setSubmit {
 
 =item B<setHref> (B<URL>) 
 
-Sets the href of the anchor. Due to one of the many bugs in Internet Explorer involving buttons, it also has to set an onclick handler to "document.location.href = $url"
+Sets the href of the anchor
 
 Parameters: B<URL> - the url of the href
 
@@ -212,14 +211,8 @@ Parameters: B<URL> - the url of the href
 sub setHref {
     my ($self, $url) = @_;
 
-    $self->{__anchor}->setHref($url);
-    if ($url =~ /javascript/i) {
-        $self->signalConnect(click => $url);
-    } else {
-        $self->signalConnect(click => "document.location.href = '$url'");
-    }
-    $self->signalConnect(mouseover => "window.status = unescape('" . escape($url) . "')");
-    return $self->signalConnect(mouseout => "window.status = ''");
+    $self->{anchor}->setHref($url);
+    return $self;
 }
 
 =item B<setDisabled> (B<BOOL>)
@@ -272,7 +265,7 @@ sub getSrc {
 }
 
 sub getHref {
-    return shift->{__anchor}->getHref;
+    return shift->{anchor}->getHref;
 }
 
 # Protected
@@ -280,22 +273,23 @@ sub getHref {
 sub _realize {
     my $self       = shift;
     my $id         = $self->getId;
+    my $required   = $self->isRequired(js => 'dist/prototype.js');
     my $options    = {};
 
     $self->SUPER::_realize;
     $self->__buildParts;
 
-    $self->{__anchor}->prependChild($self->{image}->clone)
-        unless $self->getLabel;
-
-    $options = toJSON($self->{_options});
-    $self->_appendInitScript("IWL.Button.create('$id', $options);");
+    if ($required) {
+        $options = toJSON($self->{_options});
+        $self->_appendInitScript("IWL.Button.create('$id', $options);");
+    }
 }
 
 sub _setupDefaultClass {
     my $self = shift;
     $self->SUPER::prependClass($self->{_defaultClass} . '_' . $self->{_options}{size});
     $self->SUPER::prependClass($self->{_defaultClass});
+    $self->{anchor}->prependClass($self->{_defaultClass} . '_content');
     return $self;
 }
 
@@ -305,15 +299,14 @@ sub _init {
     my $image  = IWL::Image->new;
     my $id     = $args{id};
 
-    $self->{_defaultClass}   = 'button';
-    $self->{image}           = $image;
-    $self->{__anchor}        = $anchor;
-    $image->{_ignore}        = 1;
+    $self->{image}         = $image;
+    $self->{anchor}        = $anchor;
+    $self->{_defaultClass} = 'button';
+    $image->{_ignore}      = 1;
 
     $id = randomize($self->{_defaultClass}) unless $id;
     $self->{_tag} = 'table';
     $self->setAttributes(cellspacing => 0, cellpadding => 0);
-    $self->appendAfter(IWL::Container->new(tag => 'noscript')->appendChild($anchor));
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
@@ -348,12 +341,11 @@ sub __buildParts {
         if ($_ == 0) {
             $cell->setClass($self->{_defaultClass} . '_left')->appendChild(IWL::Container->new);
         } elsif ($_ == 1) {
-            my $button = IWL::Container->new(tag => 'button', class => $self->{_defaultClass} . '_content');
             $cell->setClass($self->{_defaultClass} . '_center');
-            $cell->appendChild($button);
-            $button->appendChild($self->{image}->setId($self->getId . '_image')->setClass($self->{_defaultClass} . '_image'));
-            $button->appendChild(IWL::Label->new(id => $self->getId . '_label', class => $self->{_defaultClass} . '_label')
-                ->setText($self->{_options}{label}));
+            $cell->appendChild($self->{anchor});
+            $self->{anchor}->appendChild($self->{image}->setId($self->getId . '_image')->setClass($self->{_defaultClass} . '_image'));
+            $self->{anchor}->appendChild(IWL::Label->new(id => $self->getId . '_label', class => $self->{_defaultClass} . '_label')
+                ->setText($self->{_options}{label} || ($self->{image}{_ignore} ? '&nbsp;' : '')));
         } elsif ($_ == 2) {
             $cell->setClass($self->{_defaultClass} . '_right')->appendChild(IWL::Container->new);
         }

@@ -152,9 +152,9 @@ my $output;
     ok(!$o->isRequired(foo => 'bar'));
     $o->unrequire(js => 'base.js');
     ok(!$o->isRequired(js => 'base.js'));
+    ok(!$o->isRequired(js => 'foo.js'));
     $data = $o->getObject;
     is($data->{children}[0]{children}[0]{text}, qq(\@import "/my/skin/darkness/foo.css";\n));
-    is($data->{children}[1]{attributes}{src}, '/jscript/foo.js');
 
     $o = $o->new;
     $o2 = IWL::Test::Object2->new;

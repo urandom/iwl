@@ -65,8 +65,6 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
         if (this.hidden)
             this.form.appendChild(this.hidden);
         this.form.submit();
-        if (this.hidden)
-            this.hidden.remove();
     }
 
     function mouseOverCallback() {
@@ -184,14 +182,12 @@ IWL.Button = Object.extend(Object.extend({}, IWL.Widget), (function () {
             if (disabled) {
                 this._disabled = true;
                 this.addClassName(className + '_disabled ' + className + '_' + this.options.size + '_disabled');
-                this.down('button').disabled = true;
                 createDisabledLayer.call(this);
                 disableButton.call(this);
                 return this;
             } else {
                 this._disabled = false;
                 this.removeClassName(className + '_disabled ' + className + '_' + this.options.size + '_disabled');
-                this.down('button').disabled = false;
                 removeDisabledLayer.call(this);
                 return this;
             }

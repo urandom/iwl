@@ -296,7 +296,7 @@ iframe.upload_frame {
     border: 0;
     display: none;
 }
-form.upload div.button {
+form.upload .button {
      position: relative;
 }
 
@@ -324,6 +324,7 @@ a:hover {
 .button {
     margin: 3px;
     cursor: pointer;
+    float: left;
 }
 .button_disabled {
     cursor: default;
@@ -331,8 +332,12 @@ a:hover {
 .button_content {
     background: none;
     border: none;
-    padding: 0 1px;
+    padding: 0;
+    margin: 0;
     white-space: nowrap;
+}
+.button_content:hover {
+    text-decoration: none;
 }
 .button_press .button_content {
     padding-left: 2px;
@@ -372,11 +377,13 @@ a:hover {
     font-weight: normal;
 }
 
-.butotn_default .button_content {
+.button_default .button_content {
     height: 28px;
+    padding: 6px 2px;
 }
 .button_medium .button_content {
     height: 20px;
+    padding: 2px 1px;
 }
 .button_small .button_content {
     height: 16px;
