@@ -273,7 +273,7 @@ sub getHref {
 sub _realize {
     my $self       = shift;
     my $id         = $self->getId;
-    my $required   = $self->isRequired(js => 'dist/prototype.js');
+    my $required   = $self->isRequired(js => 'button.js');
     my $options    = {};
 
     $self->SUPER::_realize;
