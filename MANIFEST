@@ -147,9 +147,9 @@ share/icons/resize.gif
 share/icons/save.gif
 share/icons/text_x_generic.gif
 share/icons/upload.gif
-share/images/button/button_static.gif
-share/images/button/button_horizontal.gif
-share/images/button/button_vertical.gif
+share/images/button/button_default.gif
+share/images/button/button_medium.gif
+share/images/button/button_small.gif
 share/images/contentbox/arrow_left.gif
 share/images/contentbox/arrow_right.gif
 share/images/contentbox/bg_ft_alt0.gif

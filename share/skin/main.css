@@ -296,7 +296,7 @@ iframe.upload_frame {
     border: 0;
     display: none;
 }
-form.upload div.button {
+form.upload .button {
      position: relative;
 }
 
@@ -322,84 +322,29 @@ a:hover {
 /* Button */
 
 .button {
-    position: relative;
-    float: left;
     margin: 3px;
     cursor: pointer;
+    float: left;
 }
 .button_disabled {
     cursor: default;
 }
-.button_tl {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 6px;
-    height: 6px;
-    font-size: 2px;
-}
-.button_top {
-    position: absolute;
-    top: 0px;
-    left: 6px;
-    height: 6px;
-    font-size: 2px;
-}
-.button_tr {
-    position: absolute;
-    top: 0px;
-    width: 6px;
-    height: 6px;
-    font-size: 2px;
-}
-.button_l {
-    position: absolute;
-    top: 6px;
-    left: 0px;
-    width: 6px;
-    height: 15px;
-    font-size: 2px;
-}
 .button_content {
-    position: absolute;
-    top: 6px;
-    left: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
     white-space: nowrap;
-    background: #f0ebe6;
-    font-size: 2px;
-    padding: 0 2px;
 }
-.button_disabled .button_content {
-    background: #cccccc;
+.button_content:hover {
+    text-decoration: none;
 }
-.button_r {
-    position: absolute;
-    top: 6px;
-    width: 6px;
-    height: 15px;
-    font-size: 2px;
-}
-.button_bl {
-    position: absolute;
-    left: 0px;
-    width: 6px;
-    height: 6px;
-    font-size: 2px;
-}
-.button_bottom {
-    position: absolute;
-    left: 6px;
-    height: 6px;
-    font-size: 2px;
-}
-.button_br {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    font-size: 2px;
+.button_press .button_content {
+    padding-left: 2px;
+    padding-right: 0px;
 }
 .button_image {
-    margin: 0px 5px 0px 0px;
+    margin: 0px 2px;
     padding: 0px;
     border: 0px;
     vertical-align: middle;
@@ -419,244 +364,161 @@ a:hover {
     font-size: 12px;
     text-align: center;
 }
+.button_left, .button_center, .button_right {
+    padding: 0 !important;
+}
+
+.button_hover .button_label {
+    text-decoration: underline;
+}
 
 .button_disabled .button_label {
     color: #999;
     font-weight: normal;
 }
 
-.button_medium .button_label {
-    font-size: 10px;
+.button_default .button_content {
+    height: 28px;
+    padding: 6px 2px;
 }
+.button_medium .button_content {
+    height: 20px;
+    padding: 2px 1px;
+}
+.button_small .button_content {
+    height: 16px;
+}
+
+.button_medium .button_label {
+    font-size: 12px;
+}
+
 .button_small .button_label {
     font-size: 8px;
     font-weight: normal;
     color: black;
 }
 
-.button_default .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px 0px;
+.button_medium .button_image {
+    max-height: 18px;
 }
-.button_default .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px 0px;
-}
-.button_default .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px -6px;
-}
-.button_default .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px -6px;
-}
-.button_default .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y 0px 0px;
-}
-.button_default .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -6px 0px;
-}
-.button_default .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px 0px;
-}
-.button_default .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -6px;
+.button_small .button_image {
+    max-height: 14px;
 }
 
-.button_default_press .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -12px 0px;
-}
-.button_default_press .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -18px 0px;
-}
-.button_default_press .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -12px -6px;
-}
-.button_default_press .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -18px -6px;
-}
-.button_default_press .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -12px 0px;
-}
-.button_default_press .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -18px 0px;
-}
-.button_default_press .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -12px;
-}
-.button_default_press .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -18px;
+.button_default .button_left div, .button_default .button_right div {
+    width: 6px;
+    height: 28px;
+    line-height: 1px;
+    font-size: 1px;
 }
 
-.button_default_disabled .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -24px 0px;
+.button_default .button_left {
+    background: url(/iwl/skin/default/images/button/button_default.gif) no-repeat 0px 0px;
 }
-.button_default_disabled .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -30px 0px;
+.button_default .button_center {
+    background: url(/iwl/skin/default/images/button/button_default.gif) repeat-x 0px -28px;
 }
-.button_default_disabled .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -24px -6px;
-}
-.button_default_disabled .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -30px -6px;
-}
-.button_default_disabled .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -24px 0px;
-}
-.button_default_disabled .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -29px 0px;
-}
-.button_default_disabled .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -24px;
-}
-.button_default_disabled .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -30px;
+.button_default .button_right {
+    background: url(/iwl/skin/default/images/button/button_default.gif) no-repeat 0px -56px;
 }
 
-.button_medium .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px 0px;
+.button_default_press .button_left {
+    background-position: 0px -84px;
 }
-.button_medium .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px 0px;
+.button_default_press .button_center {
+    background-position: 0px -112px;
 }
-.button_medium .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px -6px;
-}
-.button_medium .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px -6px;
-}
-.button_medium .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y 0px -0px;
-}
-.button_medium .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -6px -0px;
-}
-.button_medium .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x -0px 0px;
-}
-.button_medium .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x -0px -9px;
+.button_default_press .button_right {
+    background-position: 0px -140px;
 }
 
-.button_medium_press .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -12px 0px;
+.button_default_disabled .button_left {
+    background-position: 0px -168px;
 }
-.button_medium_press .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -18px 0px;
+.button_default_disabled .button_center {
+    background-position: 0px -196px;
 }
-.button_medium_press .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -12px -6px;
-}
-.button_medium_press .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -18px -6px;
-}
-.button_medium_press .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -12px 0px;
-}
-.button_medium_press .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -18px 0px;
-}
-.button_medium_press .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -12px;
-}
-.button_medium_press .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -21px;
+.button_default_disabled .button_right {
+    background-position: 0px -224px;
 }
 
-.button_medium_disabled .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -24px 0px;
-}
-.button_medium_disabled .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -30px 0px;
-}
-.button_medium_disabled .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -24px -6px;
-}
-.button_medium_disabled .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -30px -6px;
-}
-.button_medium_disabled .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -24px 0px;
-}
-.button_medium_disabled .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -29px 0px;
-}
-.button_medium_disabled .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -24px;
-}
-.button_medium_disabled .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -33px;
+.button_medium .button_left div, .button_medium .button_right div {
+    width: 6px;
+    height: 20px;
+    line-height: 1px;
+    font-size: 1px;
 }
 
-.button_small .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -1px -1px;
+.button_medium .button_left {
+    background: url(/iwl/skin/default/images/button/button_medium.gif) no-repeat 0px 0px;
 }
-.button_small .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -6px 0px;
+.button_medium .button_center {
+    background: url(/iwl/skin/default/images/button/button_medium.gif) repeat-x 0px -20px;
 }
-.button_small .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat 0px -6px;
-}
-.button_small .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -7px -7px;
-}
-.button_small .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y 0px 0px;
-}
-.button_small .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -8px 0px;
-}
-.button_small .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px 0px;
-}
-.button_small .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -11px;
+.button_medium .button_right {
+    background: url(/iwl/skin/default/images/button/button_medium.gif) no-repeat 0px -40px;
 }
 
-.button_small_press .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -13px -1px;
+.button_medium_press .button_left {
+    background-position: 0px -60px;
 }
-.button_small_press .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -18px 0px;
+.button_medium_press .button_center {
+    background-position: 0px -80px;
 }
-.button_small_press .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -12px -6px;
-}
-.button_small_press .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -19px -7px;
-}
-.button_small_press .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -12px 0px;
-}
-.button_small_press .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -20px 0px;
-}
-.button_small_press .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -12px;
-}
-.button_small_press .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -23px;
+.button_medium_press .button_right {
+    background-position: 0px -100px;
 }
 
-.button_small_disabled .button_tl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -25px -1px;
+.button_medium_disabled .button_left {
+    background-position: 0px -120px;
 }
-.button_small_disabled .button_tr {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -30px 0px;
+.button_medium_disabled .button_center {
+    background-position: 0px -140px;
 }
-.button_small_disabled .button_bl {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -24px -6px;
+.button_medium_disabled .button_right {
+    background-position: 0px -160px;
 }
-.button_small_disabled .button_br {
-    background: url(/iwl/skin/default/images/button/button_static.gif) no-repeat -31px -7px;
+
+.button_small .button_left div, .button_small .button_right div {
+    width: 4px;
+    height: 16px;
+    line-height: 1px;
+    font-size: 1px;
 }
-.button_small_disabled .button_l {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -24px 0px;
+
+.button_small .button_left {
+    width: 4px;
+    height: 16px;
+    background: url(/iwl/skin/default/images/button/button_small.gif) no-repeat 0px 0px;
 }
-.button_small_disabled .button_r {
-    background: url(/iwl/skin/default/images/button/button_vertical.gif) repeat-y -31px 0px;
+.button_small .button_center {
+    background: url(/iwl/skin/default/images/button/button_small.gif) repeat-x 0px -16px;
 }
-.button_small_disabled .button_top {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -24px;
+.button_small .button_right {
+    width: 4px;
+    height: 16px;
+    background: url(/iwl/skin/default/images/button/button_small.gif) no-repeat 0px -32px;
 }
-.button_small_disabled .button_bottom {
-    background: url(/iwl/skin/default/images/button/button_horizontal.gif) repeat-x 0px -35px;
+
+.button_small_press .button_left {
+    background-position: 0px -48px;
+}
+.button_small_press .button_center {
+    background-position: 0px -64px;
+}
+.button_small_press .button_right {
+    background-position: 0px -80px;
+}
+
+.button_small_disabled .button_left {
+    background-position: 0px -96px;
+}
+.button_small_disabled .button_center {
+    background-position: 0px -112px;
+}
+.button_small_disabled .button_right {
+    background-position: 0px -128px;
 }
 
 /* ContentBox */

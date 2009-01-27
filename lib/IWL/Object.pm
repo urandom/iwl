@@ -1061,7 +1061,7 @@ sub require {
 
 =item B<unrequire> (B<RESOURCES>)
 
-Un-requires the given resources for sharing
+Un-requires the given resources for sharing. In case the resource is a javascript file or files, the later required files are also removed as requirements
 
 Parameters: B<RESOURCES> - See L<IWL::Object::require|IWL::Object/require> for parameter definition
 
@@ -1071,18 +1071,13 @@ sub unrequire {
     my ($self, %resources) = @_;
     if (my $js = $resources{js}) {
         my @js = 'ARRAY' eq ref $js ? @$js : ($js);
-        if (grep {$_ eq 'base.js'} @js) {
-            push @js, (
-		'dist/prototype.js',
-		'prototype_extensions.js',
-		'dist/effects.js',
-		'scriptaculous_extensions.js'
-            );
-        }
+        my @required = @{$self->{_required}{js}};
         foreach my $url (@js) {
+            $url = 'dist/prototype.js' if $url eq 'base.js';
             $url = $IWLConfig{JS_DIR} . '/' . $url
                 unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
-            $self->{_required}{js} = [grep { $_ ne $url } @{$self->{_required}{js}}];
+            my ($index) = grep {$required[$_] eq $url} 0 .. $#required;
+            splice @{$self->{_required}{js}}, $index;
         }
     }
     if (my $css = $resources{css}) {
@@ -1093,6 +1088,33 @@ sub unrequire {
         }
     }
     return $self;
+}
+
+=item B<isRequired> (B<TYPE>, B<URL>)
+
+Returns true if the given resource are required by the object, or its parents
+
+Parameters: B<TYPE> - the type of resource. See L<IWL::Object::require|IWL::Object/require> for resource types, B<URL> - the B<URL> to check
+
+=cut
+
+sub isRequired {
+    my ($self, $type, $url) = @_;
+    my $top = $self->up(options => {last => 1}) || $self;
+    if ($type eq 'js') {
+        $url = $IWLConfig{JS_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+    } elsif ($type eq 'css') {
+        $url = $IWLConfig{SKIN_DIR} . '/' . $url
+            unless $url =~ m{^(?:(?:https?|ftp|file)://|/)};
+    }
+
+    return 1 if $top->{_shared}{$type}{$url};
+    foreach (@{$self->{_required}{$type} || []}) {
+        return 1 if $_ eq $url;
+    }
+
+    return;
 }
 
 =item B<cleanStateful>

@@ -7,10 +7,10 @@ use strict;
 
 use base 'IWL::Widget';
 
-use IWL::Input;
 use IWL::Anchor;
 use IWL::Image;
 use IWL::Container;
+use IWL::Label;
 use IWL::String qw(randomize escape);
 use IWL::JSON qw(toJSON);
 
@@ -107,7 +107,7 @@ Parameters: B<TEXT> - the text for the label
 sub setLabel {
     my ($self, $text) = @_;
 
-    $self->{__anchor}->appendChild(IWL::Text->new($self->{_options}{label} = $text || ''));
+    $self->{_options}{label} = $text || '';
     return $self;
 }
 
@@ -125,7 +125,7 @@ sub getLabel {
 
 Sets the given url as the source of the image
 
-Parameters: B<SRC> - the url for the image. If the B<SRC> begins with I<IWL_STOCK_>, the B<SRC> is treaded as a stock id, B<ALT> - the alternative text for the image, optional.
+Parameters: B<SRC> - the url for the image. If the B<SRC> begins with I<IWL_STOCK_>, the B<SRC> is treated as a stock id, B<ALT> - the alternative text for the image, optional.
 
 =cut
 
@@ -202,7 +202,7 @@ sub setSubmit {
 
 =item B<setHref> (B<URL>) 
 
-Sets the href of the anchor. Due to one of the many bugs in Internet Explorer involving buttons, it also has to set an onclick handler to "document.location.href = $url"
+Sets the href of the anchor
 
 Parameters: B<URL> - the url of the href
 
@@ -211,14 +211,8 @@ Parameters: B<URL> - the url of the href
 sub setHref {
     my ($self, $url) = @_;
 
-    $self->{__anchor}->setHref($url);
-    if ($url =~ /javascript/i) {
-        $self->signalConnect(click => $url);
-    } else {
-        $self->signalConnect(click => "document.location.href = '$url'");
-    }
-    $self->signalConnect(mouseover => "window.status = unescape('" . escape($url) . "')");
-    return $self->signalConnect(mouseout => "window.status = ''");
+    $self->{anchor}->setHref($url);
+    return $self;
 }
 
 =item B<setDisabled> (B<BOOL>)
@@ -248,17 +242,6 @@ sub isDisabled {
 
 # Overrides
 #
-sub setId {
-    my ($self, $id) = @_;
-    $self->SUPER::setId($id);
-    $self->{image}->setId($id . '_image');
-    my $index = 0;
-    foreach (qw(tl top tr l content r bl bottom br)) {
-        $self->{__parts}[$index++]->setId($id . '_' . $_);
-    }
-    return $self;
-}
-
 sub setAlt {
     my ($self, $alt) = @_;
 
@@ -282,7 +265,7 @@ sub getSrc {
 }
 
 sub getHref {
-    return shift->{__anchor}->getHref;
+    return shift->{anchor}->getHref;
 }
 
 # Protected
@@ -290,30 +273,23 @@ sub getHref {
 sub _realize {
     my $self       = shift;
     my $id         = $self->getId;
-    my $visibility = $self->getStyle('visibility');
+    my $required   = $self->isRequired(js => 'button.js');
     my $options    = {};
 
     $self->SUPER::_realize;
+    $self->__buildParts;
 
-    $self->{__anchor}->prependChild($self->{image}->clone)
-        unless $self->getLabel;
-
-    $self->{_options}{visibility} = $visibility if $visibility;
-    $self->setStyle(visibility => 'hidden');
-    $options = toJSON($self->{_options});
-    $self->_appendInitScript("IWL.Button.create('$id', $options);");
+    if ($required) {
+        $options = toJSON($self->{_options});
+        $self->_appendInitScript("IWL.Button.create('$id', $options);");
+    }
 }
 
 sub _setupDefaultClass {
     my $self = shift;
     $self->SUPER::prependClass($self->{_defaultClass} . '_' . $self->{_options}{size});
     $self->SUPER::prependClass($self->{_defaultClass});
-    $self->{image}->prependClass($self->{_defaultClass} . '_image');
-    my $index = 0;
-    foreach (qw(tl top tr l content r bl bottom br)) {
-        $self->{__parts}[$index++]->prependClass(
-            $self->{_defaultClass} . '_' . $_);
-    }
+    $self->{anchor}->prependClass($self->{_defaultClass} . '_content');
     return $self;
 }
 
@@ -323,21 +299,14 @@ sub _init {
     my $image  = IWL::Image->new;
     my $id     = $args{id};
 
-    $self->{_defaultClass}   = 'button';
-    $image->{_ignore}        = 1;
-
-    $self->{image}           = $image;
-    $self->{__anchor}        = $anchor;
-    $self->{__parts}         = [IWL::Widget->newMultiple(9)];
+    $self->{image}         = $image;
+    $self->{anchor}        = $anchor;
+    $self->{_defaultClass} = 'button';
+    $image->{_ignore}      = 1;
 
     $id = randomize($self->{_defaultClass}) unless $id;
-    $self->{_tag} = 'div';
-    foreach (@{$self->{__parts}}) {
-        $_->{_tag} = 'div';
-        $self->appendChild($_);
-    }
-    $self->{__parts}[4]->appendChild($image);
-    $self->appendChild(IWL::Container->new(tag => 'noscript')->appendChild($anchor));
+    $self->{_tag} = 'table';
+    $self->setAttributes(cellspacing => 0, cellpadding => 0);
     $self->setId($id);
 
     $self->{_options}{size} = $args{size} || 'default';
@@ -356,6 +325,31 @@ sub _init {
 
     $self->setSelectable(0);
     return $self;
+}
+
+# Internal
+#
+sub __buildParts {
+    my $self = shift;
+    my $body = IWL::Container->new(tag => 'tbody');
+    my $row = IWL::Container->new(tag => 'tr');
+    $self->appendChild($body);
+    $body->appendChild($row);
+    for (0 .. 2) {
+        my $cell = IWL::Container->new(tag => 'td');
+        $row->appendChild($cell);
+        if ($_ == 0) {
+            $cell->setClass($self->{_defaultClass} . '_left')->appendChild(IWL::Container->new);
+        } elsif ($_ == 1) {
+            $cell->setClass($self->{_defaultClass} . '_center');
+            $cell->appendChild($self->{anchor});
+            $self->{anchor}->appendChild($self->{image}->setId($self->getId . '_image')->setClass($self->{_defaultClass} . '_image'));
+            $self->{anchor}->appendChild(IWL::Label->new(id => $self->getId . '_label', class => $self->{_defaultClass} . '_label')
+                ->setText($self->{_options}{label} || ($self->{image}{_ignore} ? '&nbsp;' : '')));
+        } elsif ($_ == 2) {
+            $cell->setClass($self->{_defaultClass} . '_right')->appendChild(IWL::Container->new);
+        }
+    }
 }
 
 1;
