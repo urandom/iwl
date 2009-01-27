@@ -1,4 +1,4 @@
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 use IWL::Button;
 use IWL::Environment;
@@ -34,7 +34,25 @@ use Locale::TextDomain qw(org.bloka.iwl);
     my ($b1, $b2) = (IWL::Button->new(environment => $e), IWL::Button->new(environment => $e));
     my ($o1, $o2) = ($b1->getObject, $b2->getObject);
 
-    is($o1->{children}[10]{attributes}{src}, '/jscript/dist/prototype.js');
-    ok(!exists $o2->{children}[10]{attributes}{src});
-    ok(exists $o2->{children}[10]{attributes}{'iwl:initScript'});
+    is($o1->{children}[0]{attributes}{src}, '/jscript/dist/prototype.js');
+    ok(!exists $o2->{children}[0]{attributes}{src});
+    ok(exists $o2->{children}[1]{attributes}{'iwl:initScript'});
+}
+
+{
+    my $button = IWL::Button->new;
+    my $obj = $button->getObject;
+    my $exists = 0;
+    foreach (@{$obj->{children}}) {
+        $exists = 1 if exists $_->{attributes}{'iwl:initScript'};
+    }
+    ok($exists);
+
+    $exists = 0;
+    $button = IWL::Button->new->unrequire(js => 'base.js');
+    $obj = $button->getObject;
+    foreach (@{$obj->{children}}) {
+        $exists = 1 if exists $_->{attributes}{'iwl:initScript'};
+    }
+    ok(!$exists);
 }

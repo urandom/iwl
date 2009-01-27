@@ -5,16 +5,12 @@
  * */
 IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
     function adjust() {
-        var button_width = parseInt(this.button.style.width);
-        var file_width = Element.getDimensions(this.file).width;
-        if (!button_width || !file_width) {
-            adjust.bind(this).delay(0.5);
-            return;
-        }
-
-        if (!Prototype.Browser.WebKit)
-            Element.setStyle(this.file, {left: -1 * (file_width - button_width) + 'px'});
-        this.file.setStyle({opacity: 0.001, visibility: 'visible'});
+        var file_width = Element.getWidth(this.file);
+        Element.setStyle(this.file, {
+                marginLeft: -1 * file_width + 'px',
+                opacity: 0.001,
+                visibility: 'visible'
+            });
         this.file.onchange = uploadFile.bindAsEventListener(this);
         this.file.onkeypress = function() {return false;};
         this.file.onpaste = function() {return false;};
@@ -77,7 +73,7 @@ IWL.Upload = Object.extend(Object.extend({}, IWL.Widget), (function () {
                 showTooltip: true
             }, arguments[1] || {});
             this.messages = Object.extend({}, arguments[2]);
-            button.createHtmlElement(form);
+            button.parentNode.createHtmlElement(form);
             this.file = $(this.id + '_file');
             this.button = button;
             this.frame = $(this.id + '_frame');
